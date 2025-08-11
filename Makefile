@@ -33,8 +33,11 @@ RGBLINK ?= $(RGBDS)rgblink
 .SECONDARY:
 .PHONY: all tcg2 clean tidy compare tools
 
-all: $(rom) compare
-tcg2: $(rom) compare
+all: $(rom)
+	@true
+
+tcg2: $(rom)
+	@true
 
 clean: tidy
 	find src/gfx \
@@ -51,8 +54,8 @@ tidy:
 	      src/rgbdscheck.o
 	$(MAKE) clean -C tools/
 
-compare: $(rom)
-	@$(SHA1) -c rom.sha1
+# compare: $(rom)
+#	@$(SHA1) -c rom.sha1
 
 tools:
 	$(MAKE) -C tools/

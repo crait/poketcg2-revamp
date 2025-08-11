@@ -3247,7 +3247,7 @@ DeckIDData:
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
 	db $01 ; ?
-	db COIN_CHANSEY ; coin
+	db COIN_PIKACHU ; coin
 
 	db TEN_THOUSAND_VOLTS_DECK_ID
 	tx ThunderboltDeckName ; deck name
