@@ -31,7 +31,7 @@ To see the full list of card changes, please see this [Google Doc](https://docs.
 - [ ] Add card changes to GitHub repository
 - [ ] Create card/deck-viewing tool
 - [ ] Update decks (0/123)
-- [ ] Change all battles to use 6 prize cards
+- [x] Change all battles to use 6 prize cards
 - [ ] Update Dark/Misc Pokemon names (0/48)
 - [ ] Update Dark Pokemon evolution lines (0/8)
 - [ ] Update stat screen to show a DARK symbol
@@ -40,6 +40,7 @@ To see the full list of card changes, please see this [Google Doc](https://docs.
 - [ ] Adjust cards that can be found in each pack (0/8)
 - [ ] Fix AI targeting Mysterious Fossil/Clefairy Doll
 - [x] Change Jennifer's coin to Pikachu coin
+- [ ] Figure out a way to easily re-apply Arty's English patch that can support the changes
 
 ## Details
 

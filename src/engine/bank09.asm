@@ -3121,7 +3121,7 @@ DeckIDData:
 	tx AaronsStep1DeckName ; deck name
 	tx DuelistAaronName ; opponent name
 	db NPC_AARON ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -3143,7 +3143,7 @@ DeckIDData:
 	tx AaronsStep2DeckName ; deck name
 	tx DuelistAaronName ; opponent name
 	db NPC_AARON ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -3165,7 +3165,7 @@ DeckIDData:
 	tx AaronsStep3DeckName ; deck name
 	tx DuelistAaronName ; opponent name
 	db NPC_AARON ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -3176,7 +3176,7 @@ DeckIDData:
 	tx RiversideWalkDeckName ; deck name
 	tx DuelistAaronName ; opponent name
 	db NPC_AARON ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -3187,7 +3187,7 @@ DeckIDData:
 	tx BenchTrapDeckName ; deck name
 	tx DuelistAaronName ; opponent name
 	db NPC_AARON ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -3220,7 +3220,7 @@ DeckIDData:
 	tx OverflowDeckName ; deck name
 	tx DuelistNicholasName ; opponent name
 	db NPC_NICHOLAS ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -3231,7 +3231,7 @@ DeckIDData:
 	tx TripleZapdosDeckName ; deck name
 	tx DuelistNicholasName ; opponent name
 	db NPC_NICHOLAS ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -3242,7 +3242,7 @@ DeckIDData:
 	tx ILovePikachuDeckName ; deck name
 	tx DuelistJenniferName ; opponent name
 	db NPC_JENNIFER ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -3253,7 +3253,7 @@ DeckIDData:
 	tx ThunderboltDeckName ; deck name
 	tx DuelistBrandonName ; opponent name
 	db NPC_BRANDON ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -3286,7 +3286,7 @@ DeckIDData:
 	tx PsychicDeckName ; deck name
 	tx DuelistStephanieName ; opponent name
 	db NPC_STEPHANIE ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -3297,7 +3297,7 @@ DeckIDData:
 	tx GhostDeckName ; deck name
 	tx DuelistRobertName ; opponent name
 	db NPC_ROBERT ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -3308,7 +3308,7 @@ DeckIDData:
 	tx PuppetMasterDeckName ; deck name
 	tx DuelistDanielName ; opponent name
 	db NPC_DANIEL ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -3330,7 +3330,7 @@ DeckIDData:
 	tx RollingStoneDeckName ; deck name
 	tx DuelistMatthewName ; opponent name
 	db NPC_MATTHEW ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -3341,7 +3341,7 @@ DeckIDData:
 	tx GreatEarthquakeDeckName ; deck name
 	tx DuelistRyanName ; opponent name
 	db NPC_RYAN ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -3352,7 +3352,7 @@ DeckIDData:
 	tx AwesomeFossilDeckName ; deck name
 	tx DuelistAndrewName ; opponent name
 	db NPC_ANDREW ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -3374,7 +3374,7 @@ DeckIDData:
 	tx YouCanDoItMachopDeckName ; deck name
 	tx DuelistMichaelName ; opponent name
 	db NPC_MICHAEL ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -3385,7 +3385,7 @@ DeckIDData:
 	tx NewMachokeDeckName ; deck name
 	tx DuelistMichaelName ; opponent name
 	db NPC_MICHAEL ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -3396,7 +3396,7 @@ DeckIDData:
 	tx SkilledWarriorDeckName ; deck name
 	tx DuelistChrisName ; opponent name
 	db NPC_CHRIS ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -3407,7 +3407,7 @@ DeckIDData:
 	tx LoveToBattleDeckName ; deck name
 	tx DuelistJessicaName ; opponent name
 	db NPC_JESSICA ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -3429,7 +3429,7 @@ DeckIDData:
 	tx SurvivingGreenDeckName ; deck name
 	tx DuelistBrittanyName ; opponent name
 	db NPC_BRITTANY ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -3440,7 +3440,7 @@ DeckIDData:
 	tx PoisonVespidsDeckName ; deck name
 	tx DuelistBrittanyName ; opponent name
 	db NPC_BRITTANY ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -3451,7 +3451,7 @@ DeckIDData:
 	tx GlitteringScalesDeckName ; deck name
 	tx DuelistKristinName ; opponent name
 	db NPC_KRISTIN ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -3462,7 +3462,7 @@ DeckIDData:
 	tx SteadyIncreaseDeckName ; deck name
 	tx DuelistHeatherName ; opponent name
 	db NPC_HEATHER ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -3484,7 +3484,7 @@ DeckIDData:
 	tx NaturalScienceDeckName ; deck name
 	tx DuelistDavidName ; opponent name
 	db NPC_DAVID ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -3495,7 +3495,7 @@ DeckIDData:
 	tx PoisonousSwampDeckName ; deck name
 	tx DuelistJosephName ; opponent name
 	db NPC_JOSEPH ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -3506,7 +3506,7 @@ DeckIDData:
 	tx GatheringNidoranDeckName ; deck name
 	tx DuelistErikName ; opponent name
 	db NPC_ERIK ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -3528,7 +3528,7 @@ DeckIDData:
 	tx SurvivingWaterDeckName ; deck name
 	tx DuelistJoshuaName ; opponent name
 	db NPC_JOSHUA ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -3539,7 +3539,7 @@ DeckIDData:
 	tx EnergyRemovalDeckName ; deck name
 	tx DuelistJoshuaName ; opponent name
 	db NPC_JOSHUA ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -3550,7 +3550,7 @@ DeckIDData:
 	tx SplashingAboutDeckName ; deck name
 	tx DuelistSaraName ; opponent name
 	db NPC_SARA ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -3561,7 +3561,7 @@ DeckIDData:
 	tx BeachDeckName ; deck name
 	tx DuelistAmandaName ; opponent name
 	db NPC_AMANDA ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -3583,7 +3583,7 @@ DeckIDData:
 	tx FlameFestivalDeckName ; deck name
 	tx DuelistJohnName ; opponent name
 	db NPC_JOHN ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -3594,7 +3594,7 @@ DeckIDData:
 	tx ImmortalFlameDeckName ; deck name
 	tx DuelistJonathanName ; opponent name
 	db NPC_JONATHAN ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -3605,7 +3605,7 @@ DeckIDData:
 	tx ElectricCurrentShockDeckName ; deck name
 	tx DuelistAdamName ; opponent name
 	db NPC_ADAM ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -3704,7 +3704,7 @@ DeckIDData:
 	tx InsectCollectionDeckName ; deck name
 	tx DuelistMidoriName ; opponent name
 	db NPC_MIDORI ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_GRDUELTHEME_1 ; duel theme
@@ -3715,7 +3715,7 @@ DeckIDData:
 	tx DemonicForestDeckName ; deck name
 	tx DuelistYutaName ; opponent name
 	db NPC_YUTA ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_GRDUELTHEME_1 ; duel theme
@@ -3726,7 +3726,7 @@ DeckIDData:
 	tx PoisonGoopGasDeckName ; deck name
 	tx DuelistMiyukiName ; opponent name
 	db NPC_MIYUKI ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $01 ; ?
 	db MUSIC_GRDUELTHEME_1 ; duel theme
@@ -3748,7 +3748,7 @@ DeckIDData:
 	tx DangerousBenchDeckName ; deck name
 	tx DuelistTapName ; opponent name
 	db NPC_TAP ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -3759,7 +3759,7 @@ DeckIDData:
 	tx ChainLightningByPikachuDeckName ; deck name
 	tx DuelistRennaName ; opponent name
 	db NPC_RENNA ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $07 ; ?
 	db MUSIC_GRDUELTHEME_1 ; duel theme
@@ -3770,7 +3770,7 @@ DeckIDData:
 	tx ThisIsThePowerOfElectricityDeckName ; deck name
 	tx DuelistIchikawaName ; opponent name
 	db NPC_ICHIKAWA ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $02 ; ?
 	db MUSIC_GRDUELTHEME_1 ; duel theme
@@ -3792,7 +3792,7 @@ DeckIDData:
 	tx CompleteCombustionDeckName ; deck name
 	tx DuelistJesName ; opponent name
 	db NPC_JES ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_GRDUELTHEME_1 ; duel theme
@@ -3803,7 +3803,7 @@ DeckIDData:
 	tx FireballDeckName ; deck name
 	tx DuelistYukiName ; opponent name
 	db NPC_YUKI ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $03 ; ?
 	db MUSIC_GRDUELTHEME_1 ; duel theme
@@ -3814,7 +3814,7 @@ DeckIDData:
 	tx EeveeShowdownDeckName ; deck name
 	tx DuelistShokoName ; opponent name
 	db NPC_SHOKO ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $08 ; ?
 	db MUSIC_GRDUELTHEME_1 ; duel theme
@@ -3836,7 +3836,7 @@ DeckIDData:
 	tx WhirlpoolShowerDeckName ; deck name
 	tx DuelistMiyajimaName ; opponent name
 	db NPC_MIYAJIMA ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $04 ; ?
 	db MUSIC_GRDUELTHEME_1 ; duel theme
@@ -3847,7 +3847,7 @@ DeckIDData:
 	tx ParalyzedParalyzedDeckName ; deck name
 	tx DuelistSentaName ; opponent name
 	db NPC_SENTA ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $09 ; ?
 	db MUSIC_GRDUELTHEME_1 ; duel theme
@@ -3858,7 +3858,7 @@ DeckIDData:
 	tx BenchCallDeckName ; deck name
 	tx DuelistAiraName ; opponent name
 	db NPC_AIRA ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db $04 ; special duel rules
 	db $00 ; ?
 	db MUSIC_GRDUELTHEME_1 ; duel theme
@@ -3880,7 +3880,7 @@ DeckIDData:
 	tx RockBlastDeckName ; deck name
 	tx DuelistGodaName ; opponent name
 	db NPC_GODA ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $0c ; ?
 	db MUSIC_GRDUELTHEME_1 ; duel theme
@@ -3891,7 +3891,7 @@ DeckIDData:
 	tx FullStrengthDeckName ; deck name
 	tx DuelistGraceName ; opponent name
 	db NPC_GRACE ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $05 ; ?
 	db MUSIC_GRDUELTHEME_1 ; duel theme
@@ -3913,7 +3913,7 @@ DeckIDData:
 	tx DirectHitDeckName ; deck name
 	tx DuelistMiwaName ; opponent name
 	db NPC_MIWA ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $06 ; ?
 	db MUSIC_GRDUELTHEME_1 ; duel theme
@@ -3924,7 +3924,7 @@ DeckIDData:
 	tx SuperDestructivePowerDeckName ; deck name
 	tx DuelistKevinName ; opponent name
 	db NPC_KEVIN ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db $07 ; special duel rules
 	db $00 ; ?
 	db MUSIC_GRDUELTHEME_1 ; duel theme
@@ -3935,7 +3935,7 @@ DeckIDData:
 	tx BadDreamDeckName ; deck name
 	tx DuelistYosukeName ; opponent name
 	db NPC_YOSUKE ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $0a ; ?
 	db MUSIC_GRDUELTHEME_1 ; duel theme
@@ -3946,7 +3946,7 @@ DeckIDData:
 	tx PokemonsPowerDeckName ; deck name
 	tx DuelistRyokoName ; opponent name
 	db NPC_RYOKO ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $0d ; ?
 	db MUSIC_GRDUELTHEME_1 ; duel theme
@@ -4100,7 +4100,7 @@ DeckIDData:
 	tx TestYourLuckDeckName ; deck name
 	tx DuelistPawnName ; opponent name
 	db NPC_PAWN ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_1 ; duel theme
@@ -4111,7 +4111,7 @@ DeckIDData:
 	tx ProtohistoricDeckName ; deck name
 	tx DuelistKnightName ; opponent name
 	db NPC_KNIGHT ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_DUELTHEME_2 ; duel theme
@@ -4122,7 +4122,7 @@ DeckIDData:
 	tx TextureTuner7DeckName ; deck name
 	tx DuelistBishopName ; opponent name
 	db NPC_BISHOP ; NPC ID
-	db PRIZES_4 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_GRDUELTHEME_1 ; duel theme
@@ -4133,7 +4133,7 @@ DeckIDData:
 	tx ColorlessEnergyDeckName ; deck name
 	tx DuelistRookName ; opponent name
 	db NPC_ROOK ; NPC ID
-	db PRIZES_5 ; number of prize cards
+	db PRIZES_6 ; number of prize cards
 	db NO_SPECIAL_RULE ; special duel rules
 	db $00 ; ?
 	db MUSIC_GRDUELTHEME_1 ; duel theme
