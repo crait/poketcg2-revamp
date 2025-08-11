@@ -39,7 +39,7 @@ To see the full list of card changes, please see this [Google Doc](https://docs.
 - [ ] Update POkemon/AI DB from document (0/446)
 - [ ] Adjust cards that can be found in each pack (0/8)
 - [ ] Fix AI targeting Mysterious Fossil/Clefairy Doll
-- [ ] Change Jennifer's coin to Pikachu coin
+- [x] Change Jennifer's coin to Pikachu coin
 
 ## Details
 
