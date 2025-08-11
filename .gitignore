@@ -24,3 +24,7 @@
 
 # *disasm.py output file
 *disasm_output.asm
+
+# revamp tools
+rgbds/
+bgb.exe

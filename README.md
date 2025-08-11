@@ -27,7 +27,8 @@ To see the full list of card changes, please see this [Google Doc](https://docs.
 
 ## Progress
 
-- [ ] Update card pull (Document-only) (378/446)
+- [ ] Update card pool (Document-only) (378/446)
+- [ ] Add card changes to GitHub repository
 - [ ] Create card/deck-viewing tool
 - [ ] Update decks (0/123)
 - [ ] Change all battles to use 6 prize cards
