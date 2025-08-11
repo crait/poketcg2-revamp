@@ -32,8 +32,8 @@ To see the full list of card changes, please see this [Google Doc](https://docs.
 - [ ] Create card/deck-viewing tool
 - [ ] Update decks (0/123)
 - [x] Change all battles to use 6 prize cards
-- [ ] Update Dark/Misc Pokemon names (0/48)
-- [ ] Update Dark Pokemon evolution lines (0/8)
+- [x] Update Dark/Misc Pokemon names (48/48)
+- [x] Update Dark Pokemon evolution lines (8/8)
 - [ ] Update stat screen to show a DARK symbol
 - [ ] Add new splash screen to intro & credits
 - [ ] Update POkemon/AI DB from document (0/446)
