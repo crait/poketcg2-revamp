@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+		<title>Pokemon TCG - Revamp: Card &amp; Deck Catalog</title>
+	</head>
+	<body class="d-flex flex-column h-100">
+		<div class="container py-4">
+			<h2>Pokemon TCG - Revamp: Card &amp; Deck Catalog</h2>
+			<br />
+
+			<select id="deck-selector" class="form-select">
+				
+			</select>
+			
+			<div id="deck-display" class="p-4">
+				<h5 id="deck-name"></h5>
+				<div id="deck-contents">
+
+				</div>
+			</div>
+		</div>
+
+
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+		<script>
+			fetch('data.json').then((response) => {
+				return response.json()
+			}).then((data) => {
+				console.log(data)
+
+				let update_deck_contents = (deck) => {
+					deck_contents = document.getElementById('deck-contents')
+					deck_name = document.getElementById('deck-name')
+					
+					deck_name.innerHTML = data.decks[deck].key_name
+					deck_contents.innerHTML = ''
+
+					data.decks[deck].cards.forEach((card) => {
+						let sprite = document.createElement('img')
+						sprite.src = './art/' + card + '.png'
+						sprite.width = 64
+						sprite.height = 48
+						deck_contents.appendChild(sprite)
+					})
+				}
+
+				deck_select = document.getElementById('deck-selector')
+
+				for(key in data.decks) {
+					deck_select.options[deck_select.options.length] = new Option(key, key)
+				}
+
+				deck_select.onchange = function() {
+					update_deck_contents(this.value)
+				}
+
+				update_deck_contents(this.value)
+			})
+		</script>
+	</body>
+</html>

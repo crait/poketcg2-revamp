@@ -29,7 +29,8 @@ To see the full list of card changes, please see this [Google Doc](https://docs.
 
 - [ ] Update card pool (Document-only) (378/446)
 - [ ] Add card changes to GitHub repository
-- [ ] Create card/deck-viewing tool
+- [x] Create card/deck-viewing tool
+- [ ] Update card/deck-viewing tool with more details
 - [ ] Update decks (Document-only) (0/123)
 - [x] Change all battles to use 6 prize cards
 - [x] Update Dark/Misc Pokemon names (48/48)
