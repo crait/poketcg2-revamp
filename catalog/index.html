@@ -31,6 +31,8 @@
 				return response.json()
 			}).then((data) => {
 				console.log(data)
+				decks = data.decks
+				cards = data.cards
 
 				let update_deck_contents = (deck) => {
 					deck_contents = document.getElementById('deck-contents')
@@ -50,15 +52,13 @@
 
 				deck_select = document.getElementById('deck-selector')
 
-				for(key in data.decks) {
+				for(let key in data.decks) {
 					deck_select.options[deck_select.options.length] = new Option(key, key)
 				}
 
 				deck_select.onchange = function() {
 					update_deck_contents(this.value)
 				}
-
-				update_deck_contents(this.value)
 			})
 		</script>
 	</body>

@@ -20,28 +20,29 @@ Eventually, this ROM hack will include the following:
     - The AI no longer targets Mysterious Fossil/Clefairy Doll with Gust of Wind.
     - Jennifer's coin is changed to Pikachu
 
-Tools:
-- Created a deck-viewing web tool in order to view card data and NPC decks based off of assembly files.
-
 To see the full list of card changes, please see this [Google Doc](https://docs.google.com/document/d/1UGCQfLr3KFe3WxqPLA96xznlQi7rDZiSahNdYVIH8bE/edit?usp=sharing). Feel free to also leave comments with your thoughts and suggestions.
 
 ## Progress
 
-- [ ] Update card pool (Document-only) (378/446)
-- [ ] Add card changes to GitHub repository
-- [x] Create card/deck-viewing tool
-- [ ] Update card/deck-viewing tool with more details
-- [ ] Update decks (Document-only) (0/123)
-- [x] Change all battles to use 6 prize cards
-- [x] Update Dark/Misc Pokemon names (48/48)
-- [x] Update Dark Pokemon evolution lines (8/8)
-- [x] Update stat screen to show if a Pokemon is a Dark Pokemon
-- [ ] Add new splash screen to intro & credits
-- [ ] Update Pokemon/AI DB from document (0/446)
-- [ ] Adjust cards that can be found in each pack (0/8)
-- [ ] Fix AI targeting Mysterious Fossil/Clefairy Doll
-- [x] Change Jennifer's coin to Pikachu coin
-- [ ] Figure out a way to easily re-apply Arty's English patch that can support the changes
+⬜ Update card pool (Document-only) (415/446)
+⬜ Add card changes to GitHub repository
+✅ Create card/deck-viewing tool
+⬜ Update card/deck-viewing tool with more details
+⬜ Update decks (Document-only) (0/123)
+✅ Change all battles to use 6 prize cards
+✅ Update Dark/Misc Pokemon names (48/48)
+✅ Update Dark Pokemon evolution lines (8/8)
+✅ Update stat screen to show if a Pokemon is a Dark Pokemon
+⬜ Add new splash screen to intro & credits
+⬜ Update Pokemon/AI DB from document (0/446)
+⬜ Adjust cards that can be found in each pack (0/8)
+⬜ Fix AI targeting Mysterious Fossil/Clefairy Doll
+✅ Change Jennifer's coin to Pikachu coin
+⬜ Figure out a way to easily re-apply Arty's English patch that can support the changes
+
+## Catalog Tool
+
+To run the Catalog tool, navigate to the `catalog/` directory and use `npm install` to install the Node.js package. Afterwards, you can run `npm start` to start the process. Your web browser should automatically appear with the correct webpage showing, but you can also manually navigate to: `http://localhost:8000/`
 
 ## Details
 

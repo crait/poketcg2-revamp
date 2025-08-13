@@ -38,7 +38,9 @@ app.get('/data.json', (req, res) => {
 	card_files.forEach((file) => {
 		let lines = fs.readFileSync(path.join(__dirname, file), 'utf8').split('\n')
 		while(lines.length > 0) {
-			var card = { }
+			var card = {
+				appearances: 0
+			}
 			
 			card.key_name = lines[0].cleanEnd(':')
 			
@@ -160,8 +162,8 @@ app.get('/data.json', (req, res) => {
 			data.cards[card.name] = card
 			card_lookup[card.key_name] = card.name
 		}
-
 	})
+
 	deck_files.forEach((file) => {let lines = fs.readFileSync(path.join(__dirname, file), 'utf8').split('\n')
 		lines.shift()
 		while(lines[0] != '	dw $0000') {
@@ -191,6 +193,32 @@ app.get('/data.json', (req, res) => {
 			lines.shift()
 		}
 	})
+
+	decks_to_ignore = [
+		'StarterDeck',
+		'SweatAntiGR1Deck',
+		'GiveInAntiGR2Deck',
+		'VengefulAntiGR3Deck',
+		'UnforgivingAntiGR4Deck',
+		'UnusedSamsPracticeDeck',
+		'AaronPracticeDeck1',
+		'AaronPracticeDeck2',
+		'AaronPracticeDeck3',
+		'AaronsStep1Deck',
+		'AaronsStep2Deck',
+		'AaronsStep3Deck',
+		'PlayerPracticeDeck'
+	]
+
+	for(let deck_key_name in data.decks) {
+		if(decks_to_ignore.indexOf(deck_key_name) > -1) {
+			continue
+		}
+		data.decks[deck_key_name].cards.forEach((card) => {
+			data.cards[card].appearances++
+		})
+	}
+
 	res.send(JSON.stringify(data, null, "\t"))
 })
 
