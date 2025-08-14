@@ -16,6 +16,9 @@ Eventually, this ROM hack will include the following:
     - Stage 2 Pokemon are much stronger.
 - Opponents' decks are tweaked to better align with the new cards. The AI also has been adjusted to account for the deck changes.
 - All cards can be acquired through booster packs and normal playthrough. Every card will appear in at least 1 of the opponents' decks.
+- Add options to adjust the way you play through the game
+    - Disable/enable special rules in certain matches
+    - Unlock all cards from the beginning of the game
 - AI bug fixes and minor tweaks:
     - The AI no longer targets Mysterious Fossil/Clefairy Doll with Gust of Wind.
     - Jennifer's coin is changed to Pikachu
@@ -45,6 +48,10 @@ To see the full list of card changes, please see this [Google Doc](https://docs.
 ⬜ Adjust cards that can be found in each pack (0/8)
 
 ⬜ Update Pokemon/AI DB from document (0/446)
+
+⬜ Add PC menu to unlock all cards
+
+⬜ Add PC menu to toggle special match rules
 
 ⬜ Add new splash screen to intro & credits
 
