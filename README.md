@@ -49,15 +49,17 @@ To see the full list of card changes, please see this [Google Doc](https://docs.
 
 ⬜ Update Pokemon/AI DB from document (0/446)
 
-⬜ Add PC menu to unlock all cards
+⬜ Add new splash screen to intro & credits
 
 ⬜ Add PC menu to toggle special match rules
 
-⬜ Add new splash screen to intro & credits
+✅ Add PC menu to gift the player 10 copies of each card
 
-⬜ Fix AI targeting Mysterious Fossil/Clefairy Doll
+✅ Add a PC menu option to view the credits
 
 ✅ Change Jennifer's coin to Pikachu coin
+
+⬜ Fix AI targeting Mysterious Fossil/Clefairy Doll
 
 ## Catalog Tool
 

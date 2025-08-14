@@ -2375,7 +2375,7 @@ Func_110c6:
 	push bc
 	push de
 	push hl
-	lb de, 10, 0
+	lb de, 1, 0 ; Horizontal offset for the menu
 	ld b, BANK(.menu_params)
 	ld hl, .menu_params
 	call LoadMenuBoxParams
@@ -2390,7 +2390,7 @@ Func_110c6:
 
 .menu_params
 	db TRUE ; skip clear
-	db 10, 12 ; width, height
+	db 18, 16 ; width, height
 	db SYM_CURSOR_R ; blink cursor symbol
 	db SYM_SPACE ; space symbol
 	db SYM_CURSOR_R ; default cursor symbol
@@ -2406,7 +2406,9 @@ Func_110c6:
 	textitem 2,  4, PCMenuDeckDiagnosisText
 	textitem 2,  6, PCMenuGlossaryText
 	textitem 2,  8, PCMenuPrintText
-	textitem 2, 10, PCMenuShutdownText
+	textitem 2, 10, DebugCreditsText
+	textitem 2, 12, Text0818
+	textitem 2, 14, PCMenuShutdownText
 	db $ff
 
 .HandleInput:
@@ -2437,6 +2439,8 @@ Func_110c6:
 	key_func $1, .DeckDiagnosis
 	key_func $2, .Glossary
 	key_func $3, .Printer
+	key_func $4, .Credits
+	key_func $5, .UnlockCards
 	db $ff ; end
 
 .Func_11181:
@@ -2452,6 +2456,10 @@ Func_110c6:
 	call UnsetFadePalsFrameFunc
 	call Func_10252
 	ret
+	
+.DeckDiagnosis:
+	farcall PCDeckDiagnosis
+	ret
 
 .Glossary:
 	call Func_1022a
@@ -2466,23 +2474,15 @@ Func_110c6:
 	ret
 
 .Printer:
-	call Func_1022a
-	call SetFadePalsFrameFunc
-	farcall PrinterMenu
-	farcall StartFadeToWhite
-	farcall WaitPalFading_Bank07
-	call UnsetFadePalsFrameFunc
-	call Func_10252
+	farcall PCPrinterAction
 	ret
 
-.DeckDiagnosis:
-	call Func_1022a
-	call SetFadePalsFrameFunc
-	farcall DeckDiagnosis
-	farcall StartFadeToWhite
-	farcall WaitPalFading_Bank07
-	call UnsetFadePalsFrameFunc
-	call Func_10252
+.Credits:
+	farcall PCCreditsAction
+	ret
+
+.UnlockCards:
+	farcall PCGift10Cards
 	ret
 
 Func_111f0:
