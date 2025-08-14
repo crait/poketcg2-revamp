@@ -24,35 +24,33 @@ To see the full list of card changes, please see this [Google Doc](https://docs.
 
 ## Progress
 
-⬜ Update card pool (Document-only) (415/446)
-
-⬜ Add card changes to GitHub repository
-
-✅ Create card/deck-viewing tool
-
-⬜ Update card/deck-viewing tool with more details
-
-⬜ Update decks (Document-only) (0/123)
-
 ✅ Change all battles to use 6 prize cards
+
+✅ Update stat screen to show if a Pokemon is a Dark Pokemon
 
 ✅ Update Dark/Misc Pokemon names (48/48)
 
 ✅ Update Dark Pokemon evolution lines (8/8)
 
-✅ Update stat screen to show if a Pokemon is a Dark Pokemon
+✅ Create card/deck-viewing tool
 
-⬜ Add new splash screen to intro & credits
+⬜ Update card pool (Document-only) (415/446)
+
+⬜ Test AI for compatibility with unused cards (0/30) (Document-only)
+
+⬜ Update decks (Document-only) (0/123)
+
+⬜ Add deck changes to GitHub repository
+
+⬜ Adjust cards that can be found in each pack (0/8)
 
 ⬜ Update Pokemon/AI DB from document (0/446)
 
-⬜ Adjust cards that can be found in each pack (0/8)
+⬜ Add new splash screen to intro & credits
 
 ⬜ Fix AI targeting Mysterious Fossil/Clefairy Doll
 
 ✅ Change Jennifer's coin to Pikachu coin
-
-⬜ Figure out a way to easily re-apply Arty's English patch that can support the changes
 
 ## Catalog Tool
 
