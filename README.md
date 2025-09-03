@@ -37,7 +37,7 @@ To see the full list of card changes, please see this [Google Doc](https://docs.
 
 ✅ Create card/deck-viewing tool
 
-⬜ Update card pool (Document-only) (415/446)
+✅ Update card pool (Document-only) (446/446)
 
 ⬜ Test AI for compatibility with unused cards (0/30) (Document-only)
 
