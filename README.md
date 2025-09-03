@@ -76,7 +76,13 @@ You can find the original TCG 2 disassembly repo, [here](https://github.com/pret
 
 ## Card Database
 
-![ABRA_LV8](catalog/art/ABRA_LV8.png)
+ | ![Grass](catalog/art/Grass.png) | Bulbasaur | 40HP |
+ | ![Basic](catalog/art/Basic.png) | Basic |  |
+ | ![Colorless](catalog/art/Colorless.png) | Tackle | 10 |
+ | ![Grass](catalog/art/Grass.png) ![Grass](catalog/art/Grass.png) | Razor Leaf | 20 |
+ | Weakness | ![Fire](catalog/art/Fire.png) |  |
+ | Resistance | - |  |
+ | Retreat | ![Colorless](catalog/art/Colorless.png) |  |
 
 ## NPC Decks
 
