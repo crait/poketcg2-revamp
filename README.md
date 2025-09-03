@@ -78,13 +78,12 @@ You can find the original TCG 2 disassembly repo, [here](https://github.com/pret
 
  | ![Grass](catalog/art/Grass.png) | Bulbasaur | 40HP |
  | :------------ | :------------ | :------------ |
- |   | ![BULBASAUR_LV12](catalog/art/BULBASAUR_LV12.png) |   |
  | ![Basic](catalog/art/Basic.png) | Basic |   |
+ |   | ![BULBASAUR_LV12](catalog/art/BULBASAUR_LV12.png) |   |
  | ![Colorless](catalog/art/Colorless.png) | Tackle | 10 |
  | ![Grass](catalog/art/Grass.png) ![Grass](catalog/art/Grass.png) | Razor Leaf | 20 |
- | Weakness | ![Fire](catalog/art/Fire.png) |   |
- | Resistance | - |   |
- | Retreat | ![Colorless](catalog/art/Colorless.png) |   |
+ | Weakness | Resistance | Retreat |
+ | ![Fire](catalog/art/Fire.png) | - | ![Colorless](catalog/art/Colorless.png) |
 
 ## NPC Decks
 
