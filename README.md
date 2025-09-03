@@ -73,3 +73,11 @@ This is based off of pret's disassembly of Pokémon TCG 2 that uses the followin
 - `sha1: a7e12bcc5f514e3aad8de570fd511aab0a308822`
 
 You can find the original TCG 2 disassembly repo, [here](https://github.com/pret/poketcg2)
+
+## Card Database
+
+![ABRA_LV8](catalog/art/ABRA_LV8.png)
+
+## NPC Decks
+
+Coming soon...
