@@ -29,3 +29,6 @@
 rgbds/
 bgb/
 catalog/node_modules/
+
+# English patch files
+*.ips
