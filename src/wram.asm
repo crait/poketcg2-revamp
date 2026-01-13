@@ -309,10 +309,12 @@ wSerialCounter2:: ; cb71
 wSerialTimeoutCounter:: ; cb72
 	ds $1
 
-wcb79:: ; cb73
+; tcg1: wcb79
+wcb73:: ; cb73
 	ds $2
 
-wcb7b:: ; cb75
+; tcg1: wcb7b
+wcb75:: ; cb75
 	ds $2
 
 wSerialSendSave:: ; cb77
@@ -347,6 +349,8 @@ wSerialRecvBuf:: ; cb9f
 
 wSerialEnd:: ; cbbf
 
+SECTION "WRAM0 2", WRAM0
+
 ; In a duel, the main menu current or last selected menu item
 ; From 0 to 5: Hand, Attack, Check, Pkmn Power, Retreat, Done
 wCurrentDuelMenuItem:: ; cbbf
@@ -370,7 +374,7 @@ wNumPlayAreaItems:: ; cbc1
 ; such as PrintPlayAreaCardLocation, PrintPlayAreaCardInformation and PrintPlayAreaCardHeader
 wCurPlayAreaSlot:: ; cbc2
 
-; X position to display the attached energies, HP bar, and Pluspower/Defender icons
+; X position to display the attached energies, HP bar, and PlusPower/Defender icons
 ; obviously different for player and opponent side. used by DrawDuelHUD.
 wHUDEnergyAndHPBarsX:: ; cbc2
 	ds $1
@@ -431,12 +435,12 @@ wPlayAreaSelectAction:: ; cbcd
 wTempRetreatCostCardsPos:: ; cbce
 	ds $1
 
-; in a card list, which keys (among START and A_BUTTON) do not open the item selection
+; in a card list, which keys (among START and A) do not open the item selection
 ; menu when a card is selected, directly "submitting" the selected card instead.
 wNoItemSelectionMenuKeys:: ; cbcf
 	ds $1
 
-; when viewing a card page, which keys (among B_BUTTON, D_UP, and D_DOWN) will exit the page,
+; when viewing a card page, which keys (among B, D_UP, and D_DOWN) will exit the page,
 ; either to go back to the previous menu or list, or to load the card page of the card above/below it
 wCardPageExitKeys:: ; cbd0
 	ds $1
@@ -498,6 +502,9 @@ wAttachedEnergyMenuDenominator:: ; cbec
 	ds $1
 
 wAttachedEnergyMenuNumerator:: ; cbed
+
+; number of selections already done in BenchMultiSelectMenu
+wPlayAreaMultiSelectMenuNumSelections:: ; cbed
 	ds $1
 
 ; text ID to show in the Attached Energy screen
@@ -568,7 +575,8 @@ wMaxNumPlayAreaPokemon:: ; cc01
 wDuelType:: ; cc02
 	ds $1
 
-wcc03:: ; cc03
+; set to 1 if the coin toss during the CheckSandAttackSmokescreenOrLightningFlashSubstatus check is heads
+wGotHeadsFromSandAttackSmokescreenOrLightningFlashCheck:: ; cc03
 	ds $1
 
 wAlreadyPlayedEnergy:: ; cc04
@@ -578,10 +586,12 @@ wAlreadyPlayedEnergy:: ; cc04
 wGotHeadsFromConfusionCheckDuringRetreat:: ; cc05
 	ds $1
 
-wGoopGasAttackActive:: ; cc06
+wGoopGasAttackActiveTurns:: ; cc06
 	ds $1
 
-wcc07:: ; cc07
+; if TRUE, then Prize Cards are turned face up
+; set to TRUE by the effects of Here Comes Team Rocket!
+wPrizeCardsFaceUp:: ; cc07
 	ds $1
 
 ; DUELIST_TYPE_* of the turn holder
@@ -619,14 +629,14 @@ wSpecialRule:: ; cc10
 
 	ds $1
 
-wOpponentNPCID:: ; cc12
+wOpponentPicID:: ; cc12
 	ds $1
 
 ; text id of the opponent's name
 wOpponentName:: ; cc13
 	ds $2
 
-wcc15:: ; cc15
+wNPCDuelPrizes:: ; cc15
 	ds $1
 
 wNPCDuelDeckID:: ; cc16
@@ -646,13 +656,17 @@ wOppCoin:: ; cc18
 wPlayerCoin:: ; cc19
 	ds $1
 
-wcc1a:: ; cc1a
+; increments each time turn-holder uses Prehistoric Dream
+; attack by a "Fossil" Pokémon will be boosted by 10 * this amount
+wPrehistoricDreamBoost:: ; cc1a
 	ds $1
 
-wcc1b:: ; cc1b
+; to keep track on the result of the coin toss when using Mini-Metronome
+; -1 means the coin hasn't been tossed yet, 0 means it was tails, 1 was heads
+wMiniMetronomeCoinTossResult:: ; cc1b
 	ds $1
 
-SECTION "WRAM0 Duels 2@cc21", WRAM0
+	ds $5
 
 wAttackEnergyCost:: ; cc21
 	ds NUM_TYPES
@@ -782,9 +796,8 @@ wEffectFailed:: ; cd02
 wPreEvolutionPokemonCard:: ; cd03
 	ds $1
 
-; flag to determine whether DUELVARS_ARENA_CARD_LAST_TURN_DAMAGE
-; gets zeroed or gets updated with wDealtDamage
-wccef:: ; cd04
+; whether or not current Arena card was switched due to an effect
+wForcedSwitchPlayAreaLocation:: ; cd04
 	ds $1
 
 ; stores the energy cost of the Metronome attack being used.
@@ -808,7 +821,7 @@ wDeckSize:: ; cd07
 wSkipDelayAllowed:: ; cd08
 	ds $1
 
-wcd09:: ; cd09
+wTurnEndedDueToComputerError:: ; cd09
 	ds $1
 
 wcd0a:: ; cd0a
@@ -817,16 +830,18 @@ wcd0a:: ; cd0a
 wcd0b:: ; cd0b
 	ds $1
 
-wcd0c:: ; cd0c
+wKnockedOutByGasExplosion:: ; cd0c
 	ds $1
 
 wcd0d:: ; cd0d
 	ds $1
 
-wcd0e:: ; cd0e
+; DECK_REQUIREMENT_* constant for the current duel
+wDeckRequirement:: ; cd0e
 	ds $1
 
-wcd0f:: ; cd0f
+; DUELIST_INTRO_* constant for the current duel
+wDuelistIntroText:: ; cd0f
 	ds $1
 
 ; values used by Dark Wave and Darkness Veil
@@ -843,7 +858,9 @@ wcd14:: ; cd14
 wcd15:: ; cd15
 	ds $1
 
-wcd16:: ; cd16
+; if TRUE, then attack selected with Metronome/Mini-Metronome
+; does not have its requirements met in order to be used
+wMetronomeAttackCannotBeUsed:: ; cd16
 	ds $1
 
 wcd17:: ; cd17
@@ -872,7 +889,11 @@ wNumCardsBeingDrawn:: ; cd1d
 wOpponentTurnEnded:: ; cd1e
 	ds $1
 
-	ds $2
+; stores the amount of cards that are being ordered.
+wNumberOfCardsToOrder:: ; cd1f
+	ds $1
+
+	ds $1
 
 wCardSearchFunc:: ; cd21
 	ds $1
@@ -966,6 +987,7 @@ wcd53:: ; cd53
 wcd54:: ; cd54
 	ds $1
 
+wcd55:: ; cd55
 	ds $1
 
 wDeckCheckCardName:: ; cd56
@@ -982,7 +1004,7 @@ wDeckCheckCurStage1Count:: ; cd59
 wDeckCheckCurStage2Count:: ; cd5a
 	ds $1
 
-SECTION "WRAM0 2", WRAM0
+SECTION "WRAM0 3", WRAM0
 
 ; on CGB, attributes of the text box borders. (values 0-7 seem to be used, which only affect palette)
 ; on SGB, colorize text box border with SGB1 if non-0
@@ -1095,6 +1117,7 @@ wTxRam3_b:: ; cddc
 	ds $2
 
 ; when printing text, number of frames to wait between each text tile
+; derived from wMessageSpeedSetting
 wTextSpeed:: ; cdde
 	ds $1
 
@@ -1157,7 +1180,26 @@ wPrinterStatus:: ; cdf5
 wSerialDataPtr:: ; cdf6
 	ds $2
 
-	ds $10
+; keeps track of which Bench Pokemon is pointed
+; by the cursor during Gigashock selection screen
+wCurGigashockItem:: ; cdf8
+	ds $1
+
+; card index and its attack index chosen
+; to be used by Metronome.
+wMetronomeSelectedAttack:: ; cdf9
+	ds $2
+
+wBackupPlayerAreaHP:: ; cdfb
+	ds MAX_PLAY_AREA_POKEMON
+
+wce01:: ; ce01
+	ds $1
+
+; holds misc values corresponding to each Play Area card
+; (e.g. how many times each card is selected to be damaged)
+wPlayAreaList:: ; ce02
+	ds MAX_PLAY_AREA_POKEMON
 
 wTempCardID_ce08:: ; ce08
 	ds $2
@@ -1168,6 +1210,9 @@ wce0a:: ; ce0a
 wce0c:: ; ce0c
 	ds $1
 
+; stores the real Retreat cost of a card
+; taking into account Pkmn Powers and Special Rules
+wEffectiveRetreatCost:: ; ce0d
 	ds $1
 
 wVBlankFunctionTrampolineBackup:: ; ce0e
@@ -1206,6 +1251,7 @@ wce98:: ; ce1a
 wPrinterContrastLevel:: ; ce1b
 	ds $1
 
+wPrinterCurPrizeFrame:: ; ce1c
 	ds $1
 
 wPrinterNumberLineFeeds:: ; ce1d
@@ -1375,7 +1421,21 @@ wRefreshMenuCursorSFX:: ; d01d
 wDefaultYesOrNo:: ; d01e
 	ds $1
 
-	ds $4
+; stores the total number of coins to flip
+wCoinTossTotalNum:: ; d01f
+	ds $1
+
+; this stores the result from a coin toss (number of heads)
+wCoinTossNumHeads:: ; d020
+	ds $1
+
+; stores type of the duelist that is tossing coins
+wCoinTossDuelistType:: ; d021
+	ds $1
+
+; holds the number of coins that have already been tossed
+wCoinTossNumTossed:: ; d022
+	ds $1
 
 wAIDuelVars::
 ; saves the prizes that the AI already used Peek on
@@ -1477,8 +1537,8 @@ wAIPlayAreaCardToSwitch:: ; d044
 	ds $1
 
 ; the index of attack chosen by AI
-; to use with Pluspower.
-wAIPluspowerAttack:: ; d045
+; to use with PlusPower.
+wAIPlusPowerAttack:: ; d045
 	ds $1
 
 ; whether AI is allowed to play an energy card
@@ -1612,6 +1672,7 @@ wAIRetreatedThisTurn::  ; d07d
 wAIVenusaurLv67DeckIndex::  ; d07e
 	ds $1
 
+wd07f:: ; d07f
 	ds $1
 
 wAIRetreatConsiderStatus:: ; d080
@@ -1755,7 +1816,12 @@ wd0c4:: ; d0c4
 wNumberOfPrizeCardsToSelect:: ; d0c8
 	ds $1
 
-	ds $6
+	ds $4
+
+wd0cd:: ; d0cd
+	ds $1
+
+	ds $1
 
 ; $00 when the "In Play Area" screen has been opened from the Check menu
 ; $01 when the "In Play Area" screen has been opened by pressing the select button
@@ -1790,8 +1856,6 @@ wDamageAnimPlayAreaSide:: ; d0d8
 ; buffer to store data that will be sent/received through IR
 wIRDataBuffer:: ; d0d9
 	ds $8
-
-SECTION "WRAM1@d0e1", WRAMX
 
 wScrollMenuScrollOffset:: ; d0e1
 	ds $1
@@ -1848,7 +1912,11 @@ wNumEntriesInCurFilter::
 wBoosterPackCardListSize:: ; d0ee
 	ds $1
 
-	ds $2
+wCheckMenuCursorXPosition:: ; d0ef
+	ds $1
+
+wCheckMenuCursorYPosition:: ; d0f0
+	ds $1
 
 ; deck selected by the player in the Decks screen
 wCurDeck:: ; d0f1
@@ -1926,11 +1994,16 @@ wCurCardTypeFilter:: ; d11a
 wTempCurMenuItem:: ; d11b
 	ds $1
 
-	ds $2
+wTempFilteredCardListNumCursorPositions:: ; d11c
+	ds $1
+
+wd11d:: ; d11d
+	ds $1
 
 wced7:: ; d11e
 	ds $1
 
+wCardListVisibleOffsetBackup:: ; d11f
 	ds $1
 
 ; stores how many different cards there are in a deck
@@ -1981,7 +2054,7 @@ wBoosterPackCardListPrefixBuffer:: ; d2e0
 wTempSavedDeckCards:: ; d2fe
 	ds 2 * DECK_SIZE
 
-SECTION "WRAM1@d380", WRAMX
+	ds $a
 
 ; max number of cards that are allowed
 ; to include when building a deck configuration
@@ -1996,12 +2069,33 @@ wd381:: ; d381
 wSameNameCardsLimit:: ; d382
 	ds $1
 
-	ds $5
+; whether to include the cards in the selected deck
+; to appear in the filtered lists
+; is TRUE when building a deck (since the cards should be shown for removal)
+; is FALSE when choosing a deck configuration to send through Gift Center
+; (can't select cards that are included in already built decks)
+wIncludeCardsInDeck:: ; d383
+	ds $1
+
+; pointer to a function that handles the menu
+; when building a deck configuration
+wDeckConfigurationMenuHandlerFunction:: ; d384
+	ds $2
+
+; pointer to a transition table for the
+; function in wDeckConfigurationMenuHandlerFunction
+wDeckConfigurationMenuTransitionTable:: ; d386
+	ds $2
 
 wCurCardListPtr:: ; d388
 	ds $1
 
-	ds $5
+	ds $1
+
+wd38a:: ; d38a
+	ds $2
+
+	ds $2
 
 ; the tile to draw in place of the cursor, in case
 ; the cursor is not to be drawn
@@ -2076,12 +2170,17 @@ wNamingScreenNamePosition:: ; d3e9
 wNamingScreenMode:: ; d3eb
 	ds $1
 
+; see also sUnnamedDeckCounter
+wTempUnnamedDeckCounter:: ; d3ec
 	ds $3
 
 wd3ef:: ; d3ef
 	ds $1
 
-	ds $26
+	ds $1e
+
+wd40e:: ; d40e
+	ds $8
 
 ; pointers to all decks of current deck machine
 wMachineDeckPtrs:: ; d416
@@ -2100,7 +2199,11 @@ wTempScrollMenuScrollOffset:: ; d47c
 wSelectedDeckMachineEntry:: ; d47d
 	ds $1
 
-	ds $19
+wd47e:: ; d47e
+	ds $18
+
+wd496:: ; d496
+	ds $1
 
 wDeckMachineTitleText:: ; d497
 	ds $2
@@ -2108,6 +2211,7 @@ wDeckMachineTitleText:: ; d497
 wNumDeckMachineEntries:: ; d499
 	ds $1
 
+wd49a:: ; d49a
 	ds $1
 
 wd49b:: ; d49b
@@ -2124,17 +2228,27 @@ wd49e:: ; d49e
 wd49f:: ; d49f
 	ds $1
 
-SECTION "WRAM1@d4c8", WRAMX
+	ds $13
+
+wd4b3:: ; d4b3
+	ds $1
+
+wd4b4:: ; d4b4
+	ds $8
+
+	ds $c
 
 wd4c8:: ; d4c8
 	ds $80
 
-SECTION "WRAM1@d548", WRAMX
-
 wd548:: ; d548
 	ds $2
 
-	ds $2
+wd54a:: ; d54a
+	ds $1
+
+wd54b:: ; d54b
+	ds $1
 
 wd54c:: ; d54c
 	ds $1
@@ -2155,6 +2269,7 @@ wd54f:: ; d54f
 wPlayerOWObject:: ; d550
 	ds $1
 
+; bank number of wd552
 wd551:: ; d551
 	ds $1
 
@@ -2167,7 +2282,11 @@ wd552:: ; d552
 wd554:: ; d554
 	ds $1
 
-	ds $c
+wCurrentNPCDuelistData:: ; d555
+	ds NPC_DUELIST_STRUCT_SIZE
+
+; TODO: is this really union?
+UNION
 
 wd561:: ; d561
 	ds $1
@@ -2181,27 +2300,69 @@ wd563:: ; d563
 wd565:: ; d565
 	ds $1
 
-	ds $f
+NEXTU
+
+wNumBlackBoxInputPkmnPerType:: ; d561
+	ds NUM_PKMN_TYPES
+
+ENDU
+
+	ds $d
 
 wFilteredListPtr:: ; d575
 	ds $2
 
+; TODO: is this really union?
+UNION
+
 wRemainingIntroCards:: ; d577
 	ds $1
 
-	ds $3
+wd578:: ; d578
+	ds $1
+
+wd579:: ; d579
+	ds $2
 
 wIntroCardsRepeatsAllowed:: ; d57b
 	ds $1
 
-	ds $6
+NEXTU
+
+wBlackBoxOutputCountCircle:: ; d577
+	ds $1
+
+wBlackBoxOutputCountDiamond:: ; d578
+	ds $1
+
+wBlackBoxOutputCountStar:: ; d579
+	ds $1
+
+	ds $2
+
+wTempBlackBoxInputEvoLine:: ; d57c
+
+wTempBlackBoxInputBasic:: ; d57c
+	ds $2
+
+wTempBlackBoxInputStage1:: ; d57e
+	ds $2
+
+wTempBlackBoxInputStage2:: ; d580
+	ds $2
+
+wTempBlackBoxInputEvoLineEnd:: ; d582
+
+ENDU
 
 wd582:: ; d582
 	ds $1
 
+; bit 1: set when NPC initiates duel
 wd583:: ; d583
 	ds $1
 
+; MAP_* constant
 wd584:: ; d584
 	ds $1
 
@@ -2211,9 +2372,11 @@ wd585:: ; d585
 wd586:: ; d586
 	ds $1
 
+; OWMAP_* constant
 wCurOWLocation:: ; d587
 	ds $1
 
+; OWMAP_* constant
 wPlayerOWLocation:: ; d588
 	ds $1
 
@@ -2222,7 +2385,8 @@ wPlayerOWLocation:: ; d588
 wCurIsland:: ; d589
 	ds $1
 
-wd58a:: ; d58a
+; MAP_GFX_* constant
+wCurMapGfx:: ; d58a
 	ds $1
 
 wd58b:: ; d58b
@@ -2231,7 +2395,10 @@ wd58b:: ; d58b
 wd58c:: ; d58c
 	ds $2
 
-wd58e:: ; d58e
+; MUSIC_* constant
+; See also: wCurMusic
+; notably passed to PlayAfterCurrentSong in bank03: Func_c175
+wNextMusic:: ; d58e
 	ds $1
 
 wd58f:: ; d58f
@@ -2249,6 +2416,7 @@ wd592:: ; d592
 wd593:: ; d593
 	ds $2
 
+; NPC_* ID
 wd595:: ; d595
 	ds $1
 
@@ -2277,52 +2445,84 @@ wd59d:: ; d59d
 	ds $1
 
 wEventVars:: ; d59e
-	ds $34
+	ds EVENT_VAR_BYTES
 
 wGeneralVars:: ; d5d2
-	ds $34
+	ds GENERAL_VAR_BYTES
 
-	ds $b
+; various temp flags
+; e.g. blackbox input type flags, evo stage flags, etc.
+wd606:: ; d606
+	ds wD606_STRUCT_SIZE
 
-wd611:: ; d611
+; NPC_* ID of the active speaker / OW Object
+wScriptNPC:: ; d60e
 	ds $1
 
-wd612:: ; d612
-	ds $1
-
-wd613:: ; d613
-	ds $1
-
-wd614:: ; d614
-	ds $1
-
-	ds $1
-
-wd616:: ; d616
-	ds $1
-
-wd617:: ; d617
-	ds $1
-
-wd618:: ; d618
-	ds $1
-
-wd619:: ; d619
-	ds $1
-
-wd61a:: ; d61a
-	ds $1
-
-wd61b:: ; d61b
+; text ID of the active speaker's name
+wScriptNPCName:: ; d60f
 	ds $2
 
-wd61d:: ; d61d
+; a bitfield for every unique mail in the game (29 total).
+; the corresponding bit is set when a mail is sent, and mask is checked before sending
+; mail in event scripts. Mail that is not sent via event script skips the check.
+wSentMailBitfield:: ; d611
+	ds (NUM_UNIQUE_MAILS_IN_GAME + 7) / 8
+
+wd615:: ; d615
 	ds $1
 
-wd61e:: ; d61e
+; sometimes treated as 8-bit, sometimes treated as 16-bit
+wScriptLoadedVar:: ; d616
+	ds $2
+
+; temporarily stores multiple script flags
+; - bit 0: general purpose script logic flag, often treated like a z flag
+;     examples:
+;     - set by ask_question if player chooses "Yes"
+;     - set by compare_loaded_var if var is equal to the comparison value
+; - bit 1: second general purpose script logic flag, often treated like a c flag
+;     examples:
+;     - set by duel_requirement_check to indicate failure
+;     - set by compare_loaded_var if var is less than the comparison value
+; - bit 6: set when script is ended by quit_script
+; - bit 7: set when script is ended by end_script
+wScriptFlags:: ; d618
 	ds $1
 
-	ds $49
+wScriptBank:: ; d619
+	ds $1
+
+wScriptBufferIndex:: ; d61a
+	ds $1
+
+wScriptPointer:: ; d61b
+	ds $2
+
+wScriptStackOffset:: ; d61d
+	ds $1
+
+wScriptBuffer:: ; d61e
+	ds SCRIPT_BUFFER_SIZE
+
+wScriptStack:: ; d63e
+	ds SCRIPT_STACK_SIZE
+
+; buffer to hold booster pack random choice list
+wBoosterPackList:: ; d64e
+	ds $10
+
+; size of wBoosterPackList
+wBoosterPackCount:: ; d65e
+	ds $1
+
+; the list of booster packs to give, chosen from wBoosterPackList
+wBoosterPacksToGive:: ; d65f
+	ds $8
+
+; the number of booster packs to give
+wNumBoosterPacksToGive:: ; d667
+	ds $1
 
 wd668:: ; d668
 	ds $1
@@ -2359,6 +2559,8 @@ wd672:: ; d672
 wd673:: ; d673
 	ds $1
 
+; MUSIC_* constant
+; See also: wNextMusic
 wCurMusic:: ; d674
 	ds $1
 
@@ -2382,7 +2584,24 @@ wd680:: ; d680
 wOWScrollSpeed:: ; d681
 	ds $1
 
-	ds $a
+wDebugMenuCursorPosition:: ; d682
+	ds $1
+
+	ds $2
+
+wDebugAnimDuelistSide:: ; d685
+	ds $1
+
+wDebugSelectedAnimNumber:: ; d686
+	ds $1
+
+wDebugDuelAnimationScreen:: ; d687
+	ds $1
+
+wDebugDuelAnimLocationParam:: ; d688
+	ds $1
+
+	ds $3
 
 wd68c:: ; d68c
 	ds $1
@@ -2398,7 +2617,7 @@ wd693:: ; d693
 	ds $1
 
 wDecompressedBGMap:: ; d694
-	ds 2 * BG_MAP_WIDTH
+	ds 2 * TILEMAP_WIDTH
 
 wd6d4:: ; d6d4
 	ds $100
@@ -2473,13 +2692,20 @@ wd853:: ; d853
 wScrollTargetSpritePtr:: ; d893
 	ds $2
 
-wd895:: ; d895
+wOWScrollState:: ; d895
 	ds $1
 
 wd896:: ; d896
 	ds $2
 
-	ds $3
+wd898:: ; d898
+	ds $1
+
+wd899:: ; d899
+	ds $1
+
+wd89a:: ; d89a
+	ds $1
 
 wOWScrollX:: ; d89b
 	ds $1
@@ -2493,7 +2719,11 @@ wd89d:: ; d89d
 wd89e:: ; d89e
 	ds $1
 
-	ds $2
+wd89f:: ; d89f
+	ds $1
+
+wd8a0:: ; d8a0
+	ds $1
 
 wd8a1:: ; d8a1
 	ds $1
@@ -2542,11 +2772,13 @@ wCurSpriteAnim:: sprite_anim_struct wCurSpriteAnim ; d976
 wd986:: ; d986
 	ds $1
 
+; NPC_* ID or $ff
 wd987:: ; d987
 	ds $1
 
 	ds $1
 
+; NPC_* ID
 wd989:: ; d989
 	ds $1
 
@@ -2568,18 +2800,21 @@ wPortraitSlot:: ; d9ce
 wPortraitEmotion:: ; d9cf
 	ds $1
 
-wd9d0:: ; d9d0
+; which of the 5 submenus in the Config menu is selected
+wSelectedConfigSubmenu:: ; d9d0
 	ds $1
 
 	ds $2
 
-wd9d3:: ; d9d3
+; see also: sDuelAnimationsSetting
+wDuelAnimationsSetting:: ; d9d3
 	ds $1
 
-wd9d4:: ; d9d4
+wCoinTossAnimationSetting:: ; d9d4
 	ds $1
 
-wd9d5:: ; d9d5
+; used to set wTextSpeed, sTextSpeed
+wMessageSpeedSetting:: ; d9d5
 	ds $1
 
 wTextBoxFrameColor:: ; d9d6
@@ -2719,11 +2954,17 @@ wda94:: ; da94
 wScrollTargetObject:: ; da97
 	ds $1
 
+; set to FF while chip count window is on screen (top-left corner)
 wda98:: ; da98
 	ds $1
 
-wda99:: ; da99
-	ds $4
+; capped at MAX_CHIPS
+wGameCenterChips:: ; da99
+	ds $2
+
+; capped at MAX_CHIPS
+wGameCenterBankedChips:: ; da9b
+	ds $2
 
 wIntroOrbsStates:: ; da9d
 	ds NUM_INTRO_ORBS
@@ -2795,25 +3036,109 @@ wTotalNumCardsToCollect:: ; db13
 wTotalNumCardsCollected:: ; db15
 	ds $2
 
-	ds $8
+wdb17:: ; db17
+	ds $1
+
+wdb18:: ; db18
+	ds $1
+
+wdb19:: ; db19
+	ds $1
+
+wdb1a:: ; db1a
+	ds $5
 
 wdb1f:: ; db1f
 	ds $1
 
-SECTION "WRAM1@dc06", WRAMX
+wdb20:: ; db20
+	ds $1
+
+wdb21:: ; db21
+	ds $2
+
+wdb23:: ; db23
+	ds $c
+
+wdb2f:: ; db2f
+	ds $1
+
+wdb30:: ; db30
+	ds $1
+
+wdb31:: ; db31
+	ds $1
+
+wdb32:: ; db32
+	ds $1
+
+	ds $1
+
+wdb34:: ; db34
+	ds $1
+
+wdb35:: ; db35
+	ds $1
+
+wdb36:: ; db36
+	ds $1
+
+	ds $2
+
+wdb39:: ; db39
+	ds $3
+
+wdb3c:: ; db3c
+	ds $1
+
+wdb3d:: ; db3d
+	ds $1
+
+	ds $1
+
+wdb3f:: ; db3f
+	ds $1
+
+	ds $6
+
+wdb46:: ; db46
+	ds $40
+
+wdb86:: ; db86
+	ds $40
+
+wdbc6:: ; dbc6
+	ds $40
 
 wdc06:: ; dc06
 	ds $1
 
 	ds $1
 
-wdc08:: ; dc08
+wSelectedCoin:: ; dc08
 	ds $1
 
-wdc09:: ; dc09
+; used when viewing your coins in Coin menu.
+; same values as COIN_TYPE_*
+wCoinPage:: ; dc09
 	ds $1
 
-	ds $5
+; COIN_* id being given to player during cutscene
+wIncomingCoin:: ; dc0a
+	ds $1
+
+wdc0b:: ; dc0b
+	ds $1
+
+; see: _CoinPageListTable for valid values
+wCoinPageXCoordinate:: ; dc0c
+	ds $1
+
+; see: _CoinPageListTable for valid values
+wCoinPageYCoordinate:: ; dc0d
+	ds $1
+
+	ds $1
 
 ; store settings for animation enabled/disabled
 ; FALSE means enabled, TRUE means disabled
@@ -2872,7 +3197,11 @@ wDuelAnimBuffer:: ; dc60
 	duel_anim_struct wDuelAnim16
 wDuelAnimBufferEnd::
 
-	ds $2
+wdce0:: ; dce0
+	ds $1
+
+wdce1:: ; dce1
+	ds $1
 
 ; holds an animation to play
 wCurAnimation:: ; dce2
@@ -2950,7 +3279,7 @@ wAnimationSFX:: ; dcfa
 wAnimationUnknownParam:: ; dcfb
 	ds $1
 
-SECTION "WRAM1@dd02", WRAMX
+	ds $6
 
 ; stores the player's result in a duel (0: win, 1: loss, 2: ???, -1: transmission error?)
 ; to be read by the overworld caller
@@ -2969,10 +3298,35 @@ wdd05:: ; dd05
 wdd06:: ; dd06
 	ds $1
 
-wdd07:: ; dd07
+wMinicomMenuCursorPosition:: ; dd07
 	ds $1
 
-	ds $1d
+wCurBoosterPack:: ; dd08
+	ds $1
+
+wAnotherBoosterPack:: ; dd09
+	ds $1
+
+wdd0a:: ; dd0a
+	ds $10
+
+wdd1a:: ; dd1a
+	ds $6
+
+wdd20:: ; dd20
+	ds $1
+
+wdd21:: ; dd21
+	ds $1
+
+wdd22:: ; dd22
+	ds $1
+
+wdd23:: ; dd23
+	ds $1
+
+wdd24:: ; dd24
+	ds $1
 
 wdd25:: ; dd25
 	ds $2
@@ -2995,48 +3349,69 @@ wdd2e:: ; dd2e
 wdd2f:: ; dd2f
 	ds $1
 
-	ds $6
-
-wdd36:: ; dd36
+; id of the mail item being read
+wMailId:: ; dd30
 	ds $1
 
-wdd37:: ; dd37
-	ds $19
-
-wdd50:: ; dd50
+; 0 - mailbox full, 1 - new mail, 2 - no new mail
+wMailboxStatus:: ; dd31
 	ds $1
 
-wdd51:: ; dd51
-	ds $9
+; text offset of the sender line. displayed when reading a mail
+wMailSenderText:: ; dd32
+	ds $2
 
-wdd5a:: ; dd5a
+; text offset of the subject line. displayed when reading a mail
+wMailSubjectText:: ; dd34
+	ds $2
+
+; number of minicom mail queued to be delivered. mail is delivered when changing OW locations
+wNumMailInQueue:: ; dd36
 	ds $1
 
-wdd5b:: ; dd5b
+; list of mail items queued to be delivered
+wMailQueue:: ; dd37
+	ds MAIL_QUEUE_BUFFER_SIZE
+
+; total number of mail in your mailbox
+wMailCount:: ; dd50
 	ds $1
 
-wdd5c:: ; dd5c
+; list of mail items in the player's mailbox. holds up to 8 mail.
+; Each byte is the id of a mail item.
+; When mail is read, $80 is added to the id
+wMailList:: ; dd51
+	ds MAIL_BUFFER_SIZE
+
+; $ff when the player has new mail. set to 0 when opening minicom mail menu. affects the mailbox animation
+wNewMail:: ; dd5a
 	ds $1
 
-wdd5d:: ; dd5d
+; copied from wNumMailInQueue when visiting world map.
+; cleared after viewing the mailbox screen once.
+; used to show the "mailbox full" graphic
+wTempNumMailInQueue:: ; dd5b
 	ds $1
 
-wdd5e:: ; dd5e
+; which page of mail you are viewing. 0 or 1
+wMailboxPage:: ; dd5c
 	ds $1
 
-wdd5f:: ; dd5f
+; the mail you have selected to read/delete
+wSelectedMailCursorPosition:: ; dd5d
 	ds $1
 
-wdd60:: ; dd60
+; 0 - read mail, 1 - delete mail, 2 - quit
+wMailOptionSelected:: ; dd5e
 	ds $1
 
-	ds $12
+; card offsets. the cards mailed to you after using the Game Center black box
+wBlackBoxCardReceived:: ; dd5f
+	ds BLACK_BOX_OUTPUT_BYTES
 
-wdd73:: ; dd73
-	ds $1
-
-wdd74:: ; dd74
-	ds $1
+; card offset. the card mailed to you after using the Game Center Bill's PC
+wBillsPCCardReceived:: ; dd73
+	ds $2
 
 wdd75:: ; dd75
 	ds $1
@@ -3047,7 +3422,23 @@ wdd76:: ; dd76
 wdd77:: ; dd77
 	ds $1
 
-	ds $1c
+wdd78:: ; dd78
+	ds $1
+
+wdd79:: ; dd79
+	ds $1
+
+wdd7a:: ; dd7a
+	ds $10
+
+wdd8a:: ; dd8a
+	ds $4
+
+wdd8e:: ; dd8e
+	ds $5
+
+wdd93:: ; dd93
+	ds $1
 
 wCardTilemap:: ; dd94
 	ds $30
@@ -3061,23 +3452,43 @@ wCardTilemapOffset:: ; ddf4
 wddf5:: ; ddf5
 	ds $1
 
-	ds $3
+wddf6:: ; ddf6
+	ds $1
+
+wddf7:: ; ddf7
+	ds $1
+
+wddf8:: ; ddf8
+	ds $1
 
 wddf9:: ; ddf9
 	ds $14
 
 wde0d:: ; de0d
-	ds $4
+	ds $2
+
+wde0f:: ; de0f
+	ds $2
 
 wde11:: ; de11
-	ds $4
+	ds $2
+
+wde13:: ; de13
+	ds $2
 
 wde15:: ; de15
-	ds $4
+	ds $2
+
+wde17:: ; de17
+	ds $2
 
 wde19:: ; de19
-	ds $20
+	ds $10
 
+wde29:: ; de29
+	ds $10
+
+wde39:: ; de39
 	ds $10
 
 wCreditsCmdArg1:: ; de49
@@ -3141,7 +3552,29 @@ SECTION "WRAM2", WRAMX
 wScratchCardCollection:: ; d000
 	ds CARD_COLLECTION_SIZE
 
-SECTION "WRAM2@d58e", WRAMX
+w2d200:: ; d200
+	ds $80
+
+w2d280:: ; d280
+	ds $6
+
+w2d286:: ; d286
+	ds $1
+
+w2d287:: ; d287
+	ds $6
+
+w2d28d:: ; d28d
+	ds $1
+
+w2d28e:: ; d28e
+	ds $100
+
+w2d38e:: ; d38e
+	ds $80
+
+wAutoDecks:: ; d40e
+	ds DECK_COMPRESSED_STRUCT_SIZE * NUM_AUTO_DECK_MACHINE_SLOTS
 
 w2d58e:: ; d58e
 	ds $80
@@ -3167,6 +3600,12 @@ w3d415:: ; d415
 
 w3d4c6:: ; d4c6
 	ds $415
+
+w3d8db:: ; d8db
+	ds SPRITE_ANIM_TILE_BUFFER_SIZE
+
+w3d9a5:: ; d9a5
+	ds OW_OBJECTS_BUFFER_SIZE
 
 SECTION "WRAM7 Audio", WRAMX
 

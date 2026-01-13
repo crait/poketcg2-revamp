@@ -67,7 +67,7 @@ CountLinesOfTextFromID::
 	jr nc, .char_loop
 	cp TX_HALFWIDTH
 	jr c, .skip
-	cp "\n"
+	cp '\n'
 	jr nz, .char_loop
 	inc c
 	jr .char_loop
@@ -142,7 +142,7 @@ PrintScrollableText::
 	jr nc, .apply_delay
 	; if text speed is 1, pressing b ignores it
 	ldh a, [hKeysHeld]
-	and B_BUTTON
+	and PAD_B
 	jr nz, .skip_delay
 .apply_delay
 	push bc
@@ -414,7 +414,7 @@ TwoByteNumberToText_CountLeadingZeros::
 	ld c, 4
 .digit_loop
 	ld a, [hl]
-	cp "0"
+	cp '0'
 	ret nz
 	inc hl
 	dec c
@@ -462,7 +462,7 @@ PrintText::
 	cp 3
 	jr nc, .apply_delay
 	; if text speed is 1, pressing b ignores it
-	bit B_BUTTON_F, b
+	bit B_PAD_B, b
 	jr nz, .skip_delay
 	jr .apply_delay
 .text_delay_loop
@@ -494,6 +494,8 @@ PrintTextNoDelay::
 	call BankswitchROM
 	ret
 
+; hl = text ID
+; de = coordinates
 Func_2c4b::
 	push hl
 	push de

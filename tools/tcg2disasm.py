@@ -10,6 +10,8 @@ from ctypes import c_int8
 import configuration
 from wram import read_constants
 
+from script_extractor import ScriptExtractor
+
 z80_table = [
 	('nop', 0),                    # 00
 	('ld bc, {}', 2),              # 01
@@ -304,7 +306,7 @@ bit_ops_table = [
 	"set 7, b",  "set 7, c",  "set 7, d",  "set 7, e",  "set 7, h",  "set 7, l",  "set 7, [hl]",  "set 7, a"     # $f8 - $ff
 ]
 
-unconditional_returns = [0xc9, 0xd9, 0xe7] # e7 begins a script, which is not handled by tcgdisasm
+unconditional_returns = [0xc9, 0xd9]
 absolute_jumps = [0xc3, 0xc2, 0xca, 0xd2, 0xda]
 call_commands = [0xcd, 0xc4, 0xcc, 0xd4, 0xdc, 0xdf, 0xef]
 relative_jumps = [0x18, 0x20, 0x28, 0x30, 0x38]
@@ -373,7 +375,7 @@ duelvars = {
 	0xfb: "DUELVARS_ARENA_CARD_LAST_TURN_SUBSTATUS2",
 	0xfc: "DUELVARS_ARENA_CARD_LAST_TURN_CHANGE_WEAK",
 	0xfd: "DUELVARS_ARENA_CARD_LAST_TURN_EFFECT",
-	0xfe: "DUELVARS_UNK_FE"
+	0xfe: "DUELVARS_ATTACK_NAME"
 }
 
 cards = [
@@ -841,7 +843,7 @@ def get_local_address(address):
 	"""
 	Return the local address of a rom address.
 	"""
-	bank = address / 0x4000
+	bank = address // 0x4000
 	address &= 0x3fff
 	if bank:
 		return address + 0x4000
@@ -908,32 +910,32 @@ def load_symbols(path):
 		label = symbol['label']
 
 		if 0x0000 <= address < 0x8000:
-			if not sym.has_key(bank):
+			if bank not in sym:
 				sym[bank] = {}
 
 			sym[bank][address] = label
 			reverse_sym[label] = get_global_address(address, bank)
 
 		elif 0x8000 <= address < 0xa000:
-			if not vram_sym.has_key(bank):
+			if bank not in vram_sym:
 				vram_sym[bank] = {}
 
 			vram_sym[bank][address] = label
 
 		elif 0xa000 <= address < 0xc000:
-			if not sram_sym.has_key(bank):
+			if bank not in sram_sym:
 				sram_sym[bank] = {}
 
 			sram_sym[bank][address] = label
 
 		elif 0xc000 <= address < 0xe000:
-			if not wram_sym.has_key(bank):
+			if bank not in wram_sym:
 				wram_sym[bank] = {}
 
 			wram_sym[bank][address] = label
 
 		elif 0xff80 <= address < 0xfffe:
-			if not hram_sym.has_key(bank):
+			if bank not in hram_sym:
 				hram_sym[bank] = {}
 
 			hram_sym[bank][address] = label
@@ -967,7 +969,7 @@ def get_banked_ram_sym(sym, address):
 	return None
 
 def create_address_comment(offset):
-	comment_bank = offset / 0x4000
+	comment_bank = offset // 0x4000
 	if comment_bank != 0:
 		comment_bank_addr = (offset % 0x4000) + 0x4000
 	else:
@@ -998,6 +1000,7 @@ class Disassembler(object):
 		self.sram = None
 		self.hram = None
 		self.wram = None
+		self.script_extractor = None
 
 	def initialize(self, rom, symfile):
 		"""
@@ -1015,6 +1018,17 @@ class Disassembler(object):
 		path = os.path.join(self.config.path, 'src/constants/hardware_constants.asm')
 		if os.path.exists(path):
 			self.gbhw = read_constants(path)
+
+		script_extractor_args = {
+			"address_comments":False,
+			"allow_backward_jumps":False,
+			"follow_far_calls":False,
+			"fill_gaps":False,
+			"skip_trailing_ret": True,
+			"rom":rom,
+			"symfile":symfile
+		}
+		self.script_extractor = ScriptExtractor(script_extractor_args)
 
 	def find_label(self, address, bank=0):
 		if type(address) is str:
@@ -1075,7 +1089,7 @@ class Disassembler(object):
 
 		return None
 
-	def output_bank_opcodes(self, start_offset, stop_offset, hard_stop=False, parse_data=False):
+	def output_bank_opcodes(self, start_offset, hard_stop_offset=None, parse_data=False, parse_scripts=False):
 		"""
 		Output bank opcodes.
 
@@ -1094,18 +1108,14 @@ class Disassembler(object):
 
 		debug = False
 
-		bank_id = start_offset / 0x4000
+		bank_id = start_offset // 0x4000
 
-		stop_offset_undefined = False
-
-		# check if stop_offset isn't defined
-		if stop_offset is None:
-			stop_offset_undefined = True
-			# stop at the end of the current bank if stop_offset is not defined
-			stop_offset = (bank_id + 1) * 0x4000 - 1
+		if hard_stop_offset is None:
+			# stop at the end of the current bank if hard_stop_offset is not defined
+			hard_stop_offset = (bank_id + 1) * 0x4000 - 1
 
 		if debug:
-			print "bank id is: " + str(bank_id)
+			print(f"bank id is: {bank_id}")
 
 		rom = self.rom
 
@@ -1118,6 +1128,8 @@ class Disassembler(object):
 		output = "Func_%x:\n" % (start_offset)
 		is_data = False
 
+		script_blobs = []
+		undefined_functions = []
 		while True:
 			#first check if this byte already has a label
 			#if it does, use the label
@@ -1186,7 +1198,8 @@ class Disassembler(object):
 				opcode_arg_3 = rom[offset+3]
 
 				if opcode_nargs == 0:
-					# handle cp16
+					# handle cp16*
+					# cp16 card_id
 					if opcode_byte == 0x7a \
 					and rom[offset+1] == 0xfe \
 					and rom[offset+3] == 0x20 and rom[offset+4] == 0x03 \
@@ -1194,6 +1207,61 @@ class Disassembler(object):
 					and rom[offset+6] == 0xfe:
 						card_id = (rom[offset+2] << 8) + rom[offset+7]
 						opcode_output_str = "cp16 " + cards[card_id]
+						opcode_nargs = 7
+					# cp16 bc
+					elif opcode_byte == 0x7a \
+					and rom[offset+1] == 0xb8 \
+					and rom[offset+2] == 0x20 and rom[offset+3] == 0x02 \
+					and rom[offset+4] == 0x7b \
+					and rom[offset+5] == 0xb9:
+						opcode_output_str = "cp16 bc"
+						opcode_nargs = 5
+					# cp16_long
+					elif opcode_byte == 0x7a \
+					and rom[offset+1] == 0xfe \
+					and rom[offset+3] == 0x38 and rom[offset+4] == 0x05 \
+					and rom[offset+5] == 0x20 and rom[offset+6] == 0x03 \
+					and rom[offset+7] == 0x7b \
+					and rom[offset+8] == 0xfe:
+						cp16val = (rom[offset+2] << 8) + rom[offset+9]
+						opcode_output_str = "cp16_long ${:x}".format(cp16val)
+						opcode_nargs = 9
+					# cp16_long bc
+					elif opcode_byte == 0x7a \
+					and rom[offset+1] == 0xb8 \
+					and rom[offset+2] == 0x38 and rom[offset+3] == 0x04 \
+					and rom[offset+4] == 0x20 and rom[offset+5] == 0x02 \
+					and rom[offset+6] == 0x7b \
+					and rom[offset+7] == 0xb9:
+						opcode_output_str = "cp16_long bc"
+						opcode_nargs = 7
+					# cp16bc_long
+					elif opcode_byte == 0x78 \
+					and rom[offset+1] == 0xb8 \
+					and rom[offset+3] == 0x38 and rom[offset+4] == 0x05 \
+					and rom[offset+5] == 0x20 and rom[offset+6] == 0x03 \
+					and rom[offset+7] == 0x79 \
+					and rom[offset+8] == 0xfe:
+						cp16val = (rom[offset+2] << 8) + rom[offset+9]
+						opcode_output_str = "cp16bc_long ${:x}".format(cp16val)
+						opcode_nargs = 9
+					# cp16bc_long de
+					elif opcode_byte == 0x78 \
+					and rom[offset+1] == 0xba \
+					and rom[offset+2] == 0x38 and rom[offset+3] == 0x04 \
+					and rom[offset+4] == 0x20 and rom[offset+5] == 0x02 \
+					and rom[offset+6] == 0x79 \
+					and rom[offset+7] == 0xbb:
+						opcode_output_str = "cp16bc_long de"
+						opcode_nargs = 7
+					# cp16bc_long hl
+					elif opcode_byte == 0x78 \
+					and rom[offset+1] == 0xbc \
+					and rom[offset+2] == 0x38 and rom[offset+3] == 0x04 \
+					and rom[offset+4] == 0x20 and rom[offset+5] == 0x02 \
+					and rom[offset+6] == 0x79 \
+					and rom[offset+7] == 0xbd:
+						opcode_output_str = "cp16bc_long hl"
 						opcode_nargs = 7
 					# handle cphl
 					elif opcode_byte == 0x23 \
@@ -1205,6 +1273,28 @@ class Disassembler(object):
 						card_id = (rom[offset+3] << 8) + rom[offset+8]
 						opcode_output_str = "cphl " + cards[card_id]
 						opcode_nargs = 8
+					# handle add_*_a
+					# add_hl_a
+					elif opcode_byte == 0x85 \
+					and rom[offset+1] == 0x6f \
+					and rom[offset+2] == 0x30 and rom[offset+3] == 0x01 \
+					and rom[offset+4] == 0x24:
+						opcode_output_str = "add_hl_a"
+						opcode_nargs = 4
+					# add_de_a
+					elif opcode_byte == 0x83 \
+					and rom[offset+1] == 0x5f \
+					and rom[offset+2] == 0x30 and rom[offset+3] == 0x01 \
+					and rom[offset+4] == 0x14:
+						opcode_output_str = "add_de_a"
+						opcode_nargs = 4
+					# add_at_hl_a
+					elif opcode_byte == 0x86 \
+					and rom[offset+1] == 0x22 \
+					and rom[offset+2] == 0x30 and rom[offset+3] == 0x01 \
+					and rom[offset+4] == 0x34:
+						opcode_output_str = "add_at_hl_a"
+						opcode_nargs = 4
 					else:
 						# set output string simply as the opcode
 						opcode_output_str = opcode_str
@@ -1227,6 +1317,7 @@ class Disassembler(object):
 							elif target_address < start_offset:
 							# if we're jumping to an address that is located before the start offset, assume it is a function
 								opcode_output_str = "Func_%x" % target_address
+								undefined_functions.append(target_address)
 							else:
 							# create a new label
 								opcode_output_str = asm_label(target_address)
@@ -1290,6 +1381,11 @@ class Disassembler(object):
 					if opcode_byte == 0xdf:
 					# bank1call
 						target_label = self.find_label(local_target_offset, 1)
+						if target_label is None:
+							# explicitly set target_label here if None because the next if statement
+							# would set it to a non-bank01 value
+							target_label = "Func_%x" % local_target_offset
+							undefined_functions.append(local_target_offset)
 					else:
 					# regular call or jump instructions
 						target_label = self.find_label(local_target_offset, bank_id)
@@ -1298,6 +1394,7 @@ class Disassembler(object):
 						if target_label is None:
 						# if this is a call or jump opcode and the target label is not defined, create an undocumented label descriptor
 							target_label = "Func_%x" % target_offset
+							undefined_functions.append(target_offset)
 
 					else:
 					# anything that isn't a call or jump is a load-based command
@@ -1350,6 +1447,7 @@ class Disassembler(object):
 						if target_label is None:
 						# if this is a call or jump opcode and the target label is not defined, create an undocumented label descriptor
 							target_label = "Func_%x" % target_offset
+							undefined_functions.append(target_offset)
 
 					# format the label that was created into the opcode string
 					opcode_output_str = opcode_str.format(target_label)
@@ -1358,11 +1456,55 @@ class Disassembler(object):
 					# error checking
 					raise ValueError("Invalid amount of args.")
 
-				# append the formatted opcode output string to the output
-				output += self.spacing + opcode_output_str + "\n" #+ " ; " + hex(offset)
-				# increase the current byte number and offset by the amount of arguments plus 1 (opcode itself)
-				current_byte_number += opcode_nargs + 1
-				offset += opcode_nargs + 1
+
+				# dump script if we found one. Note that we pass the offset of the "call StartScript"
+				# command (CD FF 32) into dump_script, and it is output there as "start_script"
+				if parse_scripts and (opcode_byte in call_commands and target_label == "StartScript"):
+					print('DEBUG: script block @ {:x}'.format(offset))
+
+					# += here to handle cases where we still have future scripts to add to the output,
+					# but got back to this block because we disassembled a new StartScript call
+					script_blobs += self.script_extractor.dump_script(offset, visited=set())
+					script_blobs = self.script_extractor.sort_and_filter(script_blobs)
+
+				else:
+					# append the formatted opcode output string to the output
+					output += self.spacing + opcode_output_str + "\n" #+ " ; " + hex(offset)
+					# increase the current byte number and offset by the amount of arguments plus 1 (opcode itself)
+					current_byte_number += opcode_nargs + 1
+					offset += opcode_nargs + 1
+
+				# if we have reached one of the waiting script blobs, add them to the output
+				# and advance offset until we reach the next gap so we can continue disassembling from there.
+				while len(script_blobs) > 0 and offset == script_blobs[0]["start"]:
+					blob = script_blobs.pop(0)
+					output += blob["output"] + "\n"
+					offset = blob["end"]
+
+				# if, after adding script blobs to the output, the next instruction is a ret,
+				# output the ret instruction and append more script blobs if available,
+				# until we run out of rets or blobs.
+				byte_after_scripts = rom[offset]
+				while parse_scripts and byte_after_scripts in unconditional_returns:
+					# output a .asm_xxx label before the ret, if there is one
+					local_offset = get_local_address(offset)
+					if local_offset in byte_labels.keys() and not byte_labels[local_offset]["definition"]:
+						byte_labels[local_offset]["definition"] = True
+						output += asm_label(offset) + "\n"
+
+					# output the ret, and update opcode_byte & offset since they are used later to
+					# determine if we should stop processing
+					opcode_byte = rom[offset]
+					output += self.spacing + z80_table[byte_after_scripts][0] + "\n"
+					offset += 1
+
+					# loop through script blobs and add them to output, as before
+					while len(script_blobs) > 0 and offset == script_blobs[0]["start"]:
+						blob = script_blobs.pop(0)
+						output += blob["output"] + "\n"
+						offset = blob["end"]
+
+					byte_after_scripts = rom[offset]
 
 			else:
 				# output a single lined db, using the current byte
@@ -1377,19 +1519,22 @@ class Disassembler(object):
 			# update the local offset
 			local_offset = get_local_address(offset)
 
-			# stop processing regardless of function end if we've passed the stop offset and the hard stop (dry run) flag is set
-			if hard_stop and offset >= stop_offset:
+			# stop processing regardless of function end if we've passed the hard stop offset
+			if hard_stop_offset and offset >= hard_stop_offset:
 				break
-			# check if this is the end of the function, or we're processing data
-			elif (opcode_byte in unconditional_jumps + unconditional_returns) or is_data:
+			# check if this is the end of the function, or we're processing data (StartScript begins ow scripting)
+			elif (opcode_byte in unconditional_jumps + unconditional_returns) or (not parse_scripts and opcode_byte in call_commands and target_label == "StartScript") or is_data:
 				# define data if it is located at the current offset
 				if local_offset not in byte_labels.keys() and local_offset in data_tables.keys() and created_but_unused_labels_exist(data_tables) and parse_data:
 					is_data = True
 				#stop reading at a jump, relative jump or return
-				elif all_byte_labels_are_defined(byte_labels) and (offset >= stop_offset or stop_offset_undefined):
+				elif all_byte_labels_are_defined(byte_labels):
 					break
 				# otherwise, add some spacing
 				output += "\n"
+
+		if len(script_blobs) > 0:
+			print("WARN: {} script blobs starting at {:x} were not added to output".format(len(script_blobs), script_blobs[0]['start']))
 
 		# before returning output, we need to clean up some things
 
@@ -1430,7 +1575,51 @@ class Disassembler(object):
 		# add the offset of the final location
 		output += "; " + hex(offset)
 
-		return [output, offset, stop_offset, byte_labels, data_tables]
+		return {"output": output, "start_offset": start_offset, "end_offset": offset,
+		  "byte_labels": byte_labels, "data_tables": data_tables, "undefined_functions": undefined_functions}
+
+	def recursively_output_functions(self, addresses, stop_addr, parse_data=False, parse_scripts=False, visited=set()):
+		function_outputs = []
+
+		for current_address in addresses:
+			if current_address not in visited:
+				visited.add(current_address)
+
+				# if we pass a hard stop address that is > current_address, the output would stop immediately
+				stop = stop_addr if stop_addr and current_address < stop_addr else None
+				o = self.output_bank_opcodes(current_address,stop,parse_data,parse_scripts)
+				function_outputs.append(o)
+				function_outputs += self.recursively_output_functions(o["undefined_functions"], stop_addr, parse_data, parse_scripts, visited)
+
+		return function_outputs
+
+def get_bank(address):
+	return int(address / 0x4000)
+
+def build_section(offset):
+	bank = get_bank(offset)
+	local_addr = get_local_address(offset)
+	return 'SECTION "Bank {:x}@{:04x}", ROMX[${:04x}], BANK[${:x}]\n\n'.format(bank, local_addr, local_addr, bank)
+
+def sort_and_add_sections(blobs, output_sections=False):
+	blobs.sort(key=lambda b: int(b["start_offset"]))
+	filtered = []
+
+	if output_sections:
+		# always add SECTION to start of first funtion's output
+		blobs[0]["output"] = build_section(blobs[0]["start_offset"]) + blobs[0]["output"]
+
+	for blob, next in zip(blobs, blobs[1:]+[None]):
+		if next and blob["start_offset"] < next["start_offset"] < blob["end_offset"]:
+			first_function = "Func_%x" % blob["start_offset"]
+			second_function = "Func_%x" % next["start_offset"]
+			print("WARN: overlap in functions:", first_function, second_function)
+		if output_sections and next and blob["end_offset"] < next["start_offset"]:
+			# if there is a gap, place a SECTION at the start of the next function's output
+			next["output"] = build_section(next["start_offset"]) + next["output"]
+
+		filtered.append(blob)
+	return filtered
 
 def get_raw_addr(addr):
 	if addr:
@@ -1455,10 +1644,12 @@ if __name__ == "__main__":
 	ap.add_argument("-q", "--quiet", dest="quiet", action="store_true")
 	ap.add_argument("-a", "--append", dest="append", action="store_true")
 	ap.add_argument("-nw", "--no-write", dest="no_write", action="store_true")
-	ap.add_argument("-d", "--dry-run", dest="dry_run", action="store_true")
 	ap.add_argument("-pd", "--parse_data", dest="parse_data", action="store_true")
-	ap.add_argument('offset')
-	ap.add_argument('end', nargs='?')
+	ap.add_argument("-ps", "--parse_scripts", dest="parse_scripts", action="store_true")
+	ap.add_argument("--recurse", dest="recurse", action="store_true")
+	ap.add_argument("--sections", dest="sections", action="store_true")
+	ap.add_argument("--hard-stop", dest="hard_stop", type=str)
+	ap.add_argument('addresses', type=str, nargs="+")
 
 	args = ap.parse_args()
 	conf = configuration.Config()
@@ -1467,22 +1658,38 @@ if __name__ == "__main__":
 	disasm = Disassembler(conf)
 	disasm.initialize(args.rom, args.symfile)
 
-	# get global address of the start and stop offsets
-	start_addr = get_raw_addr(args.offset)
-	stop_addr = get_raw_addr(args.end)
 
 	# run the disassembler and return the output
-	output = disasm.output_bank_opcodes(start_addr,stop_addr,hard_stop=args.dry_run,parse_data=args.parse_data)[0]
+	function_outputs = []
+
+	# get global addresses
+	addresses = [get_raw_addr(a) for a in args.addresses]
+	stop_addr = get_raw_addr(args.hard_stop)
+	if args.recurse:
+		function_outputs += disasm.recursively_output_functions(addresses,stop_addr,parse_data=args.parse_data, parse_scripts=args.parse_scripts)
+	else:
+		for start_addr in addresses:
+			function_outputs.append(disasm.output_bank_opcodes(start_addr,stop_addr,parse_data=args.parse_data, parse_scripts=args.parse_scripts))
+
+	sort_and_add_sections(function_outputs, args.sections)
+
+	formatted_output = ''
+
+	for f in function_outputs:
+		formatted_output += f["output"]
+		formatted_output += "\n\n"
+
+	formatted_output = formatted_output.rstrip('\n')
 
 	# suppress output if quiet flag is set
 	if not args.quiet:
-		print output
+		print(formatted_output)
 
 	# only write to the output file if the no write flag is unset
 	if not args.no_write:
 		if args.append:
 			with open(args.filename, "a") as f:
-				f.write("\n\n" + output)
+				f.write("\n\n" + formatted_output)
 		else:
 			with open(args.filename, "w") as f:
-				f.write(output)
+				f.write(formatted_output)

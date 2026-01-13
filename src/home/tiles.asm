@@ -7,7 +7,7 @@ FillRectangle::
 	push de
 	push af
 	push hl
-	add sp, -BG_MAP_WIDTH
+	add sp, -TILEMAP_WIDTH
 	call DECoordToBGMap0Address
 .next_row
 	push hl
@@ -38,7 +38,7 @@ FillRectangle::
 	ld [hl], a
 	pop bc
 	pop de
-	ld hl, BG_MAP_WIDTH
+	ld hl, TILEMAP_WIDTH
 	add hl, de
 	dec c
 	jr nz, .next_row
@@ -154,6 +154,7 @@ LoadDeckAndDiscardPileIcons::
 	ld de, $8a00
 	ld b, $0d
 	call CopyFontsOrDuelGraphicsTiles
+Func_1dff::
 	ld hl, $4240
 	ld a, [wConsole]
 	cp CONSOLE_CGB

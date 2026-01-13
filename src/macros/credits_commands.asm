@@ -84,7 +84,7 @@ MACRO credits_show_set
 	db $00, $00
 ENDM
 
-; \1 = NPC_* constant
+; \1 = *_PIC constant
 ; \2 = x
 ; \3 = y
 ; \4 = EMOTION_* constant
@@ -183,11 +183,11 @@ MACRO credits_load_tilemap
 	db \3
 ENDM
 
-; \1 = OW obj ID
+; \1 = NPC ID
 ; \2 = direction
 ; \3 = x
 ; \4 = y
-MACRO credits_load_ow_obj
+MACRO credits_load_npc
 	db CREDITSCMD_LOAD_OW_OBJ
 	db \1
 	db \2
@@ -196,11 +196,11 @@ MACRO credits_load_ow_obj
 	db \4
 ENDM
 
-; \1 = OW obj ID
+; \1 = NPC ID
 ; \2 = direction
 ; \3 = x
 ; \4 = y
-MACRO credits_load_ow_obj_unused
+MACRO credits_load_npc_unused
 	db CREDITSCMD_LOAD_OW_OBJ_IN_MAP
 	db \1
 	db \2

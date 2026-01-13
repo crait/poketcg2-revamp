@@ -1,256 +1,4 @@
-SECTION "Bank 11@4039", ROMX[$4039], BANK[$11]
-
-; counts number of cards in
-; $0000 terminated list in hl
-; output:
-;  a = number of cards
-CountCardsInHL:
-	push bc
-	push hl
-	xor a
-	ld c, a
-.loop
-	ld a, [hli]
-	ld b, a
-	ld a, [hli]
-	or b
-	jr z, .asm_44046
-	inc c
-	jr .loop
-.asm_44046
-	ld a, c
-	pop hl
-	pop bc
-	ret
-
-; input:
-;  hl = card list
-;  de = card ID to search for
-; output:
-;  carry set if not found
-;  a = index in list if found
-SearchCardInListInHL:
-	push bc
-	push de
-	push hl
-	xor a
-.loop_cards
-	push af
-	ld a, [hli]
-	ld c, a
-	ld a, [hli]
-	ld b, a
-	or c
-	jr z, .not_found
-	ld a, d
-	cp b
-	jr c, .not_equal
-	jr nz, .not_equal
-	ld a, e
-	cp c
-.not_equal
-	jr z, .found
-	pop af
-	inc a
-	jr .loop_cards
-.not_found
-	pop af
-	xor a
-	scf
-	jr .done
-.found
-	pop af
-	scf
-	ccf
-.done
-	pop hl
-	pop de
-	pop bc
-	ret
-; 0x44070
-
-SECTION "Bank 11@426a", ROMX[$426a], BANK[$11]
-
-; appends card ID in de to list in hl
-AppendCardToListInHL:
-	push af
-	push bc
-	push hl
-.loop_cards
-	ld a, [hli]
-	ld c, a
-	ld a, [hli]
-	ld b, a
-	or c
-	jr nz, .loop_cards
-	inc hl
-	xor a
-	ld [hld], a ; terminating byte
-	ld [hld], a ;
-	ld a, d
-	ld [hld], a ; card ID
-	ld [hl], e  ;
-	pop hl
-	pop bc
-	pop af
-	ret
-; 0x4427f
-
-SECTION "Bank 11@43d4", ROMX[$43d4], BANK[$11]
-
-; filters card list in hl
-; based on rarity in c and value in b:
-;    $0: only pkmn
-;    $1: only trainers
-;  > $1: only energy
-; input:
-;  b = filter option
-;  c = card rarity
-; output:
-;  wDuelTempList = filtered list
-;  a = number of cards in filtered list
-FilterCardListInHL:
-	push bc
-	push de
-	push hl
-	xor a
-	push af
-	ld a, LOW(wDuelTempList)
-	ld [wFilteredListPtr + 0], a
-	ld a, HIGH(wDuelTempList)
-	ld [wFilteredListPtr + 1], a
-.loop_cards
-	ld a, [hli]
-	ld e, a
-	ld a, [hli]
-	ld d, a
-	or e
-	jr z, .done
-	call LoadCardDataToBuffer1_FromCardID
-	ld a, [wLoadedCard1Rarity]
-	cp c
-	jr nz, .loop_cards
-	ld a, b
-	cp $01
-	jr z, .only_trainers
-	jr nc, .only_energy
-; only pkmn
-	ld a, [wLoadedCard1Type]
-	cp TYPE_ENERGY
-	jr nc, .loop_cards
-	jr .append_card
-.only_trainers
-	ld a, [wLoadedCard1Type]
-	cp TYPE_TRAINER
-	jr nz, .loop_cards
-	jr .append_card
-.only_energy
-	ld a, [wLoadedCard1Type]
-	cp TYPE_ENERGY
-	jr c, .loop_cards
-	cp TYPE_TRAINER
-	jr z, .loop_cards
-	jr .append_card
-
-.append_card
-; writes this card ID to the next entry in the list
-	push hl
-	ld a, [wFilteredListPtr + 0]
-	ld l, a
-	ld a, [wFilteredListPtr + 1]
-	ld h, a
-	ld a, e
-	ld [hli], a
-	ld a, d
-	ld [hli], a
-	ld a, l
-	ld [wFilteredListPtr + 0], a
-	ld a, h
-	ld [wFilteredListPtr + 1], a
-	pop hl
-	pop af
-	inc a
-	push af
-	jr .loop_cards
-
-.done
-; add terminating bytes
-	ld a, [wFilteredListPtr + 0]
-	ld l, a
-	ld a, [wFilteredListPtr + 1]
-	ld h, a
-	xor a
-	ld [hli], a
-	ld [hl], a
-	pop af
-	pop hl
-	pop de
-	pop bc
-	ret
-
-; shuffle card list in hl by running
-; random card swapping algorithm 40 times
-ShuffleCardsInHL:
-	push af
-	push bc
-	push de
-	push hl
-	call CountCardsInHL
-	or a
-	jr z, .done ; no cards in list
-	ld b, a
-	ld c, 40
-
-.loop
-	push bc
-	push hl
-	ld e, l
-	ld d, h
-
-; pick 2 random cards from list
-; then swap them
-	ld a, b
-	call Random
-	sla a
-	add l
-	ld l, a
-	jr nc, .no_carry1
-	inc h
-.no_carry1
-	ld a, b
-	call Random
-	sla a
-	add e
-	ld e, a
-	jr nc, .no_carry2
-	inc d
-.no_carry2
-	ld b, [hl]
-	ld a, [de]
-	ld [hl], a
-	ld a, b
-	ld [de], a
-	inc hl
-	inc de
-	ld b, [hl]
-	ld a, [de]
-	ld [hl], a
-	ld a, b
-	ld [de], a
-	pop hl
-	pop bc
-	dec c
-	jr nz, .loop
-
-.done
-	pop hl
-	pop de
-	pop bc
-	pop af
-	ret
-; 0x44481
-
-SECTION "Bank 11@44bd", ROMX[$44bd], BANK[$11]
+INCLUDE "engine/card_list_ops.asm"
 
 _ChooseTitleScreenCards:
 	push af
@@ -265,8 +13,8 @@ _ChooseTitleScreenCards:
 	ld [wIntroCardsRepeatsAllowed], a
 
 	call EnableSRAM
-	ld hl, sDeck1Name
-	ld c, $05
+	ld hl, sDeck1
+	ld c, NUM_DECKS + 1
 .loop_decks
 	ld a, [hli]
 	ld e, a
@@ -301,7 +49,7 @@ _ChooseTitleScreenCards:
 .star_pkmn
 	push hl
 	ld hl, wPlayerDeck
-	lb bc, $0, STAR
+	lb bc, FILTER_ONLY_PKMN, STAR
 	call FilterCardListInHL
 	pop hl
 	ld b, a
@@ -312,7 +60,7 @@ _ChooseTitleScreenCards:
 .diamond_pkmn
 	push hl
 	ld hl, wPlayerDeck
-	lb bc, $0, DIAMOND
+	lb bc, FILTER_ONLY_PKMN, DIAMOND
 	call FilterCardListInHL
 	pop hl
 	ld b, a
@@ -323,7 +71,7 @@ _ChooseTitleScreenCards:
 .circle_pkmn
 	push hl
 	ld hl, wPlayerDeck
-	lb bc, $0, CIRCLE
+	lb bc, FILTER_ONLY_PKMN, CIRCLE
 	call FilterCardListInHL
 	pop hl
 	ld b, a
@@ -334,7 +82,7 @@ _ChooseTitleScreenCards:
 .star_trainers
 	push hl
 	ld hl, wPlayerDeck
-	lb bc, $1, STAR
+	lb bc, FILTER_ONLY_TRAINER, STAR
 	call FilterCardListInHL
 	pop hl
 	ld b, a
@@ -345,7 +93,7 @@ _ChooseTitleScreenCards:
 .diamond_trainers
 	push hl
 	ld hl, wPlayerDeck
-	lb bc, $1, DIAMOND
+	lb bc, FILTER_ONLY_TRAINER, DIAMOND
 	call FilterCardListInHL
 	pop hl
 	ld b, a
@@ -356,7 +104,7 @@ _ChooseTitleScreenCards:
 .circle_trainers
 	push hl
 	ld hl, wPlayerDeck
-	lb bc, $1, CIRCLE
+	lb bc, FILTER_ONLY_TRAINER, CIRCLE
 	call FilterCardListInHL
 	pop hl
 	ld b, a
@@ -368,7 +116,7 @@ _ChooseTitleScreenCards:
 .star_energy
 	push hl
 	ld hl, wPlayerDeck
-	lb bc, $2, STAR
+	lb bc, FILTER_ONLY_ENERGY, STAR
 	call FilterCardListInHL
 	pop hl
 	ld b, a
@@ -379,7 +127,7 @@ _ChooseTitleScreenCards:
 .diamond_energy
 	push hl
 	ld hl, wPlayerDeck
-	lb bc, $2, DIAMOND
+	lb bc, FILTER_ONLY_ENERGY, DIAMOND
 	call FilterCardListInHL
 	pop hl
 	ld b, a
@@ -390,7 +138,7 @@ _ChooseTitleScreenCards:
 .circle_energy
 	push hl
 	ld hl, wPlayerDeck
-	lb bc, $2, CIRCLE
+	lb bc, FILTER_ONLY_ENERGY, CIRCLE
 	call FilterCardListInHL
 	pop hl
 	ld b, a
@@ -423,11 +171,7 @@ _ChooseTitleScreenCards:
 	ld hl, wDuelTempList
 	ld a, c
 	sla a
-	add l
-	ld l, a
-	jr nc, .no_carry
-	inc h
-.no_carry
+	add_hl_a
 	ld a, [hli]
 	ld e, a
 	ld d, [hl]
@@ -469,7 +213,12 @@ _ChooseTitleScreenCards:
 	dw HERE_COMES_TEAM_ROCKET
 	dw $0000
 
-SECTION "Bank 11@4928", ROMX[$4928], BANK[$11]
+INCLUDE "data/black_box_promos.asm"
+; 0x447b0
+
+SECTION "Bank 11@48cc", ROMX[$48cc], BANK[$11]
+
+INCLUDE "data/grand_master_cup.asm"
 
 ; a = MUSIC_*
 PlayAfterCurrentSong:
@@ -495,9 +244,15 @@ PlayCurrentSong:
 	ld a, [wCurMusic]
 	call PlaySong
 	ret
-; 0x4494a
 
-SECTION "Bank 11@4954", ROMX[$4954], BANK[$11]
+; WaitForSongToFinish but without push/pop af
+WaitSong:
+.loop
+	call DoFrame
+	call AssertSongFinished
+	or a
+	jr nz, .loop
+	ret
 
 InitMusicFadeOut:
 	ld [wMusicFadeOutCounter], a
@@ -542,6 +297,535 @@ WaitForSFXToFinish::
 	or a
 	jr nz, .loop_wait
 	ret
+; 0x449a8
 
-SECTION "Credits", ROMX[$5c6e], BANK[$11]
+SECTION "Bank 11@5301", ROMX[$5301], BANK[$11]
+
+Func_45301:
+	or a
+	jr nz, .asm_4531b
+	ld a, $2c
+	ld [wRemainingIntroCards], a
+	ld a, $b0
+	ld [wFilteredListPtr], a
+	ld a, $47
+	ld [wFilteredListPtr+1], a
+	ld a, VAR_28
+	farcall GetVarValue
+	jr .asm_45330
+.asm_4531b
+	ld a, $1b
+	ld [wRemainingIntroCards], a
+	ld a, $60
+	ld [wFilteredListPtr], a
+	ld a, $48
+	ld [wFilteredListPtr+1], a
+	ld a, VAR_30
+	farcall GetVarValue
+.asm_45330
+	cp $03
+	jr z, .asm_4533a
+	jr nc, .asm_4533e
+	ld a, $00
+	jr .asm_45340
+.asm_4533a
+	ld a, $01
+	jr .asm_45340
+.asm_4533e
+	ld a, $02
+.asm_45340
+	ld [wd578], a
+	ld e, $03
+	ld d, VAR_2D
+	ld c, $ff
+.asm_45349
+	ld a, d
+	farcall SetVarValue
+	inc d
+	dec e
+	jr nz, .asm_45349
+	ld c, $00
+.asm_45354
+	ld b, $01
+	ld a, c
+	or a
+.asm_45358
+	jr z, .asm_4535f
+	sla b
+	dec a
+	jr .asm_45358
+.asm_4535f
+	call Func_45379
+	call Func_453a3
+	jr c, .asm_4535f
+	push bc
+	ld d, a
+	ld a, VAR_2D
+	add c
+	ld c, d
+	farcall SetVarValue
+	pop bc
+	inc c
+	ld a, $03
+	cp c
+	jr nz, .asm_45354
+	ret
+
+Func_45379:
+.asm_45379
+	ld a, [wd578]
+	ld d, a
+	ld a, [wFilteredListPtr]
+	ld l, a
+	ld a, [wFilteredListPtr+1]
+	ld h, a
+	ld a, [wRemainingIntroCards]
+	call Random
+	sla a
+	sla a
+	add_hl_a
+	push hl
+	inc hl
+	ld a, d
+	add_hl_a
+	ld a, [hl]
+	pop hl
+	and b
+	jr z, .asm_45379
+	ld a, [hl]
+	ret
+
+Func_453a3:
+	ld d, a
+	farcall GetNPCByDeck
+	ld l, a
+	ld e, VAR_2D
+.asm_453ab
+	ld a, e
+	farcall GetVarValue
+	cp $ff
+	jr z, .asm_453bf
+	farcall GetNPCByDeck
+	inc e
+	cp l
+	jr nz, .asm_453ab
+	ld a, d
+	scf
+	ret
+.asm_453bf
+	ld a, d
+	scf
+	ccf
+	ret
+
+; special handling for Amy?
+Func_453c3:
+	farcall GetNPCByDeck
+	cp NPC_AMY_LOUNGE
+	jr nz, .done
+	ld a, NPC_AMY
+.done
+	ret
+
+Func_453ce:
+	ld a, VAR_2C
+	farcall GetVarValue
+	ld c, a
+	dec c
+	ld a, VAR_2D
+	add c
+	farcall GetVarValue
+	farcall GetNPCByDeck
+	farcall LoadNPCDuelist
+	ld a, [wCurrentNPCDuelistData + NPC_DUELIST_STRUCT_DIALOG_NAME]
+	ld l, a
+	ld a, [wCurrentNPCDuelistData + NPC_DUELIST_STRUCT_DIALOG_NAME + 1]
+	ld h, a
+	call LoadTxRam2
+	ld a, l
+	ld [wTxRam2_b], a
+	ld a, h
+	ld [wTxRam2_b + 1], a
+	ret
+
+Func_453f9:
+	ld a, VAR_2C
+	farcall GetVarValue
+	dec a
+	ld c, a
+	ld a, VAR_2D
+	add c
+	farcall GetVarValue
+	ld [wNPCDuelDeckID], a
+	ld a, MUSIC_MATCH_START_CLUB_MASTER
+	ld [wDuelStartTheme], a
+	ld hl, wd583
+	set 1, [hl]
+	ret
+
+SetGrandMasterCupOpponents:
+	ld e, NUM_GRANDMASTERCUP_OPPONENTS
+	ld d, VAR_GRANDMASTERCUP_OPPONENT_DECK_0
+	ld c, $ff
+.loop_init
+	ld a, d
+	farcall SetVarValue
+	inc d
+	dec e
+	jr nz, .loop_init
+; b = 1 << c for c = opponent slot number [0, 6]
+; set opponents randomly with the bitmask b
+; so Ronald may only be chosen at the last slot
+	ld c, 0
+.loop_set_opponents
+	ld b, 1
+	ld a, c
+	or a
+.loop_shift
+	jr z, .set_opponent
+	sla b
+	dec a
+	jr .loop_shift
+.set_opponent
+	call .PickOpponent
+	call .CheckDupe
+	jr c, .set_opponent
+	push bc
+	ld d, a
+	ld a, VAR_GRANDMASTERCUP_OPPONENT_DECK_0
+	add c
+	ld c, d
+	farcall SetVarValue
+	pop bc
+	inc c
+	ld a, NUM_GRANDMASTERCUP_OPPONENTS
+	cp c
+	jr nz, .loop_set_opponents
+	ret
+
+; for b = bitmask, choose a random opponent and return their deck id in a
+.PickOpponent:
+	ld hl, GrandMasterCupOpps
+	ld a, NUM_GRANDMASTERCUP_OPPONENT_IDS
+	call Random
+	sla a
+	add_hl_a
+	push hl
+	inc hl
+	ld a, [hl]
+	pop hl
+	and b
+	jr z, .PickOpponent
+	ld a, [hl]
+	ret
+
+; set carry if the opponent is already picked
+.CheckDupe:
+	ld d, a
+	farcall GetNPCByDeck
+	ld l, a
+	ld e, VAR_GRANDMASTERCUP_OPPONENT_DECK_0
+.loop_check
+	ld a, e
+	farcall GetVarValue
+	cp $ff
+	jr z, .done
+	farcall GetNPCByDeck
+	inc e
+	cp l
+	jr nz, .loop_check
+	ld a, d
+	scf
+	ret
+.done
+	ld a, d
+	scf
+	ccf
+	ret
+
+Func_45484:
+	call Func_453c3
+	ret
+
+Func_45488:
+	ld a, VAR_0E
+	farcall GetVarValue
+	cp $02
+	jr z, .asm_4549c
+	jr nc, .asm_454a4
+	ld a, VAR_GRANDMASTERCUP_OPPONENT_DECK_0
+	farcall GetVarValue
+	jr .asm_454aa
+.asm_4549c
+	ld a, VAR_1B
+	farcall GetVarValue
+	jr .asm_454aa
+.asm_454a4
+	ld a, VAR_1E
+	farcall GetVarValue
+.asm_454aa
+	ret
+
+Func_454ab:
+	call Func_45488
+	ld [wNPCDuelDeckID], a
+	ld a, MUSIC_MATCH_START_CLUB_MASTER
+	ld [wDuelStartTheme], a
+	ld hl, wd583
+	set 1, [hl]
+	ret
+
+Func_454bc:
+	call Func_45488
+	farcall GetNPCByDeck
+	farcall LoadNPCDuelist
+	ld a, [wCurrentNPCDuelistData + NPC_DUELIST_STRUCT_LOCATION_NAME]
+	ld l, a
+	ld a, [wCurrentNPCDuelistData + NPC_DUELIST_STRUCT_LOCATION_NAME + 1]
+	ld h, a
+	call LoadTxRam2
+	ld a, [wCurrentNPCDuelistData + NPC_DUELIST_STRUCT_DIALOG_NAME]
+	ld l, a
+	ld a, [wCurrentNPCDuelistData + NPC_DUELIST_STRUCT_DIALOG_NAME + 1]
+	ld h, a
+	ld a, l
+	ld [wTxRam2_b], a
+	ld a, h
+	ld [wTxRam2_b + 1], a
+	ret
+
+Func_454e3:
+	call Func_45488
+	farcall GetNPCByDeck
+	farcall LoadNPCDuelist
+	ld a, [wCurrentNPCDuelistData + NPC_DUELIST_STRUCT_DIALOG_NAME]
+	ld l, a
+	ld a, [wCurrentNPCDuelistData + NPC_DUELIST_STRUCT_DIALOG_NAME + 1]
+	ld h, a
+	call LoadTxRam2
+	ret
+
+Func_454fa:
+	ld a, VAR_GRANDMASTERCUP_OPPONENT_DECK_1
+	farcall GetVarValue
+	ld c, a
+	call UpdateRNGSources
+	rrca
+	jr nc, .asm_4550e
+	ld a, VAR_GRANDMASTERCUP_OPPONENT_DECK_2
+	farcall GetVarValue
+	ld c, a
+.asm_4550e
+	ld a, VAR_1B
+	farcall SetVarValue
+	ld a, VAR_GRANDMASTERCUP_OPPONENT_DECK_3
+	farcall GetVarValue
+	ld c, a
+	call UpdateRNGSources
+	rrca
+	jr nc, .asm_45528
+	ld a, VAR_GRANDMASTERCUP_OPPONENT_DECK_4
+	farcall GetVarValue
+	ld c, a
+.asm_45528
+	ld a, VAR_1C
+	farcall SetVarValue
+	ld a, VAR_GRANDMASTERCUP_OPPONENT_DECK_6
+	farcall GetVarValue
+	ld c, a
+	farcall GetNPCByDeck
+	cp NPC_RONALD
+	jr z, .asm_4554a
+	call UpdateRNGSources
+	rrca
+	jr c, .asm_4554a
+	ld a, VAR_GRANDMASTERCUP_OPPONENT_DECK_5
+	farcall GetVarValue
+	ld c, a
+.asm_4554a
+	ld a, VAR_1D
+	farcall SetVarValue
+	ld a, VAR_1D
+	farcall GetVarValue
+	ld c, a
+	farcall GetNPCByDeck
+	cp NPC_RONALD
+	jr z, .asm_4556c
+	call UpdateRNGSources
+	rrca
+	jr c, .asm_4556c
+	ld a, VAR_1C
+	farcall GetVarValue
+	ld c, a
+.asm_4556c
+	ld a, VAR_1E
+	farcall SetVarValue
+	ret
+
+Func_45573:
+	farcall Func_1ea00
+	ld a, VAR_GRANDMASTERCUP_OPPONENT_DECK_0
+	ld c, $01
+.asm_4557b
+	push af
+	push bc
+	farcall GetVarValue
+	farcall GetNPCByDeck
+	farcall LoadNPCDuelist
+	ld a, [wCurrentNPCDuelistData + NPC_DUELIST_STRUCT_DIALOG_NAME]
+	ld l, a
+	ld a, [wCurrentNPCDuelistData + NPC_DUELIST_STRUCT_DIALOG_NAME + 1]
+	ld h, a
+	pop bc
+	ld a, c
+	farcall Func_1e9ea
+	inc c
+	ld a, $08
+	cp c
+	jr z, .asm_455a1
+	pop af
+	inc a
+	jr .asm_4557b
+.asm_455a1
+	pop af
+	ret
+
+Func_455a3:
+	ld a, VAR_0E
+	farcall GetVarValue
+	cp $01
+	jp c, .asm_45658
+	jr z, .asm_455f0
+	cp $02
+	jr z, .asm_455c8
+	ld a, EVENT_SET_UNTIL_MAP_RELOAD_2
+	farcall GetEventValue
+	ld c, $06
+	jr z, .asm_455c2
+	ld a, $01
+	jr .asm_455c4
+.asm_455c2
+	ld a, $02
+.asm_455c4
+	farcall Func_1ea4c
+.asm_455c8
+	ld c, $04
+	ld a, $01
+	farcall Func_1ea4c
+	ld c, $05
+	ld a, $01
+	farcall Func_1ea4c
+	ld a, VAR_1C
+	farcall GetVarValue
+	ld c, a
+	ld a, VAR_1E
+	farcall GetVarValue
+	cp c
+	jr z, .asm_455f0
+	ld c, $05
+	ld a, $02
+	farcall Func_1ea4c
+.asm_455f0
+	ld c, $00
+	ld a, $01
+	farcall Func_1ea4c
+	ld c, $01
+	ld a, $01
+	farcall Func_1ea4c
+	ld a, VAR_GRANDMASTERCUP_OPPONENT_DECK_1
+	farcall GetVarValue
+	ld c, a
+	ld a, VAR_1B
+	farcall GetVarValue
+	cp c
+	jr z, .asm_45618
+	ld c, $01
+	ld a, $02
+	farcall Func_1ea4c
+.asm_45618
+	ld c, $02
+	ld a, $01
+	farcall Func_1ea4c
+	ld a, VAR_GRANDMASTERCUP_OPPONENT_DECK_3
+	farcall GetVarValue
+	ld c, a
+	ld a, VAR_1C
+	farcall GetVarValue
+	cp c
+	jr z, .asm_45638
+	ld c, $02
+	ld a, $02
+	farcall Func_1ea4c
+.asm_45638
+	ld c, $03
+	ld a, $01
+	farcall Func_1ea4c
+	ld a, VAR_GRANDMASTERCUP_OPPONENT_DECK_5
+	farcall GetVarValue
+	ld c, a
+	ld a, VAR_1D
+	farcall GetVarValue
+	cp c
+	jr z, .asm_45658
+	ld c, $03
+	ld a, $02
+	farcall Func_1ea4c
+.asm_45658
+	farcall Func_1e984
+	ret
+
+Func_4565d:
+	push bc
+	push de
+	push hl
+	or a
+	jr nz, .asm_45668
+	ld a, [wPlayerOWObject]
+	jr .asm_45672
+.asm_45668
+	dec a
+	add VAR_GRANDMASTERCUP_OPPONENT_DECK_0
+	farcall GetVarValue
+	call Func_45484
+.asm_45672
+	pop hl
+	pop de
+	pop bc
+	ret
+
+; for a = [0, 3], return bc = prize card id
+; at GrandMasterCupPromoPrizes[VAR_GRANDMASTERCUP_PRIZE_INDEX_[a]]
+GetGrandMasterCupPrizeCardID:
+	push af
+	push hl
+	ld c, VAR_GRANDMASTERCUP_PRIZE_INDEX_0
+	add c
+	farcall GetVarValue
+	ld hl, GrandMasterCupPromoPrizes
+	sla a
+	add_hl_a
+	ld a, [hli]
+	ld b, [hl]
+	ld c, a
+	pop hl
+	pop af
+	ret
+
+; for a = [0, 3], return hl = prize card name
+; at GrandMasterCupPromoPrizes[VAR_GRANDMASTERCUP_PRIZE_INDEX_[a]]
+GetGrandMasterCupPrizeCardName:
+	push af
+	push bc
+	push de
+	call GetGrandMasterCupPrizeCardID
+	ld e, c
+	ld d, b
+	farcall GetReceivingCardLongName
+	pop de
+	pop bc
+	pop af
+	ret
+
+INCLUDE "engine/black_box.asm"
+
 INCLUDE "engine/credits.asm"

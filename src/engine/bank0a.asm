@@ -43,7 +43,6 @@ FindCardIDInNonTurnDuelistsPlayArea:
 	call FindCardIDInTurnDuelistsPlayArea
 	call SwapTurn
 	ret
-; 0x28039
 
 ; returns carry if card ID is found in turn duelist's Play Area
 ; inputs:
@@ -755,7 +754,7 @@ AISelectSpecialAttackParameters:
 
 	; toss coin
 	ldtx de, IfHeadsAttachUpTo3WaterEnergyFromDeckText
-	farcall Func_68079
+	farcall Serial_TossCoin
 	ldh [hTemp_ffa0], a
 
 	; check number of Water energies attached to Kingler
@@ -902,7 +901,7 @@ AISelectSpecialAttackParameters:
 	call CreateArenaOrBenchEnergyCardList
 	jp c, .asm_286ad
 	; show Play Area
-	bank1call Func_5c30
+	bank1call SetupPlayAreaScreen
 	bank1call PrintPlayAreaCardList_EnableLCD
 .asm_28633
 	; check a potential target to give energy card
@@ -980,7 +979,7 @@ AISelectSpecialAttackParameters:
 	or a
 	jp nz, .no_carry
 	ldtx de, IfTails30DamageTo1OfYourPokemonText
-	farcall Func_68079
+	farcall Serial_TossCoin
 	ldh [hTemp_ffa0], a
 	or a
 	jr nz, .asm_286c7
@@ -1036,7 +1035,7 @@ AISelectSpecialAttackParameters:
 	or a
 	jp nz, .no_carry
 	ldtx de, AttackSuccessCheckText
-	farcall Func_68079
+	farcall Serial_TossCoin
 	ldh [hTemp_ffa0], a
 	or a
 	jr z, .errand_running_tails
@@ -1118,7 +1117,7 @@ AISelectSpecialAttackParameters:
 	jp nc, .no_carry
 	ldh [hTempPlayAreaLocation_ffa1], a
 	ldtx de, AttackSuccessCheckText
-	farcall Func_68079
+	farcall Serial_TossCoin
 	ldh [hTemp_ffa0], a
 	scf
 	ret
@@ -1130,7 +1129,7 @@ AISelectSpecialAttackParameters:
 	jp c, .no_carry
 	; no Play Area Pokémon has damage
 	ldtx de, DamageCheckIfTailsNoDamageText
-	farcall Func_68079
+	farcall Serial_TossCoin
 	ldh [hTemp_ffa0], a
 	xor a ; choose Arena card
 	ldh [hTempPlayAreaLocation_ffa1], a
@@ -1528,7 +1527,7 @@ AISelectSpecialAttackParameters:
 	farcall TossCoin_Bank1a
 	ldh [hTemp_ffa0], a
 	ret c
-	farcall Func_6809a
+	farcall SetWasUnsuccessful
 	scf
 	ret
 
@@ -1655,7 +1654,7 @@ AISelectSpecialAttackParameters:
 .got_focus_blast_target
 	ldh [hTempPlayAreaLocation_ffa1], a
 	ldtx de, IfHeads20DamageTo1OfOppPokemonText
-	farcall Func_68079
+	farcall Serial_TossCoin
 	ldh [hTemp_ffa0], a
 	scf
 	ret
@@ -2791,56 +2790,61 @@ Func_29e02:
 
 SECTION "Bank a@6331", ROMX[$6331], BANK[$a]
 
-Func_2a331:
+; cf. LookForEnergyNeededForAttackInHand
+LookForEnergyNeededInHand::
 	xor a ; FIRST_ATTACK_OR_PKMN_POWER
 	ld [wSelectedAttack], a
 	farcall CheckEnergyNeededForAttack
 	ld a, b
 	add c
 	cp 1
-	jr z, .asm_2a362
+	jr z, .one_energy
 	cp 2
-	jr nz, .asm_2a348
+	jr nz, .second_attack
 	ld a, c
 	cp 2
-	jr z, .asm_2a37a
-.asm_2a348
+	jr z, .two_colorless
+
+.second_attack
 	ld a, SECOND_ATTACK
 	ld [wSelectedAttack], a
 	farcall CheckEnergyNeededForAttack
 	ld a, b
 	add c
 	cp 1
-	jr z, .asm_2a362
+	jr z, .one_energy
 	cp 2
-	jr nz, .asm_2a360
+	jr nz, .no_carry
 	ld a, c
 	cp 2
-	jr z, .asm_2a37a
-.asm_2a360
+	jr z, .two_colorless
+
+.no_carry
 	or a
 	ret
 
-.asm_2a362
+.one_energy
 	ld a, b
 	or a
-	jr z, .asm_2a373
+	jr z, .one_colorless
 	call LookForCardIDInHandList
 	ret c
 	ld de, RAINBOW_ENERGY
 	call LookForCardIDInHandList
 	ret c
-	jr .asm_2a360
-.asm_2a373
+	jr .no_carry
+
+.one_colorless
 	bank1call CreateEnergyCardListFromHand
-	jr c, .asm_2a360
+	jr c, .no_carry
 	scf
 	ret
-.asm_2a37a
+
+.two_colorless
 	ld de, DOUBLE_COLORLESS_ENERGY
 	call LookForCardIDInHandList
 	ret c
-	jr .asm_2a360
+	jr .no_carry
 
 ; looks for energy card(s) in hand depending on
 ; what is needed for selected card's attack
@@ -3308,9 +3312,218 @@ AIDeckSpecificBenchScore:
 	; at least 2 GR's Mewtwo in Play Area
 	ld a, 28
 	ret
-; 0x2a72f
 
-SECTION "Bank a@7c4f", ROMX[$7c4f], BANK[$a]
+INCLUDE "src/data/auto_deck_list.asm"
+INCLUDE "src/data/auto_deck_machine.asm"
+
+Func_2bb32:
+	call EnableSRAM
+	ld a, [wd4b3]
+	ld l, a
+	ld h, 24
+	call HtimesL
+	ld a, [wd548]
+	or a
+	jr nz, .machine_2
+; machine 1
+	ld bc, AutoDeckMachine1Entries
+	jr .got_addr
+.machine_2
+	ld bc, AutoDeckMachine2Entries
+.got_addr
+	add hl, bc
+	ld bc, $0
+.loop
+	call Func_2bb7f
+	call Func_2bbbb
+	inc hl
+	inc hl
+	call Func_2bbf9
+	push hl
+	ld de, wd4b4
+	ld h, c
+	ld l, 2
+	call HtimesL
+	add hl, de
+	ld d, h
+	ld e, l
+	pop hl
+	ld a, [hli]
+	ld [de], a
+	inc de
+	ld a, [hli]
+	ld [de], a
+	call Func_2bb8e
+	inc b
+	ld a, b
+	cp 4
+	jr nz, .loop
+
+	ld a, c
+	ld [wNumDeckMachineEntries], a
+	call DisableSRAM
+	ret
+
+Func_2bb7f:
+	push hl
+	ld l, c
+	ld h, DECK_COMPRESSED_STRUCT_SIZE
+	call HtimesL
+	ld de, wAutoDecks
+	add hl, de
+	ld d, h
+	ld e, l
+	pop hl
+	ret
+
+Func_2bb8e:
+	ld a, [wd4b3]
+	cp $01
+	jr z, .asm_2bb9b
+	cp $08
+	jr z, .asm_2bb9b
+	inc c
+	ret
+.asm_2bb9b
+	push de
+	push hl
+	push bc
+	ld a, [wd4b3]
+	farcall CheckTCGIslandMilestoneEvents
+	inc b
+	ld e, $01
+.asm_2bba8
+	dec b
+	jr z, .asm_2bbaf
+	sla e
+	jr .asm_2bba8
+.asm_2bbaf
+	and e
+	or a
+	jr z, .asm_2bbb7
+	pop bc
+	inc c
+	jr .asm_2bbb8
+.asm_2bbb7
+	pop bc
+.asm_2bbb8
+	pop hl
+	pop de
+	ret
+
+Func_2bbbb:
+	push hl
+	push bc
+	push de
+	push de
+	ld e, [hl]
+	inc hl
+	ld d, [hl]
+	ld hl, wc000
+	xor a
+	ld b, $82
+.asm_2bbc8
+	ld [hli], a
+	dec b
+	jr nz, .asm_2bbc8
+	ld hl, wc000
+.asm_2bbcf
+	ld a, [de]
+	inc de
+	ld b, a
+	or a
+	jr z, .asm_2bbe2
+	ld a, [de]
+	inc de
+	ld c, a
+	ld a, [de]
+	inc de
+.asm_2bbda
+	ld [hl], c
+	inc hl
+	ld [hli], a
+	dec b
+	jr nz, .asm_2bbda
+	jr .asm_2bbcf
+.asm_2bbe2
+	pop hl
+	ld bc, $18
+	add hl, bc
+	ld de, wc000
+	farcall SwitchToWRAM2
+	bank1call SaveDeckCards
+	farcall SwitchToWRAM1
+	pop de
+	pop bc
+	pop hl
+	ret
+
+Func_2bbf9:
+	push hl
+	push bc
+	push de
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	ld de, wDefaultText
+	call CopyText
+	pop hl
+	farcall SwitchToWRAM2
+	ld de, wDefaultText
+	ld b, $0f
+	ld c, $0e
+.asm_2bc11
+	ld a, [de]
+	inc de
+	or a
+	jr z, .asm_2bc45
+	cp $05
+	jr z, .asm_2bc2f
+	cp $04
+	jr z, .asm_2bc3a
+	cp c
+	jr z, .asm_2bc26
+	ld [hl], b
+	inc hl
+	ld [hli], a
+	jr .asm_2bc11
+.asm_2bc26
+	ld [hli], a
+	ld a, [de]
+	inc de
+	ld [hli], a
+	ld a, b
+	ld b, c
+	ld c, a
+	jr .asm_2bc11
+.asm_2bc2f
+	ld [hli], a
+	ld a, [de]
+	inc de
+	ld [hli], a
+	ld a, [de]
+	cp b
+	jr nz, .asm_2bc11
+	inc de
+	jr .asm_2bc11
+.asm_2bc3a
+	ld [hli], a
+	ld a, [de]
+	inc de
+	ld [hli], a
+	ld a, [de]
+	cp b
+	jr nz, .asm_2bc11
+	inc de
+	jr .asm_2bc11
+.asm_2bc45
+	ld [hl], a
+	farcall SwitchToWRAM1
+	pop bc
+	pop hl
+	inc hl
+	inc hl
+	ret
 
 ; de = text ID
 Func_2bc4f:
@@ -3319,8 +3532,8 @@ Func_2bc4f:
 	inc hl
 	ld [hl], d
 
-	ld a, $ff ; all decks
-	farcall DrawDeckSelectionMenu
+	ld a, ALL_DECKS
+	farcall DrawDecksScreen
 	xor a
 .asm_2bc5c
 	ld hl, .MenuParameters
@@ -3332,7 +3545,7 @@ Func_2bc4f:
 	call DrawWideTextBox_PrintText
 .loop_input
 	call DoFrame
-	farcall Func_8fb9
+	farcall HandleStartButtonInDeckSelectionMenu
 	jr c, .asm_2bc5c
 	call HandleMenuInput
 	jp nc, .loop_input ; can be jr
@@ -3347,7 +3560,7 @@ Func_2bc4f:
 	farcall CheckIfCurDeckIsEmpty
 	jp nc, .valid ; can be jr
 	; deck is empty
-	farcall Func_9215
+	farcall PrintThereIsNoDeckHereText
 	jr .asm_2bc5c
 
 .valid
@@ -3356,10 +3569,189 @@ Func_2bc4f:
 	ret
 
 .MenuParameters:
-	db 1, 2 ; cursor x, cursor y
-	db 3 ; y displacement between items
-	db NUM_DECKS ; number of items
-	db SYM_CURSOR_R ; cursor tile number
-	db SYM_SPACE ; tile behind cursor
-	dw NULL ; function pointer if non-0
-; 0x2bc9f
+	menu_params 1, 2, 3, NUM_DECKS, SYM_CURSOR_R, SYM_SPACE, NULL
+
+_HandleAutoDeckMenu:
+	ld [wd548], a
+	xor a
+	ld [wScrollMenuScrollOffset], a
+.asm_2bca6
+	ld hl, AutoDeckMachineMenuParams
+	farcall InitializeScrollMenuParameters
+	ld a, NUM_DECK_MACHINE_VISIBLE_DECKS
+	ld [wNumMenuItems], a
+	call .InitMenu
+	ld hl, Func_3bf5e
+	ld d, h
+	ld a, l
+	ld hl, wScrollMenuScrollFunc
+	ld [hli], a
+	ld [hl], d
+	xor a
+	ld [wd119], a
+.wait_input
+	call DoFrame
+	farcall HandleScrollMenu
+	jr nc, .wait_input
+	ld a, [hCurMenuItem]
+	cp $ff
+	ret z ; cancel
+
+	ld a, [wScrollMenuScrollOffset]
+	ld [wd54a], a
+	ld b, a
+	ld a, [wTempCardTypeFilter]
+	ld [wd54b], a
+	add b
+	ld hl, wd49f
+	ld c, a
+	ld b, $00
+	add hl, bc
+	ld a, [hl]
+	dec a
+	ld [wd4b3], a
+	farcall Func_3bb09
+	ld a, [wd54a]
+	ld [wScrollMenuScrollOffset], a
+	ld a, [wd54b]
+	jr .asm_2bca6
+
+.InitMenu:
+	xor a
+	ld [wTileMapFill], a
+	call EmptyScreen
+	ld a, TRUE
+	ld [wVBlankOAMCopyToggle], a
+	farcall LoadMenuCursorTile
+	call LoadSymbolsFont
+	call LoadDuelCardSymbolTiles
+	bank1call SetDefaultPalettes
+	lb de, $3c, $ff
+	call SetupText
+	lb de, 0, 0
+	lb bc, 20, 13
+	call DrawRegularTextBox
+	lb de, 1, 0
+	ld a, [wd548]
+	or a
+	jr nz, .machine_2
+; machine 1
+	ldtx hl, AutoDeckMachine1Text
+	jr .got_name
+.machine_2
+	ldtx hl, AutoDeckMachine2Text
+.got_name
+	call Func_2c4b
+	ldtx hl, ChooseDeckTypeText
+	call DrawWideTextBox_PrintText
+	call Func_2bd48
+	farcall Func_3bf5e
+	call EnableLCD
+	ret
+
+Func_2bd48:
+	ld a, $08
+	ld hl, wd49f
+	farcall ClearNBytesFromHL
+	ld a, $08
+	ld hl, wd4b4
+	farcall ClearNBytesFromHL
+	ld bc, $0
+.asm_2bd5d
+	ld a, b
+	push bc
+	call Func_2bd7f
+	pop bc
+	jr nc, .asm_2bd6b
+	push bc
+	call Func_2bd92
+	pop bc
+	inc c
+.asm_2bd6b
+	inc b
+	ld a, b
+	cp $0a
+	jr nz, .asm_2bd5d
+	ld a, c
+	ld [wNumDeckMachineEntries], a
+	ld a, [wNumMenuItems]
+	cp c
+	ret c
+	ld a, c
+	ld [wNumMenuItems], a
+	ret
+
+Func_2bd7f:
+	push af
+	ld a, [wd548]
+	or a
+	jr nz, .machine_2
+; machine 1
+	pop af
+	farcall CheckTCGIslandMilestoneEvents
+	ret
+.machine_2
+	pop af
+	farcall CheckGRIslandMilestoneEvents
+	ret
+
+Func_2bd92:
+	ld hl, wd49f
+	push bc
+	ld a, b
+	inc a
+	ld b, 0
+	add hl, bc
+	pop bc
+	ld [hl], a
+	ld a, [wd548]
+	or a
+	jr nz, .machine_2
+; machine 1
+	ld hl, .Machine1SectionTitles
+	jr .got_addr
+.machine_2
+	ld hl, .Machine2SectionTitles
+.got_addr
+	push bc
+	ld c, b
+	sla c
+	ld b, 0
+	add hl, bc
+	pop bc
+	ld e, l
+	ld d, h
+	ld hl, wd4b4
+	sla c
+	ld b, 0
+	add hl, bc
+	ld a, [de]
+	ld [hli], a
+	inc de
+	ld a, [de]
+	ld [hl], a
+	ret
+
+.Machine1SectionTitles:
+	tx BasicDeckMachineTextPadded
+	tx GivenDeckMachineTextPadded
+	tx FightingDeckMachineText
+	tx GrassDeckMachineText
+	tx WaterDeckMachineText
+	tx FireDeckMachineText
+	tx LightningDeckMachineText
+	tx PsychicDeckMachineText
+	tx SpecialDeckMachineTextPadded
+	tx LegendaryDeckMachineTextPadded
+
+.Machine2SectionTitles:
+	tx DarkGrassDeckMachineText
+	tx DarkLightningDeckMachineText
+	tx DarkWaterDeckMachineText
+	tx DarkFireDeckMachineText
+	tx DarkFightingDeckMachineText
+	tx DarkPsychicDeckMachineText
+	tx ColorlessDeckMachineTextPadded
+	tx DarkSpecialDeckMachineText
+	tx RareCardDeckMachineText
+	tx MysteriousCardDeckMachineTextPadded

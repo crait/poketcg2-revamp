@@ -1,15 +1,191 @@
+StartUpDebugMenu::
+	push af
+	push bc
+	push de
+	push hl
+	push af
+	ld a, SFX_CONFIRM
+	call CallPlaySFX
+	pop af
+.loop
+	call ClearSpriteAnimsAndSetInitialGraphicsConfiguration
+	call FlushAllPalettes
+	call EnableLCD
+	call InitStartupDebugMenuBox
+	call HandleStartupDebugMenuBox
+	jr c, .done
+	call HandleStartupDebugMenuOption
+	jr c, .done
+	jr .loop
+.done
+	call ClearSpriteAnimsAndSetInitialGraphicsConfiguration
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+InitStartupDebugMenuBox:
+	push af
+	push bc
+	push de
+	push hl
+	lb de, 0, 0
+	ld b, BANK(.menu_params)
+	ld hl, .menu_params
+	call LoadMenuBoxParams
+	ld a, [wDebugMenuCursorPosition]
+	farcall DrawMenuBox
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+.menu_params:
+	menubox_params TRUE, 16, 11, \
+		SYM_CURSOR_R, SYM_SPACE, SYM_CURSOR_R, SYM_CURSOR_R, \
+		PAD_A, PAD_B, FALSE, 1, NULL, DebugKondoDebugText
+	textitem 2, 2, DebugPowerOnText
+	textitem 2, 3, PauseMenuCoinText
+	textitem 2, 4, PauseMenuConfigText
+	textitem 2, 5, DebugEffectViewerText
+	textitem 2, 6, DebugCreditsText
+	textitem 2, 7, DebugDuelText
+	textitem 2, 8, DebugSlotMachineText
+	textitem 2, 9, PauseMenuExitText
+	textitems_end
+
+HandleStartupDebugMenuBox:
+	ld a, [wDebugMenuCursorPosition]
+	farcall HandleMenuBox
+	ld [wDebugMenuCursorPosition], a
+	jr c, .asm_1008a
+	push af
+	ld a, SFX_CONFIRM
+	call CallPlaySFX
+	pop af
+	ret
+.asm_1008a
+	push af
+	ld a, SFX_CANCEL
+	call CallPlaySFX
+	pop af
+	ret
+
+HandleStartupDebugMenuOption:
+	ld hl, .FunctionMap
+	call CallMappedFunction
+	ret
+
+.FunctionMap
+	key_func DEBUGMENU_POWER_ON,      _CoreGameLoop
+	key_func DEBUGMENU_COIN,          SetAllCoinsObtainedAndShowCoinMenu
+	key_func DEBUGMENU_CONFIG,        DebugShowConfigMenu
+	key_func DEBUGMENU_EFFECT_VIEWER, DebugMenuEffectViewer
+	key_func DEBUGMENU_CREDITS,       _PlayCredits
+	key_func DEBUGMENU_DUEL,          StartDebugDuelVsRandomOpponent
+	key_func DEBUGMENU_SLOT,          DebugSlotMachine
+	db $ff
+
+SetAllCoinsObtainedAndShowCoinMenu:
+	call SetSpriteAnimationAndFadePalsFrameFunc
+	farcall StartFadeToWhite
+	farcall WaitPalFading_Bank07
+	ld a, [wd693]
+	res 2, a
+	ld [wd693], a
+	call SetAllCoinEvents
+	farcall ShowCoinMenuWithoutIncomingCoin ; same menu that you see from the in-game coin menu
+	call UnsetSpriteAnimationAndFadePalsFrameFunc
+	ret
+
+SetAllCoinEvents:
+	ld c, NUM_COINS
+	ld hl, .CoinEvents
+.loop
+	ld a, [hli]
+	farcall MaxOutEventValue
+	dec c
+	jr nz, .loop
+	ret
+
+.CoinEvents:
+	; note that this is the order the coins are displayed in menu, not const value order
+	db EVENT_GOT_CHANSEY_COIN
+	db EVENT_GOT_GR_COIN
+	db EVENT_GOT_ODDISH_COIN
+	db EVENT_GOT_CHARMANDER_COIN
+	db EVENT_GOT_STARMIE_COIN
+	db EVENT_GOT_PIKACHU_COIN
+	db EVENT_GOT_ALAKAZAM_COIN
+	db EVENT_GOT_KABUTO_COIN
+	db EVENT_GOT_GOLBAT_COIN
+	db EVENT_GOT_MAGNEMITE_COIN
+	db EVENT_GOT_MAGMAR_COIN
+	db EVENT_GOT_PSYDUCK_COIN
+	db EVENT_GOT_MACHAMP_COIN
+	db EVENT_GOT_MEW_COIN
+	db EVENT_GOT_SNORLAX_COIN
+	db EVENT_GOT_TOGEPI_COIN
+	db EVENT_GOT_PONYTA_COIN
+	db EVENT_GOT_HORSEA_COIN
+	db EVENT_GOT_ARBOK_COIN
+	db EVENT_GOT_JIGGLYPUFF_COIN
+	db EVENT_GOT_DUGTRIO_COIN
+	db EVENT_GOT_GENGAR_COIN
+	db EVENT_GOT_RAICHU_COIN
+	db EVENT_GOT_LUGIA_COIN
+
+DebugShowConfigMenu:
+	call SetSpriteAnimationAndFadePalsFrameFunc
+	farcall StartFadeToWhite
+	farcall WaitPalFading_Bank07
+	farcall ShowConfigMenu
+	call UnsetSpriteAnimationAndFadePalsFrameFunc
+	ret
+
+StartDebugDuelVsRandomOpponent:
+	call ClearSpriteAnimsAndSetInitialGraphicsConfiguration
+	call SetFrameFuncAndFadeFromWhite
+	ld a, $28
+	call Random
+	add $05
+	ld [wNPCDuelDeckID], a
+	farcall Func_1e5a2
+	call FadeToWhiteAndUnsetFrameFunc
+	ret
+
+DebugSlotMachine:
+	call SetSpriteAnimationAndFadePalsFrameFunc
+	farcall StartFadeToWhite
+	farcall WaitPalFading_Bank07
+	call ClearGameCenterChips
+	ld bc, 100
+	call AddChips
+	call Func_3d0d
+	push af
+	ld a, MUSIC_DUEL_THEME_GR_LEADER
+	call SetMusic
+	pop af
+	ld a, 5
+	farcall SlotMachine
+	call Func_3d16
+	call UnsetSpriteAnimationAndFadePalsFrameFunc
+	ret
+; 0x10150
+
 SECTION "Bank 4@4221", ROMX[$4221], BANK[$4]
 
 ; waits until any of the keys
 ; in register c are pressed
-Func_10221:
+WaitForButtonPress:
 .loop
 	call DoFrame
 	ldh a, [hKeysPressed]
 	and c
 	jr z, .loop
 	ret
-; 0x1022a
 
 Func_1022a:
 	push af
@@ -73,9 +249,46 @@ ClearSpriteAnimsAndSetInitialGraphicsConfiguration::
 	call ClearSpriteAnims
 	call SetInitialGraphicsConfiguration
 	ret
-; 0x102a4
 
-SECTION "Bank 4@42ef", ROMX[$42ef], BANK[$4]
+Func_102a4:
+	push af
+	push bc
+	push de
+	push hl
+	farcall StartFadeToWhite
+	farcall WaitPalFading_Bank07
+	call Func_10ea7
+	call Func_1059f
+	call SetSpriteAnimationAndFadePalsFrameFunc
+	call Func_10d40
+	call Func_102ef
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+Func_102c4:
+	push af
+	push bc
+	push de
+	push hl
+	call Func_10d40
+	call Func_102ef
+	call Func_10ed3
+	call Func_105de
+	call DisableLCD
+	call Func_10b9c
+	call Func_1055e
+	call UpdateOWScroll
+	call EnableLCD
+	call UnsetSpriteAnimationAndFadePalsFrameFunc
+	farcall StartFadeFromWhite
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
 
 Func_102ef:
 	push af
@@ -127,7 +340,9 @@ Func_102ef:
 	call SwitchWRAMBank
 	ret
 
-Func_10342:
+; de: x, y, bc: width, height
+; store bg map data from VRAM0, 1 into WRAM3
+CopyBGMapFromVRAMToWRAM:
 	push af
 	push bc
 	push de
@@ -162,9 +377,9 @@ Func_10342:
 	ld c, e ; y
 	call BCCoordToBGMap0Address
 	pop bc
-	pop de
+	pop de ; WRAM3
 .loop
-	xor a ; VRAM0
+	xor a ; BANK("VRAM0")
 	call BankswitchVRAM
 	push bc
 	push hl
@@ -193,7 +408,7 @@ Func_10342:
 	dec b
 	jr nz, .loop_copy_vram1
 	pop hl
-	ld bc, BG_MAP_WIDTH
+	ld bc, TILEMAP_WIDTH
 	add hl, bc
 	pop bc
 	dec c
@@ -217,12 +432,13 @@ Func_10342:
 	pop af
 	ret
 
-Func_103b6:
+; restore bg map data from WRAM3 into VRAM0, 1
+CopyBGMapFromWRAMToVRAM:
 	push af
 	push hl
 	ld a, [wWRAMBank]
 	push af
-	ld a, $03
+	ld a, BANK("WRAM3")
 	call SwitchWRAMBank
 	ld hl, w3d400
 	dec [hl]
@@ -235,26 +451,26 @@ Func_103b6:
 	ld a, [hli]
 	ld h, [hl]
 	ld l, a
-	ld a, [hli]
+	ld a, [hli] ; x
 	ld d, a
-	ld a, [hli]
+	ld a, [hli] ; y
 	ld e, a
-	ld a, [hli]
+	ld a, [hli] ; width
 	ld b, a
-	ld a, [hli]
+	ld a, [hli] ; height
 	ld c, a
 	push bc
 	push de
 	push hl
 	push bc
-	ld b, d
-	ld c, e
+	ld b, d ; x
+	ld c, e ; y
 	call BCCoordToBGMap0Address
 	pop bc
 	pop hl
 .loop_rows
 	push bc
-	xor a
+	xor a ; BANK("VRAM0")
 	call BankswitchVRAM
 	push de
 	call SafeCopyDataHLtoDE
@@ -267,7 +483,7 @@ Func_103b6:
 	push hl
 	ld h, d
 	ld l, e
-	ld bc, BG_MAP_WIDTH
+	ld bc, TILEMAP_WIDTH
 	add hl, bc
 	ld d, h
 	ld e, l
@@ -275,7 +491,7 @@ Func_103b6:
 	pop bc
 	dec c
 	jr nz, .loop_rows
-	xor a
+	xor a ; BANK("VRAM0")
 	call BankswitchVRAM
 	pop de
 	pop bc
@@ -285,11 +501,11 @@ Func_103b6:
 	pop af
 	ret
 
-Func_10413:
-	ld [wd895], a
+SetOWScrollState:
+	ld [wOWScrollState], a
 	ret
 
-; updates scrolling, depending on wd895:
+; updates scrolling, depending on wOWScrollState:
 ; - if $0 then move to target position
 ;   with wd7e8 = x and wd7e9 = y
 ; - if $1 then move scroll so that
@@ -299,7 +515,7 @@ UpdateOWScroll::
 	push bc
 	push de
 	push hl
-	ld a, [wd895]
+	ld a, [wOWScrollState]
 	inc a
 	dec a
 	jr nz, .no_target_position
@@ -335,12 +551,12 @@ UpdateOWScroll::
 
 	ld a, d
 	cp $40
-	ld a, $00
+	ld a, 0
 	jr c, .got_x_scroll
 	ld a, [wd7dc]
+REPT 3
 	sla a
-	sla a
-	sla a ; *8
+ENDR
 	sub $a0
 	ld b, a
 	ld a, d
@@ -353,12 +569,12 @@ UpdateOWScroll::
 
 	ld a, e
 	cp $40
-	ld a, $00
+	ld a, 0
 	jr c, .got_y_scroll
 	ld a, [wd7dd]
+REPT 3
 	sla a
-	sla a
-	sla a ; *8
+ENDR
 	sub $90
 	ld b, a
 	ld a, e
@@ -398,9 +614,78 @@ UpdateOWScroll::
 	inc [hl]
 .done
 	ret
-; 0x104ad
 
-SECTION "Bank 4@44fe", ROMX[$44fe], BANK[$4]
+; input: d = x_1, e = y_1
+; x_2 = [wOWScrollX] * 8 if x_1 bit 7 is set, x_1 otherwise
+; y_2 = [wOWScrollY] * 8 if x_1 bit 7 is set, y_1 otherwise
+; x_n = [wd7dc] * 8 - $a0, y_n = [wd7dd] * 8 - $90
+; output:
+; [wd7e8] = min(x_2 * 8, x_n),
+; [wd7e9] = min(y_2 * 8, y_n),
+; [wOWScrollState] = 0
+Func_104ad:
+	push af
+	push bc
+	push de
+	ld a, d
+	bit 7, a
+	jr z, .got_x_base
+	ld a, [wOWScrollX]
+REPT 3
+	srl a
+ENDR
+; fallthrough
+.got_x_base
+REPT 3
+	add a
+ENDR
+	ld c, a
+	ld a, [wd7dc]
+REPT 3
+	add a
+ENDR
+	sub $a0
+	ld b, a
+	ld a, c
+	cp b
+	jr c, .got_x
+	ld a, b
+; fallthrough
+.got_x
+	ld [wd7e8], a
+
+	ld a, e
+	bit 7, a
+	jr z, .got_y_base
+	ld a, [wOWScrollY]
+REPT 3
+	srl a
+ENDR
+; fallthrough
+.got_y_base
+REPT 3
+	add a
+ENDR
+	ld c, a
+	ld a, [wd7dd]
+REPT 3
+	add a
+ENDR
+	sub $90
+	ld b, a
+	ld a, c
+	cp b
+	jr c, .got_y
+	ld a, b
+; fallthrough
+.got_y
+	ld [wd7e9], a
+	xor a
+	call SetOWScrollState
+	pop de
+	pop bc
+	pop af
+	ret
 
 StoreScrollTargetObjectPtr:
 	push af
@@ -410,22 +695,67 @@ StoreScrollTargetObjectPtr:
 	ld [wScrollTargetSpritePtr + 1], a
 	pop af
 	ret
-; 0x10509
 
-SECTION "Bank 4@4541", ROMX[$4541], BANK[$4]
+; output:
+; [wOWScrollState] = 2
+; [wOWScrollX] = d * 8
+; [wOWScrollY] = e * 8
+CalcOWScroll:
+	push af
+	ld a, 2
+	call SetOWScrollState
+	ld a, d
+REPT 3
+	add a
+ENDR
+	ld [wOWScrollX], a
+	ld a, e
+REPT 3
+	add a
+ENDR
+	ld [wOWScrollY], a
+	pop af
+	ret
 
+; output:
+; a = 0 if [wOWScrollState] = 0 AND [wOWScrollX] = [wd7e8] AND [wOWScrollY] = [wd7e9]
+; a = 1 otherwise
+CheckOWScroll:
+	push bc
+	ld c, 1
+	ld a, [wOWScrollState]
+	and a
+	jr nz, .got_result
+	ld a, [wOWScrollX]
+	ld b, a
+	ld a, [wd7e8]
+	cp b
+	jr nz, .got_result
+	ld a, [wOWScrollY]
+	ld b, a
+	ld a, [wd7e9]
+	cp b
+	jr nz, .got_result
+	ld c, 0
+; fallthrough
+.got_result
+	ld a, c
+	pop bc
+	ret
+
+; output:
+; a = [wd6d4 + (e/2)*16 + d/2]
 Func_10541:
 	push bc
 	push de
 	push hl
 	srl d
 	srl e
-	ld b, $00
+	ld b, 0
 	ld hl, wd6d4
+REPT 4
 	sla e
-	sla e
-	sla e
-	sla e
+ENDR
 	ld c, e
 	add hl, bc
 	ld c, d
@@ -555,9 +885,30 @@ Func_105de:
 	pop bc
 	pop af
 	ret
-; 0x1061d
 
-SECTION "Bank 4@463a", ROMX[$463a], BANK[$4]
+; input: a, b, c
+; output:
+; [wd896] = c
+; [wd896 + 1] = b
+; [wd896 + 2] = [wd896 + 3] = a
+; [wd896 + 4] = 0
+SetwD896:
+	ld [wd896 + 2], a
+	ld [wd896 + 3], a
+	ld a, c
+	ld [wd896], a
+	ld a, b
+	ld [wd896 + 1], a
+	xor a
+	ld [wd896 + 4], a
+	ret
+
+CopyCGBBGPalsWithID_BeginWithPal2:
+	push bc
+	farcall GetPaletteGfxPointer
+	call CopyCGBBGPalsFromSource_BeginWithPal2
+	pop bc
+	ret
 
 SetInitialGraphicsConfiguration:
 	push af
@@ -583,7 +934,7 @@ SetInitialGraphicsConfiguration:
 	pop af
 	ret
 
-SetFontAndTextBoxFrameColor_PreserveRegisters:
+SetFontAndTextBoxFrameColor_PreserveRegisters::
 	push af
 	push bc
 	push de
@@ -594,11 +945,13 @@ SetFontAndTextBoxFrameColor_PreserveRegisters:
 	pop bc
 	pop af
 	ret
-; 0x10672
 
-SECTION "Bank 4@4673", ROMX[$4673], BANK[$4]
+Func_10672:
+	ret
 
-Func_10673::
+; input: de = coord
+; return d += [hSCX]/8, e += [hSCY]/8
+AdjustDECoordByhSC::
 	push af
 	ldh a, [hSCX]
 	srl a
@@ -614,9 +967,6 @@ Func_10673::
 	ld e, a
 	pop af
 	ret
-; 0x1068a
-
-SECTION "Bank 4@468a", ROMX[$468a], BANK[$4]
 
 SetZeroScroll:
 	push af
@@ -642,7 +992,7 @@ SafeClearBGMap:
 .wait_lcd_1
 	di
 	ldh a, [rSTAT]
-	and STAT_LCDC_STATUS
+	and STAT_MODE
 	jr nz, .wait_lcd_1
 	xor a
 	ld [hl], a
@@ -653,7 +1003,7 @@ SafeClearBGMap:
 .wait_lcd_2
 	di
 	ldh a, [rSTAT]
-	and STAT_LCDC_STATUS
+	and STAT_MODE
 	jr nz, .wait_lcd_2
 	xor a
 	ld [hli], a
@@ -669,9 +1019,39 @@ SafeClearBGMap:
 	pop bc
 	pop af
 	ret
-; 0x106ca
 
-SECTION "Bank 4@46f4", ROMX[$46f4], BANK[$4]
+; copy 64 bytes from hl to wBackgroundPalettesCGB, then run FlushAllPalettes with a = 7
+UpdateBackgroundPalettesCGB_Flush:
+	push af
+	push bc
+	push de
+	push hl
+	xor a
+	ld de, wBackgroundPalettesCGB
+	ld bc, NUM_BACKGROUND_PALETTES palettes
+	call CopyDataHLtoDE_SaveRegisters
+	ld a, 7
+	call FlushAllPalettes
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+; copy 64 bytes from hl to wBackgroundPalettesCGB
+UpdateBackgroundPalettesCGB:
+	push af
+	push bc
+	push de
+	push hl
+	ld hl, wBackgroundPalettesCGB
+	ld bc, NUM_BACKGROUND_PALETTES palettes
+	call CopyDataHLtoDE_SaveRegisters
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
 
 ; h = tile index
 ; l = attributes
@@ -713,7 +1093,7 @@ FillBoxInBGMap:
 	dec b
 	jr nz, .loop_columns
 	pop hl
-	ld de, BG_MAP_WIDTH
+	ld de, TILEMAP_WIDTH
 	add hl, de
 	pop bc
 	dec c
@@ -768,7 +1148,7 @@ Func_10742:
 	dec b
 	jr nz, .loop_tiles
 	pop hl
-	ld de, BG_MAP_WIDTH
+	ld de, TILEMAP_WIDTH
 	add hl, de
 	pop bc
 	dec c
@@ -780,9 +1160,142 @@ Func_10742:
 	pop bc
 	pop af
 	ret
-; 0x10772
 
-SECTION "Bank 4@488a", ROMX[$488a], BANK[$4]
+Func_10772:
+	push af
+	push bc
+	push de
+	push hl
+	ld b, $00
+	farcall Func_1c0b2
+	jr z, .asm_1077f
+	inc b
+.asm_1077f
+	ld a, b
+	ld [wd8a0], a
+	push af
+	ld a, SFX_CONFIRM
+	call CallPlaySFX
+	pop af
+.asm_1078a
+	ld a, [wd8a0]
+	and a
+	jr z, .asm_10793
+	call Func_114af
+.asm_10793
+	call Func_107bf
+	call Func_1081a
+	jr c, .asm_107ae
+	call Func_10836
+	jr c, .asm_107ae
+	call Func_10856
+	ld a, [wd8a0]
+	and a
+	jr z, .asm_1078a
+	call Func_114f9
+	jr .asm_1078a
+.asm_107ae
+	call Func_10856
+	ld a, [wd8a0]
+	and a
+	jr z, .asm_107ba
+	call Func_114f9
+.asm_107ba
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+Func_107bf:
+	push af
+	push bc
+	push de
+	push hl
+	ld de, $c00
+	ld b, $04
+	ld hl, $47ee
+	call LoadMenuBoxParams
+	farcall Func_1cacf
+	ld a, [wd89f]
+	farcall DrawMenuBox
+	farcall Func_1f309
+	jr z, .asm_107e9
+	lb bc, 18, 8
+	ld d, $0e
+	ld e, $00
+	call Func_383b
+.asm_107e9
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+; 0x107ee
+
+SECTION "Bank 4@481a", ROMX[$481a], BANK[$4]
+
+Func_1081a:
+	ld a, [wd89f]
+	farcall HandleMenuBox
+	ld [wd89f], a
+	jr c, .asm_1082e
+	push af
+	ld a, SFX_CONFIRM
+	call CallPlaySFX
+	pop af
+	ret
+.asm_1082e
+	push af
+	ld a, SFX_CANCEL
+	call CallPlaySFX
+	pop af
+	ret
+
+Func_10836:
+	ld hl, .function_map
+	call CallMappedFunction
+	ret
+
+.function_map: ; pause menu
+	key_func PAUSEMENU_STATUS,  PauseMenuStatusScreen
+	key_func PAUSEMENU_DIARY,   PauseMenuDiaryScreen
+	key_func PAUSEMENU_DECK,    PauseMenuDeckScreen
+	key_func PAUSEMENU_MINICOM, PauseMenuMinicomScreen
+	key_func PAUSEMENU_COIN,    PauseMenuCoinScreen
+	key_func PAUSEMENU_CONFIG,  PauseMenuConfigScreen
+	db $ff
+
+Func_10856:
+	farcall Func_1caf1
+	call LoadSymbolsFont
+	call Func_35a0
+	ret
+; 0x10861
+
+SECTION "Bank 4@4865", ROMX[$4865], BANK[$4]
+
+PauseMenuDeckScreen:
+	call Func_1022a
+	call ShowDeckSelectionMenuFromPauseMenu
+	call Func_10252
+	ret
+
+ShowDeckSelectionMenuFromPauseMenu:
+	push af
+	push bc
+	push de
+	push hl
+	call SetFadePalsFrameFunc
+	farcall DeckSelectionMenu
+	farcall StartFadeToWhite
+	farcall WaitPalFading_Bank07
+	call UnsetFadePalsFrameFunc
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
 
 ZeroObjectPositionsAndEnableOBPFading:
 	push af
@@ -803,11 +1316,11 @@ ZeroObjectPositionsAndEnableOBPFading:
 
 SECTION "Bank 4@48c9", ROMX[$48c9], BANK[$4]
 
-Func_108c9:
+SetwD8A1:
 	ld [wd8a1], a
 	ret
 
-Func_108cd::
+GetwD8A1::
 	ld a, [wd8a1]
 	ret
 ; 0x108d1
@@ -834,8 +1347,8 @@ ClearSpriteAnims:
 	pop af
 	ret
 
-Func_10908:
-	ld c, $00
+LoadGfxPalettesFrom0:
+	ld c, 0
 	call LoadGfxPalettes
 	ret
 
@@ -860,6 +1373,7 @@ GetNextInactiveSpriteAnim::
 	pop bc
 	pop af
 	ret
+; 0x1092b
 
 SECTION "Bank 4@4948", ROMX[$4948], BANK[$4]
 
@@ -899,8 +1413,6 @@ SetNewSpriteAnimValues::
 	pop bc
 	pop af
 	ret
-
-SECTION "Bank 4@4989", ROMX[$4989], BANK[$4]
 
 Func_10989:
 	ld [wd96f], a
@@ -1062,26 +1574,25 @@ UpdateSpriteAnims::
 	pop af
 	ret
 
-SECTION "Bank 4@4a1e", ROMX[$4a1e], BANK[$4]
-
 ; d = x coordinate
 ; e = y coordinate
 SetSpriteAnimPosition::
 	push hl
+REPT SPRITEANIMSTRUCT_X_POS
 	inc hl
-	inc hl
-	inc hl
+ENDR
 	ld [hl], d ; SPRITEANIMSTRUCT_X_POS
 	inc hl
 	ld [hl], e ; SPRITEANIMSTRUCT_Y_POS
 	pop hl
 	ret
 
+; get x coordinate in d, y in e
 GetSpriteAnimPosition:
 	push hl
+REPT SPRITEANIMSTRUCT_X_POS
 	inc hl
-	inc hl
-	inc hl
+ENDR
 	ld d, [hl] ; SPRITEANIMSTRUCT_X_POS
 	inc hl
 	ld e, [hl] ; SPRITEANIMSTRUCT_Y_POS
@@ -1089,18 +1600,18 @@ GetSpriteAnimPosition:
 	ret
 
 ; b = direction
-SetSpriteAnimDirection:
+SetSpriteAnimDirection::
 	push af
 	push bc
 	push de
 	push hl
 	inc hl
 	ld a, [hl] ; SPRITEANIMSTRUCT_1
-	and $03
+	and SPRITE_ANIM_STRUCT1_FLAG0 | SPRITE_ANIM_STRUCT1_FLAG1
 	cp b
 	jr z, .exit
 	ld a, [hl] ; SPRITEANIMSTRUCT_1
-	and $fc
+	and ~(SPRITE_ANIM_STRUCT1_FLAG0 | SPRITE_ANIM_STRUCT1_FLAG1)
 	or b
 	ld [hl], a
 	ld de, SPRITEANIMSTRUCT_FRAME_INDEX - SPRITEANIMSTRUCT_1
@@ -1126,12 +1637,12 @@ SetSpriteAnimDirection:
 	pop af
 	ret
 
-Func_10a5c:
+GetSpriteAnimStruct1Flag0And1:
 	push af
 	push hl
 	inc hl
 	ld a, [hl] ; SPRITEANIMSTRUCT_1
-	and $03
+	and SPRITE_ANIM_STRUCT1_FLAG0 | SPRITE_ANIM_STRUCT1_FLAG1
 	ld b, a
 	pop hl
 	pop af
@@ -1165,7 +1676,10 @@ SetSpriteAnimMotion:
 	pop af
 	ret
 
-Func_10a83:
+; clear the move flag of sprite anim at hl
+; return c = 2 if the speed flag is set, 1 if not
+; also e = move duration
+StopAndGetSpriteAnimSpeedAndMoveDuration:
 	push af
 	push hl
 	res SPRITEANIMSTRUCT_MOVE_F, [hl]
@@ -1180,7 +1694,10 @@ Func_10a83:
 	pop af
 	ret
 
-Func_10a94:
+; set the move flag of sprite anim at hl
+; set the speed flag if c = 2, unset if c = 1
+; set move duration from e
+MoveAndSetSpriteAnimSpeedAndMoveDuration:
 	push af
 	push bc
 	push hl
@@ -1198,7 +1715,7 @@ Func_10a94:
 	pop af
 	ret
 
-Func_10aa8:
+GetSpriteAnimSpeedAndMoveDuration:
 	push af
 	push hl
 	ld a, [hl]
@@ -1216,15 +1733,19 @@ Func_10ab7:
 	ld a, [hl]
 	ret
 
-Func_10ab9:
-	res SPRITEANIMSTRUCT_FLAG6_F, [hl] ; SPRITEANIMSTRUCT_FLAGS
+ResetSpriteAnimFlag6:
+	res SPRITEANIMSTRUCT_FLAG6_F, [hl]
 	ret
 
-Func_10abc:
-	set SPRITEANIMSTRUCT_FLAG6_F, [hl] ; SPRITEANIMSTRUCT_FLAGS
+SetSpriteAnimFlag6:
+	set SPRITEANIMSTRUCT_FLAG6_F, [hl]
 	ret
 
-Func_10abf:
+; de: x_0, y_0
+; bc: x_1, y_1
+; reset flag 6 for each active sprite anim if its x, y satisfy
+; x_0 + 1 <= x/8 < x_0 + x_1 + 1 and y_0 + 2 <= y/8 < y_0 + y_1 + 2
+ResetActiveSpriteAnimFlag6WithinArea:
 	push af
 	push bc
 	push de
@@ -1241,12 +1762,12 @@ Func_10abf:
 
 	ld hl, wSpriteAnimationStructs
 	ld a, NUM_SPRITE_ANIM_STRUCTS
-.loop_anims
+.loop_sprite_anims
 	push af
 	push hl
 	ld a, [hl] ; SPRITEANIMSTRUCT_FLAGS
 	and SPRITEANIMSTRUCT_ACTIVE
-	jr z, .next_anim
+	jr z, .next_sprite_anim
 	inc hl
 	inc hl
 	inc hl
@@ -1255,30 +1776,30 @@ Func_10abf:
 	srl a
 	srl a ; /8
 	cp d
-	jr c, .next_anim
+	jr c, .next_sprite_anim
 	ld a, [hld] ; SPRITEANIMSTRUCT_Y_POS
 	srl a
 	srl a
 	srl a ; /8
 	cp e
-	jr c, .next_anim
+	jr c, .next_sprite_anim
 	ld a, [hli] ; SPRITEANIMSTRUCT_X_POS
 	srl a
 	srl a
 	srl a ; /8
 	cp b
-	jr nc, .next_anim
+	jr nc, .next_sprite_anim
 	ld a, [hld] ; SPRITEANIMSTRUCT_Y_POS
 	srl a
 	srl a
 	srl a ; /8
 	cp c
-	jr nc, .next_anim
+	jr nc, .next_sprite_anim
 	dec hl
 	dec hl
 	dec hl
 	res SPRITEANIMSTRUCT_FLAG6_F, [hl] ; SPRITEANIMSTRUCT_FLAGS
-.next_anim
+.next_sprite_anim
 	pop hl
 	push bc
 	ld bc, SPRITEANIMSTRUCT_LENGTH
@@ -1286,14 +1807,18 @@ Func_10abf:
 	pop bc
 	pop af
 	dec a
-	jr nz, .loop_anims
+	jr nz, .loop_sprite_anims
 	pop hl
 	pop de
 	pop bc
 	pop af
 	ret
 
-Func_10b18:
+; de: x_0, y_0
+; bc: x_1, y_1
+; set flag 6 for each active sprite anim if its x, y satisfy
+; x_0 + 1 <= x/8 < x_0 + x_1 + 1 and y_0 + 2 <= y/8 < y_0 + y_1 + 2
+SetActiveSpriteAnimFlag6WithinArea:
 	push af
 	push bc
 	push de
@@ -1362,13 +1887,16 @@ Func_10b18:
 	pop af
 	ret
 
-Func_10b71:
+; just clear the current [hl]
+_ClearSpriteAnimFlags:
 	push af
 	xor a
 	ld [hl], a ; SPRITEANIMSTRUCT_FLAGS
 	pop af
 	ret
 
+; input: sprite anim x_pos in d, y_pos in e
+; output: d -= 8, e -= 16
 ConvertToOWObjectPosition:
 	push af
 	ld a, d
@@ -1380,25 +1908,27 @@ ConvertToOWObjectPosition:
 	pop af
 	ret
 
-Func_10b81:
+; input: sprite anim x_pos in d, y_pos in e
+; output: d = (d - 8) >> 4, e = (e - 16) >> 4
+ConvertToOWObjectTilePosition:
 	push af
 	ld a, d
 	sub $08
 	ld d, a
+REPT 4
 	srl d
-	srl d
-	srl d
-	srl d ; *16
+ENDR
 	ld a, e
 	sub $10
 	ld e, a
+REPT 4
 	srl e
-	srl e
-	srl e
-	srl e ; *16
+ENDR
 	pop af
 	ret
 
+; load all sprite tilesets and their sprite anim gfx
+; also clear wNumSpriteTilesets and wCurVRAMTile
 Func_10b9c:
 	push af
 	push bc
@@ -1412,15 +1942,14 @@ Func_10b9c:
 	ld hl, wSpriteTilesets
 .loop
 	push bc
-	ld a, [hli]
+	ld a, [hli] ;  LOW(OBJTILESTRUCT_ID)
 	ld c, a
-	ld a, [hld]
+	ld a, [hld] ; HIGH(OBJTILESTRUCT_ID)
 	ld b, a
 	farcall LoadSpriteAnimGfx
+REPT OBJTILESTRUCT_LENGTH
 	inc hl
-	inc hl
-	inc hl
-	inc hl
+ENDR
 	pop bc
 	dec c
 	jr nz, .loop
@@ -1430,32 +1959,34 @@ Func_10b9c:
 	pop af
 	ret
 
-Func_10bc4:
+GetSpriteAnimBuffer:
 	ld hl, wSpriteAnimationStructs
 	ret
 
 SetSpriteAnimAnimating:
-	set SPRITEANIMSTRUCT_ANIMATING_F, [hl] ; SPRITEANIMSTRUCT_FLAGS
+	set SPRITEANIMSTRUCT_ANIMATING_F, [hl]
 	ret
 
 ResetSpriteAnimAnimating:
-	res SPRITEANIMSTRUCT_ANIMATING_F, [hl] ; SPRITEANIMSTRUCT_FLAGS
+	res SPRITEANIMSTRUCT_ANIMATING_F, [hl]
 	ret
 ; 0x10bce
 
 SECTION "Bank 4@4be7", ROMX[$4be7], BANK[$4]
 
-Func_10be7:
+; push to w3d8db
+; wSpriteAnimationStructs, wCurVRAMTile, wNumSpriteTilesets, wSpriteTilesets
+PushSpriteAnimTileToBank3:
 	ei
 	di
 	push af
 	push bc
 	push de
 	push hl
-	ld de, $d8db
+	ld de, w3d8db
 	ld hl, wSpriteAnimationStructs
-	ld c, $ca
-.asm_10bf5
+	ld c, SPRITE_ANIM_TILE_BUFFER_SIZE
+.copy_loop
 	ld b, [hl]
 	ld a, [wWRAMBank]
 	push af
@@ -1468,7 +1999,7 @@ Func_10be7:
 	inc hl
 	inc de
 	dec c
-	jr nz, .asm_10bf5
+	jr nz, .copy_loop
 	pop hl
 	pop de
 	pop bc
@@ -1476,17 +2007,19 @@ Func_10be7:
 	ei
 	ret
 
-Func_10c10:
+; pull from w3d8db
+; wSpriteAnimationStructs, wCurVRAMTile, wNumSpriteTilesets, wSpriteTilesets
+PullSpriteAnimTileFromBank3:
 	ei
 	di
 	push af
 	push bc
 	push de
 	push hl
-	ld de, wSpriteAnim4TileOffset
+	ld de, w3d8db
 	ld hl, wSpriteAnimationStructs
-	ld c, $ca
-.asm_10c1e
+	ld c, SPRITE_ANIM_TILE_BUFFER_SIZE
+.copy_loop
 	ld a, [wWRAMBank]
 	push af
 	ld a, BANK("WRAM3")
@@ -1499,7 +2032,7 @@ Func_10c10:
 	inc hl
 	inc de
 	dec c
-	jr nz, .asm_10c1e
+	jr nz, .copy_loop
 	pop hl
 	pop de
 	pop bc
@@ -1509,7 +2042,7 @@ Func_10c10:
 
 ; returns nz if sprite anim in hl is animating
 CheckIsSpriteAnimAnimating:
-	bit SPRITEANIMSTRUCT_ANIMATING_F, [hl] ; SPRITEANIMSTRUCT_FLAGS
+	bit SPRITEANIMSTRUCT_ANIMATING_F, [hl]
 	ret
 ; 0x10c3c
 
@@ -1549,7 +2082,7 @@ SetSpriteAnimFrameset:
 	ret
 
 ; bc = OWFRAMEGROUP_*
-SetSpriteAnimOWFrameGroup:
+SetSpriteAnimOWFrameGroup::
 	push af
 	push bc
 	push de
@@ -1646,13 +2179,17 @@ SetSpriteAnimAnimation::
 
 SECTION "Bank 4@4cfe", ROMX[$4cfe], BANK[$4]
 
-Func_10cfe:
+Stub_10cfe:
 	ret
 ; 0x10cff
 
 SECTION "Bank 4@4d17", ROMX[$4d17], BANK[$4]
 
-Func_10d17:
+; input:
+; - b: ? (would make sense if $0/$1)
+; - hl: OW obj anim pointer
+; update its SPRITEANIMSTRUCT_1 by clearing bit 2 and then OR (b*4)
+_SetSpriteAnimStruct1Flag2:
 	push af
 	push bc
 	push hl
@@ -1660,134 +2197,195 @@ Func_10d17:
 	sla b ; *4
 	inc hl
 	ld a, [hl] ; SPRITEANIMSTRUCT_1
-	and $fb
+	and ~SPRITE_ANIM_STRUCT1_FLAG2
 	or b
 	ld [hl], a
 	pop hl
 	pop bc
 	pop af
 	ret
-; 0x10d28
 
-SECTION "Bank 4@4d40", ROMX[$4d40], BANK[$4]
+; return, in bit 0 of b, bit 2 of SPRITEANIMSTRUCT_1 of anim pointer at hl
+_GetSpriteAnimStruct1Flag2:
+	push af
+	push hl
+	inc hl
+	ld a, [hl] ; SPRITEANIMSTRUCT_1
+	and SPRITE_ANIM_STRUCT1_FLAG2
+	ld b, a
+	srl b
+	srl b ; /4
+	pop hl
+	pop af
+	ret
+
+GetPalettesWithID:
+	push bc
+	farcall GetPaletteGfxPointer
+	call LoadGfxPalettesFrom0
+	pop bc
+	ret
 
 Func_10d40::
 	call InitOWObjects
-	ld a, $01
-	call Func_108c9
-	call Func_10f26
-	ret
-; 0x10d4c
-
-SECTION "Bank 4@4d50", ROMX[$4d50], BANK[$4]
-
-Func_10d50:
-	call GetOWObjectWithID
+	ld a, 1
+	call SetwD8A1
+	call FillwD986
 	ret
 
-Func_10d54:
-	call GetOWObjectSpriteAnim
+GetNextInactiveOWObject:
+	call _GetNextInactiveOWObject
+	ret
+
+GetOWObjectWithID:
+	call _GetOWObjectWithID
+	ret
+
+GetOWObjectSpriteAnim:
+	call _GetOWObjectSpriteAnim
 	ret
 
 GetOWObjectSpriteAnimFlags::
 	call _GetOWObjectSpriteAnimFlags
 	ret
-; 0x10d5c
 
-SECTION "Bank 4@4d77", ROMX[$4d77], BANK[$4]
+; input: x in d, y in e
+; output: d = (d << 4) + 8, e = (e << 4) + 16
+ConvertFromTileToSpriteAnimPosition:
+	push af
+	ld a, d
+REPT 4
+	sla a
+ENDR
+	add $08
+	ld d, a
+	ld a, e
+REPT 4
+	sla a
+ENDR
+	add $10
+	ld e, a
+	pop af
+	ret
 
-; a = OW_* constant
+; a = NPC_* ID
+; b = direction
+; de = coordinates
 LoadOWObjectInMap::
 	push af
 	push bc
 	push de
 	push hl
+REPT 4 ; *16
 	sla d
-	sla d
-	sla d
-	sla d ; *8
+ENDR
+REPT 4 ; *16
 	sla e
-	sla e
-	sla e
-	sla e ; *8
+ENDR
 	call LoadOWObject
 	call IsStillOWObject
 	jr c, .still_object
-	; apply a random animation duration
-	; to the object so that NPCs in a map
-	; appear out of phase
+
+; apply a random animation duration
+; to the object so that NPCs in a map
+; appear out of phase
 	push af
 	call UpdateRNGSources
 	and $f
 	ld c, a
 	pop af
-	call Func_10fb8
+	call SetOWObjectFrameDuration
+
 .still_object
 	pop hl
 	pop de
 	pop bc
 	pop af
 	ret
-; 0x10da3
 
-SECTION "Bank 4@4da7", ROMX[$4da7], BANK[$4]
+ClearOWObject:
+	call _ClearOWObject
+	ret
 
-Func_10da7::
+GetOWObjectTilePosition::
 	push af
 	push hl
-	call GetOWObjectWithID
-	call Func_10d54
+	call _GetOWObjectWithID
+	call GetOWObjectSpriteAnim
 	call GetSpriteAnimPosition
-	call Func_10b81
+	call ConvertToOWObjectTilePosition
 	pop hl
 	pop af
 	ret
-; 0x10db8
 
-SECTION "Bank 4@4dcb", ROMX[$4dcb], BANK[$4]
-
-Func_10dcb::
-	call Func_112b2
+; a = NPC_* ID
+; de = coordinates
+SetOWObjectTilePosition:
+	push af
+	push de
+	push hl
+	call _GetOWObjectWithID
+	call GetOWObjectSpriteAnim
+	call ConvertFromTileToSpriteAnimPosition
+	call SetSpriteAnimPosition
+	pop hl
+	pop de
+	pop af
 	ret
 
-Func_10dcf::
-	call SetOWObjectDirection
+GetOWObjectAnimStruct1Flag0And1::
+	call _GetOWObjectAnimStruct1Flag0And1
 	ret
 
-Func_10dd3::
+; a = NPC_* constant (ow_object)
+; b = direction
+SetOWObjectDirection::
+	call _SetOWObjectDirection
+	ret
+
+StartOWObjectAnimation::
 	call SetOWObjectSpriteAnimating
 	ret
 
 StopOWObjectAnimation::
 	call ResetOWObjectSpriteAnimating
 	ret
-; 0x10ddb
 
-SECTION "Bank 4@4de3", ROMX[$4de3], BANK[$4]
+SetOWObjectSpriteAnimFlag6:
+	call _SetOWObjectSpriteAnimFlag6
+	ret
+
+ResetOWObjectSpriteAnimFlag6:
+	call _ResetOWObjectSpriteAnimFlag6
+	ret
 
 StopAndGetOWObjectSpeedAndMoveDuration::
-	call Func_11300
+	call _StopAndGetOWObjectSpeedAndMoveDuration
 	ret
 
 MoveAndSetOWObjectSpeedAndMoveDuration::
-	call Func_1130e
+	call _MoveAndSetOWObjectSpeedAndMoveDuration
 	ret
 
 GetOWObjectSpeedAndMoveDuration::
-	call Func_11320
+	call _GetOWObjectSpeedAndMoveDuration
 	ret
-; 0x10def
 
-SECTION "Bank 4@4df3", ROMX[$4df3], BANK[$4]
+; a = NPC_* ID
+; hl = NPCMovement data pointer
+MoveNPC:
+	call _MoveNPC
+	ret
 
 Func_10df3::
 	call Func_113d2
 	ret
-; 0x10df7
 
-SECTION "Bank 4@4dfb", ROMX[$4dfb], BANK[$4]
+CheckOWObjectPointerWithID:
+	call _CheckOWObjectPointerWithID
+	ret
 
-; outputs ID of OW object that is
+; outputs NPC ID of OW object that is
 ; in the grid position de
 ; if no object, then output $ff
 Func_10dfb::
@@ -1816,7 +2414,7 @@ Func_10dfb::
 	ld l, a
 	call GetSpriteAnimPosition
 	pop hl
-	call Func_10b81
+	call ConvertToOWObjectTilePosition
 	ld a, d
 	cp b
 	jr nz, .next
@@ -1840,6 +2438,7 @@ Func_10dfb::
 	pop bc
 	ret
 
+; a = NPC_* ID
 ; b = direction
 ; c = speed
 Func_10e3c::
@@ -1851,10 +2450,10 @@ Func_10e3c::
 	xor a
 	ld [wd98a], a
 	ld a, [wd989]
-	call Func_10d50
+	call GetOWObjectWithID
 	bit 5, [hl] ; OWOBJSTRUCT_FLAGS
 	jr z, .asm_10e8f
-	call Func_10da7
+	call GetOWObjectTilePosition
 	ld a, b
 	and $03
 	inc a
@@ -1925,10 +2524,10 @@ Func_10ea7:
 	push bc
 	push de
 	push hl
-	ld de, $7563
-	ld hl, $da39
-	ld c, $01
-.asm_10eb5
+	ld de, $7563 ; w3d563?
+	ld hl, wOWObjects
+	ld c, 1
+.copy_loop
 	ld b, [hl]
 	ld a, [wWRAMBank]
 	push af
@@ -1941,13 +2540,13 @@ Func_10ea7:
 	inc hl
 	inc de
 	dec c
-	jr nz, .asm_10eb5
+	jr nz, .copy_loop
 	ei
 	pop hl
 	pop de
 	pop bc
 	pop af
-	call Func_113f8
+	call PushOWObjectsAndAnimTileToBank3
 	ret
 
 Func_10ed3:
@@ -1957,10 +2556,10 @@ Func_10ed3:
 	push bc
 	push de
 	push hl
-	ld de, $7563
-	ld hl, $da39
-	ld c, $01
-.asm_10ee1
+	ld de, $7563 ; w3d563?
+	ld hl, wOWObjects
+	ld c, 1
+.copy_loop
 	ld a, [wWRAMBank]
 	push af
 	ld a, BANK("WRAM3")
@@ -1973,39 +2572,62 @@ Func_10ed3:
 	inc hl
 	inc de
 	dec c
-	jr nz, .asm_10ee1
+	jr nz, .copy_loop
 	ei
 	pop hl
 	pop de
 	pop bc
 	pop af
-	call Func_11424
+	call PullSpriteAnimTileObjFromBank3
 	ret
 
-Func_10eff::
+SetOWObjectFlag5_WithID::
 	push hl
-	call Func_10d50
-	set 5, [hl] ; OWOBJSTRUCT_FLAGS
+	call GetOWObjectWithID
+	set OBJ_FLAG5_F, [hl]
 	pop hl
 	ret
-; 0x10f07
 
-SECTION "Bank 4@4f16", ROMX[$4f16], BANK[$4]
-
-Func_10f16:
-	call Func_11471
+ResetOWObjectFlag5_WithID:
+	push hl
+	call GetOWObjectWithID
+	res OBJ_FLAG5_F, [hl]
+	pop hl
 	ret
-; 0x10f1a
 
-SECTION "Bank 4@4f26", ROMX[$4f26], BANK[$4]
+; a = NPC_* ID
+; b = direction
+; de = coordinates
+SetOWObjectTilePositionAndDirection:
+	call SetOWObjectTilePosition
+	call SetOWObjectDirection
+	ret
 
-Func_10f26:
+SetOWObjectAnimStruct1Flag2:
+	call _SetOWObjectAnimStruct1Flag2
+	ret
+
+GetOWObjectAnimStruct1Flag2:
+	call _GetOWObjectAnimStruct1Flag2
+	ret
+
+SetAndInitOWObjectFrameset:
+	call _SetAndInitOWObjectFrameset
+	ret
+
+SetOWObjectFrameset:
+	call _SetOWObjectFrameset
+	ret
+
+FillwD986:
 	ld a, $ff
 	ld [wd986], a
 	ret
-; 0x10f2c
 
-SECTION "Bank 4@4f32", ROMX[$4f32], BANK[$4]
+ClearwD986:
+	ld a, 0
+	ld [wd986], a
+	ret
 
 Func_10f32:
 	push af
@@ -2047,11 +2669,11 @@ Func_10f32:
 	ld [hl], a
 	inc hl
 	ld a, c
-	call Func_10dcb
+	call GetOWObjectAnimStruct1Flag0And1
 	ld [hl], b
 	inc hl
 	ld a, c
-	call Func_10da7
+	call GetOWObjectTilePosition
 	ld [hl], d
 	inc hl
 	ld [hl], e
@@ -2090,7 +2712,7 @@ Func_10f78:
 
 .LoadObject:
 	push bc
-	ld a, [hl] ; OW ID
+	ld a, [hl] ; NPC ID
 	inc hl
 	ld c, [hl] ; anim flags
 	inc hl
@@ -2102,25 +2724,21 @@ Func_10f78:
 	inc hl
 	call LoadOWObjectInMap
 	bit SPRITEANIMSTRUCT_ANIMATING_F, c
-	jr nz, .no_animation
+	jr nz, .done_anim
 	call StopOWObjectAnimation
-.no_animation
-	bit 1, c
-	jr z, .asm_10fb6
-	call Func_10eff
-.asm_10fb6
+.done_anim
+	bit SPRITEANIMSTRUCT_FLAG1_F, c
+	jr z, .done_flags
+	call SetOWObjectFlag5_WithID
+.done_flags
 	pop bc
 	ret
-; 0x10fb8
 
-SECTION "Bank 4@4fb8", ROMX[$4fb8], BANK[$4]
-
-Func_10fb8:
-	call SetOWObjectFrameDuration
+SetOWObjectFrameDuration:
+	call _SetOWObjectFrameDuration
 	ret
-; 0x10fbc
 
-; check if OW object ID in register a
+; check if NPC_* ID in register a
 ; is a still object, which means it
 ; will not animate its walking animation in place
 IsStillOWObject:
@@ -2146,52 +2764,52 @@ IsStillOWObject:
 	ret
 
 .OWObjectList
-	db OW_MARK
-	db OW_MINT
-	db OW_AMY_LOUNGE
-	db OW_CLERK_1
-	db OW_CLERK_2
-	db OW_GR_CLERK_1
-	db OW_GR_CLERK_2
-	db OW_GR_CLERK_3
-	db OW_GR_CLERK_4
-	db OW_GR_CLERK_5
-	db OW_CLERK_3
-	db OW_GR_CLERK_6
-	db OW_GR_CLERK_7
-	db OW_GR_CLERK_8
-	db OW_GR_CLERK_9
-	db OW_GR_CLERK_10
-	db OW_GR_CLERK_11
-	db OW_GR_CLERK_12
-	db OW_GR_CLERK_13
-	db OW_CAPTURED_AMY
-	db OW_CAPTURED_SARA
-	db OW_CAPTURED_AMANDA
-	db OW_WARP_SPARKLES
-	db OW_GR_CLERK_14
-	db OW_GR_CLERK_15
-	db OW_GR_CLERK_16
-	db OW_GR_CLERK_17
-	db OW_VOLCANO_SMOKE_TCG
-	db OW_VOLCANO_SMOKE_GR
-	db OW_CURSOR_TCG
-	db OW_CURSOR_GR
-	db OW_GR_CROSS
-	db OW_GR_CASTLE_FLAG
-	db OW_CHEST_CLOSED
-	db OW_CHEST_OPENED
-	db OW_GR_BLIMP_BEAM
-	db OW_GR_BLIMP
-	db OW_POD_DOORS
-	db OW_GR_CLERK_18
-	db OW_LASS1_6
-	db OW_LASS2_7
-	db OW_RED_FORT_COIN
-	db OW_BLUE_FORT_COIN
-	db OW_WHITE_CASTLE_COIN
-	db OW_PURPLE_CASTLE_COIN
-	db OW_STRONGHOLD_PLATFORM
+	db NPC_MARK
+	db NPC_MINT
+	db NPC_AMY_LOUNGE
+	db NPC_CLERK_BATTLE_CENTER
+	db NPC_CLERK_GIFT_CENTER
+	db NPC_GR_CLERK_TCG_AIRPORT
+	db NPC_GR_CLERK_GR_AIRPORT
+	db NPC_GR_CLERK_BATTLE_CENTER
+	db NPC_GR_CLERK_GIFT_CENTER
+	db NPC_GR_CLERK_5
+	db NPC_CLERK_TCG_CHALLENGE_HALL_ENTRANCE
+	db NPC_GR_CLERK_6
+	db NPC_GR_CLERK_GRASS_FORT
+	db NPC_GR_CLERK_LIGHTNING_FORT
+	db NPC_GR_CLERK_FIRE_FORT
+	db NPC_GR_CLERK_WATER_FORT
+	db NPC_GR_CLERK_FIGHTING_FORT
+	db NPC_GR_CLERK_PSYCHIC_STRONGHOLD
+	db NPC_GR_CLERK_13
+	db NPC_CAPTURED_AMY
+	db NPC_CAPTURED_SARA
+	db NPC_CAPTURED_AMANDA
+	db NPC_WARP_SPARKLES
+	db NPC_GR_CLERK_CASTLE_RIGHT
+	db NPC_GR_CLERK_CASTLE_LEFT
+	db NPC_GR_CLERK_GAME_CENTER_PRIZE_DESK
+	db NPC_GR_CLERK_GAME_CENTER_CHIP_DESK
+	db NPC_VOLCANO_SMOKE_TCG
+	db NPC_VOLCANO_SMOKE_GR
+	db NPC_CURSOR_TCG
+	db NPC_CURSOR_GR
+	db NPC_GR_CROSS
+	db NPC_GR_CASTLE_FLAG
+	db NPC_CHEST_CLOSED
+	db NPC_CHEST_OPENED
+	db NPC_GR_BLIMP_BEAM
+	db NPC_GR_BLIMP
+	db NPC_POD_DOORS
+	db NPC_GR_CLERK_CHALLENGE_HALL_ENTRANCE
+	db NPC_GR_CUP_CLERK_LEFT
+	db NPC_GR_CUP_CLERK_RIGHT
+	db NPC_RED_FORT_COIN
+	db NPC_BLUE_FORT_COIN
+	db NPC_WHITE_CASTLE_COIN
+	db NPC_PURPLE_CASTLE_COIN
+	db NPC_STRONGHOLD_PLATFORM
 	db $ff ; end
 
 Func_11002:
@@ -2201,10 +2819,10 @@ Func_11002:
 	push hl
 	lb de,  0, 12
 	lb bc, 20,  6
-	call Func_10673
-	call Func_10abf
+	call AdjustDECoordByhSC
+	call ResetActiveSpriteAnimFlag6WithinArea
 	call DoFrame
-	call Func_10342
+	call CopyBGMapFromVRAMToWRAM
 	pop hl
 	pop de
 	pop bc
@@ -2216,14 +2834,15 @@ Func_1101d:
 	push bc
 	push de
 	push hl
-	call Func_103b6
-	call Func_10b18
+	call CopyBGMapFromWRAMToVRAM
+	call SetActiveSpriteAnimFlag6WithinArea
 	pop hl
 	pop de
 	pop bc
 	pop af
 	ret
 
+; hl - text
 PrintScrollableText_NoTextBoxLabelVRAM0::
 	push af
 	push bc
@@ -2237,9 +2856,22 @@ PrintScrollableText_NoTextBoxLabelVRAM0::
 	pop bc
 	pop af
 	ret
-; 0x1103c
 
-SECTION "Bank 4@504c", ROMX[$504c], BANK[$4]
+; de - text box label
+; hl - text
+PrintScrollableText_WithTextBoxLabelVRAM0::
+	push af
+	push bc
+	push de
+	push hl
+	xor a
+	call BankswitchVRAM
+	call PrintScrollableText_WithTextBoxLabel
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
 
 ; input:
 ;  a = $0 for "yes" default option
@@ -2253,24 +2885,40 @@ DrawWideTextBox_PrintTextWithYesOrNoMenu:
 	push bc
 	push de
 	push hl
-	xor $1
+	xor 1
 	ld [wDefaultYesOrNo], a
 	call DrawWideTextBox_PrintText
 	call YesOrNoMenu
-	ld a, $00
+	ld a, 0
 	jr nc, .exit
-	ld a, $01
+	ld a, 1
+; fallthrough
 .exit
 	pop hl
 	pop de
 	pop bc
 	ret
-; 0x11064
 
-SECTION "Bank 4@507c", ROMX[$507c], BANK[$4]
+PrintScrollableText_WithTextBoxLabelWithYesOrNoMenu:
+	push bc
+	push de
+	push hl
+	xor 1
+	ld [wDefaultYesOrNo], a
+	call PrintScrollableText_WithTextBoxLabel_NoWait
+	call YesOrNoMenu
+	ld a, 0
+	jr nc, .exit
+	ld a, 1
+; fallthrough
+.exit
+	pop hl
+	pop de
+	pop bc
+	ret
 
 ; hl = text ID
-Func_1107c:
+PrintTextInWideTextBox:
 	push af
 	push bc
 	push de
@@ -2281,9 +2929,16 @@ Func_1107c:
 	pop bc
 	pop af
 	ret
-; 0x11088
 
-SECTION "Bank 4@5092", ROMX[$5092], BANK[$4]
+PrintTextInLabelledScrollableTextBox:
+	push bc
+	push de
+	push hl
+	call PrintScrollableText_WithTextBoxLabel_NoWait
+	pop hl
+	pop de
+	pop bc
+	ret
 
 SetFadePalsFrameFunc:
 	push hl
@@ -2329,7 +2984,7 @@ Func_110c2::
 	call PopFrameFunction
 	ret
 
-Func_110c6:
+_PCMenu:
 	push af
 	push bc
 	push de
@@ -2389,27 +3044,17 @@ Func_110c6:
 	ret
 
 .menu_params
-	db TRUE ; skip clear
-	db 18, 16 ; width, height
-	db SYM_CURSOR_R ; blink cursor symbol
-	db SYM_SPACE ; space symbol
-	db SYM_CURSOR_R ; default cursor symbol
-	db SYM_CURSOR_R ; selection cursor symbol
-	db A_BUTTON ; press keys
-	db B_BUTTON ; held keys
-	db FALSE ; has horizontal scroll
-	db 1 ; vertical step
-	dw NULL ; update function
-	dw NULL ; label text ID
-
+	menubox_params TRUE, 18, 16, \
+		SYM_CURSOR_R, SYM_SPACE, SYM_CURSOR_R, SYM_CURSOR_R, \
+		PAD_A, PAD_B, FALSE, 1, NULL, NULL
 	textitem 2,  2, PCMenuCardAlbumText
 	textitem 2,  4, PCMenuDeckDiagnosisText
 	textitem 2,  6, PCMenuGlossaryText
 	textitem 2,  8, PCMenuPrintText
 	textitem 2, 10, DebugCreditsText
-	textitem 2, 12, Text0818
+	textitem 2, 12, DebugGet10CardsEachText
 	textitem 2, 14, PCMenuShutdownText
-	db $ff
+	textitems_end
 
 .HandleInput:
 	ld a, [wPCMenuCursorPosition]
@@ -2417,13 +3062,13 @@ Func_110c6:
 	ld [wPCMenuCursorPosition], a
 	jr c, .asm_11161
 	push af
-	ld a, SFX_02
+	ld a, SFX_CONFIRM
 	call CallPlaySFX
 	pop af
 	ret
 .asm_11161
 	push af
-	ld a, SFX_03
+	ld a, SFX_CANCEL
 	call CallPlaySFX
 	pop af
 	ret
@@ -2435,12 +3080,12 @@ Func_110c6:
 	ret
 
 .function_map
-	key_func $0, .CardAlbum
-	key_func $1, .DeckDiagnosis
-	key_func $2, .Glossary
-	key_func $3, .Printer
-	key_func $4, .Credits
-	key_func $5, .UnlockCards
+	key_func PCMENU_CARD_ALBUM,     .CardAlbum
+	key_func PCMENU_DECK_DIAGNOSIS, .DeckDiagnosis
+	key_func PCMENU_GLOSSARY,       .Glossary
+	key_func PCMENU_PRINTER,        .Printer
+	key_func PCMENU_CREDITS,        .Credits
+	key_func PCMENU_UNLOCK,         .UnlockCards
 	db $ff ; end
 
 .Func_11181:
@@ -2489,7 +3134,6 @@ Func_111f0:
 	ld a, $04
 	ld [wPCMenuCursorPosition], a
 	ret
-; 0x111f6
 
 ; clears animations and all OW objects
 InitOWObjects:
@@ -2500,7 +3144,7 @@ InitOWObjects:
 	xor a
 	call ClearSpriteAnims
 	xor a
-	call Func_108c9
+	call SetwD8A1
 	xor a
 	ld bc, OWOBJSTRUCT_LENGTH * MAX_NUM_OW_OBJECTS
 	ld hl, wOWObjects
@@ -2511,7 +3155,7 @@ InitOWObjects:
 	pop af
 	ret
 
-GetNextInactiveOWObject:
+_GetNextInactiveOWObject::
 	push af
 	push bc
 	push de
@@ -2532,9 +3176,9 @@ GetNextInactiveOWObject:
 	ret
 
 ; returns in hl the pointer to the OW object
-; with the given ID in register a
+; with the given NPC ID in register a
 ; returns NULL if not found
-GetOWObjectWithID:
+_GetOWObjectWithID:
 	push af
 	push bc
 	push de
@@ -2560,10 +3204,11 @@ GetOWObjectWithID:
 	pop af
 	ret
 
-GetOWObjectSpriteAnim:
+_GetOWObjectSpriteAnim:
 	push af
+REPT OWOBJSTRUCT_ANIM_PTR
 	inc hl
-	inc hl
+ENDR
 	ld a, [hli]
 	ld h, [hl]
 	ld l, a
@@ -2573,24 +3218,25 @@ GetOWObjectSpriteAnim:
 _GetOWObjectSpriteAnimFlags:
 	push bc
 	push hl
-	call GetOWObjectWithID
+	call _GetOWObjectWithID
 	ld b, [hl]
+REPT 4
 	srl b
-	srl b
-	srl b
-	srl b
-	call GetOWObjectSpriteAnim
+ENDR
+	call _GetOWObjectSpriteAnim
 	ld a, [hl]
 	and $f0
 	or b
 	pop hl
 	pop bc
 	ret
-; 0x1126b
 
-SECTION "Bank 4@526d", ROMX[$526d], BANK[$4]
+; just set [hl] to a
+Func_1126b:
+	ld [hl], a
+	ret
 
-ConvertToSpriteAnimPosition:
+ConvertToSpriteAnimPosition::
 	push af
 	ld a, d
 	add $08
@@ -2601,22 +3247,22 @@ ConvertToSpriteAnimPosition:
 	pop af
 	ret
 
-; a = OW object ID
+; a = NPC_* ID
 ; b = direction
 ; de = coordinates
 LoadOWObject:
 	farcall _LoadOWObject
 	ret
 
-ClearOWObject:
+_ClearOWObject:
 	push af
 	push hl
-	call GetOWObjectWithID
+	call _GetOWObjectWithID
 	xor a
 	ld [hli], a ; OWOBJSTRUCT_FLAGS
 	ld [hld], a ; OWOBJSTRUCT_ID
-	call GetOWObjectSpriteAnim
-	call Func_10b71
+	call _GetOWObjectSpriteAnim
+	call _ClearSpriteAnimFlags
 	pop hl
 	pop af
 	ret
@@ -2624,8 +3270,8 @@ ClearOWObject:
 GetOWObjectPosition:
 	push af
 	push hl
-	call GetOWObjectWithID
-	call GetOWObjectSpriteAnim
+	call _GetOWObjectWithID
+	call _GetOWObjectSpriteAnim
 	call GetSpriteAnimPosition
 	call ConvertToOWObjectPosition
 	pop hl
@@ -2637,8 +3283,8 @@ SetOWObjectPosition:
 	push af
 	push de
 	push hl
-	call GetOWObjectWithID
-	call GetOWObjectSpriteAnim
+	call _GetOWObjectWithID
+	call _GetOWObjectSpriteAnim
 	call ConvertToSpriteAnimPosition
 	call SetSpriteAnimPosition
 	pop hl
@@ -2646,23 +3292,24 @@ SetOWObjectPosition:
 	pop af
 	ret
 
-Func_112b2:
+_GetOWObjectAnimStruct1Flag0And1:
 	push af
 	push hl
-	call GetOWObjectWithID
-	call GetOWObjectSpriteAnim
-	call Func_10a5c
+	call _GetOWObjectWithID
+	call _GetOWObjectSpriteAnim
+	call GetSpriteAnimStruct1Flag0And1
 	pop hl
 	pop af
 	ret
 
+; a = NPC_* constant (ow_object)
 ; b = direction
-SetOWObjectDirection:
+_SetOWObjectDirection:
 	push af
 	push bc
 	push hl
-	call GetOWObjectWithID
-	call GetOWObjectSpriteAnim
+	call _GetOWObjectWithID
+	call _GetOWObjectSpriteAnim
 	call SetSpriteAnimDirection
 	pop hl
 	pop bc
@@ -2671,79 +3318,79 @@ SetOWObjectDirection:
 
 SetOWObjectSpriteAnimating:
 	push hl
-	call GetOWObjectWithID
-	call GetOWObjectSpriteAnim
+	call _GetOWObjectWithID
+	call _GetOWObjectSpriteAnim
 	call SetSpriteAnimAnimating
 	pop hl
 	ret
 
 ResetOWObjectSpriteAnimating:
 	push hl
-	call GetOWObjectWithID
-	call GetOWObjectSpriteAnim
+	call _GetOWObjectWithID
+	call _GetOWObjectSpriteAnim
 	call ResetSpriteAnimAnimating
 	pop hl
 	ret
 
-Func_112e8:
+_SetOWObjectSpriteAnimFlag6:
 	push hl
-	call GetOWObjectWithID
-	call GetOWObjectSpriteAnim
-	call Func_10abc
+	call _GetOWObjectWithID
+	call _GetOWObjectSpriteAnim
+	call SetSpriteAnimFlag6
 	pop hl
 	ret
 
-Func_112f4:
+_ResetOWObjectSpriteAnimFlag6:
 	push hl
-	call GetOWObjectWithID
-	call GetOWObjectSpriteAnim
-	call Func_10ab9
+	call _GetOWObjectWithID
+	call _GetOWObjectSpriteAnim
+	call ResetSpriteAnimFlag6
 	pop hl
 	ret
 
-Func_11300:
+_StopAndGetOWObjectSpeedAndMoveDuration:
 	push af
 	push hl
-	call GetOWObjectWithID
-	call GetOWObjectSpriteAnim
-	call Func_10a83
+	call _GetOWObjectWithID
+	call _GetOWObjectSpriteAnim
+	call StopAndGetSpriteAnimSpeedAndMoveDuration
 	pop hl
 	pop af
 	ret
 
-Func_1130e:
+_MoveAndSetOWObjectSpeedAndMoveDuration:
 	push af
 	push bc
 	push de
 	push hl
-	call GetOWObjectWithID
-	call GetOWObjectSpriteAnim
-	call Func_10a94
+	call _GetOWObjectWithID
+	call _GetOWObjectSpriteAnim
+	call MoveAndSetSpriteAnimSpeedAndMoveDuration
 	pop hl
 	pop de
 	pop bc
 	pop af
 	ret
 
-Func_11320:
+_GetOWObjectSpeedAndMoveDuration:
 	push af
 	push hl
-	call GetOWObjectWithID
-	call GetOWObjectSpriteAnim
-	call Func_10aa8
+	call _GetOWObjectWithID
+	call _GetOWObjectSpriteAnim
+	call GetSpriteAnimSpeedAndMoveDuration
 	pop hl
 	pop af
 	ret
 
-; a = OW object ID
+; a = NPC_* ID
 ; b = direction
 ; c = speed
 Func_1132e:
 	push bc
 	push de
 	push hl
-	call GetOWObjectWithID
-	call GetOWObjectSpriteAnim
+	call _GetOWObjectWithID
+	call _GetOWObjectSpriteAnim
 	bit SPRITEANIMSTRUCT_MOVE_F, [hl]
 	jr nz, .done
 	bit 7, b
@@ -2775,9 +3422,34 @@ Func_1132e:
 	pop bc
 	ld a, [wda8b]
 	ret
-; 0x11367
 
-SECTION "Bank 4@5384", ROMX[$5384], BANK[$4]
+; a = NPC_* ID
+; hl = NPCMovement data pointer
+_MoveNPC:
+	push af
+	push bc
+	push de
+	push hl
+	ld d, h
+	ld e, l
+	call _GetOWObjectWithID
+	set OBJ_FLAG6_F, [hl]
+	push bc
+	ld bc, OWOBJSTRUCT_4
+	add hl, bc
+	pop bc
+	xor a
+	ld [hli], a ; OWOBJSTRUCT_4
+	ld [hl], b  ; OWOBJSTRUCT_5
+	inc hl
+	ld [hl], e  ;  LOW(OWOBJSTRUCT_6)
+	inc hl
+	ld [hl], d  ; HIGH(OWOBJSTRUCT_6)
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
 
 ; e = ?
 Func_11384::
@@ -2790,10 +3462,10 @@ Func_11384::
 .loop
 	push bc
 	push hl
-	bit 6, [hl] ; OWOBJSTRUCT_FLAGS
+	bit OBJ_FLAG6_F, [hl]
 	jr z, .next
 	push hl
-	call GetOWObjectSpriteAnim
+	call _GetOWObjectSpriteAnim
 	bit SPRITEANIMSTRUCT_MOVE_F, [hl]
 	pop hl
 	jr nz, .next ; is moving
@@ -2816,16 +3488,16 @@ Func_11384::
 .Func_113af:
 	inc hl
 	ld d, [hl] ; OWOBJSTRUCT_ID
+REPT OWOBJSTRUCT_4 - OWOBJSTRUCT_ID
 	inc hl
-	inc hl
-	inc hl
+ENDR
 	push hl
 	ld a, [hli] ; OWOBJSTRUCT_4
 	ld c, a
 	ld a, [hli] ; OWOBJSTRUCT_5
 	ld b, a
-	ld a, [hli] ; OWOBJSTRUCT_6
-	ld h, [hl]  ;
+	ld a, [hli] ;  LOW(OWOBJSTRUCT_6)
+	ld h, [hl]  ; HIGH(OWOBJSTRUCT_6)
 	ld l, a
 	call Func_3be0
 	pop hl
@@ -2840,7 +3512,7 @@ Func_11384::
 .asm_113cb
 	ld bc, OWOBJSTRUCT_FLAGS - OWOBJSTRUCT_4
 	add hl, bc
-	res 6, [hl]
+	res OBJ_FLAG6_F, [hl]
 	ret
 
 ; counts number of OW objects
@@ -2853,7 +3525,7 @@ Func_113d2:
 	ld hl, wOWObjects
 	xor a
 .loop
-	bit 6, [hl] ; OWOBJSTRUCT_FLAGS
+	bit OBJ_FLAG6_F, [hl] ; OWOBJSTRUCT_FLAGS
 	jr z, .next
 	inc a
 .next
@@ -2866,25 +3538,33 @@ Func_113d2:
 	pop de
 	pop bc
 	ret
-; 0x113ec
 
-SECTION "Bank 4@53f4", ROMX[$53f4], BANK[$4]
+; input: a = NPC ID
+; output: a = HIGH(pointer) | LOW(pointer)
+_CheckOWObjectPointerWithID:
+	push hl
+	call _GetOWObjectWithID
+	ld a, h
+	or l
+	pop hl
+	ret
 
 GetOWObjectsPointer:
 	ld hl, wOWObjects
 	ret
 
-Func_113f8:
+; push all wOWObjects to w3d9a5, then PushSpriteAnimTileToBank3
+PushOWObjectsAndAnimTileToBank3:
 	ei
 	di
 	push af
 	push bc
 	push de
 	push hl
-	ld de, $d9a5
+	ld de, w3d9a5
 	ld hl, wOWObjects
-	ld c, MAX_NUM_OW_OBJECTS * OWOBJSTRUCT_LENGTH
-.asm_11406
+	ld c, OW_OBJECTS_BUFFER_SIZE
+.copy_loop
 	ld b, [hl]
 	ld a, [wWRAMBank]
 	push af
@@ -2897,26 +3577,27 @@ Func_113f8:
 	inc hl
 	inc de
 	dec c
-	jr nz, .asm_11406
+	jr nz, .copy_loop
 	ei
-	call Func_10be7
+	call PushSpriteAnimTileToBank3
 	pop hl
 	pop de
 	pop bc
 	pop af
 	ret
 
-Func_11424:
+; pull all wOWObjects from w3d9a5, then PullSpriteAnimTileFromBank3
+PullSpriteAnimTileObjFromBank3:
 	ei
 	di
 	push af
 	push bc
 	push de
 	push hl
-	ld de, $d9a5
+	ld de, w3d9a5
 	ld hl, wOWObjects
-	ld c, MAX_NUM_OW_OBJECTS * OWOBJSTRUCT_LENGTH
-.asm_11432
+	ld c, OW_OBJECTS_BUFFER_SIZE
+.copy_loop
 	ld a, [wWRAMBank]
 	push af
 	ld a, BANK("WRAM3")
@@ -2929,66 +3610,359 @@ Func_11424:
 	inc hl
 	inc de
 	dec c
-	jr nz, .asm_11432
+	jr nz, .copy_loop
 	ei
-	call Func_10c10
+	call PullSpriteAnimTileFromBank3
 	pop hl
 	pop de
 	pop bc
 	pop af
 	ret
 
+; a = NPC_* ID
 SetOWObjectAsScrollTarget:
 	ld [wScrollTargetObject], a
-	call GetOWObjectWithID
-	call GetOWObjectSpriteAnim
+	call _GetOWObjectWithID
+	call _GetOWObjectSpriteAnim
 	call StoreScrollTargetObjectPtr
 	ret
-; 0x1145d
 
-SECTION "Bank 4@5471", ROMX[$5471], BANK[$4]
-
-Func_11471:
-	call GetOWObjectWithID
-	call GetOWObjectSpriteAnim
-	call Func_10d17
+CheckIsOWObjectAnimating:
+	call _GetOWObjectWithID
+	call _GetOWObjectSpriteAnim
+	call CheckIsSpriteAnimAnimating
 	ret
-; 0x1147b
 
-SECTION "Bank 4@5485", ROMX[$5485], BANK[$4]
+SetOWObjectPositionAndDirection:
+	call _GetOWObjectWithID
+	call SetOWObjectPosition
+	call _SetOWObjectDirection
+	ret
 
-SetOWObjectFrameset:
-	call GetOWObjectWithID
-	call GetOWObjectSpriteAnim
+_SetOWObjectAnimStruct1Flag2:
+	call _GetOWObjectWithID
+	call _GetOWObjectSpriteAnim
+	call _SetSpriteAnimStruct1Flag2
+	ret
+
+_GetOWObjectAnimStruct1Flag2:
+	call _GetOWObjectWithID
+	call _GetOWObjectSpriteAnim
+	call _GetSpriteAnimStruct1Flag2
+	ret
+
+_SetAndInitOWObjectFrameset:
+	call _GetOWObjectWithID
+	call _GetOWObjectSpriteAnim
 	call SetAndInitSpriteAnimFrameset
 	ret
-; 0x1148f
 
-SECTION "Bank 4@5499", ROMX[$5499], BANK[$4]
+_SetOWObjectFrameset:
+	call _GetOWObjectWithID
+	call _GetOWObjectSpriteAnim
+	call SetSpriteAnimFrameset
+	ret
 
-SetOWObjectFrameDuration:
-	call GetOWObjectWithID
-	call GetOWObjectSpriteAnim
+_SetOWObjectFrameDuration:
+	call _GetOWObjectWithID
+	call _GetOWObjectSpriteAnim
 	ld a, c
 	call SetSpriteAnimFrameDuration
 	ret
-; 0x114a4
 
-SECTION "Bank 4@557c", ROMX[$557c], BANK[$4]
+_SetOWObjectFrameIndex:
+	call _GetOWObjectWithID
+	call _GetOWObjectSpriteAnim
+	ld a, b
+	call SetSpriteAnimFrameIndex
+	ret
 
-Func_1157c:
+Func_114af:
+	push af
+	push bc
+	push de
+	push hl
+	ld a, [wda98]
+	and a
+	jr nz, .fill
+
+	lb de, 0, 0
+	lb bc, 8, 4
+	call AdjustDECoordByhSC
+	call CopyBGMapFromVRAMToWRAM
+	call ResetActiveSpriteAnimFlag6WithinArea
+	lb de, 0, 0
+	lb bc, 8, 4
+	call AdjustDECoordByhSC
+	call DrawRegularTextBoxVRAM0
+	lb de, 1, 1
+	call AdjustDECoordByhSC
+	ldtx hl, ChipsText
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	lb de, 6, 2
+	call AdjustDECoordByhSC
+	ldtx hl, PlayerDiaryCardsUnitText
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	call PrintNumberOfChips
+
+.fill
+	ld a, $ff
+	ld [wda98], a
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+Func_114f9:
+	push af
+	push bc
+	push de
+	push hl
+	ld a, [wda98]
+	and a
+	jr z, .clear
+
+	call CopyBGMapFromWRAMToVRAM
+	call SetActiveSpriteAnimFlag6WithinArea
+
+.clear
+	xor a
+	ld [wda98], a
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+; bc = number of chips
+AddChips:
+	push af
+	push bc
+	push hl
+	ld a, [wGameCenterChips]
+	ld l, a
+	ld a, [wGameCenterChips + 1]
+	ld h, a
+	add hl, bc
+	ld a, h
+	cp HIGH(MAX_CHIPS)
+	jr c, .got_value
+	ld a, l
+	cp LOW(MAX_CHIPS)
+	jr c, .got_value
+	ld hl, MAX_CHIPS
+.got_value
+	ld a, l
+	ld [wGameCenterChips], a
+	ld a, h
+	ld [wGameCenterChips + 1], a
+	ld a, [wda98]
+	and a
+	jr z, .done
+	call PrintNumberOfChips
+.done
+	pop hl
+	pop bc
+	pop af
+	ret
+
+; bc = number of chips
+SubtractChips:
+	push af
+	push bc
+	push hl
+	ld a, c
+	xor $ff
+	ld l, a
+	ld a, b
+	xor $ff
+	ld h, a
+	ld bc, 1
+	add hl, bc
+	ld c, l
+	ld b, h
+	ld a, [wGameCenterChips]
+	ld l, a
+	ld a, [wGameCenterChips + 1]
+	ld h, a
+	add hl, bc
+	ld a, h
+	cp HIGH(MAX_CHIPS)
+	jr c, .got_value
+	ld a, l
+	cp LOW(MAX_CHIPS)
+	jr c, .got_value
+	ld hl, 0
+.got_value
+	ld a, l
+	ld [wGameCenterChips], a
+	ld a, h
+	ld [wGameCenterChips + 1], a
+	ld a, [wda98]
+	and a
+	jr z, .done
+	call PrintNumberOfChips
+.done
+	pop hl
+	pop bc
+	pop af
+	ret
+
+; clear wda98 to wda9c
+ClearGameCenterChips:
 	push af
 	xor a
-	ld [wda99 + 0], a
-	ld [wda99 + 1], a
-	ld [wda99 + 2], a
-	ld [wda99 + 3], a
+	ld [wGameCenterChips], a
+	ld [wGameCenterChips + 1], a
+	ld [wGameCenterBankedChips], a
+	ld [wGameCenterBankedChips + 1], a
 	ld [wda98], a
 	pop af
 	ret
-; 0x1158f
 
-SECTION "Bank 4@5641", ROMX[$5641], BANK[$4]
+; load [wGameCenterChips] to bc
+GetGameCenterChips:
+	push af
+	ld a, [wGameCenterChips]
+	ld c, a
+	ld a, [wGameCenterChips + 1]
+	ld b, a
+	pop af
+	ret
+
+; increases player's chip count and ticks up the display on screen
+; while playing sfx. first ticks up slowly, then quickly if bc is large enough.
+; bc = number of chips
+IncreaseChipsSmoothly:
+	push af
+	push bc
+	push de
+	push hl
+	ld a, b
+	or c
+	jr z, .done
+	ld d, b
+	ld e, c
+	ld bc, 20
+	call DivideDEByBC
+	ld a, h
+	or l
+	jr z, .next
+	ld bc, 1
+	inc h
+.display_loop_1
+	call AddChipsAndPlaySFX
+	dec l
+	jr nz, .display_loop_1
+	dec h
+	jr nz, .display_loop_1
+; fallthrough
+.next
+	ld a, d
+	or e
+	jr z, .done
+	ld b, d
+	ld c, e
+	ld e, 20
+.display_loop_2
+	call AddChipsAndPlaySFX
+	dec e
+	jr nz, .display_loop_2
+.done
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+; bc = number of chips
+AddChipsAndPlaySFX:
+	push af
+	ld a, SFX_CHIPS_COUNTING
+	call CallPlaySFX
+	pop af
+	call AddChips
+	ld a, 3
+	call DoAFrames_WithPreCheck
+	ret
+
+; decreases player's chip count and ticks down the display on screen
+; while playing sfx. first ticks down slowly, then quickly if bc is large enough.
+; bc = number of chips
+DecreaseChipsSmoothly:
+	push af
+	push bc
+	push de
+	push hl
+	ld a, b
+	or c
+	jr z, .done
+	ld d, b
+	ld e, c
+	ld bc, 20
+	call DivideDEByBC
+	ld a, h
+	or l
+	jr z, .next
+	ld bc, 1
+	inc h
+.display_loop_1
+	call SubtractChipsAndPlaySFX
+	dec l
+	jr nz, .display_loop_1
+	dec h
+	jr nz, .display_loop_1
+; fallthrough
+.next
+	ld a, d
+	or e
+	jr z, .done
+	ld b, d
+	ld c, e
+	ld e, 20
+.display_loop_2
+	call SubtractChipsAndPlaySFX
+	dec e
+	jr nz, .display_loop_2
+.done
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+; bc = number of chips
+SubtractChipsAndPlaySFX:
+	push af
+	ld a, SFX_CHIPS_COUNTING
+	call CallPlaySFX
+	pop af
+	call SubtractChips
+	ld a, 3
+	call DoAFrames_WithPreCheck
+	ret
+
+; prints value from RAM
+PrintNumberOfChips:
+	push af
+	push bc
+	push de
+	push hl
+	ld a, [wGameCenterChips]
+	ld l, a
+	ld a, [wGameCenterChips + 1]
+	ld h, a
+	lb de, 2, 2
+	call AdjustDECoordByhSC
+	ld a, 4
+	ld b, TRUE
+	farcall PrintNumber
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
 
 IntroAndTitleScreen:
 	push af
@@ -3021,7 +3995,7 @@ IntroAndTitleScreen:
 .title_screen_idle
 	call Func_3d02
 	push af
-	ld a, MUSIC_TITLESCREEN
+	ld a, MUSIC_TITLE_SCREEN
 	call SetMusic
 	pop af
 	call TitleScreenPushStart
@@ -3080,12 +4054,11 @@ SetAthSpriteAnimPosition:
 	pop bc
 	ret
 
-; returns nz if sprite anim was animating
-; before setting the flag
-SetCthSpriteAnimAnimating:
+; also return nz if already animating before setting the flag
+SetAthSpriteAnimAnimating:
 	push bc
 	ld c, a
-	call Func_12ead
+	call SetCthSpriteAnimAnimating
 	pop bc
 	ret
 
@@ -3181,7 +4154,7 @@ IntroCheckInput:
 	ccf
 	call DoFrame
 	ldh a, [hKeysPressed]
-	and A_BUTTON | START
+	and PAD_A | PAD_START
 	jr z, .no_carry
 	scf
 .no_carry
@@ -3195,7 +4168,7 @@ WaitAFramesForInput:
 .loop_wait
 	call DoFrame
 	ldh a, [hKeysPressed]
-	and A_BUTTON | START
+	and PAD_A | PAD_START
 	jr nz, .set_carry
 	dec c
 	jr nz, .loop_wait
@@ -3219,7 +4192,7 @@ WaitBCFramesForInput:
 .loop_wait
 	call DoFrame
 	ldh a, [hKeysPressed]
-	and A_BUTTON | START
+	and PAD_A | PAD_START
 	jr nz, .set_carry
 	dec c
 	jr nz, .loop_wait
@@ -3258,7 +4231,7 @@ DoIntro:
 	call ResetIntroState
 	call ResetIntroOrbStates
 	push af
-	ld a, SFX_9A
+	ld a, SFX_TCG2_INTRO_ORBS
 	call CallPlaySFX
 	pop af
 
@@ -3314,7 +4287,7 @@ UpdateIntroOrbs:
 	push de
 	push hl
 	ld a, c
-	call SetCthSpriteAnimAnimating
+	call SetAthSpriteAnimAnimating
 	jr nz, .skip
 	call .UpdateState
 .skip
@@ -3468,7 +4441,7 @@ AnimateTitle:
 	call WaitAFramesForInput
 	jr c, .finish
 	push af
-	ld a, SFX_9B
+	ld a, SFX_TCG2_INTRO_TITLE
 	call CallPlaySFX
 	pop af
 	call .Expand
@@ -3486,7 +4459,7 @@ AnimateTitle:
 .asm_11976
 	call DoFrame
 	ldh a, [hKeysPressed]
-	and A_BUTTON | START
+	and PAD_A | PAD_START
 	scf
 	ret nz
 	ld a, [wIntroStateCounter]
@@ -3556,10 +4529,10 @@ AnimateTitle:
 	ld [hl], a
 	ld de, rBGPD
 	ld hl, wBackgroundPalettesCGB + $20
-	ld c, CGB_PAL_SIZE
+	ld c, PAL_SIZE
 .loop_load_pal
 	ldh a, [rSTAT]
-	and STAT_ON_OAM
+	and STAT_OAM
 	jr nz, .loop_load_pal
 	ld a, [hli]
 	ld [de], a
@@ -3586,7 +4559,7 @@ AnimateSubtitleEnter:
 	ld a, $02
 	call LoadTitleScreenGraphics
 	push af
-	ld a, SFX_9C
+	ld a, SFX_TCG2_INTRO_SUBTITLE
 	call CallPlaySFX
 	pop af
 	call .Distort
@@ -3602,7 +4575,7 @@ AnimateSubtitleEnter:
 .asm_11a3c
 	call DoFrame
 	ldh a, [hKeysPressed]
-	and A_BUTTON | START
+	and PAD_A | PAD_START
 	scf
 	ret nz
 	ld a, [wIntroStateCounter]
@@ -3718,7 +4691,7 @@ AnimateSubtitleEnter:
 	ld c, 2 palettes
 .asm_11af2
 	ldh a, [rSTAT]
-	and STAT_ON_OAM
+	and STAT_OAM
 	jr nz, .asm_11af2
 	ld a, [hli]
 	ld [de], a
@@ -3869,7 +4842,7 @@ AnimateSubtitleExit:
 .asm_11bd2
 	call DoFrame
 	ldh a, [hKeysPressed]
-	and A_BUTTON | START
+	and PAD_A | PAD_START
 	scf
 	ret nz
 .asm_11bdb
@@ -4005,7 +4978,7 @@ ScrollIntroCard:
 .asm_11cbc
 	call DoFrame
 	ldh a, [hKeysPressed]
-	and A_BUTTON | START
+	and PAD_A | PAD_START
 	scf
 	jr nz, .done
 .asm_11cc6
@@ -4126,7 +5099,7 @@ ClearBoxInBGMap:
 	dec b
 	jr nz, .loop_columns
 	pop hl
-	ld de, BG_MAP_WIDTH
+	ld de, TILEMAP_WIDTH
 	add hl, de
 	pop bc
 	dec c
@@ -4239,7 +5212,7 @@ PrintPlayTime:
 	inc d
 	inc d
 	ldtx hl, SingleColonText
-	call Func_35af
+	call InitTextPrinting_ProcessTextFromIDVRAM0
 	inc d
 	ld a, [wDisplayMinutes]
 	ld l, a
@@ -4281,7 +5254,7 @@ PrintCardAlbumProgress:
 	inc d
 	inc d
 	ldtx hl, CardCountSeparatorText
-	call Func_35af
+	call InitTextPrinting_ProcessTextFromIDVRAM0
 	inc d
 	ld hl, wTotalNumCardsToCollect
 	ld a, [hli]
@@ -4295,7 +5268,891 @@ PrintCardAlbumProgress:
 	pop bc
 	pop af
 	ret
-; 0x121e1
+
+Func_121e1:
+	push bc
+	push de
+	push hl
+	ld hl, wdb17
+	ld [hl], b
+	add a
+	add a
+	ld c, a
+	ld b, $00
+	ld hl, $6214
+	add hl, bc
+	ld e, [hl]
+	inc hl
+	ld d, [hl]
+	inc hl
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	ld b, $04
+	call LoadMenuBoxParams
+	farcall Func_1cacf
+	ld a, [wdb17]
+	farcall DrawMenuBox
+	farcall HandleMenuBox
+	farcall Func_1caf1
+	pop hl
+	pop de
+	pop bc
+	ret
+; 0x12214
+
+SECTION "Bank 4@639b", ROMX[$639b], BANK[$4]
+
+AskToPlaySlots:
+	call ClearSpriteAnimsAndSetInitialGraphicsConfiguration
+	call DrawSlotMachineDescriptionBox
+	call SetFrameFuncAndFadeFromWhite
+	call PlaySlotsPrompt
+	call FadeToWhiteAndUnsetFrameFunc
+	ret
+
+DrawSlotMachineDescriptionBox:
+	lb de, 0, 0
+	lb bc, 20, 12
+	call DrawRegularTextBoxVRAM0
+	lb de, 0, 12
+	lb bc, 20, 6
+	call DrawRegularTextBoxVRAM0
+	lb de, 1, 0
+	ldtx hl, GameCenterSlotMachineTitleText
+	call Func_2c4b
+	lb de, 1, 2
+	ldtx hl, GameCenterSlotMachineDescriptionText
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	ld a, [wdb2f]
+	ld l, a
+	ld h, $00
+	call LoadTxRam3
+	ldtx hl, GameCenterXChipsPerPlayText
+	lb de, 14, 0
+	call Func_2c4b
+	ret
+
+PlaySlotsPrompt:
+	ldtx hl, GameCenterSlotMachineStartPromptText
+	ld a, $01
+	call DrawWideTextBox_PrintTextWithYesOrNoMenu
+	ret c
+	call Func_3d0d
+	push af
+	ld a, MUSIC_GAME_CENTER_POWER_ON
+	call Func_3d09
+	pop af
+	call WaitForSongToFinish
+	call Func_3d16
+	ret
+
+StartSlotMachine:
+	call ClearSpriteAnimsAndSetInitialGraphicsConfiguration
+	call Func_125bf
+	xor a
+	ld [wdb3c], a
+	xor a
+	ld [wdb32], a
+	call Func_125ed
+	call Func_12d17
+	call SetFrameFuncAndFadeFromWhite
+	call Func_1241a
+	call FadeToWhiteAndUnsetFrameFunc
+	ret
+
+Func_1241a:
+.asm_1241a
+	call Func_12463
+	call Func_129ca
+	ret c
+	call Func_12546
+	call Func_1247d
+	push af
+	ld a, SFX_SLOT_START
+	call CallPlaySFX
+	pop af
+	ld a, $08
+	call DoAFrames_WithPreCheck
+.asm_12433
+	call DoFrame
+	ld a, [wdb3f]
+	ld b, a
+	ld a, [wVBlankCounter]
+	and b
+	jr nz, .asm_12433
+	call Func_12818
+	call Func_128aa
+	call Func_12670
+	call Func_129b8
+	jr nc, .asm_12433
+	call Func_12a6a
+	jr c, .asm_1245a
+	ld a, $1e
+	call DoAFrames_WithPreCheck
+	jr .asm_1241a
+.asm_1245a
+	call Func_12ac7
+	xor a
+	ld [wdb35], a
+	jr .asm_1241a
+
+Func_12463:
+	ld a, $1e
+	call Random
+	add $18
+	ld [wdb30], a
+	xor a
+	ld [wdb31], a
+	ld a, $01
+	ld [wdb3f], a
+	call Func_125dd
+	call Func_12dcc
+	ret
+
+Func_1247d:
+	ld a, [wdb35]
+	and a
+	ret z
+	ld a, [wdb36]
+	cp $03
+	jr z, .asm_1248e
+	cp $04
+	jr z, .asm_1248e
+	ret
+.asm_1248e
+	call Func_12d60
+	ret
+; 0x12492
+
+SECTION "Bank 4@6546", ROMX[$6546], BANK[$4]
+
+Func_12546:
+	ld a, [wdb35]
+	and a
+	jr z, .asm_12551
+	dec a
+	ld [wdb35], a
+	ret
+.asm_12551
+	call Func_12558
+	call Func_12570
+	ret
+
+Func_12558:
+	ld a, [wdb32]
+	ld c, a
+	ld b, $00
+	ld hl, $6594
+	add hl, bc
+	ld b, [hl]
+	ld a, $64
+	call Random
+	cp b
+	ret nc
+	ld a, $03
+	ld [wdb35], a
+	ret
+
+Func_12570:
+	ld a, [wdb32]
+	add a
+	ld c, a
+	ld b, $00
+	ld hl, $6596
+	add hl, bc
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	ld a, $64
+	call Random
+	ld b, a
+	ld c, $06
+.asm_12586
+	ld a, [hli]
+	ld e, a
+	ld a, [hli]
+	cp b
+	jr nc, .asm_1258f
+	dec c
+	jr nz, .asm_12586
+.asm_1258f
+	ld a, e
+	ld [wdb36], a
+	ret
+; 0x12594
+
+SECTION "Bank 4@65b2", ROMX[$65b2], BANK[$4]
+
+Func_125b2:
+	push af
+	push hl
+	call Func_12cb2
+	ld a, $3a
+	ld [hli], a
+	xor a
+	ld [hl], a
+	pop hl
+	pop af
+	ret
+
+Func_125bf:
+	push af
+	push bc
+	ld c, $00
+.asm_125c3
+	call Func_125b2
+	inc c
+	ld a, c
+	cp $03
+	jr nz, .asm_125c3
+	pop bc
+	pop af
+	ret
+
+Func_125cf:
+	push af
+	push hl
+	call Func_12cb2
+	ld a, [hl]
+	and $3f
+	ld [hli], a
+	xor a
+	ld [hl], a
+	pop hl
+	pop af
+	ret
+
+Func_125dd:
+	push af
+	push bc
+	ld c, $00
+.asm_125e1
+	call Func_125cf
+	inc c
+	ld a, c
+	cp $03
+	jr nz, .asm_125e1
+	pop bc
+	pop af
+	ret
+
+Func_125ed:
+	and a
+	jr nz, .asm_1260c
+	ld hl, wdb46
+	ld de, $6def
+	call Func_12628
+	ld hl, wdb86
+	ld de, $6e03
+	call Func_12628
+	ld hl, wdbc6
+	ld de, $6e17
+	call Func_12628
+	ret
+.asm_1260c
+	ld hl, wdb46
+	ld de, $6e2b
+	call Func_12628
+	ld hl, wdb86
+	ld de, $6e3f
+	call Func_12628
+	ld hl, wdbc6
+	ld de, $6e53
+	call Func_12628
+	ret
+
+Func_12628:
+	ld c, $14
+.asm_1262a
+	push bc
+	push de
+	call Func_12636
+	pop de
+	pop bc
+	inc de
+	dec c
+	jr nz, .asm_1262a
+	ret
+
+Func_12636:
+	push hl
+	ld a, [de]
+	ld c, a
+	sla c
+	add c
+	ld c, a
+	ld b, $00
+	ld hl, $664f
+	add hl, bc
+	ld d, h
+	ld e, l
+	pop hl
+	ld c, $03
+.asm_12648
+	ld a, [de]
+	inc de
+	ld [hli], a
+	dec c
+	jr nz, .asm_12648
+	ret
+; 0x1264f
+
+SECTION "Bank 4@6670", ROMX[$6670], BANK[$4]
+
+Func_12670:
+	ld hl, wdb23
+	ld c, $03
+.asm_12675
+	call Func_1267e
+	inc hl
+	inc hl
+	dec c
+	jr nz, .asm_12675
+	ret
+
+Func_1267e:
+	push bc
+	push hl
+	ld a, [hl]
+	and $3f
+	ld e, a
+	dec c
+	ld b, $00
+	sla c
+	sla c
+	ld hl, $669c
+	add hl, bc
+	ld a, [hli]
+	ld c, a
+	ld a, [hli]
+	ld b, a
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	call Func_126a8
+	pop hl
+	pop bc
+	ret
+; 0x1269c
+
+SECTION "Bank 4@66a8", ROMX[$66a8], BANK[$4]
+
+Func_126a8:
+	ld d, $00
+	add hl, de
+	ld d, $07
+.asm_126ad
+	push de
+	ld a, [hli]
+	ld e, a
+	call Func_126c7
+	pop de
+	inc e
+	ld a, e
+	cp $3c
+	jr c, .asm_126c2
+	push bc
+	ld bc, $ffc4
+	add hl, bc
+	pop bc
+	ld e, $00
+.asm_126c2
+	inc c
+	dec d
+	jr nz, .asm_126ad
+	ret
+
+Func_126c7:
+	push af
+	push bc
+	push de
+	push hl
+	ld d, $00
+	sla e
+	rl d
+	sla e
+	rl d
+	sla e
+	rl d
+	ld hl, $6710
+	add hl, de
+	ld a, $04
+.asm_126df
+	push af
+	ld a, [hl]
+	add $80
+	ld d, a
+	pop af
+	inc hl
+	ld e, [hl]
+	inc hl
+	call Func_126f4
+	inc b
+	dec a
+	jr nz, .asm_126df
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+Func_126f4:
+	push af
+	xor a
+	call BankswitchVRAM
+	push bc
+	push de
+	ld a, d
+	call WriteByteToBGMap0
+	ld a, BANK("VRAM1")
+	call BankswitchVRAM
+	pop de
+	pop bc
+	ld a, e
+	call WriteByteToBGMap0
+	xor a
+	call BankswitchVRAM
+	pop af
+	ret
+; 0x12710
+
+SECTION "Bank 4@6818", ROMX[$6818], BANK[$4]
+
+Func_12818:
+	ld c, $00
+.asm_1281a
+	call Func_12824
+	inc c
+	ld a, c
+	cp $03
+	jr nz, .asm_1281a
+	ret
+
+Func_12824:
+	call Func_12cb2
+	bit 7, [hl]
+	ret nz
+	bit 6, [hl]
+	jr nz, .asm_1283f
+.asm_1282e
+	ld a, [hl]
+	and $c0
+	ld b, a
+	ld a, [hl]
+	and $3f
+	dec a
+	cp $ff
+	jr nz, .asm_1283c
+	ld a, $3b
+.asm_1283c
+	or b
+	ld [hl], a
+	ret
+.asm_1283f
+	call Func_1286a
+	jr nz, .asm_1282e
+	inc hl
+	ld a, [hld]
+	and a
+	jr z, .asm_12856
+	ld e, a
+	and $1f
+	dec a
+	ld b, a
+	ld a, e
+	and $e0
+	or b
+	inc hl
+	ld [hld], a
+	jr nz, .asm_1282e
+.asm_12856
+	res 6, [hl]
+	set 7, [hl]
+	ld b, $00
+	call Func_12a99
+	call Func_12a8d
+	push af
+	ld a, SFX_SLOT_REEL
+	call CallPlaySFX
+	pop af
+	ret
+
+Func_1286a:
+	ld a, [hl]
+	and $3f
+	cp $01
+	ret z
+	cp $04
+	ret z
+	cp $07
+	ret z
+	cp $0a
+	ret z
+	cp $0d
+	ret z
+	cp $10
+	ret z
+	cp $13
+	ret z
+	cp $16
+	ret z
+	cp $19
+	ret z
+	cp $1c
+	ret z
+	cp $1f
+	ret z
+	cp $22
+	ret z
+	cp $25
+	ret z
+	cp $28
+	ret z
+	cp $2b
+	ret z
+	cp $2e
+	ret z
+	cp $31
+	ret z
+	cp $34
+	ret z
+	cp $37
+	ret z
+	cp $3a
+	ret z
+	ret
+
+Func_128aa:
+	ld a, [wdb30]
+	and a
+	jr z, .asm_128b5
+	dec a
+	ld [wdb30], a
+	ret
+.asm_128b5
+	ld a, [wdb31]
+	cp $03
+	ret z
+	ld a, [wdb31]
+	and a
+	jr z, .asm_128c9
+	ld c, a
+	dec c
+	call Func_12cb2
+	bit 7, [hl]
+	ret z
+.asm_128c9
+	ld a, [wdb31]
+	ld c, a
+	call Func_128eb
+	ld hl, wdb31
+	inc [hl]
+	ld a, $1e
+	call Random
+	add $12
+	ld [wdb30], a
+	ret
+; 0x128df
+
+SECTION "Bank 4@68eb", ROMX[$68eb], BANK[$4]
+
+Func_128eb:
+	call Func_12cb2
+	set 6, [hl]
+	call Func_128f4
+	ret
+
+Func_128f4:
+	ld e, c
+	sla e
+	ld d, $00
+	ld hl, $6901
+	add hl, de
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	jp hl
+; 0x12901
+
+SECTION "Bank 4@69b8", ROMX[$69b8], BANK[$4]
+
+Func_129b8:
+	scf
+	ccf
+	ld hl, wdb23
+	ld c, $03
+.asm_129bf
+	bit 7, [hl]
+	jr z, .asm_129c9
+	inc hl
+	inc hl
+	dec c
+	jr nz, .asm_129bf
+	scf
+.asm_129c9
+	ret
+
+Func_129ca:
+	call Func_114af
+	call Func_11002
+	call Func_12a02
+	ld a, $3c
+	ld [wdb3d], a
+.asm_129d8
+	call DoFrame
+	call UpdateRNGSources
+	jr c, .asm_129ee
+	ldh a, [hKeysPressed]
+	and PAD_B
+	jr nz, .asm_129fa
+	ldh a, [hKeysPressed]
+	and PAD_DOWN
+	jr nz, .asm_129ee
+	jr .asm_129d8
+.asm_129ee
+	call Func_12a15
+	jr c, .asm_129d8
+	ld a, $14
+	call DoAFrames_WithPreCheck
+	jr .asm_129fb
+.asm_129fa
+	scf
+.asm_129fb
+	call Func_1101d
+	call Func_114f9
+	ret
+
+Func_12a02:
+	lb de, 0, 12
+	lb bc, 20, 6
+	call DrawRegularTextBoxVRAM0
+	ldtx hl, GameCenterSlotMachineDialogText
+	lb de, 1, 14
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	ret
+
+Func_12a15:
+	call GetGameCenterChips
+	ld a, [wdb2f]
+	ld e, a
+	ld d, $00
+	call CompareBCAndDE
+	jr c, .asm_12a34
+	ld a, [wdb2f]
+	ld c, a
+	ld b, $00
+	call DecreaseChipsSmoothly
+	ld a, $04
+	call DoAFrames_WithPreCheck
+	scf
+	ccf
+	ret
+.asm_12a34
+	push af
+	ld a, SFX_DENIED
+	call CallPlaySFX
+	pop af
+	scf
+	ret
+; 0x12a3d
+
+SECTION "Bank 4@6a6a", ROMX[$6a6a], BANK[$4]
+
+Func_12a6a:
+	ld c, $00
+	call Func_12a81
+	ld b, a
+.asm_12a70
+	call Func_12a81
+	cp b
+	jr nz, .asm_12a7e
+	inc c
+	ld a, c
+	cp $03
+	jr c, .asm_12a70
+	scf
+	ret
+.asm_12a7e
+	scf
+	ccf
+	ret
+
+Func_12a81:
+	push bc
+	push hl
+	ld b, $00
+	ld hl, wdb39
+	add hl, bc
+	ld a, [hl]
+	pop hl
+	pop bc
+	ret
+
+Func_12a8d:
+	push bc
+	push hl
+	ld b, $00
+	ld hl, wdb39
+	add hl, bc
+	ld [hl], a
+	pop hl
+	pop bc
+	ret
+
+Func_12a99:
+	push bc
+	push de
+	push hl
+	call Func_12cb2
+	call Func_12cbd
+	ld a, [hl]
+	and $3f
+	add $02
+	sub b
+	sub b
+	sub b
+	bit 7, a
+	jr z, .asm_12ab0
+	add $3c
+.asm_12ab0
+	cp $3c
+	jr c, .asm_12ab6
+	sub $3c
+.asm_12ab6
+	ld c, a
+	ld b, $00
+	ld h, d
+	ld l, e
+	add hl, bc
+	ld a, [hl]
+	ld c, $03
+	call Func_34ca
+	ld a, b
+	pop hl
+	pop de
+	pop bc
+	ret
+
+Func_12ac7:
+	call Func_12af1
+	ld c, $00
+	call Func_12a81
+	add a
+	ld c, a
+	ld b, $00
+	ld hl, $6adb
+	add hl, bc
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	jp hl
+; 0x12adb
+
+SECTION "Bank 4@6af1", ROMX[$6af1], BANK[$4]
+
+Func_12af1:
+	call Func_12dcc
+	call Func_12d45
+	ld a, $28
+	call DoAFrames_WithPreCheck
+	ret
+; 0x12afd
+
+SECTION "Bank 4@6cb2", ROMX[$6cb2], BANK[$4]
+
+Func_12cb2:
+	push bc
+	sla c
+	ld b, $00
+	ld hl, wdb23
+	add hl, bc
+	pop bc
+	ret
+
+Func_12cbd:
+	push bc
+	push hl
+	ld b, $00
+	sla c
+	rl b
+	sla c
+	rl b
+	sla c
+	rl b
+	sla c
+	rl b
+	sla c
+	rl b
+	sla c
+	rl b
+	ld hl, wdb46
+	add hl, bc
+	ld d, h
+	ld e, l
+	pop hl
+	pop bc
+	ret
+; 0x12ce2
+
+SECTION "Bank 4@6cfc", ROMX[$6cfc], BANK[$4]
+
+Func_12cfc:
+	lb de, 8, 15
+	lb bc, 4, 1
+	call FillBoxInBGMapWithZero
+	ld a, [wdb34]
+	ld l, a
+	ld h, $00
+	lb de, 9, 15
+	ld a, $02
+	ld b, FALSE
+	farcall PrintNumber
+	ret
+
+Func_12d17:
+	ld b, $04
+	ld hl, $6d2b
+	ld de, $0
+	ld c, $02
+	call LoadBGGraphics
+	call Func_12670
+	call Func_12cfc
+	ret
+; 0x12d2b
+
+SECTION "Bank 4@6d45", ROMX[$6d45], BANK[$4]
+
+Func_12d45:
+	ld b, $04
+	ld hl, $6d58
+	ld de, $5858
+	ld a, $ff
+	ld c, $00
+	call CreateSpriteAnim
+	call FlushAllPalettes
+	ret
+; 0x12d58
+
+SECTION "Bank 4@6d60", ROMX[$6d60], BANK[$4]
+
+Func_12d60:
+	ld b, $04
+	ld hl, $6d73
+	ld de, $5858
+	ld a, $ff
+	ld c, $00
+	call CreateSpriteAnim
+	call FlushAllPalettes
+	ret
+; 0x12d73
+
+SECTION "Bank 4@6dcc", ROMX[$6dcc], BANK[$4]
+
+Func_12dcc:
+	call ClearSpriteAnims
+	ret
+; 0x12dd0
 
 SECTION "Bank 4@6e68", ROMX[$6e68], BANK[$4]
 
@@ -4349,16 +6206,403 @@ SetCthSpriteAnimStartDelay:
 	pop bc
 	ret
 
-Func_12ead:
+; also return nz if already animating before setting the flag
+SetCthSpriteAnimAnimating:
 	push hl
 	call GetCthSpriteAnim
 	call CheckIsSpriteAnimAnimating
 	call SetSpriteAnimAnimating
 	pop hl
 	ret
-; 0x12eb9
 
-SECTION "Bank 4@73f0", ROMX[$73f0], BANK[$4]
+INCLUDE "engine/scenes.asm"
+
+Func_1312e:
+	call Func_1022a
+	call Func_13138
+	call Func_10252
+	ret
+
+Func_13138:
+	push bc
+	push de
+	push hl
+	call Func_1315e
+	jr c, .asm_1315a
+	call Func_3d0d
+	push af
+	ld a, MUSIC_CARD_POP
+	call SetMusic
+	pop af
+	call Func_1320f
+	call Func_13357
+	jr c, .asm_13157
+	call Func_1323b
+	scf
+	ccf
+.asm_13157
+	call Func_3d16
+.asm_1315a
+	pop hl
+	pop de
+	pop bc
+	ret
+
+Func_1315e:
+	call ClearSpriteAnimsAndSetInitialGraphicsConfiguration
+	lb de, $40, $ff
+	call SetupText
+	call Func_13189
+	call SetFrameFuncAndFadeFromWhite
+	call SetFadePalsFrameFunc
+	call Func_131bd
+	jr c, .asm_13182
+	call Func_131fd
+	jr c, .asm_13182
+	call Func_131eb
+	jr c, .asm_13182
+	call Func_131d7
+.asm_13182
+	call UnsetFadePalsFrameFunc
+	call FadeToWhiteAndUnsetFrameFunc
+	ret
+
+Func_13189:
+	lb de, 0, 0
+	lb bc, 20, 13
+	call DrawRegularTextBoxVRAM0
+	lb de, 0, 12
+	lb bc, 20, 6
+	call DrawRegularTextBoxVRAM0
+	ldtx hl, GameCenterBlackBoxDescriptionText
+	lb de, 1, 2
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	ldtx hl, GameCenterBlackBoxTitleText
+	lb de, 1, 0
+	call Func_2c4b
+	ld hl, $5
+	call LoadTxRam3
+	ldtx hl, GameCenterXChipsPerPlayText
+	lb de, 14, 0
+	call Func_2c4b
+	ret
+
+Func_131bd:
+	ldtx hl, GameCenterBlackBoxStartPromptText
+	ld a, $01
+	call DrawWideTextBox_PrintTextWithYesOrNoMenu
+	ret c
+	call Func_3d0d
+	push af
+	ld a, MUSIC_GAME_CENTER_POWER_ON
+	call Func_3d09
+	pop af
+	call WaitForSongToFinish
+	call Func_3d16
+	ret
+
+Func_131d7:
+	ldtx hl, GameCenterBlackBoxSaveRequestText
+	call PrintScrollableText_NoTextBoxLabelVRAM0
+	ld c, $00
+	farcall DrawSavePromptAndWaitForInput
+	ret nc
+	ldtx hl, GameCenterBlackBoxUnableSaveRequiredText
+	call PrintScrollableText_NoTextBoxLabelVRAM0
+	ret
+
+Func_131eb:
+	call GetGameCenterChips
+	ld de, $5
+	call CompareBCAndDE
+	ret z
+	ret nc
+	ldtx hl, GameCenterBlackBoxUnableNotEnoughChipsText
+	call PrintScrollableText_NoTextBoxLabelVRAM0
+	ret
+
+Func_131fd:
+	farcall CheckForBlackBoxCardInMail
+	ret nc
+	ldtx hl, GameCenterBlackBoxUnableLastOutputRemainingText
+	call PrintScrollableText_NoTextBoxLabelVRAM0
+	ldtx hl, GameCenterBlackBoxUnableLastOutputRemainingTextCont
+	call PrintScrollableText_NoTextBoxLabelVRAM0
+	ret
+
+Func_1320f:
+	call ClearSpriteAnimsAndSetInitialGraphicsConfiguration
+	call Func_13222
+	call SetFrameFuncAndFadeFromWhite
+	ldtx hl, GameCenterBlackBoxProcedureDialogText
+	call PrintScrollableText_NoTextBoxLabelVRAM0
+	call FadeToWhiteAndUnsetFrameFunc
+	ret
+
+Func_13222:
+	lb de, 0, 12
+	lb bc, 20, 6
+	call DrawRegularTextBoxVRAM0
+	bank1call SetNoLineSeparation
+	ldtx hl, GameCenterBlackBoxProcedureText
+	lb de, 1, 1
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	bank1call SetOneLineSeparation
+	ret
+
+Func_1323b:
+	call ClearSpriteAnimsAndSetInitialGraphicsConfiguration
+	call Func_1325a
+	call SetFrameFuncAndFadeFromWhite
+	call Func_13267
+	ldtx hl, GameCenterBlackBoxDoneText
+	call PrintScrollableText_NoTextBoxLabelVRAM0
+	call Func_132c4
+	ldtx hl, GameCenterToBeMailedText
+	call PrintScrollableText_NoTextBoxLabelVRAM0
+	call FadeToWhiteAndUnsetFrameFunc
+	ret
+
+Func_1325a:
+	call Func_1325e
+	ret
+
+Func_1325e:
+	ld a, SCENE_BLACK_BOX
+	lb bc, 0, 0
+	call LoadScene
+	ret
+
+Func_13267:
+	call ClearSpriteAnims
+	call Func_132f3
+	call FlushAllPalettes
+	call Func_133dc
+	ld c, a
+	ld a, $00
+	ld de, $2020
+.asm_13279
+	push bc
+	call Func_1328c
+	call Func_132ad
+	pop bc
+	push af
+	ld a, $18
+	add d
+	ld d, a
+	pop af
+	inc a
+	dec c
+	jr nz, .asm_13279
+	ret
+
+Func_1328c:
+	push de
+	ld de, $5858
+	call Func_13314
+	ld c, $01
+	call Func_13321
+	pop de
+	push af
+	ld a, $28
+	call DoAFrames_WithPreCheck
+	push af
+	ld a, SFX_BLACK_BOX_INSERT
+	call CallPlaySFX
+	pop af
+	ld a, $28
+	call DoAFrames_WithPreCheck
+	pop af
+	ret
+
+Func_132ad:
+	call Func_13314
+	ld c, $00
+	call Func_13321
+	push af
+	ld a, SFX_BLACK_BOX_INSERTED
+	call CallPlaySFX
+	pop af
+	push af
+	ld a, $14
+	call DoAFrames_WithPreCheck
+	pop af
+	ret
+
+Func_132c4:
+	ld a, $00
+	ld c, $05
+.asm_132c8
+	push bc
+	ld c, $02
+	call Func_13321
+	pop bc
+	inc a
+	dec c
+	jr nz, .asm_132c8
+	ld a, $3c
+	call DoAFrames_WithPreCheck
+	call ClearSpriteAnims
+	call Func_1333f
+	call FlushAllPalettes
+	ld a, $28
+	call DoAFrames_WithPreCheck
+	push af
+	ld a, SFX_BLACK_BOX_TRANSMITTED
+	call CallPlaySFX
+	pop af
+	ld a, $14
+	call DoAFrames_WithPreCheck
+	ret
+
+Func_132f3:
+	ld hl, $730c
+	ld b, $04
+	ld de, $c0c0
+	ld c, $05
+.asm_132fd
+	push hl
+	push bc
+	ld a, $ff
+	ld c, $00
+	call CreateSpriteAnim
+	pop bc
+	pop hl
+	dec c
+	jr nz, .asm_132fd
+	ret
+; 0x1330c
+
+SECTION "Bank 4@7314", ROMX[$7314], BANK[$4]
+
+Func_13314:
+	push af
+	push bc
+	push de
+	push hl
+	ld c, a
+	call SetCthSpriteAnimPosition
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+Func_13321:
+	push af
+	push bc
+	push de
+	push hl
+	sla c
+	ld b, $00
+	ld hl, $7339
+	add hl, bc
+	ld e, [hl]
+	inc hl
+	ld d, [hl]
+	ld c, a
+	call SetCthSpriteAnimFrameset
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+; 0x13339
+
+SECTION "Bank 4@733f", ROMX[$733f], BANK[$4]
+
+Func_1333f:
+	ld hl, $734f
+	ld b, $04
+	ld a, $ff
+	ld de, $5858
+	ld c, $00
+	call CreateSpriteAnim
+	ret
+; 0x1334f
+
+SECTION "Bank 4@7357", ROMX[$7357], BANK[$4]
+
+Func_13357:
+	call ClearSpriteAnimsAndSetInitialGraphicsConfiguration
+	call SetFrameFuncAndFadeFromWhite
+	call SetFadePalsFrameFunc
+.asm_13360
+	farcall Func_a705
+	jr nc, .asm_13373
+	ldtx hl, GameCenterBlackBoxCancelPromptText
+	ld a, $01
+	call DrawWideTextBox_PrintTextWithYesOrNoMenu
+	jr c, .asm_13360
+	scf
+	jr .asm_13391
+.asm_13373
+	call Func_133dc
+	and a
+	jr nz, .asm_13381
+	ldtx hl, NoCardsSelectedTryAgainText
+	call PrintScrollableText_NoTextBoxLabelVRAM0
+	jr .asm_13360
+.asm_13381
+	call Func_133b0
+	ldtx hl, GameCenterBlackBoxConfirmPromptText
+	ld a, $01
+	call DrawWideTextBox_PrintTextWithYesOrNoMenu
+	jr c, .asm_13360
+	call Func_13398
+.asm_13391
+	call UnsetFadePalsFrameFunc
+	call FadeToWhiteAndUnsetFrameFunc
+	ret
+
+Func_13398:
+	call Func_114af
+	ldtx hl, GameCenterBlackBoxChipsPaidText
+	call PrintScrollableText_NoTextBoxLabelVRAM0
+	ld bc, $5
+	call DecreaseChipsSmoothly
+	ld a, $1e
+	call DoAFrames_WithPreCheck
+	call Func_114f9
+	ret
+
+Func_133b0:
+	farcall Func_a6ef
+	ldtx hl, GameCenterBlackBoxSendingHeaderText
+	lb de, 1, 1
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	call Func_133dc
+	ld [wTxRam3], a
+	xor a
+	ld [wTxRam3 + 1], a
+	ld bc, $5
+	ld a, c
+	ld [wTxRam3_b], a
+	ld a, b
+	ld [wTxRam3_b + 1], a
+	ldtx hl, NumberSlashNumberText
+	lb de, 16, 1
+	call PrintTextNoDelay_InitVRAM0
+	ret
+
+Func_133dc:
+	push bc
+	push hl
+	ld hl, wCurDeckCards
+	ld c, $00
+.asm_133e3
+	ld a, [hli]
+	ld b, a
+	ld a, [hli]
+	or b
+	jr z, .asm_133ec
+	inc c
+	jr .asm_133e3
+.asm_133ec
+	ld a, c
+	pop hl
+	pop bc
+	ret
 
 ; de = card ID
 DrawIntroCardGfx:
@@ -4451,7 +6695,7 @@ CopyCardPalettesToBGPals:
 	ld b, $00
 	sla c
 	sla c
-	sla c ; *CGB_PAL_SIZE
+	sla c ; *PAL_SIZE
 	ld hl, wBackgroundPalettesCGB
 	add hl, bc
 	ld d, h
@@ -4549,7 +6793,7 @@ DrawLoadedCard:
 	push hl
 	ld h, d
 	ld l, e
-	ld bc, BG_MAP_WIDTH - 8 ; start of next line
+	ld bc, TILEMAP_WIDTH - 8 ; start of next line
 	add hl, bc
 	ld d, h
 	ld e, l
@@ -4562,9 +6806,479 @@ DrawLoadedCard:
 	pop bc
 	pop af
 	ret
-; 0x1352a
+
+Func_1352a:
+	push af
+	push bc
+	push de
+	push hl
+	call Func_13561.asm_1358a
+	ld hl, $0
+	ld a, $de
+	call Random
+	ld c, a
+	ld b, $00
+	add hl, bc
+	ld a, $de
+	call Random
+	ld c, a
+	ld b, $00
+	add hl, bc
+	ld d, h
+	ld e, l
+	call Func_135b3
+.asm_1354b
+	call DoFrame
+	ldh a, [hKeysPressed]
+	and PAD_A | PAD_B
+	jr nz, .asm_13559
+	call Func_13561
+	jr .asm_1354b
+.asm_13559
+	call Func_13561.asm_135ac
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+Func_13561:
+	ldh a, [hDPadHeld]
+	and $10
+	jr nz, .asm_1357c
+	ldh a, [hDPadHeld]
+	and $20
+	jr nz, .asm_1356e
+	ret
+.asm_1356e
+	ld bc, $1
+	call CompareBCAndDE
+	jr c, .asm_13579
+	ld de, $1be
+.asm_13579
+	dec de
+	jr Func_135b3
+.asm_1357c
+	ld bc, $1bc
+	call CompareBCAndDE
+	jr nc, .asm_13587
+	ld de, $0
+.asm_13587
+	inc de
+	jr Func_135b3
+.asm_1358a:
+	lb de, 5, 4
+	lb bc, 10, 8
+	call AdjustDECoordByhSC
+	call CopyBGMapFromVRAMToWRAM
+	call ResetActiveSpriteAnimFlag6WithinArea
+	call DrawRegularTextBoxVRAM0
+	lb de, 11, 11
+	lb bc, 3, 1
+	ld hl, $2000
+	call AdjustDECoordByhSC
+	call FillBoxInBGMap
+	ret
+.asm_135ac:
+	call CopyBGMapFromWRAMToVRAM
+	call SetActiveSpriteAnimFlag6WithinArea
+	ret
+
+Func_135b3:
+	push de
+	push de
+	lb de, 6, 5
+	call AdjustDECoordByhSC
+	ld b, d
+	ld c, e
+	pop de
+	push bc
+	ld c, $80
+	call LoadCardGfx_FromCardID
+	pop de
+	ld c, $05
+	call CopyCardPalettesToBGPals
+	ld b, $80
+	ld c, $05
+	call DrawLoadedCard
+	call FlushAllPalettes
+	pop de
+	push de
+	xor a
+	call BankswitchVRAM
+	ld h, d
+	ld l, e
+	lb de, 11, 11
+	call AdjustDECoordByhSC
+	ld a, $03
+	ld b, $00
+	farcall PrintNumber
+	pop de
+	ret
+
+Func_135ec:
+	call Func_102a4
+	call Func_135f6
+	call Func_102c4
+	ret
+
+Func_135f6:
+	push bc
+	push de
+	push hl
+	ld [wddf6], a
+	ld a, c
+	ld [wddf8], a
+	ld a, b
+	ld [wddf7], a
+	and a
+	jr nz, .asm_1360e
+	call Func_13617
+	ld a, $00
+	jr c, .asm_13613
+.asm_1360e
+	call Func_136e4
+	ld a, $01
+.asm_13613
+	pop hl
+	pop de
+	pop bc
+	ret
+
+Func_13617:
+	call ClearSpriteAnimsAndSetInitialGraphicsConfiguration
+	lb de, $40, $ff
+	call SetupText
+	call Func_1362d
+	call SetFrameFuncAndFadeFromWhite
+	call Func_136db
+	call FadeToWhiteAndUnsetFrameFunc
+	ret
+
+Func_1362d:
+	lb de, 0, 0
+	lb bc, 20, 13
+	call DrawRegularTextBoxVRAM0
+	lb de, 0, 12
+	lb bc, 20, 6
+	call DrawRegularTextBoxVRAM0
+	ld a, [wddf6]
+	add a
+	ld c, a
+	ld b, $00
+	ld hl, $76b0
+	add hl, bc
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	lb de, 1, 0
+	call Func_2c4b
+	ld hl, $7697
+	call PlaceTextItemsVRAM0
+	ldtx hl, ChallengeMachineScoreTitleText
+	lb de, 1, 2
+	call PrintTextNoDelay_InitVRAM0
+	ld hl, wde0d
+	ld de, $e04
+	call Func_13681
+	ld hl, wde11
+	ld de, $e06
+	call Func_13681
+	ld hl, wde15
+	ld de, $e0a
+	call Func_13681
+	call Func_136b4
+	ret
+
+Func_13681:
+	push hl
+	ld a, [wddf6]
+	add a
+	ld c, a
+	ld b, $00
+	add hl, bc
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	ld a, $03
+	ld b, $01
+	farcall PrintNumber
+	pop hl
+	ret
+; 0x13697
+
+SECTION "Bank 4@76b4", ROMX[$76b4], BANK[$4]
+
+Func_136b4:
+	ld de, wde39
+	call Func_13d1f
+	ld a, [wddf6]
+	add a
+	add a
+	add a
+	add a
+	ld c, a
+	ld b, $00
+	ld hl, wde19
+	add hl, bc
+	call SavePlayerName
+	ldtx hl, TxRam1Text
+	lb de, 2, 10
+	call PrintTextNoDelay_InitVRAM0
+	ld hl, wde39
+	call SavePlayerName
+	ret
+
+Func_136db:
+	ldtx hl, ChallengeMachineStartPromptText
+	ld a, $01
+	call DrawWideTextBox_PrintTextWithYesOrNoMenu
+	ret
+
+Func_136e4:
+	call ClearSpriteAnimsAndSetInitialGraphicsConfiguration
+	lb de, $40, $ff
+	call SetupText
+	call Func_1371f
+	call SetFrameFuncAndFadeFromWhite
+	ld a, [wddf8]
+	and a
+	jr z, .asm_1370b
+	call Func_137fa
+	ld a, [wddf8]
+	cp $02
+	jr z, .asm_13718
+	ld a, [wddf7]
+	cp $05
+	scf
+	jr z, .asm_13718
+.asm_1370b
+	call Func_13792
+	call Func_137df
+	jr nc, .asm_1371b
+	ld a, $02
+	ld [wddf8], a
+.asm_13718
+	call Func_1382e
+.asm_1371b
+	call FadeToWhiteAndUnsetFrameFunc
+	ret
+
+Func_1371f:
+	lb de, 0, 0
+	lb bc, 20, 13
+	call DrawRegularTextBoxVRAM0
+	lb de, 0, 12
+	lb bc, 20, 6
+	call DrawRegularTextBoxVRAM0
+	ld a, [wddf6]
+	add a
+	ld c, a
+	ld b, $00
+	ld hl, $7749
+	add hl, bc
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	lb de, 1, 0
+	call Func_2c4b
+	call Func_1374d
+	ret
+; 0x13749
+
+SECTION "Bank 4@774d", ROMX[$774d], BANK[$4]
+
+Func_1374d:
+	ld hl, wddf9
+	ld c, $05
+	ld e, $02
+.asm_13754
+	call Func_13763
+	call Func_13778
+	call Func_13785
+	inc e
+	inc e
+	dec c
+	jr nz, .asm_13754
+	ret
+
+Func_13763:
+	push hl
+	ld a, $06
+	sub c
+	ld [wTxRam3], a
+	xor a
+	ld [wTxRam3 + 1], a
+	ldtx hl, TxRam3Text
+	ld d, $02
+	call PrintTextNoDelay_InitVRAM0
+	pop hl
+	ret
+
+Func_13778:
+	push hl
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	ld d, $04
+	call PrintTextNoDelay_InitVRAM0
+	pop hl
+	inc hl
+	inc hl
+	ret
+
+Func_13785:
+	push hl
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	ld d, $0e
+	call PrintTextNoDelay_InitVRAM0
+	pop hl
+	inc hl
+	inc hl
+	ret
+
+Func_13792:
+	ld a, [wddf7]
+	and a
+	jr nz, .asm_1379e
+	ldtx hl, ChallengeMachineOpponentListDialogText
+	call PrintScrollableText_NoTextBoxLabelVRAM0
+.asm_1379e
+	ld a, [wddf6]
+	add a
+	ld c, a
+	ld b, $00
+	ld hl, wde11
+	add hl, bc
+	ld c, [hl]
+	inc hl
+	ld b, [hl]
+	ld de, $1
+	call CompareBCAndDE
+	ret c
+	ret z
+	ld h, b
+	ld l, c
+	call LoadTxRam3
+	ld a, [wddf7]
+	inc a
+	ld [wTxRam3_b], a
+	xor a
+	ld [wTxRam3_b + 1], a
+	ld a, [wddf7]
+	add a
+	add a
+	ld c, a
+	ld b, $00
+	ld hl, wddf9
+	add hl, bc
+	inc hl
+	inc hl
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	call LoadTxRam2
+	ldtx hl, ChallengeMachineOpponentXDialogText
+	call PrintScrollableText_NoTextBoxLabelVRAM0
+	ret
+
+Func_137df:
+.asm_137df
+	ldtx hl, ChallengeMachineDuelPromptText
+	ld a, $01
+	call DrawWideTextBox_PrintTextWithYesOrNoMenu
+	ret nc
+	ldtx hl, ChallengeMachineQuitWinStreakWarningText
+	call PrintScrollableText_NoTextBoxLabelVRAM0
+	ldtx hl, ChallengeMachineQuitPromptText
+	ld a, $01
+	call DrawWideTextBox_PrintTextWithYesOrNoMenu
+	jr c, .asm_137df
+	scf
+	ret
+
+Func_137fa:
+	ld a, [wddf7]
+	dec a
+	add a
+	add a
+	ld c, a
+	ld b, $00
+	ld hl, wddf9
+	add hl, bc
+	inc hl
+	inc hl
+	ld a, [hli]
+	ld [wTxRam2], a
+	ld a, [hl]
+	ld [wTxRam2 + 1], a
+	ld a, [wddf7]
+	ld l, a
+	ld h, $00
+	call LoadTxRam3
+	ld a, [wddf8]
+	dec a
+	jr z, .asm_13827
+	ldtx hl, ChallengeMachineLossDialogText
+	call PrintScrollableText_NoTextBoxLabelVRAM0
+	ret
+.asm_13827
+	ldtx hl, ChallengeMachineWinDialogText
+	call PrintScrollableText_NoTextBoxLabelVRAM0
+	ret
+
+Func_1382e:
+	push af
+	ld a, [wddf8]
+	dec a
+	jr z, .asm_1384e
+	ld a, [wddf6]
+	add a
+	ld c, a
+	ld b, $00
+	ld hl, wde11
+	add hl, bc
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	call LoadTxRam3
+	ldtx hl, ChallengeMachineLossDialogWinStreakText
+	call PrintScrollableText_NoTextBoxLabelVRAM0
+	jr .asm_1387e
+.asm_1384e
+	call Func_3d0d
+	push af
+	ld a, MUSIC_MEDAL
+	call Func_3d09
+	pop af
+	ldtx hl, ChallengeMachineWonASetText
+	call PrintTextInWideTextBox
+	call WaitForSongToFinish
+	call Func_3d16
+	call WaitForWideTextBoxInput
+	ld a, [wddf6]
+	add a
+	ld c, a
+	ld b, $00
+	ld hl, wde0d
+	add hl, bc
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	call LoadTxRam3
+	ldtx hl, ChallengeMachineSetsWonText
+	call PrintScrollableText_NoTextBoxLabelVRAM0
+.asm_1387e
+	ldtx hl, ChallengeMachineComeAgainText
+	call PrintScrollableText_NoTextBoxLabelVRAM0
+	pop af
+	ret
+; 0x13886
 
 SECTION "Bank 4@7890", ROMX[$7890], BANK[$4]
+
 INCLUDE "engine/credits_commands.asm"
 
 ShowProloguePortraitAndText_WithFade:
@@ -4604,18 +7318,18 @@ ShowProloguePortraitAndText:
 	ret
 
 .FunctionMap:
-	key_func $00, .Func_13bd8
-	key_func $01, .Func_13bdf
-	key_func $02, .Func_13bd8
+	key_func PROLOGUE_PLAYER_RECAP,  .Player
+	key_func PROLOGUE_GR_INVASION,   .GR
+	key_func PROLOGUE_PLAYER_TO_LAB, .Player
 	db $ff ; end
 
-.Func_13bd8:
+.Player:
 	lb bc, 7, 3
 	call DrawPlayerPortrait
 	ret
 
-.Func_13bdf:
-	ld a, NPC_GR_1
+.GR:
+	ld a, GR_1_PIC
 	lb bc, 7, 3
 	ld e, EMOTION_NORMAL
 	call DrawNPCPortrait
@@ -4635,30 +7349,30 @@ ShowProloguePortraitAndText:
 	ret
 
 .TextListPointers:
-	dw .text_list1
-	dw .text_list2
-	dw .text_list3
+	dw .PlayerRecap
+	dw .GRInvasion
+	dw .PlayerToLab
 
-.text_list1
-	tx PrologueScene1Line1Text
-	tx PrologueScene1Line2Text
-	tx PrologueScene1Line3Text
-	tx PrologueScene1Line4Text
-	tx PrologueScene1Line5Text
-	tx PrologueScene1Line6Text
-	tx PrologueScene1Line7Text
+.PlayerRecap
+	tx ProloguePlayerRecapLine1Text
+	tx ProloguePlayerRecapLine2Text
+	tx ProloguePlayerRecapLine3Text
+	tx ProloguePlayerRecapLine4Text
+	tx ProloguePlayerRecapLine5Text
+	tx ProloguePlayerRecapLine6Text
+	tx ProloguePlayerRecapLine7Text
 	dw $ffff
 
-.text_list2
-	tx PrologueScene2Line1Text
-	tx PrologueScene2Line2Text
-	tx PrologueScene2Line3Text
+.GRInvasion
+	tx PrologueGRInvasionLine1Text
+	tx PrologueGRInvasionLine2Text
+	tx PrologueGRInvasionLine3Text
 	dw $ffff
 
-.text_list3
-	tx PrologueScene3Line1Text
-	tx PrologueScene3Line2Text
-	tx PrologueScene3Line3Text
+.PlayerToLab
+	tx ProloguePlayerToLabLine1Text
+	tx ProloguePlayerToLabLine2Text
+	tx ProloguePlayerToLabLine3Text
 	dw $ffff
 ; 0x13c22
 
@@ -4823,9 +7537,22 @@ SavePlayerName:
 	pop bc
 	pop af
 	ret
-; 0x13d1f
 
-SECTION "Bank 4@7d37", ROMX[$7d37], BANK[$4]
+Func_13d1f:
+	push af
+	push bc
+	push de
+	push hl
+	call EnableSRAM
+	ld hl, sPlayerName
+	ld bc, $10
+	call CopyBCBytesFromHLToDE
+	call DisableSRAM
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
 
 PlayerGenderSelection:
 	push af
@@ -4876,27 +7603,17 @@ PlayerGenderSelection:
 	ret
 
 .MenuParams
-	db FALSE ; skip clear
-	db 16, 1 ; width, height
-	db SYM_CURSOR_R ; blink cursor symbol
-	db SYM_SPACE ; space symbol
-	db SYM_CURSOR_R ; default cursor symbol
-	db SYM_CURSOR_R ; selection cursor symbol
-	db A_BUTTON ; press keys
-	db $00 ; held keys
-	db TRUE ; has horizontal scroll
-	db 0 ; vertical step
-	dw NULL ; update function
-	dw NULL ; label text ID
-
+	menubox_params FALSE, 16, 1, \
+		SYM_CURSOR_R, SYM_SPACE, SYM_CURSOR_R, SYM_CURSOR_R, \
+		PAD_A, 0, TRUE, 0, NULL, NULL
 	textitem  1, 0, PlayerGenderMaleText
 	textitem 11, 0, PlayerGenderFemaleText
-	db $ff
+	textitems_end
 
 .HandleSelection:
 .loop
 	ldtx hl, ChoosePlayerGenderText
-	call Func_1107c
+	call PrintTextInWideTextBox
 	ld a, [wde64]
 	farcall HandleMenuBox
 	ld [wde64], a

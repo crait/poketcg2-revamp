@@ -125,13 +125,13 @@ Music1_SetVolume:
 Music1_Init:
 	call Music1_LoadAudioWRAMBank
 	xor a
-	ldh [rNR52], a
-	ld a, $80
-	ldh [rNR52], a
+	ldh [rAUDENA], a
+	ld a, AUDENA_ON
+	ldh [rAUDENA], a
 	ld a, $77
-	ldh [rNR50], a
-	ld a, $ff
-	ldh [rNR51], a
+	ldh [rAUDVOL], a
+	ld a, AUDTERM_1_RIGHT | AUDTERM_2_RIGHT | AUDTERM_3_RIGHT | AUDTERM_4_RIGHT | AUDTERM_1_LEFT | AUDTERM_2_LEFT | AUDTERM_3_LEFT | AUDTERM_4_LEFT
+	ldh [rAUDTERM], a
 	ld a, $78
 	ld [wCurSongBank], a
 	ld a, $7e
@@ -202,7 +202,7 @@ Music1_Update:
 	call Bankswitch78To7e
 	ld a, [wCurSongBank]
 	ldh [hBankROM], a
-	ld [MBC3RomBank], a
+	ld [rROMB], a
 	ld a, [wddf2]
 	cp $0
 	jr z, .update_channels
@@ -255,35 +255,35 @@ Music1_StopAllChannels:
 	ld [wMusicIsPlaying], a
 	bit 0, d
 	jr nz, .stop_channel_2
-	ld a, $8
-	ldh [rNR12], a
-	swap a
-	ldh [rNR14], a
+	ld a, AUD1ENV_UP
+	ldh [rAUD1ENV], a
+	swap a ; AUD1HIGH_RESTART
+	ldh [rAUD1HIGH], a
 .stop_channel_2
 	xor a
 	ld [wMusicIsPlaying + 1], a
 	bit 1, d
 	jr nz, .stop_channel_4
-	ld a, $8
-	ldh [rNR22], a
-	swap a
-	ldh [rNR24], a
+	ld a, AUD2ENV_UP
+	ldh [rAUD2ENV], a
+	swap a ; AUD2HIGH_RESTART
+	ldh [rAUD2HIGH], a
 .stop_channel_4
 	xor a
 	ld [wMusicIsPlaying + 3], a
 	bit 3, d
 	jr nz, .stop_channel_3
-	ld a, $8
-	ldh [rNR42], a
-	swap a
-	ldh [rNR44], a
+	ld a, AUD4ENV_UP
+	ldh [rAUD4ENV], a
+	swap a ; AUD4GO_RESTART
+	ldh [rAUD4GO], a
 .stop_channel_3
 	xor a
 	ld [wMusicIsPlaying + 2], a
 	bit 2, d
 	jr nz, .done
 	ld a, $0
-	ldh [rNR32], a
+	ldh [rAUD3LEVEL], a
 .done
 	ret
 
@@ -297,7 +297,7 @@ Music1_BeginSong:
 	ld a, [hl]
 	ld [wCurSongBank], a
 	ldh [hBankROM], a
-	ld [MBC3RomBank], a
+	ld [rROMB], a
 	pop af
 	add a
 	ld c, a
@@ -453,7 +453,7 @@ Music1_UpdateChannel1:
 	ld a, [wdd8c]
 	bit 0, a
 	jr nz, .asm_f42d4
-	ld hl, rNR12
+	ld hl, rAUD1ENV
 	ld a, [wMusicEcho]
 	ld [hli], a
 	inc hl
@@ -482,14 +482,14 @@ Music1_UpdateChannel1:
 	ld a, [wdd8c]
 	bit 0, a
 	jr nz, .asm_f4309
-	ld a, $8
-	ldh [rNR12], a
-	swap a
-	ldh [rNR14], a
+	ld a, AUD1ENV_UP
+	ldh [rAUD1ENV], a
+	swap a ; AUD1HIGH_RESTART
+	ldh [rAUD1HIGH], a
 .asm_f4309
-	ldh a, [rNR11]
-	and $c0
-	ldh [rNR11], a
+	ldh a, [rAUD1LEN]
+	and AUD1LEN_DUTY
+	ldh [rAUD1LEN], a
 	ret
 
 Music1_UpdateChannel2:
@@ -509,7 +509,7 @@ Music1_UpdateChannel2:
 	ld a, [wdd8c]
 	bit 1, a
 	jr nz, .asm_f4339
-	ld hl, rNR22
+	ld hl, rAUD2ENV
 	ld a, [wMusicEcho + 1]
 	ld [hli], a
 	inc hl
@@ -538,10 +538,10 @@ Music1_UpdateChannel2:
 	ld a, [wdd8c]
 	bit 1, a
 	jr nz, .asm_f436e
-	ld a, $8
-	ldh [rNR22], a
-	swap a
-	ldh [rNR24], a
+	ld a, AUD2ENV_UP
+	ldh [rAUD2ENV], a
+	swap a ; AUD2HIGH_RESTART
+	ldh [rAUD2HIGH], a
 .asm_f436e
 	ret
 
@@ -563,7 +563,7 @@ Music1_UpdateChannel3:
 	cp $1
 	jr z, .asm_f4398
 	ld a, [wMusicEcho + 2]
-	ldh [rNR32], a
+	ldh [rAUD3LEVEL], a
 .asm_f4398
 	ld a, [wddbb + 2]
 	dec a
@@ -588,9 +588,9 @@ Music1_UpdateChannel3:
 	bit 2, a
 	jr nz, .asm_f43cd
 	ld a, $0
-	ldh [rNR32], a
+	ldh [rAUD3LEVEL], a
 	ld a, $80
-	ldh [rNR34], a
+	ldh [rAUD3HIGH], a
 .asm_f43cd
 	ret
 
@@ -625,10 +625,10 @@ Music1_UpdateChannel4:
 	jr nz, .asm_f4413
 	xor a
 	ld [wddef], a
-	ld a, $8
-	ldh [rNR42], a
-	swap a
-	ldh [rNR44], a
+	ld a, AUD4ENV_UP
+	ldh [rAUD4ENV], a
+	swap a ; AUD4GO_RESTART
+	ldh [rAUD4GO], a
 .asm_f4413
 	ret
 
@@ -1408,7 +1408,7 @@ Music1_f4714:
 	bit 0, a
 	jr nz, .asm_f4749
 	ld a, d
-	ldh [rNR12], a
+	ldh [rAUD1ENV], a
 	ld d, $80
 .asm_f4733
 	ld hl, wMusicTie
@@ -1417,14 +1417,14 @@ Music1_f4714:
 	bit 0, a
 	jr nz, .asm_f4749
 	ld a, [wAudio_d083]
-	ldh [rNR10], a
+	ldh [rAUD1SWEEP], a
 	ld a, [wMusicDuty1]
-	ldh [rNR11], a
+	ldh [rAUD1LEN], a
 	ld a, [wMusicCh1CurPitch]
-	ldh [rNR13], a
+	ldh [rAUD1LOW], a
 	ld a, [wMusicCh1CurOctave]
 	or d
-	ldh [rNR14], a
+	ldh [rAUD1HIGH], a
 .asm_f4749
 	ret
 .asm_f474a
@@ -1433,8 +1433,8 @@ Music1_f4714:
 	ld a, [wdd8c]
 	bit 0, a
 	jr nz, .asm_f4749
-	ld hl, rNR12
-	ld a, $8
+	ld hl, rAUD1ENV
+	ld a, AUD1ENV_UP
 	ld [hli], a
 	inc hl
 	swap a
@@ -1468,7 +1468,7 @@ Music1_f475a:
 	bit 1, a
 	jr nz, .asm_f478b
 	ld a, d
-	ldh [rNR22], a
+	ldh [rAUD2ENV], a
 	ld d, $80
 .asm_f4779
 	ld hl, wMusicTie + 1
@@ -1477,12 +1477,12 @@ Music1_f475a:
 	bit 1, a
 	jr nz, .asm_f478b
 	ld a, [wMusicDuty2]
-	ldh [rNR21], a
+	ldh [rAUD2LEN], a
 	ld a, [wMusicCh2CurPitch]
-	ldh [rNR23], a
+	ldh [rAUD2LOW], a
 	ld a, [wMusicCh2CurOctave]
 	or d
-	ldh [rNR24], a
+	ldh [rAUD2HIGH], a
 .asm_f478b
 	ret
 .asm_f478c
@@ -1491,8 +1491,8 @@ Music1_f475a:
 	ld a, [wdd8c]
 	bit 1, a
 	jr nz, .asm_f478b
-	ld hl, rNR22
-	ld a, $8
+	ld hl, rAUD2ENV
+	ld a, AUD2ENV_UP
 	ld [hli], a
 	inc hl
 	swap a
@@ -1505,7 +1505,7 @@ Music1_f479c:
 	or a
 	jr z, .no_wave_change
 	xor a
-	ldh [rNR30], a
+	ldh [rAUD3ENA], a
 	call Music1_LoadWaveInstrument
 	ld d, $80
 .no_wave_change
@@ -1534,9 +1534,9 @@ Music1_f479c:
 	bit 2, a
 	jr nz, .asm_f47e0
 	ld a, d
-	ldh [rNR32], a
+	ldh [rAUD3LEVEL], a
 	xor a
-	ldh [rNR30], a
+	ldh [rAUD3ENA], a
 	ld d, $80
 .asm_f47cc
 	ld hl, wMusicTie + 2
@@ -1545,14 +1545,14 @@ Music1_f479c:
 	bit 2, a
 	jr nz, .asm_f47e0
 	xor a
-	ldh [rNR31], a
+	ldh [rAUD3LEN], a
 	ld a, [wMusicCh3CurPitch]
-	ldh [rNR33], a
+	ldh [rAUD3LOW], a
 	ld a, $80
-	ldh [rNR30], a
+	ldh [rAUD3ENA], a
 	ld a, [wMusicCh3CurOctave]
 	or d
-	ldh [rNR34], a
+	ldh [rAUD3HIGH], a
 .asm_f47e0
 	ret
 .asm_f47e1
@@ -1562,7 +1562,7 @@ Music1_f479c:
 	bit 2, a
 	jr nz, .asm_f47e0
 	xor a
-	ldh [rNR30], a
+	ldh [rAUD3ENA], a
 	ret
 
 Music1_LoadWaveInstrument:
@@ -1596,7 +1596,7 @@ Music1_f480a:
 	ld a, [wddba]
 	cp $0
 	jr z, .asm_f482a
-	ld de, rNR41
+	ld de, rAUD4LEN
 	ld hl, wddab
 	ld a, [hli]
 	ld [de], a
@@ -1614,8 +1614,8 @@ Music1_f480a:
 .asm_f482a
 	xor a
 	ld [wddef], a
-	ld hl, rNR42
-	ld a, $8
+	ld hl, rAUD4ENV
+	ld a, AUD4ENV_UP
 	ld [hli], a
 	inc hl
 	swap a
@@ -1639,7 +1639,7 @@ Music1_f4839:
 	jr nz, .asm_f4853
 	jr Music1_f480a.asm_f482a
 .asm_f4853
-	ldh [rNR43], a
+	ldh [rAUD4POLY], a
 	inc de
 	ld a, d
 	ld [hld], a
@@ -1658,7 +1658,7 @@ Music1_f485a:
 
 Music1_f4866:
 	ld a, [wMusicPanning]
-	ldh [rNR50], a
+	ldh [rAUDVOL], a
 	ld a, [wdd8c]
 	or a
 	ld hl, wMusicStereoPanning
@@ -1687,7 +1687,7 @@ Music1_f4866:
 	swap e
 	or e
 	and d
-	ldh [rNR51], a
+	ldh [rAUDTERM], a
 	ret
 
 Music1_UpdateVibrato:
@@ -1784,7 +1784,7 @@ Music1_1dcaff:
 	ld a, [wdd8c]
 	bit 0, a
 	jr nz, .asm_1dcb22
-	ld de, rNR11
+	ld de, rAUD1LEN
 	ld a, [hli]
 	ld [de], a
 	jr .asm_1dcb22
@@ -1794,7 +1794,7 @@ Music1_1dcaff:
 	ld a, [wdd8c]
 	bit 0, a
 	jr nz, .asm_1dcb22
-	ld de, rNR21
+	ld de, rAUD2LEN
 	ld a, [hli]
 	ld [de], a
 .asm_1dcb22
@@ -1813,13 +1813,13 @@ Music1_f490b:
 	bit 0, a
 	jr nz, .done
 	ld a, e
-	ldh [rNR13], a
-	ldh a, [rNR11]
-	and $c0
-	ldh [rNR11], a
+	ldh [rAUD1LOW], a
+	ldh a, [rAUD1LEN]
+	and AUD1LEN_DUTY
+	ldh [rAUD1LEN], a
 	ld a, d
 	and $3f
-	ldh [rNR14], a
+	ldh [rAUD1HIGH], a
 	ret
 .not_channel_1
 	cp $1
@@ -1831,12 +1831,12 @@ Music1_f490b:
 	bit 1, a
 	jr nz, .done
 	ld a, e
-	ldh [rNR23], a
-	ldh a, [rNR21]
-	and $c0
-	ldh [rNR21], a
+	ldh [rAUD2LOW], a
+	ldh a, [rAUD2LEN]
+	and AUD2LEN_DUTY
+	ldh [rAUD2LEN], a
 	ld a, d
-	ldh [rNR24], a
+	ldh [rAUD2HIGH], a
 	ret
 .not_channel_2
 	cp $2
@@ -1848,11 +1848,11 @@ Music1_f490b:
 	bit 2, a
 	jr nz, .done
 	ld a, e
-	ldh [rNR33], a
+	ldh [rAUD3LOW], a
 	xor a
-	ldh [rNR31], a
+	ldh [rAUD3LEN], a
 	ld a, d
-	ldh [rNR34], a
+	ldh [rAUD3HIGH], a
 .done
 	ret
 
@@ -1884,29 +1884,29 @@ Music1_f4980:
 	ld d, a
 	bit 0, d
 	jr nz, .asm_f4990
-	ld a, $8
-	ldh [rNR12], a
-	swap a
-	ldh [rNR14], a
+	ld a, AUD1ENV_UP
+	ldh [rAUD1ENV], a
+	swap a ; AUD1HIGH_RESTART
+	ldh [rAUD1HIGH], a
 .asm_f4990
 	bit 1, d
 	jr nz, .asm_f499c
 	swap a
-	ldh [rNR22], a
-	swap a
-	ldh [rNR24], a
+	ldh [rAUD2ENV], a
+	swap a ; AUD2HIGH_RESTART
+	ldh [rAUD2HIGH], a
 .asm_f499c
 	bit 3, d
 	jr nz, .asm_f49a8
 	swap a
-	ldh [rNR42], a
-	swap a
-	ldh [rNR44], a
+	ldh [rAUD4ENV], a
+	swap a ; AUD4GO_RESTART
+	ldh [rAUD4GO], a
 .asm_f49a8
 	bit 2, d
 	jr nz, .asm_f49b0
 	ld a, $0
-	ldh [rNR32], a
+	ldh [rAUD3LEVEL], a
 .asm_f49b0
 	ret
 
@@ -2218,10 +2218,10 @@ Music1_CopyData:
 
 Music1_LoadAudioWRAMBank:
 	push af
-	ldh a, [rSVBK]
+	ldh a, [rWBK]
 	push af
 	ld a, BANK("WRAM7 Audio")
-	ldh [rSVBK], a
+	ldh [rWBK], a
 	pop af
 	ld [wSVBKBackup], a
 	pop af
@@ -2230,16 +2230,16 @@ Music1_LoadAudioWRAMBank:
 Music1_UnloadAudioWRAMBank:
 	push af
 	ld a, [wSVBKBackup]
-	ldh [rSVBK], a
+	ldh [rWBK], a
 	pop af
 	ret
 
 Music1_LoadAudioWRAMBank2:
 	push af
-	ldh a, [rSVBK]
+	ldh a, [rWBK]
 	push af
 	ld a, BANK("WRAM7 Audio")
-	ldh [rSVBK], a
+	ldh [rWBK], a
 	pop af
 	ld [wSVBKBackup2], a
 	pop af
@@ -2248,7 +2248,7 @@ Music1_LoadAudioWRAMBank2:
 Music1_UnloadAudioWRAMBank2:
 	push af
 	ld a, [wSVBKBackup2]
-	ldh [rSVBK], a
+	ldh [rWBK], a
 	pop af
 	ret
 
@@ -2372,253 +2372,254 @@ INCLUDE "audio/presets.asm"
 ; all real SFX have the same priority (SFX_STOP does not use this table)
 Music1_SFXPriorities:
 	db $00 ; SFX_STOP
-	db $0a ; SFX_01
-	db $0a ; SFX_02
-	db $0a ; SFX_03
-	db $0a ; SFX_04
-	db $0a ; SFX_05
+	db $0a ; SFX_CURSOR
+	db $0a ; SFX_CONFIRM
+	db $0a ; SFX_CANCEL
+	db $0a ; SFX_DENIED
+	db $0a ; SFX_JINGLE
 	db $0a ; SFX_06
-	db $0a ; SFX_07
-	db $0a ; SFX_08
+	db $0a ; SFX_CARD_SHUFFLE
+	db $0a ; SFX_PLACE_PRIZE
 	db $0a ; SFX_09
 	db $0a ; SFX_0A
-	db $0a ; SFX_0B
-	db $0a ; SFX_0C
+	db $0a ; SFX_COIN_TOSS
+	db $0a ; SFX_WARP
 	db $0a ; SFX_0D
 	db $0a ; SFX_0E
-	db $0a ; SFX_0F
-	db $0a ; SFX_10
-	db $0a ; SFX_11
-	db $0a ; SFX_12
-	db $0a ; SFX_13
-	db $0a ; SFX_14
-	db $0a ; SFX_15
-	db $0a ; SFX_16
-	db $0a ; SFX_17
-	db $0a ; SFX_18
-	db $0a ; SFX_19
-	db $0a ; SFX_1A
-	db $0a ; SFX_1B
-	db $0a ; SFX_1C
-	db $0a ; SFX_1D
-	db $0a ; SFX_1E
-	db $0a ; SFX_1F
-	db $0a ; SFX_20
-	db $0a ; SFX_21
-	db $0a ; SFX_22
-	db $0a ; SFX_23
-	db $0a ; SFX_24
-	db $0a ; SFX_25
-	db $0a ; SFX_26
-	db $0a ; SFX_27
-	db $0a ; SFX_28
-	db $0a ; SFX_29
-	db $0a ; SFX_2A
-	db $0a ; SFX_2B
-	db $0a ; SFX_2C
-	db $0a ; SFX_2D
-	db $0a ; SFX_2E
-	db $0a ; SFX_2F
-	db $0a ; SFX_30
-	db $0a ; SFX_31
-	db $0a ; SFX_32
-	db $0a ; SFX_33
-	db $0a ; SFX_34
-	db $0a ; SFX_35
-	db $0a ; SFX_36
-	db $0a ; SFX_37
-	db $0a ; SFX_38
-	db $0a ; SFX_39
-	db $0a ; SFX_3A
-	db $0a ; SFX_3B
-	db $0a ; SFX_3C
-	db $0a ; SFX_3D
-	db $0a ; SFX_3E
-	db $0a ; SFX_3F
-	db $0a ; SFX_40
-	db $0a ; SFX_41
-	db $0a ; SFX_42
-	db $0a ; SFX_43
-	db $0a ; SFX_44
-	db $0a ; SFX_45
-	db $0a ; SFX_46
-	db $0a ; SFX_47
-	db $0a ; SFX_48
-	db $0a ; SFX_49
-	db $0a ; SFX_4A
-	db $0a ; SFX_4B
-	db $0a ; SFX_4C
-	db $0a ; SFX_4D
-	db $0a ; SFX_4E
-	db $0a ; SFX_4F
-	db $0a ; SFX_50
-	db $0a ; SFX_51
-	db $0a ; SFX_52
-	db $0a ; SFX_53
-	db $0a ; SFX_54
-	db $0a ; SFX_55
-	db $0a ; SFX_56
-	db $0a ; SFX_57
-	db $0a ; SFX_58
-	db $0a ; SFX_59
-	db $0a ; SFX_5A
-	db $0a ; SFX_5B
-	db $0a ; SFX_5C
-	db $0a ; SFX_5D
-	db $0a ; SFX_5E
+	db $0a ; SFX_DOORS
+	db $0a ; SFX_TCG1_LEGENDARY_CARDS
+	db $0a ; SFX_GLOW
+	db $0a ; SFX_PARALYSIS
+	db $0a ; SFX_SLEEP
+	db $0a ; SFX_CONFUSION
+	db $0a ; SFX_POISON
+	db $0a ; SFX_SMALL_HIT
+	db $0a ; SFX_HIT
+	db $0a ; SFX_THUNDER_SHOCK
+	db $0a ; SFX_LIGHTNING
+	db $0a ; SFX_BORDER_SPARK
+	db $0a ; SFX_BIG_LIGHTNING
+	db $0a ; SFX_SMALL_FLAME
+	db $0a ; SFX_BIG_FLAME
+	db $0a ; SFX_FIRE_SPIN
+	db $0a ; SFX_DIVE_BOMB
+	db $0a ; SFX_WATER_JETS
+	db $0a ; SFX_WATER_GUN
+	db $0a ; SFX_WHIRLPOOL
+	db $0a ; SFX_HYDRO_PUMP
+	db $0a ; SFX_BLIZZARD
+	db $0a ; SFX_PSYCHIC
+	db $0a ; SFX_LEER
+	db $0a ; SFX_BEAM
+	db $0a ; SFX_HYPER_BEAM
+	db $0a ; SFX_AVALANCHE
+	db $0a ; SFX_STONE_BARRAGE
+	db $0a ; SFX_PUNCH
+	db $0a ; SFX_STRETCH_KICK
+	db $0a ; SFX_SLASH
+	db $0a ; SFX_SONIC_BOOM
+	db $0a ; SFX_FURY_SWIPES
+	db $0a ; SFX_DRILL
+	db $0a ; SFX_POT_SMASH
+	db $0a ; SFX_BONEMERANG
+	db $0a ; SFX_SEISMIC_TOSS
+	db $0a ; SFX_NEEDLES
+	db $0a ; SFX_WHITE_GAS
+	db $0a ; SFX_POWDER
+	db $0a ; SFX_GOO
+	db $0a ; SFX_BUBBLES
+	db $0a ; SFX_STRING_SHOT
+	db $0a ; SFX_BOYFRIENDS
+	db $0a ; SFX_LURE
+	db $0a ; SFX_TOXIC
+	db $0a ; SFX_CONFUSE_RAY
+	db $0a ; SFX_SING
+	db $0a ; SFX_SUPERSONIC
+	db $0a ; SFX_PETAL_DANCE
+	db $0a ; SFX_PROTECT
+	db $0a ; SFX_BARRIER
+	db $0a ; SFX_SPEED
+	db $0a ; SFX_WHIRLWIND
+	db $0a ; SFX_CRY
+	db $0a ; SFX_QUESTION_MARK
+	db $0a ; SFX_SELFDESTRUCT
+	db $0a ; SFX_BIG_SELFDESTRUCT
+	db $0a ; SFX_HEAL
+	db $0a ; SFX_DRAIN
+	db $0a ; SFX_DARK_GAS
+	db $0a ; SFX_HEALING_WIND
+	db $0a ; SFX_WHIRLWIND_BENCH
+	db $0a ; SFX_EXPAND
+	db $0a ; SFX_CAT_PUNCH
+	db $0a ; SFX_THUNDER_WAVE
+	db $0a ; SFX_FIREGIVER
+	db $0a ; SFX_THUNDER_PUNCH
+	db $0a ; SFX_FIRE_PUNCH
+	db $0a ; SFX_COIN_TOSS_POSITIVE
+	db $0a ; SFX_COIN_TOSS_NEGATIVE
+	db $0a ; SFX_SAVE_GAME
+	db $0a ; SFX_PLAYER_WALK_MAP
+	db $0a ; SFX_TCG1_INTRO_ORB
+	db $0a ; SFX_TCG1_INTRO_ORB_SWOOP
+	db $0a ; SFX_TCG1_INTRO_ORB_TITLE
+	db $0a ; SFX_TCG1_INTRO_ORB_SCATTER
+	db $0a ; SFX_FIREGIVER_START
+	db $0a ; SFX_RECEIVE_CARD_POP
+	db $0a ; SFX_POKEMON_EVOLUTION
 	db $0a ; SFX_5F
-	db $0a ; SFX_60
-	db $0a ; SFX_61
-	db $0a ; SFX_62
-	db $0a ; SFX_63
-	db $0a ; SFX_64
-	db $0a ; SFX_65
-	db $0a ; SFX_66
-	db $0a ; SFX_67
-	db $0a ; SFX_68
-	db $0a ; SFX_69
-	db $0a ; SFX_6A
-	db $0a ; SFX_6B
-	db $0a ; SFX_6C
-	db $0a ; SFX_6D
-	db $0a ; SFX_6E
-	db $0a ; SFX_6F
-	db $0a ; SFX_70
-	db $0a ; SFX_71
-	db $0a ; SFX_72
-	db $0a ; SFX_73
-	db $0a ; SFX_74
-	db $0a ; SFX_75
-	db $0a ; SFX_76
-	db $0a ; SFX_77
-	db $0a ; SFX_78
-	db $0a ; SFX_79
-	db $0a ; SFX_7A
-	db $0a ; SFX_7B
-	db $0a ; SFX_7C
-	db $0a ; SFX_7D
-	db $0a ; SFX_7E
-	db $0a ; SFX_7F
-	db $0a ; SFX_80
-	db $0a ; SFX_81
-	db $0a ; SFX_82
-	db $0a ; SFX_83
-	db $0a ; SFX_84
-	db $0a ; SFX_85
-	db $0a ; SFX_86
-	db $0a ; SFX_87
-	db $0a ; SFX_88
-	db $0a ; SFX_89
-	db $0a ; SFX_8A
-	db $0a ; SFX_8B
-	db $0a ; SFX_8C
-	db $0a ; SFX_8D
-	db $0a ; SFX_8E
-	db $0a ; SFX_8F
-	db $0a ; SFX_90
-	db $0a ; SFX_91
-	db $0a ; SFX_92
-	db $0a ; SFX_93
-	db $0a ; SFX_94
-	db $0a ; SFX_95
-	db $0a ; SFX_96
-	db $0a ; SFX_97
-	db $0a ; SFX_98
-	db $0a ; SFX_99
-	db $0a ; SFX_9A
-	db $0a ; SFX_9B
-	db $0a ; SFX_9C
-	db $0a ; SFX_9D
-	db $0a ; SFX_9E
-	db $0a ; SFX_9F
-	db $0a ; SFX_A0
-	db $0a ; SFX_A1
-	db $0a ; SFX_A2
-	db $0a ; SFX_A3
-	db $0a ; SFX_A4
-	db $0a ; SFX_A5
-	db $0a ; SFX_A6
-	db $0a ; SFX_A7
-	db $0a ; SFX_A8
-	db $0a ; SFX_A9
-	db $0a ; SFX_AA
-	db $0a ; SFX_AB
-	db $0a ; SFX_AC
-	db $0a ; SFX_AD
-	db $0a ; SFX_AE
-	db $0a ; SFX_AF
-	db $0a ; SFX_B0
-	db $0a ; SFX_B1
-	db $0a ; SFX_B2
-	db $0a ; SFX_B3
-	db $0a ; SFX_B4
-	db $0a ; SFX_B5
-	db $0a ; SFX_B6
-	db $0a ; SFX_B7
-	db $0a ; SFX_B8
-	db $0a ; SFX_B9
-	db $0a ; SFX_BA
-	db $0a ; SFX_BB
-	db $0a ; SFX_BC
-	db $0a ; SFX_BD
-	db $0a ; SFX_BE
-	db $0a ; SFX_BF
-	db $0a ; SFX_C0
-	db $0a ; SFX_C1
-	db $0a ; SFX_C2
-	db $0a ; SFX_C3
-	db $0a ; SFX_C4
-	db $0a ; SFX_C5
-	db $0a ; SFX_C6
-	db $0a ; SFX_C7
-	db $0a ; SFX_C8
-	db $0a ; SFX_C9
-	db $0a ; SFX_CA
-	db $0a ; SFX_CB
-	db $0a ; SFX_CC
-	db $0a ; SFX_CD
-	db $0a ; SFX_CE
-	db $0a ; SFX_CF
-	db $0a ; SFX_D0
-	db $0a ; SFX_D1
-	db $0a ; SFX_D2
-	db $0a ; SFX_D3
-	db $0a ; SFX_D4
-	db $0a ; SFX_D5
-	db $0a ; SFX_D6
-	db $0a ; SFX_D7
-	db $0a ; SFX_D8
-	db $0a ; SFX_D9
-	db $0a ; SFX_DA
-	db $0a ; SFX_DB
-	db $0a ; SFX_DC
-	db $0a ; SFX_DD
-	db $0a ; SFX_DE
-	db $0a ; SFX_DF
-	db $0a ; SFX_E0
-	db $0a ; SFX_E1
-	db $0a ; SFX_E2
-	db $0a ; SFX_E3
-	db $0a ; SFX_E4
-	db $0a ; SFX_E5
-	db $0a ; SFX_E6
-	db $0a ; SFX_E7
-	db $0a ; SFX_E8
-	db $0a ; SFX_E9
-	db $0a ; SFX_EA
-	db $0a ; SFX_EB
-	db $0a ; SFX_EC
-	db $0a ; SFX_ED
-	db $0a ; SFX_EE
-	db $0a ; SFX_EF
-	db $0a ; SFX_F0
-	db $0a ; SFX_F1
-	db $0a ; SFX_F2
-	db $0a ; SFX_F3
-	db $0a ; SFX_F4
-	db $0a ; SFX_F5
-	db $0a ; SFX_F6
-	db $0a ; SFX_F7
+	db $0a ; SFX_PLACEHOLDER_60
+	db $0a ; SFX_PLACEHOLDER_61
+	db $0a ; SFX_PLACEHOLDER_62
+	db $0a ; SFX_PLACEHOLDER_63
+	db $0a ; SFX_FIREBALL
+	db $0a ; SFX_CONTINUOUS_FIREBALL
+	db $0a ; SFX_BENCH_MANIPULATION
+	db $0a ; SFX_PSYCHIC_BEAM
+	db $0a ; SFX_PSYCHIC_BEAM_BENCH
+	db $0a ; SFX_BOULDER_SMASH
+	db $0a ; SFX_MEGA_PUNCH
+	db $0a ; SFX_PSYPUNCH
+	db $0a ; SFX_SLUDGE_PUNCH
+	db $0a ; SFX_ICE_PUNCH
+	db $0a ; SFX_KICK
+	db $0a ; SFX_TAIL_SLAP
+	db $0a ; SFX_TAIL_WHIP
+	db $0a ; SFX_SLAP
+	db $0a ; SFX_QUESTION_MARK_BENCH
+	db $0a ; SFX_SKULL_BASH
+	db $0a ; SFX_COIN_HURL
+	db $0a ; SFX_TELEPORT
+	db $0a ; SFX_FOLLOW_ME
+	db $0a ; SFX_SWIFT
+	db $0a ; SFX_3D_ATTACK
+	db $0a ; SFX_DRY_UP
+	db $0a ; SFX_FOCUS_BLAST
+	db $0a ; SFX_FOCUS_BLAST_BENCH
+	db $0a ; SFX_CHIPS_COUNTING
+	db $0a ; SFX_SLOT_START
+	db $0a ; SFX_SLOT_REEL
+	db $0a ; SFX_BLACK_BOX_INSERT
+	db $0a ; SFX_BLACK_BOX_INSERTED
+	db $0a ; SFX_BLACK_BOX_TRANSMITTED
+	db $0a ; SFX_NEW_MAIL
+	db $0a ; SFX_POD_DOORS
+	db $0a ; SFX_PITFALL
+	db $0a ; SFX_OPEN_CHEST
+	db $0a ; SFX_NPC_WARP_TRANSFORM
+	db $0a ; SFX_STRONGHOLD_PLATFORM_UP
+	db $0a ; SFX_STRONGHOLD_PLATFORM_DOWN
+	db $0a ; SFX_GR_BLIMP_HATCH_CLOSE
+	db $0a ; SFX_GR_BLIMP_HATCH_OPEN
+	db $0a ; SFX_GR_BLIMP_TRACTOR_BEAM
+	db $0a ; SFX_BONE_TOSS_BENCH
+	db $0a ; SFX_COIN_HURL_BENCH
+	db $0a ; SFX_BIG_SNORE
+	db $0a ; SFX_SLOT_BIG_HIT
+	db $0a ; SFX_SLOT_BONUS_HIT
+	db $0a ; SFX_SLOT_SMALL_HIT
+	db $0a ; SFX_RAZOR_LEAF
+	db $0a ; SFX_GUILLOTINE
+	db $0a ; SFX_VINE_PULL
+	db $0a ; SFX_PERPLEX
+	db $0a ; SFX_NINE_TAILS
+	db $0a ; SFX_BONE_HEADBUTT
+	db $0a ; SFX_DRILL_DIVE
+	db $0a ; SFX_DARK_SONG
+	db $0a ; SFX_TCG2_INTRO_ORBS
+	db $0a ; SFX_TCG2_INTRO_TITLE
+	db $0a ; SFX_TCG2_INTRO_SUBTITLE
+	db $0a ; SFX_ELECTRONIC_INPUT
+	db $0a ; SFX_ELECTRONIC_RESPONSE
+	db $0a ; SFX_GHOST_MASTER_APPEAR
+	db $0a ; SFX_GHOST_MASTER_DISAPPEAR
+
+	db $0a ; ?
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
+	db $0a
 
 INCLUDE "audio/music1_headers.asm"
 

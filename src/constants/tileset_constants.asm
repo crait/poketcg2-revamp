@@ -4,8 +4,8 @@
 	const TILESET_GR_ISLAND                   ; $002
 	const TILESET_GR_OAM                      ; $003
 	const TILESET_MASON_LAB_MAIN              ; $004
-	const TILESET_MASON_LAB_SIDE_1            ; $005
-	const TILESET_MASON_LAB_SIDE_2            ; $006
+	const TILESET_MASON_LAB_COMPUTER_ROOM     ; $005
+	const TILESET_MASON_LAB_TRAINING_ROOM     ; $006
 	const TILESET_ISHIHARA_HOUSE              ; $007
 	const TILESET_LIGHTNING_CLUB_ENTRANCE     ; $008
 	const TILESET_LIGHTNING_CLUB_LOBBY        ; $009
@@ -41,8 +41,8 @@
 	const TILESET_OVERHEAD_ISLANDS            ; $027
 	const TILESET_GR_AIRPORT_ENTRANCE         ; $028
 	const TILESET_GR_AIRPORT                  ; $029
-	const TILESET_ISHIHARA_VILLA_1            ; $02a
-	const TILESET_ISHIHARA_VILLA_2            ; $02b
+	const TILESET_ISHIHARA_VILLA_MAIN         ; $02a
+	const TILESET_ISHIHARA_VILLA_LIBRARY      ; $02b
 	const TILESET_GAME_CENTER_ENTRANCE        ; $02c
 	const TILESET_GAME_CENTER_LOBBY           ; $02d
 	const TILESET_GAME_CENTER_1               ; $02e
@@ -297,7 +297,7 @@
 	const TILESET_CHAP                        ; $127
 	const TILESET_MAN                         ; $128
 	const TILESET_PAPPY                       ; $129
-	const TILESET_GAMBLER                     ; $12a
+	const TILESET_FIXER                       ; $12a
 	const TILESET_GR_LAD                      ; $12b
 	const TILESET_GR_CHAP                     ; $12c
 	const TILESET_MIYAJIMA                    ; $12d
@@ -327,17 +327,17 @@
 	const TILESET_WARP_SPARKLES               ; $145
 	const TILESET_GR_BLIMP                    ; $146
 	const TILESET_TRACTOR_BEAM                ; $147
-	const TILESET_HIT                         ; $148
+	const TILESET_GLOW                        ; $148
 	const TILESET_PARALYSIS                   ; $149
 	const TILESET_SLEEP                       ; $14a
 	const TILESET_CONFUSION_STAR              ; $14b
 	const TILESET_POISON                      ; $14c
-	const TILESET_GLOW                        ; $14d
+	const TILESET_HIT                         ; $14d
 	const TILESET_DAMAGE                      ; $14e
 	const TILESET_THUNDER                     ; $14f
-	const TILESET_LIGHTING                    ; $150
+	const TILESET_LIGHTNING                   ; $150
 	const TILESET_SPARK                       ; $151
-	const TILESET_BIG_LIGHTING                ; $152
+	const TILESET_BIG_LIGHTNING               ; $152
 	const TILESET_EMBER                       ; $153
 	const TILESET_FIRE_SPIN                   ; $154
 	const TILESET_FIRE_BIRD                   ; $155
@@ -387,9 +387,9 @@
 	const TILESET_CAT_PUNCH                   ; $181
 	const TILESET_ELECTRIC_WAVE               ; $182
 	const TILESET_FIREBALLS                   ; $183
-	const TILESET_BENCH_MANIP                 ; $184
+	const TILESET_BENCH_MANIPULATION          ; $184
 	const TILESET_PSYCHIC_BEAM                ; $185
-	const TILESET_BENCH_PSYCHIC_BEAM          ; $186
+	const TILESET_PSYCHIC_BEAM_BENCH          ; $186
 	const TILESET_ROCK_THROW                  ; $187
 	const TILESET_MEGA_PUNCH                  ; $188
 	const TILESET_PSYPUNCH                    ; $189
@@ -402,7 +402,7 @@
 	const TILESET_QUESTION_MARK_SMALL         ; $190
 	const TILESET_SKULL_BASH                  ; $191
 	const TILESET_COIN_HURL                   ; $192
-	const TILESET_193                         ; $193
+	const TILESET_TELEPORT                    ; $193
 	const TILESET_FOLLOW_ME                   ; $194
 	const TILESET_SWIFT                       ; $195
 	const TILESET_3D_ATTACK                   ; $196
@@ -494,3 +494,18 @@
 	const TILESET_LINK_OAM                    ; $1ec
 	const TILESET_COIN_TOSS_RESULT            ; $1ed
 	const TILESET_GR_PIECES                   ; $1ee
+
+RSRESET
+DEF OBJTILESTRUCT_ID          RW ; $0
+DEF OBJTILESTRUCT_TILE_OFFSET RB ; $2
+DEF OBJTILESTRUCT_PADDING     RB ; $3
+
+DEF OBJTILESTRUCT_LENGTH EQU _RS ; $4
+
+RSRESET
+DEF SPRITE_ANIM_BUFFER       RB SPRITEANIMSTRUCT_LENGTH * NUM_SPRITE_ANIM_STRUCTS
+DEF SPRITE_CURRENT_VRAM_TILE RB
+DEF SPRITE_TILESET_NUMBER    RB
+DEF SPRITE_TILESET_BUFFER    RB OBJTILESTRUCT_LENGTH * NUM_SPRITE_ANIM_STRUCTS
+
+DEF SPRITE_ANIM_TILE_BUFFER_SIZE EQU _RS ; $ca

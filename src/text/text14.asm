@@ -1,4 +1,4 @@
-Text12b3:
+UsefulButtonsBookText:
 	textfw "対戦画面での べんりなボタン"
 	linefw "Bボタンをおしながら 十字ボタン!"
 	linefw "じぶんや あいての場とトラッシュが"
@@ -11,7 +11,7 @@ Text12b3:
 	linefw "とっても べんりだよ"
 	done
 
-Text12b4:
+ColorlessPokemonBookText:
 	textfw "無色のポケモンは"
 	linefw "とても つかいやすい"
 	linefw "どの色の エネルギーカードでも"
@@ -22,7 +22,7 @@ Text12b4:
 	linefw "よく カードをしらべて おぼえよう"
 	done
 
-Text12b5:
+CardPopBookText:
 	textfw "対戦あいてを たおすと"
 	linefw "拡張パックを ゲットできるが"
 	linefw "「カードポン!」で ともだちと"
@@ -33,7 +33,7 @@ Text12b5:
 	linefw "たくさん カードをあつめよう"
 	done
 
-Text12b6:
+EnergyCardColorsBookText:
 	textfw "エネルギーカードは 6つの色"
 	linefw "草・炎・水・雷・闘・超!"
 	linefw "これらの 6つの基本エネルギーほかに"
@@ -44,7 +44,7 @@ Text12b6:
 	linefw "デッキに 4枚までしか いれられない"
 	done
 
-Text12b7:
+LegendaryPokemonCardsVol1BookText:
 	textfw "伝説のポケモンカード"
 	linefw "1枚目は 「ファイヤー<Lv>40」"
 	linefw "「ほのおをもたらす」で"
@@ -55,7 +55,7 @@ Text12b7:
 	linefw "「ヒロコ」が もつカードだ!"
 	done
 
-Text12b8:
+LegendaryPokemonCardsVol2BookText:
 	textfw "伝説のポケモンカード"
 	linefw "2枚目は 「サンダー<Lv>68」"
 	linefw "「カミングサンダー」は"
@@ -66,7 +66,7 @@ Text12b8:
 	linefw "「スティーブ」が もつカードだ!"
 	done
 
-Text12b9:
+LegendaryPokemonCardsVol3BookText:
 	textfw "伝説のポケモンカード"
 	linefw "3枚目は 「フリーザー<Lv>37」"
 	linefw "「こおりつかせる」で 場にでるだけで"
@@ -77,7 +77,7 @@ Text12b9:
 	linefw "「カネコウジ」が もつカードだ!"
 	done
 
-Text12ba:
+LegendaryPokemonCardsVol4BookText:
 	textfw "伝説のポケモンカード"
 	linefw "4枚目は 「カイリュー<Lv>41」"
 	linefw "「いやしのかぜ」は 場にでるだけで"
@@ -88,7 +88,7 @@ Text12ba:
 	linefw "「リュウドー」が もつカードだ!"
 	done
 
-Text12bb:
+GrandMastersBookText:
 	textfw "伝説のポケモンカードを まもる"
 	linefw "4人の グランドマスター"
 	linefw "「ヒロコ」「スティーブ」"
@@ -97,7 +97,7 @@ Text12bb:
 	linefw "ポケモンカードの つかいてだ!"
 	done
 
-Text12bc:
+CoinsBookText:
 	textfw "コインをなげて ワザのはんていに"
 	linefw "つかう コインが ありますが"
 	linefw "このせかいには ぜんぶで 24枚の"
@@ -106,7 +106,7 @@ Text12bc:
 	linefw "ガンバッテ ぜんぶ あつめてみよう"
 	done
 
-Text12bd:
+PhantomCardsBookText:
 	textfw "カードポン!でしか ゲットできない"
 	linefw "まぼろしのカードが あるらしい"
 	linefw "「フシギバナ<Lv>64」「ミュウ<Lv>15」"
@@ -119,7 +119,7 @@ Text12bd:
 	linefw "          Mr.イシハラ"
 	done
 
-Text12be:
+DarkPokemonBookText:
 	textfw "GR団は わるい進化カードを"
 	linefw "つかうのを とくいに している"
 	linefw "わるい進化カードは"
@@ -128,7 +128,7 @@ Text12be:
 	linefw "HPが すくないのが とくちょうだ"
 	done
 
-Text12bf:
+AugmentBasicPokemonBookText:
 	textfw "「シャワーズ」「サンダース」"
 	linefw "「ブースター」を デッキにいれたい"
 	linefw "イーブイが 4枚じゃあ たりない"
@@ -139,7 +139,7 @@ Text12bf:
 	linefw "イーブイを ふやして たたかおう"
 	done
 
-Text12c0:
+GRKingCardsBookText:
 	textfw "GR団のキング ビルリッチは"
 	linefw "とくべつなカードを もっている"
 	linefw "キングだけが もつ そのカードは"
@@ -150,7 +150,7 @@ Text12c0:
 	linefw "すごいカードに ちがいない"
 	done
 
-Text12c1:
+SpecialEnergyBookText:
 	textfw "6つの 基本エネルギーのほかに"
 	linefw "5つの 特殊エネルギーが ある"
 	linefw "「無色2個エネルギー」や"
@@ -163,7 +163,7 @@ Text12c1:
 	linefw "かんがえて いれるようにしよう"
 	done
 
-Text12c2:
+GetCoinsBookText:
 	textfw "ゲットできる コインは"
 	linefw "ぜんぶで 24枚だ"
 	linefw "クラブや トリデのリーダーから"
@@ -176,7 +176,7 @@ Text12c2:
 	linefw "コインを コンプリートしよう!"
 	done
 
-Text12c3:
+ImakuniBlackCardlessFirstCardPopText:
 	textfw "んっ?"
 	linefw "なんだ オマエは?"
 	linefw "えっ オレは だれだ?って"
@@ -191,12 +191,12 @@ Text12c3:
 	linefw "「カードポン!」の じゅんびしろ!"
 	done
 
-Text12c4:
+ImakuniBlackCardlessAfterFirstCardPopSaveText:
 	textfw "カード ゲットだ!"
 	linefw "オマエの データをセーブしてやる!!"
 	done
 
-Text12c5:
+ImakuniBlackCardlessAfterFirstCardPopResultText:
 	textfw "オレの カードは"
 	linefw "「<RAMTEXT>」だ!"
 	linefw "オマエのカードは・・・「イマクニ?」"
@@ -205,7 +205,7 @@ Text12c5:
 	linefw "オマエには もう ようはない!"
 	done
 
-Text12c6:
+ImakuniBlackCardlessAfterFirstCardPopRepeatText:
 	textfw "オレは スーパーミュージカルスター!"
 	linefw "イマクニ?だ!"
 	linefw "んっ なんだ?"
@@ -216,7 +216,7 @@ Text12c6:
 	linefw "じゃあなっ!"
 	done
 
-Text12c7:
+ImakuniBlackWantsToDuelFirstEncounterText:
 	textfw "んっ?"
 	linefw "なんだ オマエは?"
 	linefw "えっ オレは だれだ?って"
@@ -227,7 +227,7 @@ Text12c7:
 	linefw "カードで しょうぶが したいのか?"
 	done
 
-Text12c8:
+ImakuniBlackWantsToDuelRepeatText:
 	textfw "オレは スーパーミュージカルスター!"
 	linefw "イマクニ?だ!"
 	linefw "んっ なんだ?"
@@ -240,61 +240,61 @@ Text12c8:
 	linefw "さあ こい!"
 	done
 
-Text12c9:
+ImakuniBlackDuelPromptText:
 	textfw "イマクニ?と 対戦しますか?"
 	done
 
-Text12ca:
+ImakuniBlackDuelStartText:
 	textfw "サイドカード6枚!"
 	linefw "しんけん しょうぶだ!!"
 	done
 
-Text12cb:
+ImakuniBlackDeclinedDuelText:
 	textfw "なんだよ さびしいなぁ"
 	linefw "カードで対戦すんじゃ ないのかよ"
 	linefw "つまんねーやつだな"
 	linefw "オマエ!"
 	done
 
-Text12cc:
+ImakuniBlackPlayerLostText:
 	textfw "アララ・・・"
 	linefw "オレ かっちゃったよ!"
 	linefw "さすが オレだ!"
 	linefw "でも オマエも つよかったな!"
 	done
 
-Text12cd:
+ImakuniBlackByeText:
 	textfw "じゃあ オレは また"
 	linefw "ほうろうのたびに でるぜ じゃあな"
 	done
 
-Text12ce:
+ImakuniBlackPlayerWonNormalText:
 	textfw "なんだよ オマエ"
 	linefw "けっこう つよいんだな"
 	linefw "拡張パックを あげちゃうからさ"
 	linefw "オレが まけたこと ひとにいうなよ"
 	done
 
-Text12cf:
+ImakuniBlackPlayerWon3Text:
 	textfw "オマエ このオレに3かいも 勝ったよ"
 	linefw "うれしい? ねぇ うれしい?"
 	done
 
-Text12d0:
+ImakuniBlackPlayerWon6Text:
 	textfw "オレが 6かいも まけるなんて"
 	linefw "くやしいなあ・・・マジでさ!"
 	linefw "くやしいから オマエに"
 	linefw "これを やるぜ!"
 	done
 
-Text12d1:
+ImakuniBlackPlayerWon9Text:
 	textfw "なんでだよ オレが 9かいも"
 	linefw "オマエに まけちゃうんだよ!!"
 	linefw "オレは オレに ガッカリだぜ!"
 	linefw "くそ~っ!"
 	done
 
-Text12d2:
+ImakuniBlackPlayerWonManyText:
 	textfw "なんだよ また オマエ勝ちか・・・"
 	linefw "なかなかの ウデまえだなぁ"
 	linefw "なんだか オレ オマエに"
@@ -445,54 +445,54 @@ Text12e3:
 	linefw "じゃあな! オレは たびにでるぜ"
 	done
 
-Text12e4:
+BattleCenterWelcomeText:
 	textfw "いらっしゃいませ"
 	linefw "バトルセンターへ ようこそ!!"
 	linefw "通信対戦で 拡張パックを ゲット!"
 	linefw "勝てば3パック まけると1パックです"
 	done
 
-Text12e5:
+BattleCenterBeginPromptText:
 	textfw "おともだちとの対戦を はじめますか?"
 	done
 
-Text12e6:
+BattleCenterThankYouText:
 	textfw "バトルセンターの ごりよう"
 	linefw "ありがとうございました"
 	done
 
-Text12e7:
+BattleCenterComeAgainText:
 	textfw "またの ごりようを"
 	linefw "おまちしております"
 	done
 
-Text12e8:
+BattleCenterWinRewardsText:
 	textfw "おめでとうございます!"
 	linefw "みごと対戦に 勝ちましたね"
 	linefw "勝った <RAMNAME>さんには"
 	linefw "拡張パックを 3つプレゼント!"
 	done
 
-Text12e9:
+BattleCenterLoseRewardsText:
 	textfw "ざんねんでしたね・・・"
 	linefw " "
 	linefw "<RAMNAME>さんには"
 	linefw "拡張パックを 1つプレゼントします!"
 	done
 
-Text12ea:
+BattleCenter50WinsRewardsText:
 	textfw "おめでとうございます"
 	linefw "通信対戦 50勝めです!"
 	linefw "<RAMNAME>さんには"
 	linefw "きねんのコインを さしあげます!"
 	done
 
-Text12eb:
+BattleCenterAppreciateContinuedSupportText:
 	textfw "これからも バトルセンターを"
 	linefw "よろしく おねがいします"
 	done
 
-Text12ec:
+BattleCenter100WinsRewardsText:
 	textfw "おめでとうございます"
 	linefw "なんと 通信対戦 100勝めです!"
 	linefw "<RAMNAME>さんには"
@@ -593,11 +593,11 @@ PotionEnergyDescriptionCont:
 	linefw "わりになる。"
 	done
 
-FullhealEnergyName:
+FullHealEnergyName:
 	textfw "なんでもなおし配合E"
 	done
 
-FullhealEnergyDescription:
+FullHealEnergyDescription:
 	textfw "【特殊エネルギーカード】"
 	linefw "このカードは「無色」エネルギー1個"
 	linefw "ぶんとしてあつかう。このカードを手札"

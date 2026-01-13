@@ -142,12 +142,7 @@ Glossary:
 	db 11, 18 ; BLACK_HOLE
 
 .MainMenuParameters:
-	db 1, 3 ; cursor x, cursor y
-	db 2 ; y displacement between items
-	db 5 ; number of items
-	db SYM_CURSOR_R ; cursor tile number
-	db SYM_SPACE ; tile behind cursor
-	dw NULL ; function pointer if non-0
+	menu_params 1, 3, 2, 5, SYM_CURSOR_R, SYM_SPACE, NULL
 
 .MainMenuItems:
 	textitem 2,  1, GlossaryTitleText
@@ -156,7 +151,7 @@ Glossary:
 	textitem 3,  7, GlossaryStatusesAndDecisionText
 	textitem 3,  9, GlossarySpecialRulesText
 	textitem 3, 11, GlossaryExitText
-	db $ff
+	textitems_end
 
 ; shows which topics are inside this Glossary menu
 ; each menu has a text ID for title and for the items
@@ -309,10 +304,10 @@ Glossary:
 .loop_wait_b_btn
 	call DoFrame
 	ldh a, [hKeysPressed]
-	and B_BUTTON
+	and PAD_B
 	jr z, .loop_wait_b_btn
-	ld a, $ff
-	farcall PlayAcceptOrDeclineSFX
+	ld a, MENU_CANCEL
+	farcall PlaySFXConfirmOrCancel
 	ret
 
 MACRO explanation

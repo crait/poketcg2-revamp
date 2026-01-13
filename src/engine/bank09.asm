@@ -122,7 +122,7 @@ DuelDataToSave:
 	dw wWhoseTurn, $24
 	dw hWhoseTurn, $1
 	dw wRNG1, $3
-	dw $d023, $20
+	dw wAIDuelVars, $20
 	dw NULL
 
 ; return carry if saved duel checksum
@@ -378,7 +378,7 @@ HandleWaitingLinkOpponentMenu:
 	call .HandleInput
 	call RefreshMenuCursor
 	ldh a, [hKeysPressed]
-	bit A_BUTTON_F, a
+	bit B_PAD_A, a
 	jr nz, .a_pressed
 	ld a, $01
 	bank1call HandleSpecialDuelMainSceneHotkeys
@@ -399,11 +399,11 @@ HandleWaitingLinkOpponentMenu:
 
 .HandleInput:
 	ldh a, [hDPadHeld]
-	bit B_BUTTON_F, a
+	bit B_PAD_B, a
 	ret nz
-	and D_LEFT | D_RIGHT
+	and PAD_LEFT | PAD_RIGHT
 	ret z
-	ld a, SFX_01
+	ld a, SFX_CURSOR
 	call PlaySFX
 	call EraseCursor
 	ld hl, wCurrentDuelMenuItem
@@ -443,7 +443,62 @@ ResetDoFrameFunction_Bank9:
 	ld [hli], a
 	ld [hl], a
 	ret
-; 0x24350
+
+; outputs in hl the next position
+; in hTempList to place a new card,
+; and increments hCurSelectionItem.
+GetNextPositionInTempList:
+	push de
+	ld hl, hCurSelectionItem
+	ld a, [hl]
+	inc [hl]
+	ld e, a
+	ld d, $00
+	ld hl, hTempList
+	add hl, de
+	pop de
+	ret
+
+; returns carry if Deck is empty
+CheckIfDeckIsEmpty:
+	ld a, DUELVARS_NUMBER_OF_CARDS_NOT_IN_DECK
+	get_turn_duelist_var
+	ldtx hl, NoCardsLeftInTheDeckText
+	cp DECK_SIZE
+	ccf
+	ret
+
+; returns carry if Play Area is full
+CheckIfHasSpaceInBench:
+	ld a, DUELVARS_NUMBER_OF_POKEMON_IN_PLAY_AREA
+	get_turn_duelist_var
+	ld hl, wMaxNumPlayAreaPokemon
+	cp [hl]
+	ldtx hl, NoSpaceOnTheBenchText
+	ccf
+	ret
+
+; prints "<Arena Pokémon>'s <attack>"
+PrintAttackDeclarationText::
+	bank1call DrawDuelMainScene
+	ld a, DUELVARS_ARENA_CARD
+	get_turn_duelist_var
+	call LoadCardDataToBuffer1_FromDeckIndex
+	ld a, 18
+	call CopyCardNameAndLevel
+	ld [hl], TX_END
+	ld hl, wTxRam2
+	xor a
+	ld [hli], a ; NULL
+	ld [hli], a ;
+	ld a, [wLoadedAttackName + 0]
+	ld [hli], a
+	ld a, [wLoadedAttackName + 1]
+	ld [hli], a
+	ldtx hl, PokemonsAttackText
+	call DrawWideTextBox_PrintText
+	ret
+; 0x2439a
 
 SECTION "Bank 9@43ee", ROMX[$43ee], BANK[$9]
 
@@ -522,8 +577,6 @@ DisplayUsedTrainerCardDetailScreen:
 	bank1call DisplayCardDetailScreen
 	ret
 
-SECTION "Bank 9@44b0", ROMX[$44b0], BANK[$9]
-
 ; print the AttachedEnergyToPokemonText, given the energy card to attach in hTempCardIndex_ff98,
 ; and the PLAY_AREA_* of the turn holder's Pokemon to attach the energy to in hTempPlayAreaLocation_ff9d
 PrintAttachedEnergyToPokemon:
@@ -540,7 +593,7 @@ PrintAttachedEnergyToPokemon:
 ; print the PokemonEvolvedIntoPokemonText, given the Pokemon card to evolve in wPreEvolutionPokemonCard,
 ; and the evolved Pokemon card in hTempCardIndex_ff98. also play a sound effect.
 PrintPokemonEvolvedIntoPokemon:
-	ld a, SFX_5E
+	ld a, SFX_POKEMON_EVOLUTION
 	call PlaySFX
 	ld a, [wPreEvolutionPokemonCard]
 	call LoadCardNameToTxRam2
@@ -741,7 +794,7 @@ DrawDuelistPortraitsAndNames:
 DrawOpponentPortrait:
 	ld a, [wcd78]
 	ld e, a
-	ld a, [wOpponentNPCID]
+	ld a, [wOpponentPicID]
 	lb bc, 13, 1
 	call DrawNPCPortrait
 	ret
@@ -867,7 +920,71 @@ PlayShuffleAndDrawCardsAnimation:
 	pop bc
 	ret
 
-SECTION "Bank 9@49c6", ROMX[$49c6], BANK[$9]
+PlayDeckShuffleAnimation:
+	ld a, [wDuelDisplayedScreen]
+	cp SHUFFLE_DECK
+	jr z, .skip_draw_scene
+	bank1call ZeroObjectPositionsAndToggleOAMCopy
+	call EmptyScreen
+	call DrawDuelistPortraitsAndNames
+.skip_draw_scene
+	ld a, SHUFFLE_DECK
+	ld [wDuelDisplayedScreen], a
+
+; if duelist has only one card in deck,
+; skip shuffling animation
+	ld a, DUELVARS_NUMBER_OF_CARDS_NOT_IN_DECK
+	get_turn_duelist_var
+	ld a, DECK_SIZE
+	sub [hl]
+	cp 2
+	jr c, .one_card_in_deck
+
+	ldtx hl, ShufflesTheDeckText
+	call DrawWideTextBox_PrintText
+	call EnableLCD
+	call ResetAnimationQueue
+
+; load correct animation depending on turn duelist
+	ld e, DUEL_ANIM_PLAYER_SHUFFLE
+	ldh a, [hWhoseTurn]
+	cp PLAYER_TURN
+	jr z, .load_anim
+	ld e, DUEL_ANIM_OPP_SHUFFLE
+.load_anim
+; play animation 3 times
+REPT 3
+	ld a, e
+	call PlayDuelAnimation
+ENDR
+
+.loop_anim
+	call DoFrame
+	bank1call CheckSkipDelayAllowed
+	jr c, .done_anim
+	call CheckAnyAnimationPlaying
+	jr c, .loop_anim
+
+.done_anim
+	call FinishQueuedAnimations
+	ld a, $01
+	ret
+
+.one_card_in_deck
+; no animation, just print text and delay
+	ld l, a
+	ld h, $00
+	call LoadTxRam3
+	ldtx hl, DeckPileCardCountText
+	call DrawWideTextBox_PrintText
+	call EnableLCD
+	ld a, 60
+.loop_wait
+	call DoFrame
+	dec a
+	jr nz, .loop_wait
+	ld a, $01
+	ret
 
 ; places the prize cards on both sides
 ; of the Play Area (player & opp)
@@ -891,7 +1008,7 @@ PlacePrizes:
 	call .DrawPrizeTile
 
 	push hl
-	ld a, SFX_08
+	ld a, SFX_PLACE_PRIZE
 	call PlaySFX
 	; print new deck card number
 	lb bc, 3, 5
@@ -1120,9 +1237,214 @@ DeckAndHandIconsCGBPalData:
 	db 13,  9, $03, $03, 0
 	db 13, 10, $03, $03, 0
 	db $ff
-; 0x24b83
 
-SECTION "Bank 9@4cd7", ROMX[$4cd7], BANK[$9]
+; draws a menu on screen for selecting number of cards
+; that player chooses to draw from the deck
+; due to the effects of Computer Error
+HandleComputerErrorPlayerSelection:
+	call EmptyScreen
+	lb de, 0, 0
+	lb bc, 20, 13
+	call DrawRegularTextBox
+	ldtx hl, ComputerErrorPromptText
+	call DrawWideTextBox_PrintText
+
+	ld a, DUELVARS_NUMBER_OF_CARDS_NOT_IN_DECK
+	get_turn_duelist_var
+	ld a, DECK_SIZE
+	sub [hl]
+	; a = num cards in deck
+	ld c, 5
+	cp c
+	jr nc, .got_num_cards
+	ld c, a ; load num cards left
+.got_num_cards
+	inc c ; plus 1 due to 0
+	ld a, c
+	ld [wNumCardsBeingDrawn], a
+
+	; draws 0 1 2 3 4 5
+	lb de, 2, 2
+	ld b, SYM_0
+.loop_draw_numbers
+	push bc
+	ld a, b
+	ld c, e
+	ld b, d
+	call WriteByteToBGMap0
+	push de
+	inc d ; y + 1
+	ldtx hl, EffectTargetCardsUnitText
+	call InitTextPrinting_ProcessTextFromID
+	pop de
+	pop bc
+	inc e ; increment x
+	inc b ; increment digit to draw
+	dec c
+	jr nz, .loop_draw_numbers
+
+	call EnableLCD
+	ld hl, .MenuParameters
+	xor a
+	call InitializeMenuParameters
+	ld a, [wNumCardsBeingDrawn]
+	ld [wNumScrollMenuItems], a
+.loop_input
+	call DoFrame
+	call HandleMenuInput
+	jr nc, .loop_input
+	cp $ff
+	jr z, .loop_input ; mandatory
+	ldh a, [hCurScrollMenuItem]
+	ret
+
+.MenuParameters:
+	menu_params 1, 2, 1, 6, SYM_CURSOR_R, SYM_SPACE, NULL
+
+; handles player selection when opponent
+; accepts challenge due to the effects of Challenge! card
+HandleChallengeCardPlayerSelection:
+	ldh a, [hTemp_ffa0]
+	ldh [hCurSelectionItem], a
+	call CreateDeckCardList
+	jr nc, .has_deck_cards
+	; no cards
+	ldtx hl, NoCardsLeftInTheDeckText
+	call DrawWideTextBox_WaitForInput
+	jr .done_selection
+
+.has_deck_cards
+	call CheckIfHasSpaceInBench
+	jr nc, .has_space_in_bench
+	call DrawWideTextBox_WaitForInput
+	ldtx hl, NoTargetsButCheckDeckPromptText
+	call YesOrNoMenuWithText_SetCursorToYes
+	jr c, .done_selection
+
+	; no space in Bench, but player chose to look at deck anyway
+	call CreateDeckCardList ; unnecessary, already done above
+	bank1call InitAndDrawCardListScreenLayout
+	ldtx hl, ChooseCardToCheckText
+	ldtx de, DuelistDeckText
+	bank1call SetCardListHeaderAndInfoText
+	ld a, PAD_A | PAD_START
+	ld [wNoItemSelectionMenuKeys], a
+	bank1call DisplayCardList
+	jr .done_selection
+
+.has_space_in_bench
+	; get number of maximum cards that can select
+	ld a, DUELVARS_NUMBER_OF_POKEMON_IN_PLAY_AREA
+	get_turn_duelist_var
+	ld a, [wMaxNumPlayAreaPokemon]
+	sub [hl]
+	ld [wNumberOfCardsToOrder], a
+.start_selection
+	bank1call InitAndDrawCardListScreenLayout_WithSelectCheckMenu
+	ldtx hl, ChooseBasicPokemonText
+	ldtx de, DuelistDeckText
+	bank1call SetCardListHeaderAndInfoText
+.loop_selection
+	bank1call DisplayCardList
+	ldh [hTempCardIndex_ff98], a
+	cp $ff
+	jr z, .try_cancel ; player cancelled operation
+	call LoadCardDataToBuffer2_FromDeckIndex
+	ld a, [wLoadedCard2Type]
+	cp TYPE_ENERGY
+	jr nc, .loop_selection ; not Pkmn
+	ld a, [wLoadedCard2Stage]
+	or a
+	jr nz, .loop_selection ; not Basic
+	; add this Basic Pokémon to hTempList
+	call GetNextPositionInTempList
+	ldh a, [hTempCardIndex_ff98]
+	ld [hl], a
+	call RemoveCardFromDuelTempList
+	jr c, .done_selection
+	; check if we are done selecting
+	ld hl, wNumberOfCardsToOrder
+	dec [hl]
+	jr nz, .start_selection
+
+.done_selection
+	call GetNextPositionInTempList
+	ld [hl], $ff ; terminating byte
+	ldh a, [hCurSelectionItem]
+	ldh [hTemp_ffa0], a
+	ret
+
+.try_cancel
+	; prompt player if they still want to exit
+	; since they can still select more cards
+	ld a, [wNumberOfCardsToOrder]
+	ld l, a
+	ld h, $00
+	call LoadTxRam3
+	ldtx hl, MaySelectMoreCardsButQuitPromptText
+	call YesOrNoMenuWithText
+	jr c, .start_selection
+	jr .done_selection
+
+PrintHowManyCardsLinkOpponentChoseDueToChallenge:
+	ldh a, [hTemp_ffa0]
+	sub $02
+	ld hl, wTxRam3
+	ld [hli], a
+	ld [hl], $00
+	inc hl
+	push hl
+	ld a, DUELVARS_NUMBER_OF_POKEMON_IN_PLAY_AREA
+	get_turn_duelist_var
+	ld a, [wTxRam3]
+	add [hl]
+	pop hl
+	ld [hli], a
+	ld [hl], TX_END
+	ldtx hl, DuelistSelectsPokemonTotalNumberText
+	call DrawWideTextBox_WaitForInput
+	ret
+
+; input:
+; - a = CARDSEARCH_* constant
+; - de = parameter for card search function
+; - hl = text to print while selecting target in deck
+; - bc = target name to print in case target not found
+; returns -1 in a if no valid target found in wDuelTempList
+; and carry set if player agreed to check deck anyway
+LookForCardsInDeck:
+	push hl
+	push bc
+	call SetCardSearchFuncParams
+	ld a, [wDuelTempList]
+	cp $ff
+	jr z, .none_in_deck
+
+	ld hl, wDuelTempList
+.loop_deck
+	ld a, [hli]
+	cp $ff
+	jr z, .none_in_deck
+	call ExecuteCardSearchFunc
+	jr nc, .loop_deck
+	pop bc
+	pop hl
+	call DrawWideTextBox_WaitForInput
+	xor a
+	ld [$cd20], a
+	ret
+
+.none_in_deck
+	pop hl
+	call LoadTxRam2
+	pop hl
+	ldtx hl, NoTargetsInDeckText
+	call DrawWideTextBox_WaitForInput
+	ldtx hl, NoTargetsButCheckDeckPromptText
+	call YesOrNoMenuWithText_SetCursorToYes
+	ld a, $ff
+	ld [$cd20], a
+	ret
 
 ; saves a to wCardSearchFunc and de to wCardSearchFuncParam
 ; input:
@@ -1164,7 +1486,7 @@ ExecuteCardSearchFunc:
 	dw .SearchNidoran                ; CARDSEARCH_NIDORAN
 	dw .SearchBasicFightingPkmn      ; CARDSEARCH_BASIC_FIGHTING_POKEMON
 	dw .SearchBasicEnergy            ; CARDSEARCH_BASIC_ENERGY
-	dw .SearchAnyEnergy              ; CARDSEARCH_ANY_ENERGY
+	dw .SearchPkmn                   ; CARDSEARCH_POKEMON
 	dw .SearchPokedexNumber          ; CARDSEARCH_POKEDEX_NUMBER
 	dw .SearchDarkPkmn               ; CARDSEARCH_DARK_POKEMON
 	dw .SearchPsychicEnergy          ; CARDSEARCH_PSYCHIC_ENERGY
@@ -1234,8 +1556,8 @@ ExecuteCardSearchFunc:
 	scf
 	ret
 
-; returns carry if input card is an energy card
-.SearchAnyEnergy:
+; returns carry if input card is a Pokémon Card
+.SearchPkmn:
 	ld a, e
 	call GetCardIDFromDeckIndex
 	call GetCardType
@@ -1342,9 +1664,50 @@ ExecuteCardSearchFunc:
 .Func_24df6:
 	scf
 	ret
-; 0x24df8
 
-SECTION "Bank 9@4e25", ROMX[$4e25], BANK[$9]
+; displays the deck card selection screen for a specific target
+; the target is set by a previous call to SetCardSearchFuncParams
+; expected to be called after LookForCardsInDeck, since
+; we need to know whether there is a valid target or not in $cd20
+; input:
+; - hl = info text ID
+; - de = header text ID
+; returns carry if no selection made, else return selection in [hTempCardIndex_ff98]
+SelectCardSearchTarget:
+	push hl
+	push de
+	bank1call InitAndDrawCardListScreenLayout_WithSelectCheckMenu
+	pop de
+	pop hl
+	bank1call SetCardListHeaderAndInfoText
+.loop
+	; player input for selection
+	bank1call DisplayCardList
+	jr c, .check_can_exit
+	; is selected card valid selection?
+	call ExecuteCardSearchFunc
+	jr nc, .invalid_selection
+	ld a, [$cd20]
+	or a
+	jr nz, .loop
+	; valid selection
+	ldh a, [hTempCardIndex_ff98]
+	or a
+	ret
+
+.check_can_exit
+	; only allowed to exit if $cd20 is 0
+	ld a, [$cd20]
+	or a
+	jr nz, .exit_without_selecting
+.invalid_selection
+	call PlaySFX_InvalidChoice
+	jr .loop
+
+.exit_without_selecting
+	ld a, $ff
+	scf
+	ret
 
 ; given the deck index of a turn holder's card in register a,
 ; and a pointer in hl to the wLoadedCard* buffer where the card data is loaded,
@@ -1420,7 +1783,7 @@ ConvertSpecialTrainerCardToPokemon::
 	tx DiscardActionDescription ; CARD_DATA_ATTACK1_DESCRIPTION
 	ds CARD_DATA_ATTACK1_CATEGORY - (CARD_DATA_ATTACK1_DESCRIPTION + 2)
 	db POKEMON_POWER      ; CARD_DATA_ATTACK1_CATEGORY
-	dw $4896; TrainerCardAsPokemonEffectCommands ; CARD_DATA_ATTACK1_EFFECT_COMMANDS
+	dw $4896 ; TrainerCardAsPokemonEffectCommands ; CARD_DATA_ATTACK1_EFFECT_COMMANDS
 	ds CARD_DATA_RETREAT_COST - (CARD_DATA_ATTACK1_EFFECT_COMMANDS + 2)
 	db UNABLE_RETREAT     ; CARD_DATA_RETREAT_COST
 	ds PKMN_CARD_DATA_LENGTH - (CARD_DATA_RETREAT_COST + 1)
@@ -1438,9 +1801,184 @@ ConvertSpecialTrainerCardToPokemon::
 	db NONE ; flags 3
 	db 0 ; ?
 	db ATK_ANIM_NONE ; animation
-; 0x24ebf
 
-SECTION "Bank 9@4fe0", ROMX[$4fe0], BANK[$9]
+; handles drawing and selection of screen for
+; choosing a color (excluding colorless), for use
+; of Shift Pkmn Power and Conversion attacks.
+; outputs in a the color that was selected
+; input:
+;	a  = Play Area location (PLAY_AREA_*), with:
+;	     bit 7 not set if it's applying to opponent's card
+;	     bit 7 set if it's applying to player's card
+;	hl = text to be printed in the bottom box
+; output:
+;	a = color that was selected
+HandleColorChangeScreen:
+	or a
+	call z, SwapTurn
+	push af
+	call Func_24ef5
+	pop af
+	call z, SwapTurn
+
+	ld hl, .menu_params
+	xor a
+	call InitializeMenuParameters
+	call EnableLCD
+
+.loop_input
+	call DoFrame
+	call HandleMenuInput
+	jr nc, .loop_input
+	cp -1 ; b pressed?
+	jr z, .loop_input
+	ld e, a
+	ld d, $00
+	ld hl, ShiftListItemToColor
+	add hl, de
+	ld a, [hl]
+	or a
+	ret
+
+	scf
+	ret
+
+.menu_params
+	menu_params 1, 1, 2, MAX_PLAY_AREA_POKEMON, SYM_CURSOR_R, SYM_SPACE, NULL
+
+Func_24ef5:
+	push hl
+	push af
+	call EmptyScreen
+	call ZeroObjectPositions
+	call LoadDuelCardSymbolTiles
+	bank1call Func_6c12
+
+; load card data
+	pop af
+	and $7f
+	ld [wTempPlayAreaLocation_cceb], a
+	add DUELVARS_ARENA_CARD
+	get_turn_duelist_var
+	call LoadCardDataToBuffer1_FromDeckIndex
+
+; draw card gfx
+	ld de, v0Tiles1 + $20 tiles ; destination offset of loaded gfx
+	ld hl, wLoadedCard1Gfx
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	lb bc, $30, TILE_SIZE
+	call LoadCardGfx
+	lb de, 9, 2
+	bank1call DrawCardGfxToDE_BGPalIndex5
+	bank1call FlushAllPalettesIfNotDMG
+	ld a, $a0
+	lb hl, 6, 1
+	lb de, 9, 2
+	lb bc, 8, 6
+	call FillRectangle
+	bank1call StubbedApplyBGP6OrSGB3ToCardImage
+
+; print card name and level at the top
+	ld a, 16
+	call CopyCardNameAndLevel
+	ld [hl], TX_END
+	lb de, 7, 0
+	call InitTextPrinting
+	ld hl, wDefaultText
+	call ProcessText
+
+	ld hl, ShiftMenuData
+	call PlaceTextItems
+
+; print card's color, resistance and weakness
+	ld a, [wTempPlayAreaLocation_cceb]
+	bank1call GetPlayAreaCardColor
+	inc a
+	lb bc, 14, 9
+	call WriteByteToBGMap0
+	ld a, [wTempPlayAreaLocation_cceb]
+	bank1call GetPlayAreaCardWeakness
+	lb bc, 14, 10
+	bank1call PrintCardPageWeaknessesOrResistances
+	ld a, [wTempPlayAreaLocation_cceb]
+	bank1call GetPlayAreaCardResistance
+	lb bc, 14, 11
+	bank1call PrintCardPageWeaknessesOrResistances
+
+	call DrawWideTextBox
+
+; print list of color names on all list items
+	lb de, 5, 1
+	ldtx hl, ColorListText
+	call InitTextPrinting_ProcessTextFromID
+
+; print input hl to text box
+	lb de, 1, 14
+	pop hl
+	call InitTextPrinting_ProcessTextFromID
+
+; draw and apply palette to color icons
+	ld hl, ColorTileAndBGP
+	lb de, 2, 0
+	ld c, NUM_COLORED_TYPES
+.loop_colors
+	ld a, [hli]
+	push de
+	push bc
+	push hl
+	lb hl, 1, 2
+	lb bc, 2, 2
+	call FillRectangle
+
+	; this is a remnant from TCG1
+	; console is always CGB
+	ld a, [wConsole]
+	cp CONSOLE_CGB
+	jr nz, .skip_vram1
+	pop hl
+	push hl
+	call BankswitchVRAM1
+	ld a, [hl]
+	lb hl, 0, 0
+	lb bc, 2, 2
+	call FillRectangle
+	call BankswitchVRAM0
+
+.skip_vram1
+	pop hl
+	pop bc
+	pop de
+	inc hl
+	inc e
+	inc e
+	dec c
+	jr nz, .loop_colors
+	ret
+
+ShiftMenuData:
+	textitem 10,  9, TypeText
+	textitem 10, 10, WeaknessText
+	textitem 10, 11, ResistanceText
+	textitems_end
+
+ColorTileAndBGP:
+	; tile, BG
+	db $e4, $03
+	db $e0, $02
+	db $ec, $03
+	db $e8, $02
+	db $f0, $04
+	db $f4, $04
+
+ShiftListItemToColor:
+	db GRASS
+	db FIRE
+	db WATER
+	db LIGHTNING
+	db FIGHTING
+	db PSYCHIC
 
 DeckDiagnosis:
 	farcall GetNumberOfDeckDiagnosisStepsUnlocked
@@ -1609,23 +2147,18 @@ HandleDeckDiagnosisMenu:
 	ret
 
 .MenuParameters:
-	db 11, 2 ; cursor x, cursor y
-	db 2 ; y displacement between items
-	db 5 ; number of items
-	db SYM_CURSOR_R ; cursor tile number
-	db SYM_SPACE ; tile behind cursor
-	dw .UpdateFunc ; function pointer if non-0
+	menu_params 11, 2, 2, 5, SYM_CURSOR_R, SYM_SPACE, .UpdateFunc
 
 .UpdateFunc:
 	ldh a, [hDPadHeld]
-	and D_UP | D_DOWN
+	and PAD_UP | PAD_DOWN
 	jr z, .check_a_btn
 	call .PrintCursorMenuItemText
 .check_a_btn
 	ldh a, [hKeysPressed]
-	bit A_BUTTON_F, a
+	bit B_PAD_A, a
 	jr nz, .a_btn_pressed
-	and B_BUTTON
+	and PAD_B
 	ret z
 	; b btn pressed
 	ld a, $ff
@@ -1721,7 +2254,7 @@ LoadDeckDiagnosisScene:
 	lb bc, 2, 6
 ;	fallthrough
 DrawDrMasonsPortrait:
-	ld a, NPC_DR_MASON
+	ld a, DR_MASON_PIC
 	ld e, EMOTION_NORMAL
 	call DrawNPCPortrait
 	call FlushAllPalettes
@@ -2123,7 +2656,7 @@ CheckDeck:
 .skip_portrait_switch
 	push de
 	call DoFrame
-	ld a, NPC_DR_MASON
+	ld a, DR_MASON_PIC
 	lb bc, 7, 4
 	call DrawNPCPortrait
 	call FlushAllPalettes
@@ -2132,7 +2665,7 @@ CheckDeck:
 	jr nz, .check_delay
 
 	; show happy portrait
-	ld a, NPC_DR_MASON
+	ld a, DR_MASON_PIC
 	ld e, EMOTION_HAPPY
 	lb bc, 7, 4
 	call DrawNPCPortrait
@@ -2186,7 +2719,7 @@ CheckDeck:
 ; of each type there are (Basic, Stage1, Stage2, Energy, Trainer)
 ; and within Energy cards, count each color as well
 ; outputs all results in wDeckCheckCardCounts
-.GetDeckCardCounts:
+.GetDeckCardCounts
 	ld e, l
 	ld d, h
 	ld hl, wPlayerDeck
@@ -2196,9 +2729,10 @@ CheckDeck:
 	call DisableSRAM
 	pop hl
 
+.asm_25461
 	push hl
 	ld hl, wDeckCheckCardCounts
-	ld c, wDeckCheckCardCountsEnd - wDeckCheckCardCounts
+	ld c, DECKCHECKSTRUCT_LENGTH
 	xor a
 .loop_clear
 	ld [hli], a
@@ -2221,22 +2755,22 @@ CheckDeck:
 	inc [hl]
 .not_rainbow
 	ld a, [wLoadedCard1Type]
-	ld e, $4
+	ld e, DECKCHECKSTRUCT_TRAINER
 	cp TYPE_TRAINER
 	jr z, .got_type
-	ld e, $0
+	ld e, DECKCHECKSTRUCT_ENERGY
 	cp TYPE_ENERGY
 	jr nc, .got_type
-	ld e, $1
+	ld e, DECKCHECKSTRUCT_BASIC_PKMN
 	ld a, [wLoadedCard1Stage]
 	or a
 	jr z, .got_type
-	ld e, $2
+	ld e, DECKCHECKSTRUCT_STAGE1_PKMN
 	cp STAGE1
 	jr z, .got_type
-	ld e, $3
+	ld e, DECKCHECKSTRUCT_STAGE2_PKMN
 .got_type
-	ld d, $00
+	ld d, 0
 	ld hl, wDeckCheckCardCounts
 	add hl, de
 	inc [hl]
@@ -2850,9 +3384,120 @@ CheckDeck:
 	db $13 ; x1.2 WATER
 	db $15 ; x1.3 FIGHTING
 	db $15 ; x1.3 PSYCHIC
-; 0x257da
 
-SECTION "Bank 9@58a2", ROMX[$58a2], BANK[$9]
+; a = BOOSTER_* constant
+; generate the content, according to .ContentTable[a]
+; using CreateCardPopCandidateList
+; and set wDuelTempList to 0--9
+GenerateBoosterContent:
+	ld e, a
+	add a
+	add e
+	add a ; a *= 6
+	ld e, a
+	ld d, 0
+	ld hl, .ContentTable
+	add hl, de
+	ld b, [hl]
+	inc hl
+	ld c, [hl]
+	inc hl
+	ld de, wPlayerDeck
+
+	ld a, CARDPOP_STAR
+	call .GenerateCard
+
+	ld a, CARDPOP_DIAMOND
+	call .GenerateCard
+
+	ld a, CARDPOP_CIRCLE
+	call .GenerateCard
+
+	ld a, CARDPOP_ENERGY
+	call .GenerateCard
+
+	xor a
+	ld [de], a
+	inc de
+	ld [de], a
+	ld hl, wDuelTempList
+	ld c, NUM_CARDS_IN_BOOSTER
+	xor a
+.loop_set_temp_list
+	ld [hli], a
+	inc a
+	dec c
+	jr nz, .loop_set_temp_list
+	ld [hl], $ff
+	ret
+
+.GenerateCard:
+	ldh [hff96], a
+	ld a, [hli]
+	or a
+	ret z
+
+	dec hl
+	push bc
+	push de
+	push hl
+	ldh a, [hff96]
+	call CreateCardPopCandidateList
+	pop hl
+	pop de
+	pop bc
+	ld a, [hli]
+	push hl
+	push bc
+	ld c, a
+.loop_generate
+	push bc
+	ld hl, wDuelTempList
+.loop_random_get
+	ld a, [wcd54]
+	call Random
+	ld l, a
+	ld h, 0
+	add hl, hl
+	ld bc, wCardPopCandidateList
+	add hl, bc
+	ld a, [hli]
+	or [hl]
+	dec hl
+	jr z, .loop_random_get
+	ld a, [hli]
+	ld [de], a
+	inc de
+	ld a, [hl]
+	ld [de], a
+	inc de
+	xor a
+	ld [hld], a
+	ld [hl], a
+	pop bc
+	dec c
+	jr nz, .loop_generate
+	pop bc
+	pop hl
+	ret
+
+; arg0 <= set range <= arg1
+; arg2--5: number of star, diamond, circle, energy
+.ContentTable:
+	db BEGINNING_POKEMON,     BEGINNING_POKEMON,     1, 3, 5,  1 ; BOOSTER_BEGINNING_POKEMON
+	db LEGENDARY_POWER,       LEGENDARY_POWER,       1, 3, 5,  1 ; BOOSTER_LEGENDARY_POWER
+	db ISLAND_OF_FOSSIL,      ISLAND_OF_FOSSIL,      1, 3, 5,  1 ; BOOSTER_ISLAND_OF_FOSSIL
+	db PSYCHIC_BATTLE,        PSYCHIC_BATTLE,        1, 3, 6,  0 ; BOOSTER_PSYCHIC_BATTLE
+	db SKY_FLYING_POKEMON,    SKY_FLYING_POKEMON,    1, 3, 6,  0 ; BOOSTER_SKY_FLYING_POKEMON
+	db WE_ARE_TEAM_ROCKET,    WE_ARE_TEAM_ROCKET,    1, 3, 6,  0 ; BOOSTER_WE_ARE_TEAM_ROCKET
+	db TEAM_ROCKETS_AMBITION, TEAM_ROCKETS_AMBITION, 1, 3, 6,  0 ; BOOSTER_TEAM_ROCKETS_AMBITION
+	db BEGINNING_POKEMON,     PROMOTIONAL,          10, 0, 0,  0 ; BOOSTER_DEBUG_10_STAR
+	db BEGINNING_POKEMON,     BEGINNING_POKEMON,     0, 0, 0, 10 ; BOOSTER_PRESENT_10_ENERGY
+	db BEGINNING_POKEMON,     TEAM_ROCKETS_AMBITION, 1, 3, 6,  0 ; BOOSTER_PRESENT_FROM_ALL_SETS
+	db BEGINNING_POKEMON,     SKY_FLYING_POKEMON,    1, 3, 6,  0 ; BOOSTER_PRESENT_FROM_NON_ROCKET_SETS
+	db PSYCHIC_BATTLE,        TEAM_ROCKETS_AMBITION, 1, 3, 6,  0 ; BOOSTER_PRESENT_FROM_LATTER_4_SETS
+	db WE_ARE_TEAM_ROCKET,    TEAM_ROCKETS_AMBITION, 1, 3, 6,  0 ; BOOSTER_PRESENT_FROM_ROCKET_SETS
+	db BEGINNING_POKEMON,     TEAM_ROCKETS_AMBITION, 2, 3, 5,  0 ; BOOSTER_DEBUG_2_STAR
 
 ; fills wCardPopCandidateList with cards that satisfy
 ; certain criteria:
@@ -2863,9 +3508,9 @@ SECTION "Bank 9@58a2", ROMX[$58a2], BANK[$9]
 ; - b <= set <= c
 ; outputs in a the number of cards in the list
 CreateCardPopCandidateList:
-	cp $ff
+	cp CARDPOP_ENERGY
 	jr z, .energy_cards
-	cp $fe
+	cp CARDPOP_PHANTOM
 	jr z, .phantom_cards
 
 	ld hl, wcd51
@@ -3001,17 +3646,17 @@ LoadDeckIDData:
 	ld a, [hli]
 	ld [wOpponentName + 1], a
 	ld a, [hli]
-	ld [wOpponentNPCID], a
+	ld [wOpponentPicID], a
 	ld a, [hli]
-	ld [wcc15], a
+	ld [wNPCDuelPrizes], a
 	ld a, [hli]
 	ld [wSpecialRule], a
 	ld a, [hli]
-	ld [wcd0e], a
+	ld [wDeckRequirement], a
 	ld a, [hli]
 	ld [wDuelTheme], a
 	ld a, [hli]
-	ld [wcd0f], a
+	ld [wDuelistIntroText], a
 	ld a, [hli]
 	ld [wOppCoin], a
 	or a
@@ -3021,1310 +3666,2433 @@ DeckIDData:
 	db SAMS_PRACTICE_DECK_ID
 	tx SamsPracticeDeckName ; deck name
 	tx DuelistSamName ; opponent name
-	db NPC_SAM ; NPC ID
+	db SAM_PIC ; Pic ID
 	db PRIZES_2 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $12 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_TECH ; duelist intro text
 	db COIN_CHANSEY ; coin
 
 	db STARTER_DECK_ID - 1
 	tx StarterDeckName ; deck name
 	tx DuelistMainCharacterName ; opponent name
-	db NPC_MARK ; NPC ID
+	db MARK_PIC ; Pic ID
 	db 0 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
 	db MUSIC_STOP ; duel theme
-	db $00 ; ?
+	db NONE ; duelist intro text
 	db COIN_CHANSEY ; coin
 
 	db SWEAT_ANTI_GR1_DECK_ID - 1
 	tx SweatAntiGR1DeckName ; deck name
 	tx DuelistMainCharacterName ; opponent name
-	db NPC_MARK ; NPC ID
+	db MARK_PIC ; Pic ID
 	db 0 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
 	db MUSIC_STOP ; duel theme
-	db $00 ; ?
+	db NONE ; duelist intro text
 	db COIN_CHANSEY ; coin
 
 	db GIVE_IN_ANTI_GR2_DECK_ID - 1
 	tx GiveInAntiGR2DeckName ; deck name
 	tx DuelistMainCharacterName ; opponent name
-	db NPC_MARK ; NPC ID
+	db MARK_PIC ; Pic ID
 	db 0 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
 	db MUSIC_STOP ; duel theme
-	db $00 ; ?
+	db NONE ; duelist intro text
 	db COIN_CHANSEY ; coin
 
 	db VENGEFUL_ANTI_GR3_DECK_ID - 1
 	tx VengefulAntiGR3DeckName ; deck name
 	tx DuelistMainCharacterName ; opponent name
-	db NPC_MARK ; NPC ID
+	db MARK_PIC ; Pic ID
 	db 0 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
 	db MUSIC_STOP ; duel theme
-	db $00 ; ?
+	db NONE ; duelist intro text
 	db COIN_CHANSEY ; coin
 
 	db UNFORGIVING_ANTI_GR4_DECK_ID - 1
 	tx UnforgivingAntiGR4DeckName ; deck name
 	tx DuelistMainCharacterName ; opponent name
-	db NPC_MARK ; NPC ID
+	db MARK_PIC ; Pic ID
 	db 0 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
 	db MUSIC_STOP ; duel theme
-	db $00 ; ?
+	db NONE ; duelist intro text
 	db COIN_CHANSEY ; coin
 
 	db UNUSED_SAMS_PRACTICE_DECK_ID - 1
 	tx PracticeDeckName ; deck name
 	tx DuelistMainCharacterName ; opponent name
-	db NPC_MARK ; NPC ID
+	db MARK_PIC ; Pic ID
 	db 0 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
 	db MUSIC_STOP ; duel theme
-	db $00 ; ?
+	db NONE ; duelist intro text
 	db COIN_CHANSEY ; coin
 
 	db UNUSED_SAMS_PRACTICE_DECK_ID
 	tx SamsPracticeDeckName ; deck name
 	tx DuelistSamName ; opponent name
-	db NPC_SAM ; NPC ID
+	db SAM_PIC ; Pic ID
 	db PRIZES_2 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $12 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_TECH ; duelist intro text
 	db COIN_CHANSEY ; coin
 
 	db AARON_PRACTICE_DECK1_ID
 	tx YourPracticeDeck1Name ; deck name
 	tx DuelistMainCharacterName ; opponent name
-	db NPC_MARK ; NPC ID
+	db MARK_PIC ; Pic ID
 	db 0 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
 	db MUSIC_STOP ; duel theme
-	db $00 ; ?
+	db NONE ; duelist intro text
 	db COIN_CHANSEY ; coin
 
 	db AARONS_STEP1_DECK_ID
 	tx AaronsStep1DeckName ; deck name
 	tx DuelistAaronName ; opponent name
-	db NPC_AARON ; NPC ID
+	db AARON_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $12 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_TECH ; duelist intro text
 	db COIN_CHANSEY ; coin
 
 	db AARON_PRACTICE_DECK2_ID
 	tx YourPracticeDeck2Name ; deck name
 	tx DuelistMainCharacterName ; opponent name
-	db NPC_MARK ; NPC ID
+	db MARK_PIC ; Pic ID
 	db 0 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
 	db MUSIC_STOP ; duel theme
-	db $00 ; ?
+	db NONE ; duelist intro text
 	db COIN_CHANSEY ; coin
 
 	db AARONS_STEP2_DECK_ID
 	tx AaronsStep2DeckName ; deck name
 	tx DuelistAaronName ; opponent name
-	db NPC_AARON ; NPC ID
+	db AARON_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $12 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_TECH ; duelist intro text
 	db COIN_CHANSEY ; coin
 
 	db AARON_PRACTICE_DECK3_ID
 	tx YourPracticeDeck3Name ; deck name
 	tx DuelistMainCharacterName ; opponent name
-	db NPC_MARK ; NPC ID
+	db MARK_PIC ; Pic ID
 	db 0 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
 	db MUSIC_STOP ; duel theme
-	db $00 ; ?
+	db NONE ; duelist intro text
 	db COIN_CHANSEY ; coin
 
 	db AARONS_STEP3_DECK_ID
 	tx AaronsStep3DeckName ; deck name
 	tx DuelistAaronName ; opponent name
-	db NPC_AARON ; NPC ID
+	db AARON_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $12 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_TECH ; duelist intro text
 	db COIN_CHANSEY ; coin
 
 	db BRICK_WALK_DECK_ID
 	tx RiversideWalkDeckName ; deck name
 	tx DuelistAaronName ; opponent name
-	db NPC_AARON ; NPC ID
+	db AARON_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $12 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_TECH ; duelist intro text
 	db COIN_CHANSEY ; coin
 
 	db BENCH_TRAP_DECK_ID
 	tx BenchTrapDeckName ; deck name
 	tx DuelistAaronName ; opponent name
-	db NPC_AARON ; NPC ID
+	db AARON_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $12 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_TECH ; duelist intro text
 	db COIN_CHANSEY ; coin
 
 	db SKY_SPARK_DECK_ID
 	tx SkySparkDeckName ; deck name
 	tx DuelistIsaacName ; opponent name
-	db NPC_ISAAC ; NPC ID
+	db ISAAC_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_2 ; duel theme
-	db $09 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MASTER ; duel theme
+	db DUELIST_INTRO_LIGHTNING_CLUB_MASTER ; duelist intro text
 	db COIN_PIKACHU ; coin
 
 	db ELECTRIC_SELFDESTRUCT_DECK_ID
 	tx ElectricSelfDestructDeckName ; deck name
 	tx DuelistIsaacName ; opponent name
-	db NPC_ISAAC ; NPC ID
+	db ISAAC_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_2 ; duel theme
-	db $09 ; ?
-	db COIN_PIKACHU ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MASTER ; duel theme
+	db DUELIST_INTRO_LIGHTNING_CLUB_MASTER ; duelist intro text
+	db COIN_MAGNEMITE ; coin
 
 	db OVERFLOW_DECK_ID
 	tx OverflowDeckName ; deck name
 	tx DuelistNicholasName ; opponent name
-	db NPC_NICHOLAS ; NPC ID
+	db NICHOLAS_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $01 ; ?
-	db COIN_CHANSEY ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_LIGHTNING_CLUB_MEMBER ; duelist intro text
+	db COIN_MAGNEMITE ; coin
 
 	db TRIPLE_ZAPDOS_DECK_ID
 	tx TripleZapdosDeckName ; deck name
 	tx DuelistNicholasName ; opponent name
-	db NPC_NICHOLAS ; NPC ID
+	db NICHOLAS_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $01 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_LIGHTNING_CLUB_MEMBER ; duelist intro text
 	db COIN_PIKACHU ; coin
 
 	db I_LOVE_PIKACHU_DECK_ID
 	tx ILovePikachuDeckName ; deck name
 	tx DuelistJenniferName ; opponent name
-	db NPC_JENNIFER ; NPC ID
+	db JENNIFER_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $01 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_LIGHTNING_CLUB_MEMBER ; duelist intro text
 	db COIN_PIKACHU ; coin
 
 	db TEN_THOUSAND_VOLTS_DECK_ID
 	tx ThunderboltDeckName ; deck name
 	tx DuelistBrandonName ; opponent name
-	db NPC_BRANDON ; NPC ID
+	db BRANDON_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $01 ; ?
-	db COIN_CHANSEY ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_LIGHTNING_CLUB_MEMBER ; duelist intro text
+	db COIN_PIKACHU ; coin
 
 	db HAND_OVER_GR_DECK_ID
 	tx HandedOverGRDeckName ; deck name
 	tx DuelistMurrayName ; opponent name
-	db NPC_MURRAY ; NPC ID
+	db MURRAY_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_2 ; duel theme
-	db $0a ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MASTER ; duel theme
+	db DUELIST_INTRO_PSYCHIC_CLUB_MASTER ; duelist intro text
 	db COIN_ALAKAZAM ; coin
 
 	db PSYCHIC_ELITE_DECK_ID
 	tx PsychicEliteDeckName ; deck name
 	tx DuelistMurrayName ; opponent name
-	db NPC_MURRAY ; NPC ID
+	db MURRAY_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_2 ; duel theme
-	db $0a ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MASTER ; duel theme
+	db DUELIST_INTRO_PSYCHIC_CLUB_MASTER ; duelist intro text
 	db COIN_ALAKAZAM ; coin
 
 	db PSYCHOKINESIS_DECK_ID
 	tx PsychicDeckName ; deck name
 	tx DuelistStephanieName ; opponent name
-	db NPC_STEPHANIE ; NPC ID
+	db STEPHANIE_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $02 ; ?
-	db COIN_CHANSEY ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_PSYCHIC_CLUB_MEMBER ; duelist intro text
+	db COIN_ALAKAZAM ; coin
 
 	db PHANTOM_DECK_ID
 	tx GhostDeckName ; deck name
 	tx DuelistRobertName ; opponent name
-	db NPC_ROBERT ; NPC ID
+	db ROBERT_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $02 ; ?
-	db COIN_CHANSEY ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_PSYCHIC_CLUB_MEMBER ; duelist intro text
+	db COIN_GENGAR ; coin
 
 	db PUPPET_MASTER_DECK_ID
 	tx PuppetMasterDeckName ; deck name
 	tx DuelistDanielName ; opponent name
-	db NPC_DANIEL ; NPC ID
+	db DANIEL_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $02 ; ?
-	db COIN_CHANSEY ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_PSYCHIC_CLUB_MEMBER ; duelist intro text
+	db COIN_MEW ; coin
 
 	db EVEN3_YEARS_ON_A_ROCK_DECK_ID
 	tx ThreeYearsOnRockDeckName ; deck name
 	tx DuelistGeneName ; opponent name
-	db NPC_GENE ; NPC ID
+	db GENE_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_2 ; duel theme
-	db $0b ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MASTER ; duel theme
+	db DUELIST_INTRO_ROCK_CLUB_MASTER ; duelist intro text
 	db COIN_KABUTO ; coin
 
 	db ROLLING_STONE_DECK_ID
 	tx RollingStoneDeckName ; deck name
 	tx DuelistMatthewName ; opponent name
-	db NPC_MATTHEW ; NPC ID
+	db MATTHEW_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $03 ; ?
-	db COIN_CHANSEY ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_ROCK_CLUB_MEMBER ; duelist intro text
+	db COIN_DUGTRIO ; coin
 
 	db GREAT_EARTHQUAKE_DECK_ID
 	tx GreatEarthquakeDeckName ; deck name
 	tx DuelistRyanName ; opponent name
-	db NPC_RYAN ; NPC ID
+	db RYAN_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $03 ; ?
-	db COIN_CHANSEY ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_ROCK_CLUB_MEMBER ; duelist intro text
+	db COIN_DUGTRIO ; coin
 
 	db AWESOME_FOSSIL_DECK_ID
 	tx AwesomeFossilDeckName ; deck name
 	tx DuelistAndrewName ; opponent name
-	db NPC_ANDREW ; NPC ID
+	db ANDREW_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $03 ; ?
-	db COIN_CHANSEY ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_ROCK_CLUB_MEMBER ; duelist intro text
+	db COIN_KABUTO ; coin
 
 	db RAGING_BILLOW_OF_FISTS_DECK_ID
 	tx RagingBillowOfFistsDeckName ; deck name
 	tx DuelistMitchName ; opponent name
-	db NPC_MITCH ; NPC ID
+	db MITCH_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_2 ; duel theme
-	db $0c ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MASTER ; duel theme
+	db DUELIST_INTRO_FIGHTING_CLUB_MASTER ; duelist intro text
 	db COIN_MACHAMP ; coin
 
 	db YOU_CAN_DO_IT_MACHOP_DECK_ID
 	tx YouCanDoItMachopDeckName ; deck name
 	tx DuelistMichaelName ; opponent name
-	db NPC_MICHAEL ; NPC ID
+	db MICHAEL_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $04 ; ?
-	db COIN_CHANSEY ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_FIGHTING_CLUB_MEMBER ; duelist intro text
+	db COIN_MACHAMP ; coin
 
 	db NEW_MACHOKE_DECK_ID
 	tx NewMachokeDeckName ; deck name
 	tx DuelistMichaelName ; opponent name
-	db NPC_MICHAEL ; NPC ID
+	db MICHAEL_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $04 ; ?
-	db COIN_CHANSEY ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_FIGHTING_CLUB_MEMBER ; duelist intro text
+	db COIN_MACHAMP ; coin
 
 	db SKILLED_WARRIOR_DECK_ID
 	tx SkilledWarriorDeckName ; deck name
 	tx DuelistChrisName ; opponent name
-	db NPC_CHRIS ; NPC ID
+	db CHRIS_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $04 ; ?
-	db COIN_CHANSEY ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_FIGHTING_CLUB_MEMBER ; duelist intro text
+	db COIN_MACHAMP ; coin
 
 	db I_LOVE_TO_FIGHT_DECK_ID
 	tx LoveToBattleDeckName ; deck name
 	tx DuelistJessicaName ; opponent name
-	db NPC_JESSICA ; NPC ID
+	db JESSICA_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $04 ; ?
-	db COIN_CHANSEY ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_FIGHTING_CLUB_MEMBER ; duelist intro text
+	db COIN_MACHAMP ; coin
 
 	db MAX_ENERGY_DECK_ID
 	tx MaxEnergyDeckName ; deck name
 	tx DuelistNikkiName ; opponent name
-	db NPC_NIKKI ; NPC ID
+	db NIKKI_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_2 ; duel theme
-	db $0d ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MASTER ; duel theme
+	db DUELIST_INTRO_GRASS_CLUB_MASTER ; duelist intro text
 	db COIN_ODDISH ; coin
 
 	db REMAINING_GREEN_DECK_ID
 	tx SurvivingGreenDeckName ; deck name
 	tx DuelistBrittanyName ; opponent name
-	db NPC_BRITTANY ; NPC ID
+	db BRITTANY_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $05 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_GRASS_CLUB_MEMBER ; duelist intro text
 	db COIN_CHANSEY ; coin
 
 	db POISON_CURSE_DECK_ID
 	tx PoisonVespidsDeckName ; deck name
 	tx DuelistBrittanyName ; opponent name
-	db NPC_BRITTANY ; NPC ID
+	db BRITTANY_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $05 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_GRASS_CLUB_MEMBER ; duelist intro text
 	db COIN_ODDISH ; coin
 
 	db GLITTERING_SCALES_DECK_ID
 	tx GlitteringScalesDeckName ; deck name
 	tx DuelistKristinName ; opponent name
-	db NPC_KRISTIN ; NPC ID
+	db KRISTIN_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $05 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_GRASS_CLUB_MEMBER ; duelist intro text
 	db COIN_CHANSEY ; coin
 
 	db STEADY_INCREASE_DECK_ID
 	tx SteadyIncreaseDeckName ; deck name
 	tx DuelistHeatherName ; opponent name
-	db NPC_HEATHER ; NPC ID
+	db HEATHER_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $05 ; ?
-	db COIN_CHANSEY ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_GRASS_CLUB_MEMBER ; duelist intro text
+	db COIN_ODDISH ; coin
 
 	db DARK_SCIENCE_DECK_ID
 	tx DarkScienceDeckName ; deck name
 	tx DuelistRickName ; opponent name
-	db NPC_RICK ; NPC ID
+	db RICK_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_2 ; duel theme
-	db $0e ; ?
-	db COIN_MAGNEMITE ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MASTER ; duel theme
+	db DUELIST_INTRO_SCIENCE_CLUB_MASTER ; duelist intro text
+	db COIN_ARBOK ; coin
 
 	db NATURAL_SCIENCE_DECK_ID
 	tx NaturalScienceDeckName ; deck name
 	tx DuelistDavidName ; opponent name
-	db NPC_DAVID ; NPC ID
+	db DAVID_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $06 ; ?
-	db COIN_CHANSEY ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_SCIENCE_CLUB_MEMBER ; duelist intro text
+	db COIN_GOLBAT ; coin
 
 	db POISONOUS_SWAMP_DECK_ID
 	tx PoisonousSwampDeckName ; deck name
 	tx DuelistJosephName ; opponent name
-	db NPC_JOSEPH ; NPC ID
+	db JOSEPH_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $06 ; ?
-	db COIN_CHANSEY ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_SCIENCE_CLUB_MEMBER ; duelist intro text
+	db COIN_ARBOK ; coin
 
 	db GATHERING_NIDORAN_DECK_ID
 	tx GatheringNidoranDeckName ; deck name
 	tx DuelistErikName ; opponent name
-	db NPC_ERIK ; NPC ID
+	db ERIK_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $06 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_SCIENCE_CLUB_MEMBER ; duelist intro text
 	db COIN_CHANSEY ; coin
 
 	db RAIN_DANCE_CONFUSION_DECK_ID
 	tx RainDanceConfusionDeckName ; deck name
 	tx DuelistAmyName ; opponent name
-	db NPC_AMY ; NPC ID
+	db AMY_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_2 ; duel theme
-	db $0f ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MASTER ; duel theme
+	db DUELIST_INTRO_WATER_CLUB_MASTER ; duelist intro text
 	db COIN_STARMIE ; coin
 
 	db CONSERVING_WATER_DECK_ID
 	tx SurvivingWaterDeckName ; deck name
 	tx DuelistJoshuaName ; opponent name
-	db NPC_JOSHUA ; NPC ID
+	db JOSHUA_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $07 ; ?
-	db COIN_CHANSEY ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_WATER_CLUB_MEMBER ; duelist intro text
+	db COIN_STARMIE ; coin
 
 	db ENERGY_REMOVAL_DECK_ID
 	tx EnergyRemovalDeckName ; deck name
 	tx DuelistJoshuaName ; opponent name
-	db NPC_JOSHUA ; NPC ID
+	db JOSHUA_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $07 ; ?
-	db COIN_STARMIE ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_WATER_CLUB_MEMBER ; duelist intro text
+	db COIN_PSYDUCK ; coin
 
 	db SPLASHING_ABOUT_DECK_ID
 	tx SplashingAboutDeckName ; deck name
 	tx DuelistSaraName ; opponent name
-	db NPC_SARA ; NPC ID
+	db SARA_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $07 ; ?
-	db COIN_CHANSEY ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_WATER_CLUB_MEMBER ; duelist intro text
+	db COIN_HORSEA ; coin
 
 	db BEACH_DECK_ID
 	tx BeachDeckName ; deck name
 	tx DuelistAmandaName ; opponent name
-	db NPC_AMANDA ; NPC ID
+	db AMANDA_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $07 ; ?
-	db COIN_CHANSEY ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_WATER_CLUB_MEMBER ; duelist intro text
+	db COIN_STARMIE ; coin
 
 	db GO_ARCANINE_DECK_ID
 	tx GoArcanineDeckName ; deck name
 	tx DuelistKenName ; opponent name
-	db NPC_KEN ; NPC ID
+	db KEN_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_2 ; duel theme
-	db $10 ; ?
-	db COIN_CHARMANDER ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MASTER ; duel theme
+	db DUELIST_INTRO_FIRE_CLUB_MASTER ; duelist intro text
+	db COIN_MAGMAR ; coin
 
 	db FLAME_FESTIVAL_DECK_ID
 	tx FlameFestivalDeckName ; deck name
 	tx DuelistJohnName ; opponent name
-	db NPC_JOHN ; NPC ID
+	db JOHN_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $08 ; ?
-	db COIN_CHANSEY ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_FIRE_CLUB_MEMBER ; duelist intro text
+	db COIN_MAGMAR ; coin
 
 	db IMMORTAL_FLAME_DECK_ID
 	tx ImmortalFlameDeckName ; deck name
 	tx DuelistJonathanName ; opponent name
-	db NPC_JONATHAN ; NPC ID
+	db JONATHAN_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $08 ; ?
-	db COIN_CHANSEY ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_FIRE_CLUB_MEMBER ; duelist intro text
+	db COIN_MAGMAR ; coin
 
 	db ELECTRIC_CURRENT_SHOCK_DECK_ID
 	tx ElectricCurrentShockDeckName ; deck name
 	tx DuelistAdamName ; opponent name
-	db NPC_ADAM ; NPC ID
+	db ADAM_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $08 ; ?
-	db COIN_CHANSEY ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_FIRE_CLUB_MEMBER ; duelist intro text
+	db COIN_PONYTA ; coin
 
 	db GREAT_ROCKET4_DECK_ID
 	tx GreatRocket4DeckName ; deck name
 	tx DuelistGR4Name ; opponent name
-	db NPC_GR_4 ; NPC ID
+	db GR_4_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_GRDUELTHEME_1 ; duel theme
-	db $16 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_MEMBER ; duel theme
+	db DUELIST_INTRO_ENIGMATIC_MASK ; duelist intro text
 	db COIN_GR ; coin
 
 	db GREAT_ROCKET1_DECK_ID
 	tx GreatRocket1DeckName ; deck name
 	tx DuelistGR1Name ; opponent name
-	db NPC_GR_1 ; NPC ID
+	db GR_1_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_GRDUELTHEME_1 ; duel theme
-	db $16 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_MEMBER ; duel theme
+	db DUELIST_INTRO_ENIGMATIC_MASK ; duelist intro text
 	db COIN_GR ; coin
 
 	db GREAT_ROCKET2_DECK_ID
 	tx GreatRocket2DeckName ; deck name
 	tx DuelistGR2Name ; opponent name
-	db NPC_GR_2 ; NPC ID
+	db GR_2_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_GRDUELTHEME_1 ; duel theme
-	db $16 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_MEMBER ; duel theme
+	db DUELIST_INTRO_ENIGMATIC_MASK ; duelist intro text
 	db COIN_GR ; coin
 
 	db GREAT_ROCKET3_DECK_ID
 	tx GreatRocket3DeckName ; deck name
 	tx DuelistGR3Name ; opponent name
-	db NPC_GR_3 ; NPC ID
+	db GR_3_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_GRDUELTHEME_1 ; duel theme
-	db $16 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_MEMBER ; duel theme
+	db DUELIST_INTRO_ENIGMATIC_MASK ; duelist intro text
 	db COIN_GR ; coin
 
 	db GRAND_FIRE_DECK_ID
 	tx GrandFireDeckName ; deck name
 	tx DuelistCourtneyName ; opponent name
-	db NPC_COURTNEY ; NPC ID
+	db COURTNEY_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_3 ; duel theme
-	db $11 ; ?
-	db COIN_CHARMANDER ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GRAND_MASTER ; duel theme
+	db DUELIST_INTRO_GRAND_MASTER ; duelist intro text
+	db COIN_MAGMAR ; coin
 
 	db LEGENDARY_FOSSIL_DECK_ID
 	tx LegendaryFossilDeckName ; deck name
 	tx DuelistSteveName ; opponent name
-	db NPC_STEVE ; NPC ID
+	db STEVE_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_3 ; duel theme
-	db $11 ; ?
-	db COIN_PIKACHU ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GRAND_MASTER ; duel theme
+	db DUELIST_INTRO_GRAND_MASTER ; duelist intro text
+	db COIN_KABUTO ; coin
 
 	db WATER_LEGEND_DECK_ID
 	tx WaterLegendDeckName ; deck name
 	tx DuelistJackName ; opponent name
-	db NPC_JACK ; NPC ID
+	db JACK_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_3 ; duel theme
-	db $11 ; ?
-	db COIN_STARMIE ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GRAND_MASTER ; duel theme
+	db DUELIST_INTRO_GRAND_MASTER ; duelist intro text
+	db COIN_HORSEA ; coin
 
 	db GREAT_DRAGON_DECK_ID
 	tx GreatDragonDeckName ; deck name
 	tx DuelistRodName ; opponent name
-	db NPC_ROD ; NPC ID
+	db ROD_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_3 ; duel theme
-	db $11 ; ?
-	db COIN_CHANSEY ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GRAND_MASTER ; duel theme
+	db DUELIST_INTRO_GRAND_MASTER ; duelist intro text
+	db COIN_CHARMANDER ; coin
 
 	db BUG_COLLECTING_DECK_ID
 	tx InsectCollectionDeckName ; deck name
 	tx DuelistMidoriName ; opponent name
-	db NPC_MIDORI ; NPC ID
+	db MIDORI_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_GRDUELTHEME_1 ; duel theme
-	db $17 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_MEMBER ; duel theme
+	db DUELIST_INTRO_GR_GRASS_FORT_MEMBER ; duelist intro text
 	db COIN_GR ; coin
 
 	db DEMONIC_FOREST_DECK_ID
 	tx DemonicForestDeckName ; deck name
 	tx DuelistYutaName ; opponent name
-	db NPC_YUTA ; NPC ID
+	db YUTA_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_GRDUELTHEME_1 ; duel theme
-	db $17 ; ?
-	db COIN_GR ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_MEMBER ; duel theme
+	db DUELIST_INTRO_GR_GRASS_FORT_MEMBER ; duelist intro text
+	db COIN_GOLBAT ; coin
 
 	db STICKY_POISON_GAS_DECK_ID
 	tx PoisonGoopGasDeckName ; deck name
 	tx DuelistMiyukiName ; opponent name
-	db NPC_MIYUKI ; NPC ID
+	db MIYUKI_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $01 ; ?
-	db MUSIC_GRDUELTHEME_1 ; duel theme
-	db $17 ; ?
-	db COIN_GR ; coin
+	db NONE ; special duel rules
+	db DECK_REQUIREMENT_GRASS_ENERGY ; deck requirement
+	db MUSIC_DUEL_THEME_GR_MEMBER ; duel theme
+	db DUELIST_INTRO_GR_GRASS_FORT_MEMBER ; duelist intro text
+	db COIN_ARBOK ; coin
 
 	db MAD_PETALS_DECK_ID
 	tx MadPetalsDeckName ; deck name
 	tx DuelistMorinoName ; opponent name
-	db NPC_MORINO ; NPC ID
+	db MORINO_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db $01 ; special duel rules
-	db $00 ; ?
-	db MUSIC_GRDUELTHEME_2 ; duel theme
-	db $1d ; ?
-	db COIN_MAGNEMITE ; coin
+	db CHLOROPHYLL ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_LEADER ; duel theme
+	db DUELIST_INTRO_GR_GRASS_FORT_LEADER ; duelist intro text
+	db COIN_ODDISH ; coin
 
 	db DANGEROUS_BENCH_DECK_ID
 	tx DangerousBenchDeckName ; deck name
 	tx DuelistTapName ; opponent name
-	db NPC_TAP ; NPC ID
+	db TAP_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $26 ; ?
-	db COIN_CHANSEY ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_TAP ; duelist intro text
+	db COIN_SNORLAX ; coin
 
 	db CHAIN_LIGHTNING_BY_PIKACHU_DECK_ID
 	tx ChainLightningByPikachuDeckName ; deck name
 	tx DuelistRennaName ; opponent name
-	db NPC_RENNA ; NPC ID
+	db RENNA_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $07 ; ?
-	db MUSIC_GRDUELTHEME_1 ; duel theme
-	db $18 ; ?
+	db NONE ; special duel rules
+	db DECK_REQUIREMENT_4X_PIKACHU ; deck requirement
+	db MUSIC_DUEL_THEME_GR_MEMBER ; duel theme
+	db DUELIST_INTRO_GR_LIGHTNING_FORT_MEMBER ; duelist intro text
 	db COIN_GR ; coin
 
 	db THIS_IS_THE_POWER_OF_ELECTRICITY_DECK_ID
 	tx ThisIsThePowerOfElectricityDeckName ; deck name
 	tx DuelistIchikawaName ; opponent name
-	db NPC_ICHIKAWA ; NPC ID
+	db ICHIKAWA_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $02 ; ?
-	db MUSIC_GRDUELTHEME_1 ; duel theme
-	db $18 ; ?
-	db COIN_GR ; coin
+	db NONE ; special duel rules
+	db DECK_REQUIREMENT_LIGHTNING_ENERGY ; deck requirement
+	db MUSIC_DUEL_THEME_GR_MEMBER ; duel theme
+	db DUELIST_INTRO_GR_LIGHTNING_FORT_MEMBER ; duelist intro text
+	db COIN_MAGNEMITE ; coin
 
 	db QUICK_ATTACK_DECK_ID
 	tx QuickAttackDeckName ; deck name
 	tx DuelistCatherineName ; opponent name
-	db NPC_CATHERINE ; NPC ID
+	db CATHERINE_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db $02 ; special duel rules
-	db $00 ; ?
-	db MUSIC_GRDUELTHEME_2 ; duel theme
-	db $1e ; ?
-	db COIN_GOLBAT ; coin
+	db THUNDER_CHARGE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_LEADER ; duel theme
+	db DUELIST_INTRO_GR_LIGHTNING_FORT_LEADER ; duelist intro text
+	db COIN_MAGNEMITE ; coin
 
 	db COMPLETE_COMBUSTION_DECK_ID
 	tx CompleteCombustionDeckName ; deck name
 	tx DuelistJesName ; opponent name
-	db NPC_JES ; NPC ID
+	db JES_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_GRDUELTHEME_1 ; duel theme
-	db $19 ; ?
-	db COIN_GR ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_MEMBER ; duel theme
+	db DUELIST_INTRO_GR_FIRE_FORT_MEMBER ; duelist intro text
+	db COIN_PONYTA ; coin
 
 	db FIREBALL_DECK_ID
 	tx FireballDeckName ; deck name
 	tx DuelistYukiName ; opponent name
-	db NPC_YUKI ; NPC ID
+	db YUKI_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $03 ; ?
-	db MUSIC_GRDUELTHEME_1 ; duel theme
-	db $19 ; ?
-	db COIN_GR ; coin
+	db NONE ; special duel rules
+	db DECK_REQUIREMENT_FIRE_ENERGY ; deck requirement
+	db MUSIC_DUEL_THEME_GR_MEMBER ; duel theme
+	db DUELIST_INTRO_GR_FIRE_FORT_MEMBER ; duelist intro text
+	db COIN_CHARMANDER ; coin
 
 	db EEVEE_SHOWDOWN_DECK_ID
 	tx EeveeShowdownDeckName ; deck name
 	tx DuelistShokoName ; opponent name
-	db NPC_SHOKO ; NPC ID
+	db SHOKO_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $08 ; ?
-	db MUSIC_GRDUELTHEME_1 ; duel theme
-	db $19 ; ?
+	db NONE ; special duel rules
+	db DECK_REQUIREMENT_4X_EEVEE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_MEMBER ; duel theme
+	db DUELIST_INTRO_GR_FIRE_FORT_MEMBER ; duelist intro text
 	db COIN_GR ; coin
 
 	db GAZE_UPON_THE_POWER_OF_FIRE_DECK_ID
 	tx GazeUponThePowerOfFireDeckName ; deck name
 	tx DuelistHideroName ; opponent name
-	db NPC_HIDERO ; NPC ID
+	db HIDERO_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db $03 ; special duel rules
-	db $00 ; ?
-	db MUSIC_GRDUELTHEME_2 ; duel theme
-	db $1f ; ?
+	db FLAME_ARMOR ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_LEADER ; duel theme
+	db DUELIST_INTRO_GR_FIRE_FORT_LEADER ; duelist intro text
 	db COIN_MAGMAR ; coin
 
 	db WHIRLPOOL_SHOWER_DECK_ID
 	tx WhirlpoolShowerDeckName ; deck name
 	tx DuelistMiyajimaName ; opponent name
-	db NPC_MIYAJIMA ; NPC ID
+	db MIYAJIMA_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $04 ; ?
-	db MUSIC_GRDUELTHEME_1 ; duel theme
-	db $1a ; ?
-	db COIN_GR ; coin
+	db NONE ; special duel rules
+	db DECK_REQUIREMENT_WATER_ENERGY ; deck requirement
+	db MUSIC_DUEL_THEME_GR_MEMBER ; duel theme
+	db DUELIST_INTRO_GR_WATER_FORT_MEMBER ; duelist intro text
+	db COIN_STARMIE ; coin
 
 	db PARALYZED_PARALYZED_DECK_ID
 	tx ParalyzedParalyzedDeckName ; deck name
 	tx DuelistSentaName ; opponent name
-	db NPC_SENTA ; NPC ID
+	db SENTA_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $09 ; ?
-	db MUSIC_GRDUELTHEME_1 ; duel theme
-	db $1a ; ?
+	db NONE ; special duel rules
+	db DECK_REQUIREMENT_4X_MAGIKARP ; deck requirement
+	db MUSIC_DUEL_THEME_GR_MEMBER ; duel theme
+	db DUELIST_INTRO_GR_WATER_FORT_MEMBER ; duelist intro text
 	db COIN_GR ; coin
 
 	db BENCH_CALL_DECK_ID
 	tx BenchCallDeckName ; deck name
 	tx DuelistAiraName ; opponent name
-	db NPC_AIRA ; NPC ID
+	db AIRA_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db $04 ; special duel rules
-	db $00 ; ?
-	db MUSIC_GRDUELTHEME_1 ; duel theme
-	db $1a ; ?
+	db SMALL_BENCH ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_MEMBER ; duel theme
+	db DUELIST_INTRO_GR_WATER_FORT_MEMBER ; duelist intro text
 	db COIN_GR ; coin
 
 	db WATER_STREAM_DECK_ID
 	tx WaterStreamDeckName ; deck name
 	tx DuelistKanokoName ; opponent name
-	db NPC_KANOKO ; NPC ID
+	db KANOKO_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db $05 ; special duel rules
-	db $00 ; ?
-	db MUSIC_GRDUELTHEME_2 ; duel theme
-	db $20 ; ?
-	db COIN_PSYDUCK ; coin
+	db RUNNING_WATER ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_LEADER ; duel theme
+	db DUELIST_INTRO_GR_WATER_FORT_LEADER ; duelist intro text
+	db COIN_STARMIE ; coin
 
 	db ROCK_BLAST_DECK_ID
 	tx RockBlastDeckName ; deck name
 	tx DuelistGodaName ; opponent name
-	db NPC_GODA ; NPC ID
+	db GODA_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $0c ; ?
-	db MUSIC_GRDUELTHEME_1 ; duel theme
-	db $1b ; ?
-	db COIN_GR ; coin
+	db NONE ; special duel rules
+	db DECK_REQUIREMENT_NO_ENERGY_REMOVAL ; deck requirement
+	db MUSIC_DUEL_THEME_GR_MEMBER ; duel theme
+	db DUELIST_INTRO_GR_FIGHTING_FORT_MEMBER ; duelist intro text
+	db COIN_DUGTRIO ; coin
 
 	db FULL_STRENGTH_DECK_ID
 	tx FullStrengthDeckName ; deck name
 	tx DuelistGraceName ; opponent name
-	db NPC_GRACE ; NPC ID
+	db GRACE_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $05 ; ?
-	db MUSIC_GRDUELTHEME_1 ; duel theme
-	db $1b ; ?
-	db COIN_GR ; coin
+	db NONE ; special duel rules
+	db DECK_REQUIREMENT_FIGHTING_ENERGY ; deck requirement
+	db MUSIC_DUEL_THEME_GR_MEMBER ; duel theme
+	db DUELIST_INTRO_GR_FIGHTING_FORT_MEMBER ; duelist intro text
+	db COIN_MACHAMP ; coin
 
 	db RUNNING_WILD_DECK_ID
 	tx RunningWildDeckName ; deck name
 	tx DuelistKamiyaName ; opponent name
-	db NPC_KAMIYA ; NPC ID
+	db KAMIYA_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db $06 ; special duel rules
-	db $00 ; ?
-	db MUSIC_GRDUELTHEME_2 ; duel theme
-	db $21 ; ?
+	db EARTH_POWER ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_LEADER ; duel theme
+	db DUELIST_INTRO_GR_FIGHTING_FORT_LEADER ; duelist intro text
 	db COIN_MACHAMP ; coin
 
 	db DIRECT_HIT_DECK_ID
 	tx DirectHitDeckName ; deck name
 	tx DuelistMiwaName ; opponent name
-	db NPC_MIWA ; NPC ID
+	db MIWA_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $06 ; ?
-	db MUSIC_GRDUELTHEME_1 ; duel theme
-	db $1c ; ?
-	db COIN_GR ; coin
+	db NONE ; special duel rules
+	db DECK_REQUIREMENT_PSYCHIC_ENERGY ; deck requirement
+	db MUSIC_DUEL_THEME_GR_MEMBER ; duel theme
+	db DUELIST_INTRO_GR_PSYCHIC_STRONGHOLD_MEMBER ; duelist intro text
+	db COIN_ALAKAZAM ; coin
 
 	db SUPERDESTRUCTIVE_POWER_DECK_ID
 	tx SuperDestructivePowerDeckName ; deck name
 	tx DuelistKevinName ; opponent name
-	db NPC_KEVIN ; NPC ID
+	db KEVIN_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db $07 ; special duel rules
-	db $00 ; ?
-	db MUSIC_GRDUELTHEME_1 ; duel theme
-	db $1c ; ?
+	db LOW_RESISTANCE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_MEMBER ; duel theme
+	db DUELIST_INTRO_GR_PSYCHIC_STRONGHOLD_MEMBER ; duelist intro text
 	db COIN_GR ; coin
 
 	db BAD_DREAM_DECK_ID
 	tx BadDreamDeckName ; deck name
 	tx DuelistYosukeName ; opponent name
-	db NPC_YOSUKE ; NPC ID
+	db YOSUKE_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $0a ; ?
-	db MUSIC_GRDUELTHEME_1 ; duel theme
-	db $1c ; ?
-	db COIN_GR ; coin
+	db NONE ; special duel rules
+	db DECK_REQUIREMENT_6X_GASTLY_HAUNTER ; deck requirement
+	db MUSIC_DUEL_THEME_GR_MEMBER ; duel theme
+	db DUELIST_INTRO_GR_PSYCHIC_STRONGHOLD_MEMBER ; duelist intro text
+	db COIN_GENGAR ; coin
 
 	db POKEMON_POWER_DECK_ID
 	tx PokemonsPowerDeckName ; deck name
 	tx DuelistRyokoName ; opponent name
-	db NPC_RYOKO ; NPC ID
+	db RYOKO_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $0d ; ?
-	db MUSIC_GRDUELTHEME_1 ; duel theme
-	db $1c ; ?
-	db COIN_GR ; coin
+	db NONE ; special duel rules
+	db DECK_REQUIREMENT_NO_TRAINERS ; deck requirement
+	db MUSIC_DUEL_THEME_GR_MEMBER ; duel theme
+	db DUELIST_INTRO_GR_PSYCHIC_STRONGHOLD_MEMBER ; duelist intro text
+	db COIN_ALAKAZAM ; coin
 
 	db SPIRITED_AWAY_DECK_ID
 	tx SpiritedAwayDeckName ; deck name
 	tx DuelistMamiName ; opponent name
-	db NPC_MAMI ; NPC ID
+	db MAMI_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db $08 ; special duel rules
-	db $00 ; ?
-	db MUSIC_GRDUELTHEME_2 ; duel theme
-	db $22 ; ?
+	db ENERGY_RETURN ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_LEADER ; duel theme
+	db DUELIST_INTRO_GR_PSYCHIC_FORT_LEADER ; duelist intro text
 	db COIN_MEW ; coin
 
 	db SNORLAX_GUARD_DECK_ID
 	tx SnorlaxGuardDeckName ; deck name
 	tx DuelistNishijimaName ; opponent name
-	db NPC_NISHIJIMA ; NPC ID
+	db NISHIJIMA_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $0e ; ?
-	db MUSIC_GRDUELTHEME_2 ; duel theme
-	db $23 ; ?
+	db NONE ; special duel rules
+	db DECK_REQUIREMENT_COLORLESS_NISHIJIMA ; deck requirement
+	db MUSIC_DUEL_THEME_GR_LEADER ; duel theme
+	db DUELIST_INTRO_GR_COLORLESS_ALTAR_GUARDIAN ; duelist intro text
 	db COIN_SNORLAX ; coin
 
 	db EYE_OF_THE_STORM_DECK_ID
 	tx EyeOfTheStormDeckName ; deck name
 	tx DuelistIshiiName ; opponent name
-	db NPC_ISHII ; NPC ID
+	db ISHII_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $0f ; ?
-	db MUSIC_GRDUELTHEME_2 ; duel theme
-	db $23 ; ?
+	db NONE ; special duel rules
+	db DECK_REQUIREMENT_COLORLESS_ISHII ; deck requirement
+	db MUSIC_DUEL_THEME_GR_LEADER ; duel theme
+	db DUELIST_INTRO_GR_COLORLESS_ALTAR_GUARDIAN ; duelist intro text
 	db COIN_SNORLAX ; coin
 
 	db SUDDEN_GROWTH_DECK_ID
 	tx SuddenGrowthDeckName ; deck name
 	tx DuelistSamejimaName ; opponent name
-	db NPC_SAMEJIMA ; NPC ID
+	db SAMEJIMA_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $10 ; ?
-	db MUSIC_GRDUELTHEME_2 ; duel theme
-	db $23 ; ?
+	db NONE ; special duel rules
+	db DECK_REQUIREMENT_COLORLESS_SAMEJIMA ; deck requirement
+	db MUSIC_DUEL_THEME_GR_LEADER ; duel theme
+	db DUELIST_INTRO_GR_COLORLESS_ALTAR_GUARDIAN ; duelist intro text
 	db COIN_SNORLAX ; coin
 
 	db VERY_RARE_CARD_DECK_ID
 	tx VeryRareCardDeckName ; deck name
 	tx DuelistMrIshiharaName ; opponent name
-	db NPC_ISHIHARA ; NPC ID
+	db ISHIHARA_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
 	db MUSIC_ISHIHARA ; duel theme
-	db $14 ; ?
+	db DUELIST_INTRO_COLLECTOR ; duelist intro text
 	db COIN_JIGGLYPUFF ; coin
 
 	db BAD_GUYS_DECK_ID
 	tx BadGuysDeckName ; deck name
 	tx DuelistKanzakiName ; opponent name
-	db NPC_KANZAKI ; NPC ID
+	db KANZAKI_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $0b ; ?
-	db MUSIC_GRDUELTHEME_2 ; duel theme
-	db $24 ; ?
-	db COIN_HORSEA ; coin
+	db NONE ; special duel rules
+	db DECK_REQUIREMENT_FOUR_GB_LEGENDARY ; deck requirement
+	db MUSIC_DUEL_THEME_GR_LEADER ; duel theme
+	db DUELIST_INTRO_GR_BIG_BOSS ; duelist intro text
+	db COIN_PSYDUCK ; coin
 
 	db POISON_MIST_DECK_ID
 	tx PoisonMistDeckName ; deck name
 	tx DuelistRuiName ; opponent name
-	db NPC_RUI ; NPC ID
+	db RUI_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db $09 ; special duel rules
-	db $00 ; ?
-	db MUSIC_GRDUELTHEME_2 ; duel theme
-	db $24 ; ?
+	db TOUGH_ESCAPE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_LEADER ; duel theme
+	db DUELIST_INTRO_GR_BIG_BOSS ; duelist intro text
 	db COIN_ARBOK ; coin
 
 	db ULTRA_REMOVAL_DECK_ID
 	tx UltraRemovalDeckName ; deck name
 	tx DuelistRuiName ; opponent name
-	db NPC_RUI ; NPC ID
+	db RUI_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db $0a ; special duel rules
-	db $00 ; ?
-	db MUSIC_GRDUELTHEME_2 ; duel theme
-	db $24 ; ?
-	db COIN_JIGGLYPUFF ; coin
+	db BLACK_HOLE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_LEADER ; duel theme
+	db DUELIST_INTRO_GR_BIG_BOSS ; duelist intro text
+	db COIN_PSYDUCK ; coin
 
 	db PSYCHIC_BATTLE_DECK_ID
 	tx PsychicBattleDeckName ; deck name
 	tx DuelistRuiName ; opponent name
-	db NPC_RUI ; NPC ID
+	db RUI_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db $07 ; special duel rules
-	db $00 ; ?
-	db MUSIC_GRDUELTHEME_2 ; duel theme
-	db $24 ; ?
+	db LOW_RESISTANCE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_LEADER ; duel theme
+	db DUELIST_INTRO_GR_BIG_BOSS ; duelist intro text
 	db COIN_GENGAR ; coin
 
 	db STOP_LIFE_DECK_ID
 	tx ChokeDeckName ; deck name
 	tx DuelistBiruritchiName ; opponent name
-	db NPC_BIRURITCHI ; NPC ID
+	db BIRURITCHI_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_GRDUELTHEME_3 ; duel theme
-	db $25 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_KING ; duel theme
+	db DUELIST_INTRO_GR_KING ; duelist intro text
 	db COIN_TOGEPI ; coin
 
 	db SCORCHER_DECK_ID
 	tx IncinerateDeckName ; deck name
 	tx DuelistBiruritchiName ; opponent name
-	db NPC_BIRURITCHI ; NPC ID
+	db BIRURITCHI_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_GRDUELTHEME_3 ; duel theme
-	db $25 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_KING ; duel theme
+	db DUELIST_INTRO_GR_KING ; duelist intro text
 	db COIN_TOGEPI ; coin
 
 	db TSUNAMI_STARTER_DECK_ID
 	tx SmashDeckName ; deck name
 	tx DuelistBiruritchiName ; opponent name
-	db NPC_BIRURITCHI ; NPC ID
+	db BIRURITCHI_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_GRDUELTHEME_3 ; duel theme
-	db $25 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_KING ; duel theme
+	db DUELIST_INTRO_GR_KING ; duelist intro text
 	db COIN_TOGEPI ; coin
 
 	db SMASH_TO_MINCEMEAT_DECK_ID
 	tx ThrowOutDeckName ; deck name
 	tx DuelistBiruritchiName ; opponent name
-	db NPC_BIRURITCHI ; NPC ID
+	db BIRURITCHI_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_GRDUELTHEME_3 ; duel theme
-	db $25 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_KING ; duel theme
+	db DUELIST_INTRO_GR_KING ; duelist intro text
 	db COIN_TOGEPI ; coin
 
 	db TEST_YOUR_LUCK_DECK_ID
 	tx TestYourLuckDeckName ; deck name
 	tx DuelistPawnName ; opponent name
-	db NPC_PAWN ; NPC ID
+	db PAWN_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_1 ; duel theme
-	db $27 ; ?
-	db COIN_JIGGLYPUFF ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MEMBER ; duel theme
+	db DUELIST_INTRO_DUNGEON_MASTER ; duelist intro text
+	db COIN_CHANSEY ; coin
 
 	db PROTOHISTORIC_DECK_ID
 	tx ProtohistoricDeckName ; deck name
 	tx DuelistKnightName ; opponent name
-	db NPC_KNIGHT ; NPC ID
+	db KNIGHT_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_DUELTHEME_2 ; duel theme
-	db $27 ; ?
-	db COIN_JIGGLYPUFF ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_CLUB_MASTER ; duel theme
+	db DUELIST_INTRO_DUNGEON_MASTER ; duelist intro text
+	db COIN_KABUTO ; coin
 
 	db TEXTURE_TUNER7_DECK_ID
 	tx TextureTuner7DeckName ; deck name
 	tx DuelistBishopName ; opponent name
-	db NPC_BISHOP ; NPC ID
+	db BISHOP_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_GRDUELTHEME_1 ; duel theme
-	db $27 ; ?
-	db COIN_JIGGLYPUFF ; coin
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_MEMBER ; duel theme
+	db DUELIST_INTRO_DUNGEON_MASTER ; duelist intro text
+	db COIN_GOLBAT ; coin
 
 	db COLORLESS_ENERGY_DECK_ID
 	tx ColorlessEnergyDeckName ; deck name
 	tx DuelistRookName ; opponent name
-	db NPC_ROOK ; NPC ID
+	db ROOK_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_GRDUELTHEME_1 ; duel theme
-	db $27 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_MEMBER ; duel theme
+	db DUELIST_INTRO_DUNGEON_MASTER ; duelist intro text
 	db COIN_JIGGLYPUFF ; coin
 
 	db POWERFUL_POKEMON_DECK_ID
 	tx PowerfulPokemonDeckName ; deck name
 	tx DuelistQueenName ; opponent name
-	db NPC_QUEEN ; NPC ID
+	db QUEEN_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_GRDUELTHEME_2 ; duel theme
-	db $27 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_LEADER ; duel theme
+	db DUELIST_INTRO_DUNGEON_MASTER ; duelist intro text
 	db COIN_JIGGLYPUFF ; coin
 
 	db WEIRD_DECK_ID
 	tx WeirdDeckName ; deck name
 	tx DuelistImakuniName ; opponent name
-	db NPC_IMAKUNI_BLACK ; NPC ID
+	db IMAKUNI_BLACK_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_IMAKUNI ; duel theme
-	db $13 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_IMAKUNI_BLACK ; duel theme
+	db DUELIST_INTRO_STRANGE_LIFE_FORM ; duelist intro text
 	db COIN_PSYDUCK ; coin
 
 	db STRANGE_DECK_ID
 	tx StrangeDeckName ; deck name
 	tx DuelistImakuniName ; opponent name
-	db NPC_IMAKUNI_RED ; NPC ID
+	db IMAKUNI_RED_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_IMAKUNI2 ; duel theme
-	db $13 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_IMAKUNI_RED ; duel theme
+	db DUELIST_INTRO_STRANGE_LIFE_FORM ; duelist intro text
 	db COIN_JIGGLYPUFF ; coin
 
 	db RONALDS_UNCOOL_DECK_ID
 	tx RonaldsUncoolDeckName ; deck name
 	tx DuelistRonaldName ; opponent name
-	db NPC_RONALD ; NPC ID
+	db RONALD_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
 	db MUSIC_RONALD ; duel theme
-	db $15 ; ?
+	db DUELIST_INTRO_RIVAL ; duelist intro text
 	db COIN_RAICHU ; coin
 
 	db RONALDS_GRX_DECK_ID
 	tx RonaldsGRXDeckName ; deck name
 	tx DuelistGRXName ; opponent name
-	db NPC_GR_X ; NPC ID
+	db GR_X_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
 	db MUSIC_RONALD ; duel theme
-	db $16 ; ?
+	db DUELIST_INTRO_ENIGMATIC_MASK ; duelist intro text
 	db COIN_RAICHU ; coin
 
 	db RONALDS_POWER_DECK_ID
 	tx RonaldsPowerDeckName ; deck name
 	tx DuelistRonaldName ; opponent name
-	db NPC_RONALD ; NPC ID
+	db RONALD_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
 	db MUSIC_RONALD ; duel theme
-	db $15 ; ?
+	db DUELIST_INTRO_RIVAL ; duelist intro text
 	db COIN_RAICHU ; coin
 
 	db RONALDS_PSYCHIC_DECK_ID
 	tx RonaldsSuperDeckName ; deck name
 	tx DuelistRonaldName ; opponent name
-	db NPC_RONALD ; NPC ID
+	db RONALD_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
 	db MUSIC_RONALD ; duel theme
-	db $15 ; ?
+	db DUELIST_INTRO_RIVAL ; duelist intro text
 	db COIN_RAICHU ; coin
 
 	db RONALDS_ULTRA_DECK_ID
 	tx RonaldsUltraDeckName ; deck name
 	tx DuelistRonaldName ; opponent name
-	db NPC_RONALD ; NPC ID
+	db RONALD_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
 	db MUSIC_RONALD ; duel theme
-	db $15 ; ?
+	db DUELIST_INTRO_RIVAL ; duelist intro text
 	db COIN_RAICHU ; coin
 
 	db EVERYBODYS_FRIEND_DECK_ID
 	tx EverybodysFriendDeckName ; deck name
 	tx DuelistEijiName ; opponent name
-	db NPC_EIJI ; NPC ID
+	db EIJI_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_GRDUELTHEME_2 ; duel theme
-	db $28 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_LEADER ; duel theme
+	db DUELIST_INTRO_GHOST_MASTER ; duelist intro text
 	db COIN_LUGIA ; coin
 
 	db IMMORTAL_POKEMON_DECK_ID
 	tx ImmortalPokemonDeckName ; deck name
 	tx DuelistMagicianName ; opponent name
-	db NPC_MAGICIAN ; NPC ID
+	db MAGICIAN_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_GRDUELTHEME_2 ; duel theme
-	db $28 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_LEADER ; duel theme
+	db DUELIST_INTRO_GHOST_MASTER ; duelist intro text
 	db COIN_LUGIA ; coin
 
 	db TORRENTIAL_FLOOD_DECK_ID
 	tx TorrentialFloodDeckName ; deck name
 	tx DuelistYuiName ; opponent name
-	db NPC_YUI ; NPC ID
+	db YUI_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_GRDUELTHEME_2 ; duel theme
-	db $28 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_LEADER ; duel theme
+	db DUELIST_INTRO_GHOST_MASTER ; duelist intro text
 	db COIN_LUGIA ; coin
 
 	db TRAINER_IMPRISON_DECK_ID
 	tx TrainerImprisonDeckName ; deck name
 	tx DuelistToshironName ; opponent name
-	db NPC_TOSHIRON ; NPC ID
+	db TOSHIRON_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_GRDUELTHEME_2 ; duel theme
-	db $28 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_LEADER ; duel theme
+	db DUELIST_INTRO_GHOST_MASTER ; duelist intro text
 	db COIN_LUGIA ; coin
 
 	db BLAZING_FLAME_DECK_ID
 	tx BlazingFlameDeckName ; deck name
 	tx DuelistPierrotName ; opponent name
-	db NPC_PIERROT ; NPC ID
+	db PIERROT_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_GRDUELTHEME_2 ; duel theme
-	db $28 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_LEADER ; duel theme
+	db DUELIST_INTRO_GHOST_MASTER ; duelist intro text
 	db COIN_LUGIA ; coin
 
 	db DAMAGE_CHAOS_DECK_ID
 	tx DamageChaosDeckName ; deck name
 	tx DuelistAnnaName ; opponent name
-	db NPC_ANNA ; NPC ID
+	db ANNA_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_GRDUELTHEME_2 ; duel theme
-	db $28 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_LEADER ; duel theme
+	db DUELIST_INTRO_GHOST_MASTER ; duelist intro text
 	db COIN_LUGIA ; coin
 
 	db BIG_THUNDER_DECK_ID
 	tx BigThunderDeckName ; deck name
 	tx DuelistDeeName ; opponent name
-	db NPC_DEE ; NPC ID
+	db DEE_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_GRDUELTHEME_2 ; duel theme
-	db $28 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_LEADER ; duel theme
+	db DUELIST_INTRO_GHOST_MASTER ; duelist intro text
 	db COIN_LUGIA ; coin
 
 	db POWER_OF_DARKNESS_DECK_ID
 	tx PowerOfDarknessDeckName ; deck name
 	tx DuelistMasqueradeName ; opponent name
-	db NPC_MASQUERADE ; NPC ID
+	db MASQUERADE_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_GRDUELTHEME_2 ; duel theme
-	db $28 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_LEADER ; duel theme
+	db DUELIST_INTRO_GHOST_MASTER ; duelist intro text
 	db COIN_LUGIA ; coin
 
 	db POISON_STORM_DECK_ID
 	tx PoisonStormDeckName ; deck name
 	tx DuelistTobichanName ; opponent name
-	db NPC_TOBICHAN ; NPC ID
+	db TOBICHAN_PIC ; Pic ID
 	db PRIZES_6 ; number of prize cards
-	db NO_SPECIAL_RULE ; special duel rules
-	db $00 ; ?
-	db MUSIC_GRDUELTHEME_2 ; duel theme
-	db $28 ; ?
+	db NONE ; special duel rules
+	db NONE ; deck requirement
+	db MUSIC_DUEL_THEME_GR_LEADER ; duel theme
+	db DUELIST_INTRO_GHOST_MASTER ; duelist intro text
 	db COIN_LUGIA ; coin
 
 	db $ff ; end
+
+; set [wcd55] = e
+; then check deck requirement using the opponent offset in [wDeckRequirement]
+CheckDuelDeckRequirement::
+	ld a, e
+	ld [wcd55], a
+	bank1call LoadPlayerDeck
+	ld a, [wDeckRequirement]
+	ld hl, .DuelDeckRequirementPointers
+	jp JumpToFunctionInTable
+
+.DuelDeckRequirementPointers:
+	dw NULL                      ; $00
+	dw CheckMiyukiRequirement    ; $01
+	dw CheckIchikawaRequirement  ; $02
+	dw CheckYukiRequirement      ; $03
+	dw CheckMiyajimaRequirement  ; $04
+	dw CheckGraceRequirement     ; $05
+	dw CheckMiwaRequirement      ; $06
+	dw CheckRennaRequirement     ; $07
+	dw CheckShokoRequirement     ; $08
+	dw CheckSentaRequirement     ; $09
+	dw CheckYosukeRequirement    ; $0a
+	dw CheckKanzakiRequirement   ; $0b
+	dw CheckGodaRequirement      ; $0c
+	dw CheckRyokoRequirement     ; $0d
+	dw CheckNishijimaRequirement ; $0e
+	dw CheckIshiiRequirement     ; $0f
+	dw CheckSamejimaRequirement  ; $10
+
+CheckMiyukiRequirement:
+	ld b, TYPE_ENERGY_GRASS
+	jr CheckSoloEnergyRequirement
+
+CheckIchikawaRequirement:
+	ld b, TYPE_ENERGY_LIGHTNING
+	jr CheckSoloEnergyRequirement
+
+CheckYukiRequirement:
+	ld b, TYPE_ENERGY_FIRE
+	jr CheckSoloEnergyRequirement
+
+CheckMiyajimaRequirement:
+	ld b, TYPE_ENERGY_WATER
+	jr CheckSoloEnergyRequirement
+
+CheckGraceRequirement:
+	ld b, TYPE_ENERGY_FIGHTING
+	jr CheckSoloEnergyRequirement
+
+CheckMiwaRequirement:
+	ld b, TYPE_ENERGY_PSYCHIC
+; fallthrough
+
+; check if the deck has energy cards of different types than b
+; return carry if so
+CheckSoloEnergyRequirement:
+	ld c, DECK_SIZE
+	ld hl, wPlayerDeck
+.scan_deck_loop
+	ld e, [hl]
+	inc hl
+	ld d, [hl]
+	inc hl
+	call GetCardType
+	bit 3, a
+	jr z, .non_energy
+	cp b
+	jr nz, .found_different_energy
+.non_energy
+	dec c
+	jr nz, .scan_deck_loop
+	or a
+	ret
+.found_different_energy
+	scf
+	ret
+
+CheckRennaRequirement:
+	ld hl, Whitelist_Pikachu
+	call CountListedCardsInDeck
+	cp 4 ; amount
+	ret
+
+CheckShokoRequirement:
+	ld hl, Whitelist_Eevee
+	call CountListedCardsInDeck
+	cp 4 ; amount
+	ret
+
+CheckSentaRequirement:
+	ld hl, Whitelist_Magikarp
+	call CountListedCardsInDeck
+	cp 4 ; amount
+	ret
+
+CheckYosukeRequirement:
+	ld hl, Whitelist_GastlyAndHaunter
+	call CountListedCardsInDeck
+	cp 6 ; amount
+	ret
+
+CheckKanzakiRequirement:
+	ld de, MOLTRES_LV40
+	call CountIfListedCardsInDeck
+	ret c
+	ld de, ARTICUNO_LV37
+	call CountIfListedCardsInDeck
+	ret c
+	ld de, ZAPDOS_LV68
+	call CountIfListedCardsInDeck
+	ret c
+	ld de, DRAGONITE_LV41
+	call CountIfListedCardsInDeck
+	ret
+
+CheckGodaRequirement:
+	ld hl, Blacklist_Removal
+	call CountListedCardsInDeck
+	ret
+
+CheckRyokoRequirement:
+	ld c, DECK_SIZE
+	ld hl, wPlayerDeck
+.scan_deck_loop
+	ld e, [hl]
+	inc hl
+	ld d, [hl]
+	inc hl
+	call GetCardType
+	cp TYPE_TRAINER
+	jr z, .found_trainer
+	dec c
+	jr nz, .scan_deck_loop
+	or a
+	ret
+.found_trainer
+	scf
+	ret
+
+CheckNishijimaRequirement:
+	ld e, 0 ; table offset
+	jr CheckColorlessAltarRequirement
+
+CheckIshiiRequirement:
+	ld e, 3 ; table offset
+	ld a, [wcd55]
+	or a
+	jr z, CheckDarkPokemonRequirement
+	jr CheckColorlessAltarRequirement
+
+CheckSamejimaRequirement:
+	ld e, 6 ; table offset
+	; fallthrough
+CheckColorlessAltarRequirement:
+	ld a, [wcd55]
+	add e
+	add a
+	ld e, a
+	ld d, 0
+	ld hl, ColorlessAltarRequirementTable
+	add hl, de
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	push hl
+	call CountListedCardsInDeck
+	pop hl
+	push af
+	ld e, [hl]
+	inc hl
+	ld d, [hl]
+	call LoadCardDataToBuffer1_FromCardID
+	ld hl, wLoadedCard1Name
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	pop af
+	cp 4 ; amount
+	ret
+
+CheckDarkPokemonRequirement:
+	ld hl, wPlayerDeck
+	ld c, 0
+.scan_deck_loop
+	ld e, [hl]
+	inc hl
+	ld d, [hl]
+	inc hl
+	ld a, e
+	or d
+	jr z, .scanned
+	call LoadCardDataToBuffer1_FromCardID
+	ld a, [wLoadedCard1Type]
+	cp TYPE_ENERGY ; non-pokemon
+	jr nc, .scan_deck_loop
+	ld a, [wLoadedCard1Dark]
+	or a
+	jr z, .scan_deck_loop
+	inc c
+	jr .scan_deck_loop
+.scanned
+	ldtx hl, EffectTargetDarkPokemonText
+	ld a, c
+	cp 4 ; amount
+	ret
+
+Whitelist_Pikachu:
+	dw PIKACHU_LV5
+	dw PIKACHU_LV12
+	dw PIKACHU_LV13
+	dw PIKACHU_LV14
+	dw PIKACHU_LV16
+	dw PIKACHU_ALT_LV16
+	dw NULL
+Whitelist_Eevee:
+	dw EEVEE_LV5
+	dw EEVEE_LV9
+	dw EEVEE_LV12
+	dw NULL
+Whitelist_Magikarp:
+	dw MAGIKARP_LV6
+	dw MAGIKARP_LV8
+	dw MAGIKARP_LV10
+	dw NULL
+Whitelist_GastlyAndHaunter:
+	dw GASTLY_LV8
+	dw GASTLY_LV13
+	dw GASTLY_LV17
+	dw HAUNTER_LV17
+	dw HAUNTER_LV22
+	dw HAUNTER_LV25
+	dw HAUNTER_LV26
+	dw NULL
+Blacklist_Removal:
+	dw ENERGY_REMOVAL
+	dw SUPER_ENERGY_REMOVAL
+	dw NULL
+
+ColorlessAltarRequirementTable:
+	; Nishijima
+	dw Whitelist_DCE
+	dw Whitelist_Pidgey
+	dw Whitelist_Spearow
+	; Ishii
+	dw NULL ; Dark Pokémon
+	dw Whitelist_Rattata
+	dw Whitelist_Meowth
+	; Samejima
+	dw Whitelist_MysteriousFossil
+	dw Whitelist_Jigglypuff
+	dw Whitelist_Dratini
+Whitelist_DCE:
+	dw DOUBLE_COLORLESS_ENERGY
+	dw NULL
+Whitelist_Pidgey:
+	dw PIDGEY_LV8
+	dw PIDGEY_LV10
+	dw NULL
+Whitelist_Spearow:
+	dw SPEAROW_LV9
+	dw SPEAROW_LV12
+	dw SPEAROW_LV13
+	dw NULL
+Whitelist_Rattata:
+	dw RATTATA_LV9
+	dw RATTATA_LV12
+	dw RATTATA_LV15
+	dw NULL
+Whitelist_Meowth:
+	dw MEOWTH_LV10
+	dw MEOWTH_LV13
+	dw MEOWTH_LV14
+	dw MEOWTH_LV15
+	dw MEOWTH_LV17
+	dw NULL
+Whitelist_MysteriousFossil:
+	dw MYSTERIOUS_FOSSIL
+	dw NULL
+Whitelist_Jigglypuff:
+	dw JIGGLYPUFF_LV12
+	dw JIGGLYPUFF_LV13
+	dw JIGGLYPUFF_LV14
+	dw NULL
+Whitelist_Dratini:
+	dw DRATINI_LV10
+	dw DRATINI_LV12
+	dw NULL
+
+; output: a = b = total number of the target card(s)
+CountListedCardsInDeck:
+	ld b, 0
+.target_card_loop
+	ld e, [hl]
+	inc hl
+	ld d, [hl]
+	inc hl
+	ld a, d
+	or e
+	jr z, .no_more_targets
+	push hl
+	ld hl, wPlayerDeck
+	ld c, DECK_SIZE
+.scan_deck_loop
+	ld a, [hl]
+	cp e
+	jr nz, .next_deck_card
+	inc hl
+	ld a, [hld]
+	cp d
+	jr nz, .next_deck_card
+	inc b
+.next_deck_card
+	inc hl
+	inc hl
+	dec c
+	jr nz, .scan_deck_loop
+	pop hl
+	jr .target_card_loop
+.no_more_targets
+	ld a, b
+	or a
+	ret z
+	scf
+	ret
+
+CountIfListedCardsInDeck:
+	ld hl, wPlayerDeck
+	ld c, DECK_SIZE
+.scan_deck_loop
+	ld a, [hl]
+	cp e
+	jr nz, .next_deck_card
+	inc hl
+	ld a, [hld]
+	cp d
+	jr z, .found
+.next_deck_card
+	inc hl
+	inc hl
+	dec c
+	jr nz, .scan_deck_loop
+	scf
+	ret
+.found
+	or a
+	ret
+
+; for a card in de,
+; create in wDuelTempList a list of its unique evo cards
+; also set carry if at least 1
+_ListUniqueEvoCardsFromDE:
+	call LoadCardDataToBuffer1_FromCardID
+	ld hl, wLoadedCard1Name
+	ld c, [hl]
+	inc hl
+	ld b, [hl]
+	ld hl, wDuelTempList
+	ld de, GRASS_ENERGY - 1 ; 0
+.loop_cards
+	inc de
+	push hl
+	push de
+	call LoadCardDataToBuffer1_FromCardID
+	jr c, .exit
+	ld a, [wLoadedCard1Type]
+	cp TYPE_ENERGY
+	jr nc, .next_card
+	ld hl, wLoadedCard1PreEvoName
+	ld a, c
+	cp [hl]
+	jr nz, .next_card
+	inc hl
+	ld a, b
+	cp [hl]
+	jr nz, .next_card
+; found evo
+	pop de
+	pop hl
+	ld [hl], e
+	inc hl
+	ld [hl], d
+	inc hl
+	jr .loop_cards
+.next_card
+	pop de
+	pop hl
+	jr .loop_cards
+
+.exit
+	pop de
+	pop hl
+; append $0000 terminator
+	xor a
+	ld [hli], a
+	ld [hl], a
+	ld hl, wDuelTempList
+	ld a, [hli]
+	or [hl]
+	ret z ; empty
+; not empty
+	scf
+	ret
+
+Func_2612a:
+	bank1call SetupDuel
+	call DisableLCD
+	lb de, 0, 0
+	lb bc, 20, 13
+	call DrawRegularTextBox
+	lb de, 1, 0
+	ldtx hl, GameCenterBillsPCTitleText
+	call Func_2c4b
+	lb de, 13, 0
+	ldtx hl, GameCenterBillsPC20ChipsPerPlayText
+	call Func_2c4b
+	lb de, 2, 2
+	ldtx hl, GameCenterBillsPCDescriptionText
+	call InitTextPrinting_ProcessTextFromID
+	ldtx hl, GameCenterBillsPCDescriptionDialogText
+	call DrawWideTextBox_WaitForInput
+	ldtx hl, GameCenterBillsPCStartPromptText
+	call YesOrNoMenuWithText
+	ret c
+	farcall CheckForBillsPCCardInMail
+	ldtx hl, GameCenterBillsPCUnableLastOutputRemainingText
+	jr c, .asm_2619a
+	farcall GetGameCenterChips
+	ldtx hl, GameCenterBillsPCUnableNotEnoughChipsText
+	ld a, b
+	or a
+	jr nz, .asm_2617a
+	ld a, c
+	cp $14
+	jr c, .asm_2619a
+.asm_2617a
+	ld de, BILLS_COMPUTER
+	call GetCardCountInCollectionAndDecks
+	ldtx hl, GameCenterBillsPCUnableNoBillsComputerText
+	jr c, .asm_2619a
+	xor a
+	ld [wDeckDiagnosisStep], a
+	ld [wDeckDiagnosisTextIDsPtr], a
+	call Func_263a5
+	call Func_264a5
+	ld [wcd29], a
+	ldtx hl, GameCenterBillsPCUnableNoCompatibleCardsText
+	jr nc, .asm_2619f
+.asm_2619a
+	call PrintScrollableText_NoTextBoxLabel
+	scf
+	ret
+.asm_2619f
+	call Func_26353
+	ret c
+	call LoadCardDataToBuffer1_FromCardID
+	call DrawLargePictureOfCard
+	ldtx hl, GameCenterBillsPCConfirmPromptText
+	call YesOrNoMenuWithText
+	jr nc, .asm_261b6
+	call Func_263a5
+	jr .asm_2619f
+.asm_261b6
+	call EmptyScreen
+	farcall Func_102ef.Func_10327
+	farcall Func_114af
+	ldtx hl, GameCenterBillsPCChipsPaidText
+	call DrawWideTextBox_WaitForInput
+	ld bc, $14
+	farcall DecreaseChipsSmoothly
+	farcall Func_114f9
+	lb de, $38, $7f
+	call SetupText
+	call EmptyScreen
+	ld hl, $4930
+	ld de, $9300
+	ld b, $08
+	call CopyFontsOrDuelGraphicsTiles
+	call LoadCardOrDuelMenuBorderTiles
+	ld hl, $62a2
+	call WriteDataBlocksToBGMap0
+	ld de, BILLS_COMPUTER
+	call LoadCardDataToBuffer2_FromCardID
+	ld hl, wLoadedCard2Gfx
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	ld bc, $3010
+	ld de, $8a00
+	call LoadCardGfx
+	ld a, $a0
+	lb hl, 6, 1
+	lb de, 1, 3
+	lb bc, 8, 6
+	call FillRectangle
+	bank1call DrawCardGfxToDE_BGPalIndex5
+	ld de, v0Tiles1
+	ld hl, $34d0
+	ld b, $10
+	call CopyFontsOrDuelGraphicsTiles
+	ld a, $80
+	lb de, 1, 1
+	lb bc, 8, 2
+	lb hl, 1, 8
+	call FillRectangle
+	ld hl, wLoadedCard1Gfx
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	ld bc, $3010
+	ld de, $8d00
+	call LoadCardGfx
+	ld a, $d0
+	lb hl, 6, 1
+	lb de, 11, 3
+	lb bc, 8, 6
+	call FillRectangle
+	bank1call DrawCardGfxToDE_BGPalIndex2
+	ld de, $8900
+	ld hl, $36d0
+	ld b, $10
+	call CopyFontsOrDuelGraphicsTiles
+	ld a, $90
+	lb de, 11 ,1
+	lb bc, 8, 2
+	lb hl, 1, 8
+	call FillRectangle
+	call FlushAllPalettes
+	ldtx hl, GameCenterBillsPCCardsInsertedText
+	call DrawWideTextBox_WaitForInput
+	ld de, BILLS_COMPUTER
+	call RemoveCardFromCollection
+	ld hl, wLoadedCard1ID
+	ld e, [hl]
+	inc hl
+	ld d, [hl]
+	call RemoveCardFromCollection
+	ld a, [wLoadedCard1PokedexNumber]
+	ld de, $b6
+	cp $8a
+	ret z
+	ld de, $f8
+	cp $43
+	ret z
+	ld de, $101
+	cp $4b
+	ret z
+	ld de, $11c
+	cp $40
+	ret z
+	ld de, $12d
+	cp $5d
+	ret z
+	scf
+	ret
+; 0x262a2
+
+SECTION "bank 9@6353", ROMX[$6353], BANK[$9]
+
+Func_26353:
+.asm_26353
+	ld hl, $63bb
+	ld a, [wDeckDiagnosisStep]
+	call InitializeMenuParameters
+	ld a, [wcd29]
+	cp $07
+	jr nc, .asm_26366
+	ld [wNumScrollMenuItems], a
+.asm_26366
+	call Func_2641e
+	call EnableLCD
+.asm_2636c
+	call DoFrame
+	call HandleMenuInput
+	ld a, [wCurMenuItem]
+	ld [wDeckDiagnosisStep], a
+	jr nc, .asm_2636c
+	ldh a, [hCurScrollMenuItem]
+	cp $ff
+	jr z, .asm_2639b
+	add a
+	ld e, a
+	ld d, $00
+	ld hl, wPlayerDeck
+	add hl, de
+	ld e, [hl]
+	inc hl
+	ld d, [hl]
+	ldh a, [hKeysPressed]
+	and PAD_START
+	ret z
+	call LoadCardDataToBuffer1_FromCardID
+	bank1call OpenCardPage_FromHand
+.asm_26396
+	call Func_263a5
+	jr .asm_26353
+.asm_2639b
+	ldtx hl, GameCenterBillsPCCancelPromptText
+	call YesOrNoMenuWithText
+	jr c, .asm_26396
+	scf
+	ret
+
+Func_263a5:
+	call EmptyScreen
+	lb de, 0, 0
+	lb bc, 20, 3
+	call DrawRegularTextBox
+
+Func_263b1:
+	lb de, 1, 1
+	ldtx hl, GameCenterBillsPCYourCompatibleCardsText
+	call InitTextPrinting_ProcessTextFromID
+	ret
+; 0x263bb
+
+SECTION "bank 9@63c4", ROMX[$63c4], BANK[$9]
+
+Func_263c4:
+	adc a
+	ld b, a
+	and $c0
+	jr z, .asm_26404
+	bit 7, b
+	jr nz, .asm_263e6
+	ld hl, wCurMenuItem
+	ld a, [wNumScrollMenuItems]
+	dec a
+	cp [hl]
+	jr nz, .asm_26404
+	xor a
+	ld [wCurMenuItem], a
+	ld hl, wDeckDiagnosisTextIDsPtr
+	ld a, [hl]
+	or a
+	jr z, .asm_26404
+	dec [hl]
+	jr .asm_26401
+.asm_263e6
+	ld hl, wCurMenuItem
+	ld a, [hl]
+	or a
+	jr nz, .asm_26404
+	ld a, [wNumScrollMenuItems]
+	dec a
+	ld [hl], a
+	ld hl, wDeckDiagnosisTextIDsPtr
+	add [hl]
+	inc a
+	ld hl, wcd29
+	cp [hl]
+	jr nc, .asm_26404
+	ld hl, wDeckDiagnosisTextIDsPtr
+	inc [hl]
+.asm_26401
+	call Func_2641e
+.asm_26404
+	ld a, [wCurMenuItem]
+	ld hl, wDeckDiagnosisTextIDsPtr
+	add [hl]
+	ldh [hCurScrollMenuItem], a
+	ldh a, [hKeysPressed]
+	and PAD_A | PAD_START
+	jr nz, .asm_2641c
+	ldh a, [hKeysPressed]
+	and PAD_B
+	ret z
+	ld a, $ff
+	ldh [hCurScrollMenuItem], a
+.asm_2641c
+	scf
+	ret
+
+Func_2641e:
+	call Func_263b1
+	ld a, [wNumScrollMenuItems]
+	ld b, a
+	ld a, [wDeckDiagnosisTextIDsPtr]
+	ld c, a
+	ld de, $204
+.asm_2642c
+	push bc
+	push de
+	ld a, c
+	call Func_26464
+	pop de
+	pop bc
+	inc e
+	inc e
+	inc c
+	dec b
+	jr nz, .asm_2642c
+	ld e, $00
+	ld a, [wDeckDiagnosisTextIDsPtr]
+	or a
+	jr z, .asm_26444
+	ld e, $0d
+.asm_26444
+	ld a, e
+	ld bc, $1303
+	call WriteByteToBGMap0
+	ld e, $00
+	ld a, [wDeckDiagnosisTextIDsPtr]
+	ld hl, wNumScrollMenuItems
+	add [hl]
+	ld hl, wcd29
+	cp [hl]
+	jr nc, .asm_2645c
+	ld e, $2f
+.asm_2645c
+	ld a, e
+	ld bc, $1311
+	call WriteByteToBGMap0
+	ret
+
+Func_26464:
+	push de
+	ld e, a
+	ld d, $00
+	ld hl, wOpponentDeck
+	add hl, de
+	ld a, [hl]
+	ld [wDeckCheckTotalEnergySurplus], a
+	sla e
+	rl d
+	ld hl, wPlayerDeck
+	add hl, de
+	ld e, [hl]
+	inc hl
+	ld d, [hl]
+	call LoadCardDataToBuffer1_FromCardID
+	ld a, $10
+	call CopyCardNameAndLevel
+	pop de
+	push de
+	call InitTextPrinting
+	ld hl, wDefaultText
+	call ProcessText
+	pop bc
+	push bc
+	ld b, $10
+	ld a, [wDeckCheckTotalEnergySurplus]
+	bank1call WriteTwoDigitNumberInTxSymbolFormat
+	pop de
+	ld d, $12
+	call InitTextPrinting
+	ld de, $84
+	call Func_22ca
+	ret
+
+Func_264a5:
+	call EnableSRAM
+	ld de, wOpponentDeck
+	call SetListPointer
+	ld de, wPlayerDeck
+	call SetListPointer2
+	ld hl, $64dd
+	ld c, $00
+.asm_264b9
+	ld e, [hl]
+	inc hl
+	ld d, [hl]
+	inc hl
+	ld a, e
+	or d
+	jr z, .asm_264d5
+	push hl
+	ld hl, sCardCollection
+	add hl, de
+	ld a, [hl]
+	pop hl
+	bit 7, a
+	jr nz, .asm_264b9
+	call SetNextElementOfList
+	call Func_0b99
+	inc c
+	jr .asm_264b9
+.asm_264d5
+	call DisableSRAM
+	ld a, c
+	or a
+	ret nz
+	scf
+	ret
+; 0x264dd
+
+SECTION "GBC Only Disclaimer", ROMX[$64fd], BANK[$9]
+INCLUDE "engine/gbc_only_disclaimer.asm"
+
+_TossCoin::
+	ld [wCoinTossTotalNum], a
+	ld a, [wDuelDisplayedScreen]
+	cp COIN_TOSS
+	jr z, .print_text
+
+	xor a
+	ld [wCoinTossNumTossed], a
+	call EmptyScreen
+	call LoadDuelCoinTossResultTiles
+
+.print_text
+; no need to print text if this is not the first coin toss
+	ld a, [wCoinTossNumTossed]
+	or a
+	jr nz, .clear_text_pointer
+	ld a, COIN_TOSS
+	ld [wDuelDisplayedScreen], a
+	lb de, 0, 12
+	lb bc, 20, 6
+	ld hl, NULL
+	call DrawLabeledTextBox
+	call EnableLCD
+	lb de, 1, 14
+	ld a, 19
+	call InitTextPrintingInTextbox
+	ld hl, wCoinTossScreenTextID
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	call PrintText
+
+.clear_text_pointer
+	ld hl, wCoinTossScreenTextID
+	xor a
+	ld [hli], a
+	ld [hl], a
+
+; store duelist type and reset number of heads
+	call EnableLCD
+	ld a, DUELVARS_DUELIST_TYPE
+	get_turn_duelist_var
+	ld [wCoinTossDuelistType], a
+	call ExchangeRNG
+	xor a
+	ld [wCoinTossNumHeads], a
+
+.toss_next_coin
+; skip printing text if it's only one coin toss
+	ld a, [wCoinTossTotalNum]
+	cp 2
+	jr c, .skip_print_coin_tally
+
+; write "#coin/#total coins"
+	lb bc, 15, 11
+	ld a, [wCoinTossNumTossed]
+	inc a ; current coin number is wCoinTossNumTossed + 1
+	bank1call WriteTwoDigitNumberInTxSymbolFormat
+	ld b, 17
+	ld a, SYM_SLASH
+	call WriteByteToBGMap0
+	inc b
+	ld a, [wCoinTossTotalNum]
+	bank1call WriteTwoDigitNumberInTxSymbolFormat
+
+.skip_print_coin_tally
+	call ResetAnimationQueue
+	ld a, DUEL_ANIM_COIN_SPIN
+	call .LoadCoinAnimation
+
+	ld a, [wCoinTossDuelistType]
+	or a
+	jr z, .player_tossing ; DUELIST_TYPE_PLAYER
+; opponent tossing
+	call .WaitForOpponent
+	jr .generate_coin_result
+.player_tossing
+	; wait for input, and send byte when player is ready to toss
+	call WaitForWideTextBoxInput
+	call .SendSerialByte
+
+.generate_coin_result
+	call ResetAnimationQueue
+	ld d, DUEL_ANIM_COIN_TOSS_GOING_TAILS
+	ld e, TAILS
+	call UpdateRNGSources
+	rla
+	jr c, .got_result
+	ld d, DUEL_ANIM_COIN_TOSS_GOING_HEADS
+	ld e, HEADS
+
+.got_result
+; already decided on coin toss result,
+; check if we should show animation or not
+	ld a, [wcd14]
+	or a
+	jr z, .dont_skip_animation
+	ldh a, [hKeysHeld]
+	and PAD_B | PAD_UP | PAD_DOWN
+	jr nz, .skip_animation
+.dont_skip_animation
+; load the correct tossing animation
+	ld a, d
+	call .LoadCoinAnimation
+
+.skip_animation
+	ld a, [wCoinTossDuelistType]
+	or a
+	jr z, .wait_anim ; player tossing
+; opponent tossing
+	ld a, e
+	call .GetOpponentCoinResult
+	ld e, a ; coin result from opponent
+	jr .done_toss_anim
+
+.wait_anim
+	push de
+	call DoFrame
+	call CheckAnyAnimationPlaying
+	pop de
+	jr c, .wait_anim
+	ld a, e
+	call .SendSerialByte
+
+.done_toss_anim
+	ld b, DUEL_ANIM_COIN_HEADS
+	ld c, $34 ; tile for cross
+	ld a, e
+	or a
+	jr z, .show_result
+	ld b, DUEL_ANIM_COIN_TAILS
+	ld c, $30 ; tile for circle
+	ld hl, wCoinTossNumHeads
+	inc [hl]
+
+.show_result
+	ld a, b
+	call .LoadCoinAnimation
+
+; load correct sound effect
+; the sound of the coin toss result
+; is dependant on whether it was the Player
+; or the Opponent to get heads/tails
+	ld a, [wCoinTossDuelistType]
+	or a
+	jr z, .check_sfx
+	ld a, $1
+	xor e ; invert result in case it's not Player
+	ld e, a
+.check_sfx
+	ld d, SFX_COIN_TOSS_POSITIVE
+	ld a, e
+	or a
+	jr nz, .got_sfx
+	ld d, SFX_COIN_TOSS_NEGATIVE
+.got_sfx
+	ld a, d
+	call PlaySFX
+
+; in case it's a multiple coin toss scenario,
+; then the result needs to be registered on screen
+; with a circle (o) or a cross (x)
+	ld a, [wCoinTossTotalNum]
+	dec a
+	jr z, .incr_num_coin_tossed ; skip if not more than 1 coin toss
+	ld a, c
+	push af
+	ld e, 0
+	ld a, [wCoinTossNumTossed]
+; calculate the offset to draw the circle/cross
+.loop_get_offset
+	; if < 10, then the offset is simply calculated
+	; from wCoinTossNumTossed * 2...
+	cp 10
+	jr c, .got_offset
+	; ...else the y-offset is added for each multiple of 10
+	inc e
+	inc e
+	sub 10
+	jr .loop_get_offset
+
+.got_offset
+	add a
+	ld d, a
+	lb bc, 2, 2
+	pop af
+
+	push af
+	push bc
+	push de
+	ld l, $1 ; red
+	cp $30 ; circle tile?
+	jr z, .got_color
+	inc l ; $2 blue
+.got_color
+	ld a, l
+	lb hl, 0, 0
+	call BankswitchVRAM1
+	call FillRectangle
+	call BankswitchVRAM0
+	pop de
+	pop bc
+	pop af
+	lb hl, 1, 2
+	call FillRectangle
+
+.incr_num_coin_tossed
+	ld hl, wCoinTossNumTossed
+	inc [hl]
+
+	ld a, [wCoinTossDuelistType]
+	or a
+	jr z, .player_tossing_next_coin
+	; wait for input if we are finished, that is
+	; if wCoinTossNumTossed == wCoinTossTotalNum
+	ld a, [hl]
+	ld hl, wCoinTossTotalNum
+	cp [hl]
+	call z, WaitForWideTextBoxInput
+
+	; delay/wait for link opp input
+	call .WaitForOpponent
+
+	; if we are "tossing until tails",
+	; (i.e. wCoinTossTotalNum == 0)
+	; and we got no heads, wait for input
+	ld a, [wCoinTossTotalNum]
+	ld hl, wCoinTossNumHeads
+	or [hl]
+	jr nz, .check_if_finished
+	call z, WaitForWideTextBoxInput
+	jr .check_if_finished
+
+.player_tossing_next_coin
+	call WaitForWideTextBoxInput
+	call .SendSerialByte
+
+.check_if_finished
+	call FinishQueuedAnimations
+	ld a, [wCoinTossNumTossed]
+	ld hl, wCoinTossTotalNum
+	cp [hl]
+	jp c, .toss_next_coin
+	call ExchangeRNG
+	call FinishQueuedAnimations
+	call ResetAnimationQueue
+
+; return carry if at least 1 heads
+	ld a, [wCoinTossNumHeads]
+	or a
+	ret z
+	scf
+	ret
+
+.LoadCoinAnimation:
+	ld [wCurAnimation], a
+	ldh a, [hWhoseTurn]
+	ld [wDuelAnimDuelistSide], a
+	ld a, [wOppCoin]
+	ld [wdce1], a
+	ld a, [wPlayerCoin]
+	ld [wdce0], a
+	call LoadDuelAnimationToBuffer
+	ret
+
+; input:
+; - a = byte to send through serial
+.SendSerialByte:
+	ldh [hff96], a
+	ld a, [wDuelType]
+	cp DUELTYPE_LINK
+	ret nz ; not link duel
+	ldh a, [hff96]
+	call SerialSendByte
+	call .CheckTransmissionError
+	ret
+
+; if opponent is AI, then wait for animation and
+; use the result generated beforehand (input register a)
+; if link opponent, then wait for serial byte which
+; gives the coin result
+; input:
+; - a = coin result to use for AI (HEADS or TAILS)
+; output:
+; - a = coin result (HEADS or TAILS)
+.GetOpponentCoinResult:
+	ldh [hff96], a
+	ld a, [wDuelType]
+	cp DUELTYPE_LINK
+	jr z, .wait_serial_byte_recv
+.wait_anim_ai
+	call DoFrame
+	call CheckAnyAnimationPlaying
+	jr c, .wait_anim_ai
+	ldh a, [hff96]
+	ret
+
+; waits for opponent
+; AI delays for 30 frames
+; link opponent sends byte through serial when ready
+.WaitForOpponent:
+	ldh [hff96], a
+	ld a, [wDuelType]
+	cp DUELTYPE_LINK
+	jr z, .wait_serial_byte_recv
+
+; delay coin flip for AI opponent
+	ld a, 30
+.ai_coin_toss_delay
+	call DoFrame
+	dec a
+	jr nz, .ai_coin_toss_delay
+	ldh a, [hff96]
+	ret
+
+.wait_serial_byte_recv
+	call DoFrame
+	call SerialRecvByte
+	jr c, .wait_serial_byte_recv
+	call .CheckTransmissionError
+	ret
+
+.CheckTransmissionError:
+	push af
+	ld a, [wSerialFlags]
+	or a
+	jr nz, .transmission_error
+	pop af
+	ret
+.transmission_error
+	call FinishQueuedAnimations
+	call DuelTransmissionError
+	ret
+; 0x26709

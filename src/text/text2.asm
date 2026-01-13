@@ -1561,7 +1561,7 @@ GameCenterBillsPCStartPromptText:
 	textfw "マサキのパソコンで あそびますか?"
 	done
 
-GameCenterBillsPCUnableNoBillsPCCardsText:
+GameCenterBillsPCUnableNoBillsComputerText:
 	textfw "「マサキのパソコン」カードが無いので"
 	linefw "あそぶことが できません"
 	linefw "「マサキのパソコン」カードを"

@@ -1,4 +1,91 @@
-SECTION "Bank 2@43b3", ROMX[$43b3], BANK[$2]
+SECTION "Bank 2@4302", ROMX[$4302], BANK[$2]
+
+Func_8302:
+	ld a, h
+	ld [wCheckMenuPlayAreaWhichDuelist], a
+	ld a, l
+	ld [wCheckMenuPlayAreaWhichLayout], a
+	xor a
+	ld [wTileMapFill], a
+	call ZeroObjectPositions
+	ld a, $01
+	ld [wVBlankOAMCopyToggle], a
+	call DoFrame
+	call EmptyScreen
+	call LoadMenuCursorTile
+	jr DrawYourOrOppPlayAreaScreen_EmptiedScreen
+
+	xor a
+	ld [wTileMapFill], a
+	call ZeroObjectPositions
+	ld a, $01
+	ld [wVBlankOAMCopyToggle], a
+	call DoFrame
+	call EmptyScreen
+;	fallthrough
+
+DrawYourOrOppPlayAreaScreen_EmptiedScreen:
+	call LoadSymbolsFont
+	call Func_1dff
+	bank1call SetDefaultPalettes
+	lb de, 6, 0
+	call InitTextPrinting
+
+	ld a, [wCheckMenuPlayAreaWhichDuelist]
+	cp PLAYER_TURN
+	jr nz, .opp_name
+
+; print <RAMNAME>'s Play Area
+	ld de, wDefaultText
+	call CopyPlayerName
+	jr .got_duelist_name
+.opp_name
+	ld de, wDefaultText
+	call CopyOpponentName
+.got_duelist_name
+	ld hl, wDefaultText
+
+	call ProcessText
+	ld hl, wDefaultText
+	call GetTextLengthInTiles
+	ld a, 6 ; max name size in tiles
+	add b
+	ld d, a ; text horizontal alignment
+	ld e, 0
+	call InitTextPrinting
+	ldtx hl, DuelistsPlayAreaSuffixText
+	call ProcessTextFromID
+	ld a, [wCheckMenuPlayAreaWhichDuelist]
+	ld b, a
+	ld a, [wCheckMenuPlayAreaWhichLayout]
+	cp b
+	jr nz, .not_equal
+
+	ld hl, PrizeCardsCoordinateData_YourOrOppPlayArea.player
+	call DrawPlayArea_PrizeCards
+	lb de, 6, 2 ; coordinates of player's active card
+	call DrawYourOrOppPlayArea_ActiveCardGfx
+	lb de, 1, 9 ; coordinates of player's bench cards
+	ld c, 4
+	call DrawPlayArea_BenchCards
+	xor a
+	call DrawYourOrOppPlayArea_Icons
+	jr .done
+
+.not_equal
+	ld hl, PrizeCardsCoordinateData_YourOrOppPlayArea.opponent
+	call DrawPlayArea_PrizeCards
+	lb de, 6, 5 ; coordinates of opponent's active card
+	call DrawYourOrOppPlayArea_ActiveCardGfx
+	lb de, 1, 2 ; coordinates of opponent's bench cards
+	ld c, 4 ; spacing
+	call DrawPlayArea_BenchCards
+	ld a, $01
+	call DrawYourOrOppPlayArea_Icons
+
+.done
+	call EnableLCD
+	ret
 
 Func_82b6:
 	ld a, [wCheckMenuPlayAreaWhichDuelist]
@@ -16,6 +103,66 @@ Func_82b6:
 	call DrawPlayArea_PrizeCards
 	ret
 ; 0x83cb
+
+SECTION "Bank 2@4495", ROMX[$4495], BANK[$2]
+
+; draws the active card gfx at coordinates de
+; of the player (or opponent) depending on wCheckMenuPlayAreaWhichDuelist
+; input:
+; de = coordinates
+DrawYourOrOppPlayArea_ActiveCardGfx:
+	push de
+	ld a, DUELVARS_ARENA_CARD
+	ld l, a
+	ld a, [wCheckMenuPlayAreaWhichDuelist]
+	ld h, a
+	ld a, [hl]
+	cp -1
+	jr z, .no_pokemon
+
+	ld d, a
+	ld a, [wCheckMenuPlayAreaWhichDuelist]
+	ld b, a
+	ldh a, [hWhoseTurn]
+	cp b
+	jr nz, .swap
+	ld a, d
+	call LoadCardDataToBuffer1_FromDeckIndex
+	jr .draw
+.swap
+	call SwapTurn
+	ld a, d
+	call LoadCardDataToBuffer1_FromDeckIndex
+	call SwapTurn
+
+.draw
+	ld de, v0Tiles1 + $20 tiles ; destination offset of loaded gfx
+	ld hl, wLoadedCard1Gfx
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	lb bc, $30, TILE_SIZE
+	call LoadCardGfx
+	pop de
+	push de
+	bank1call DrawCardGfxToDE_BGPalIndex5
+	bank1call Func_6c12
+	bank1call FlushAllPalettesIfNotDMG
+	pop de
+
+; draw card gfx
+	ld a, $a0
+	lb hl, 6, 1
+	lb bc, 8, 6
+	call FillRectangle
+	bank1call StubbedApplyBGP6OrSGB3ToCardImage
+	ret
+
+.no_pokemon
+	bank1call Func_6c12
+	pop de
+	ret
+; 0x84eb
 
 SECTION "Bank 2@4587", ROMX[$4587], BANK[$2]
 
@@ -49,13 +196,13 @@ DrawPlayArea_PrizeCards:
 	ld a, $e0 ; tile byte for empty slot
 	jr .draw
 .not_taken
-	ld a, [wcc07]
+	ld a, [wPrizeCardsFaceUp]
 	or a
-	jr z, .asm_85b2
-	ld a, $f9
+	jr z, .face_down
+	ld a, $f9 ; tile byte for face up card
 	jr .draw
-.asm_85b2
-	ld a, $dc ; tile byte for card
+.face_down
+	ld a, $dc ; tile byte for face down card
 .draw
 	ld e, [hl]
 	inc hl
@@ -125,7 +272,397 @@ GetDuelInitialPrizesUpperBitsSet:
 	or %11000000
 	ld [wDuelInitialPrizesUpperBitsSet], a
 	ret
-; 0x863e
+
+; draws filled and empty bench slots depending on the turn loaded in wCheckMenuPlayAreaWhichDuelist
+; if wCheckMenuPlayAreaWhichDuelist is different from wCheckMenuPlayAreaWhichLayout adjusts coordinates of the bench slots
+; input:
+; de = coordinates to draw bench
+; c  = spacing between slots
+DrawPlayArea_BenchCards:
+	ld a, [wCheckMenuPlayAreaWhichLayout]
+	ld b, a
+	ld a, [wCheckMenuPlayAreaWhichDuelist]
+	cp b
+	jr z, .skip
+
+; adjust the starting bench position for opponent
+	ld a, d
+	add c
+	add c
+	add c
+	add c
+	ld d, a
+	; d = d + 4 * c
+
+; have the spacing go to the left instead of right
+	xor a
+	sub c
+	ld c, a
+	; c = $ff - c + 1
+
+	ld a, [wCheckMenuPlayAreaWhichDuelist]
+.skip
+	ld h, a
+	ld l, DUELVARS_NUMBER_OF_POKEMON_IN_PLAY_AREA
+	ld b, [hl]
+	ld l, DUELVARS_BENCH1_CARD_STAGE
+.loop_1
+	dec b ; num of Bench Pokemon left
+	jr z, .done
+
+	ld a, [hli]
+	push hl
+	push bc
+	sla a
+	sla a
+	add $e4
+; a holds the correct stage gfx tile
+	ld b, a
+	push bc
+
+	lb hl, 1, 2
+	lb bc, 2, 2
+	call FillRectangle
+
+	ld a, [wConsole]
+	cp CONSOLE_CGB
+	pop bc
+	jr nz, .next
+
+	ld a, b
+	cp $ec ; tile offset of 2 stage
+	jr z, .two_stage
+	cp $f0 ; tile offset of 2 stage with no 1 stage
+	jr z, .two_stage
+
+	ld a, $03 ; blue colour
+	jr .palette
+.two_stage
+	ld a, $02 ; red colour
+.palette
+	lb bc, 2, 2
+	lb hl, 0, 0
+	call BankswitchVRAM1
+	call FillRectangle
+	call BankswitchVRAM0
+
+.next ; adjust coordinates for next card
+	pop bc
+	pop hl
+	ld a, d
+	add c
+	ld d, a
+	; d = d + c
+	jr .loop_1
+
+.done
+	ld a, [wCheckMenuPlayAreaWhichDuelist]
+	ld h, a
+	ld l, DUELVARS_NUMBER_OF_POKEMON_IN_PLAY_AREA
+	ld a, [wMaxNumPlayAreaPokemon]
+	sub [hl]
+	ret z ; return if already full
+
+	ld b, a
+	inc b
+.loop_2
+	dec b
+	ret z
+
+	push bc
+	ld a, $f4 ; empty bench slot tile
+	lb hl, 1, 2
+	lb bc, 2, 2
+	call FillRectangle
+
+	ld a, [wConsole]
+	cp CONSOLE_CGB
+	jr nz, .not_cgb
+
+	ld a, $03 ; colour
+	lb bc, 2, 2
+	lb hl, 0, 0
+	call BankswitchVRAM1
+	call FillRectangle
+	call BankswitchVRAM0
+
+.not_cgb
+	pop bc
+	ld a, d
+	add c
+	ld d, a
+	jr .loop_2
+
+; draws Your/Opp Play Area icons depending on value in a
+; the icons correspond to Deck, Discard Pile, and Hand
+; the corresponding number of cards is printed alongside each icon
+; for "Hand", text is displayed rather than an icon
+; input:
+; a = $00: draws player icons
+; a = $01: draws opponent icons
+DrawYourOrOppPlayArea_Icons:
+	or a
+	jr nz, .opponent
+	ld hl, PlayAreaIconCoordinates.player1
+	jr .draw
+.opponent
+	ld hl, PlayAreaIconCoordinates.opponent1
+
+.draw
+; hand icon and value
+	ld a, [wCheckMenuPlayAreaWhichDuelist]
+	ld d, a
+	ld e, DUELVARS_NUMBER_OF_CARDS_IN_HAND
+	ld a, [de]
+	ld b, a
+	ld a, $d0 ; hand icon, unused?
+	call $47a3
+
+; deck icon and value
+	ld a, [wCheckMenuPlayAreaWhichDuelist]
+	ld d, a
+	ld e, DUELVARS_NUMBER_OF_CARDS_NOT_IN_DECK
+	ld a, [de]
+	ld b, a
+	ld a, DECK_SIZE
+	sub b
+	ld b, a
+	ld a, $d4 ; deck icon
+	call DrawPlayArea_IconWithValue
+
+; discard pile icon and value
+	ld a, [wCheckMenuPlayAreaWhichDuelist]
+	ld d, a
+	ld e, DUELVARS_NUMBER_OF_CARDS_IN_DISCARD_PILE
+	ld a, [de]
+	ld b, a
+	ld a, $d8 ; discard pile icon
+	call DrawPlayArea_IconWithValue
+	ret
+
+; draws the interface icon corresponding to the gfx tile in a
+; also prints the number in decimal corresponding to the value in b
+; the coordinates in screen are given by [hl]
+; input:
+; a  = tile for the icon
+; b  = value to print alongside icon
+; hl = pointer to coordinates
+DrawPlayArea_IconWithValue:
+; drawing the icon
+	ld d, [hl]
+	inc hl
+	ld e, [hl]
+	inc hl
+	push hl
+	push bc
+	lb hl, 1, 2
+	lb bc, 2, 2
+	call FillRectangle
+
+	ld a, [wConsole]
+	cp CONSOLE_CGB
+	jr nz, .skip
+	ld a, $03
+	lb bc, 2, 2
+	lb hl, 0, 0
+	call BankswitchVRAM1
+	call FillRectangle
+	call BankswitchVRAM0
+
+.skip
+; adjust coordinate to the lower right
+	inc d
+	inc d
+	inc e
+	call InitTextPrinting
+	pop bc
+	ld a, b
+	call CalculateOnesAndTensDigits
+
+	ld hl, wDecimalDigitsSymbols
+	ld a, [hli]
+	ld b, a
+	ld a, [hl]
+
+; loading numerical and cross symbols
+	ld hl, wDefaultText
+	ld [hl], TX_SYMBOL
+	inc hl
+	ld [hl], SYM_CROSS
+	inc hl
+	ld [hl], TX_SYMBOL
+	inc hl
+	ld [hli], a ; tens place
+	ld [hl], TX_SYMBOL
+	inc hl
+	ld a, b
+	ld [hli], a ; ones place
+	ld [hl], TX_END
+
+; printing the decimal value
+	ld hl, wDefaultText
+	call ProcessText
+	pop hl
+	ret
+
+PlayAreaIconCoordinates:
+; used for "Your/Opp. Play Area" screen
+.player1
+	db 15,  7 ; hand
+	db 15,  2 ; deck
+	db 15,  4 ; discard pile
+.opponent1
+	db  1,  5 ; hand
+	db  1,  9 ; deck
+	db  1,  7 ; discard pile
+
+; used for "In Play Area" screen
+.player2
+	db 15, 14
+	db 15,  9
+	db 15, 11
+.opponent2
+	db  0,  2
+	db  0,  6
+	db  0,  4
+
+SECTION "Bank 2@47d3", ROMX[$47d3], BANK[$2]
+
+Func_87d3:
+	xor a
+	ld [wMenuInputSFX], a
+	ld a, [wCheckMenuCursorXPosition]
+	ld d, a
+	ld a, [wCheckMenuCursorYPosition]
+	ld e, a
+	ldh a, [hDPadHeld]
+	or a
+	jr z, .asm_8852
+	ld a, [wd0cd]
+	and $80
+	ldh a, [hDPadHeld]
+	jr nz, .asm_881c
+	bit B_PAD_LEFT, a
+	jr nz, .asm_87f5
+	bit B_PAD_RIGHT, a
+	jr z, .asm_881c
+.asm_87f5
+	ld a, [wd0cd]
+	and $7f
+	cp $01
+	jr z, .asm_8809
+	cp $02
+	jr z, .asm_8810
+	ld a, e
+	or a
+	jr z, .asm_8816
+	dec e
+	jr .asm_8816
+.asm_8809
+	ld a, e
+	or a
+	jr nz, .asm_8816
+	inc e
+	jr .asm_8816
+.asm_8810
+	ld a, $01
+	sub d
+	ld d, a
+	jr .asm_883c
+.asm_8816
+	ld a, d
+	xor $01
+	ld d, a
+	jr .asm_883c
+.asm_881c
+	bit 6, a
+	jr nz, .asm_8824
+	bit 7, a
+	jr z, .asm_8852
+.asm_8824
+	ld a, [wd0cd]
+	and $7f
+	cp $02
+	jr z, .asm_8838
+	ld a, d
+	or a
+	jr z, .asm_8832
+	dec d
+.asm_8832
+	ld a, e
+	xor $01
+	ld e, a
+	jr .asm_883c
+.asm_8838
+	ld a, $01
+	sub e
+	ld e, a
+.asm_883c
+	ld a, SFX_CURSOR
+	ld [wMenuInputSFX], a
+	push de
+	call .asm_8884
+	pop de
+	ld a, d
+	ld [wCheckMenuCursorXPosition], a
+	ld a, e
+	ld [wCheckMenuCursorYPosition], a
+	xor a
+	ld [wScrollMenuCursorBlinkCounter], a
+.asm_8852
+	ldh a, [hKeysPressed]
+	and PAD_A | PAD_B
+	jr z, .asm_886d
+	and PAD_A
+	jr nz, .asm_8863
+	ld a, MENU_CANCEL
+	call PlaySFXConfirmOrCancel
+	scf
+	ret
+.asm_8863
+	call .asm_88a3
+	ld a, MENU_CONFIRM
+	call PlaySFXConfirmOrCancel
+	scf
+	ret
+.asm_886d
+	ld a, [wMenuInputSFX]
+	or a
+	jr z, .asm_8876
+	call PlaySFX
+.asm_8876
+	ld hl, wScrollMenuCursorBlinkCounter
+	ld a, [hl]
+	inc [hl]
+	and $0f
+	ret nz
+	ld a, $0f
+	bit 4, [hl]
+	jr z, .asm_8886
+.asm_8884
+	ld a, $00
+.asm_8886
+	ld e, a
+	ld a, $0a
+	ld l, a
+	ld a, [wCheckMenuCursorXPosition]
+	ld h, a
+	call HtimesL
+	ld a, l
+	add $01
+	ld b, a
+	ld a, [wCheckMenuCursorYPosition]
+	sla a
+	add $0e
+	ld c, a
+	ld a, e
+	call WriteByteToBGMap0
+	or a
+	ret
+.asm_88a3:
+	ld a, $0f
+	jr .asm_8886
+; 0x88a7
 
 SECTION "Bank 2@4acb", ROMX[$4acb], BANK[$2]
 
@@ -167,7 +704,7 @@ HandleMultiDirectionalMenu:
 	inc hl
 	inc hl
 
-	bit D_UP_F, a
+	bit B_PAD_UP, a
 	jr z, .else_if_down
 	; up
 	ld a, [hl]
@@ -175,7 +712,7 @@ HandleMultiDirectionalMenu:
 
 .else_if_down
 	inc hl
-	bit D_DOWN_F, a
+	bit B_PAD_DOWN, a
 	jr z, .else_if_right
 	; down
 	ld a, [hl]
@@ -183,7 +720,7 @@ HandleMultiDirectionalMenu:
 
 .else_if_right
 	inc hl
-	bit D_RIGHT_F, a
+	bit B_PAD_RIGHT, a
 	jr z, .else_if_left
 	; right
 	ld a, [hl]
@@ -191,7 +728,7 @@ HandleMultiDirectionalMenu:
 
 .else_if_left
 	inc hl
-	bit D_LEFT_F, a
+	bit B_PAD_LEFT, a
 	jr z, .check_button
 	; left
 	ld a, [hl]
@@ -223,9 +760,9 @@ HandleMultiDirectionalMenu:
 ; check if one of the dpad, left or right, is pressed.
 ; if not, just go back to the start.
 	ldh a, [hDPadHeld]
-	bit D_RIGHT_F, a
+	bit B_PAD_RIGHT, a
 	jr nz, .left_or_right
-	bit D_LEFT_F, a
+	bit B_PAD_LEFT, a
 	jr z, HandleMultiDirectionalMenu
 
 .left_or_right
@@ -263,7 +800,7 @@ HandleMultiDirectionalMenu:
 	jr .make_bitmask_loop
 
 .sfx
-	ld a, SFX_01
+	ld a, SFX_CURSOR
 	ld [wMenuInputSFX], a
 
 	; reset cursor blink
@@ -271,19 +808,19 @@ HandleMultiDirectionalMenu:
 	ld [wScrollMenuCursorBlinkCounter], a
 .check_button
 	ldh a, [hKeysPressed]
-	and A_BUTTON | B_BUTTON
+	and PAD_A | PAD_B
 	jr z, .no_btns
-	and A_BUTTON
+	and PAD_A
 	jr nz, .a_btn
 ; b btn
-	ld a, $ff ; cancel
-	call PlayAcceptOrDeclineSFX
+	ld a, MENU_CANCEL
+	call PlaySFXConfirmOrCancel
 	scf
 	ret
 .a_btn
 	call .DrawCursor
-	ld a, $01
-	call PlayAcceptOrDeclineSFX
+	ld a, MENU_CONFIRM
+	call PlaySFXConfirmOrCancel
 	ld a, [wd0c1]
 	scf
 	ret
@@ -332,7 +869,156 @@ ZeroObjectPositionsWithCopyToggleOn:
 	ret
 ; 0x8be6
 
-SECTION "Bank 2@4e6b", ROMX[$4e6b], BANK[$2]
+SECTION "Bank 2@4c98", ROMX[$4c98], BANK[$2]
+
+PickPrizeCardTransitionTable:
+	cursor_transition $08, $28, $00, $04, $02, $01, $01
+	cursor_transition $30, $28, $20, $05, $03, $00, $00
+	cursor_transition $08, $38, $00, $00, $04, $03, $03
+	cursor_transition $30, $38, $20, $01, $05, $02, $02
+	cursor_transition $08, $48, $00, $02, $00, $05, $05
+	cursor_transition $30, $48, $20, $03, $01, $04, $04
+
+OpenPrizeCardPageIfFaceUp:
+	ld a, [wPrizeCardsFaceUp]
+	or a
+	ret z ; not face-up
+
+	ld a, MENU_CONFIRM
+	call PlaySFXConfirmOrCancel
+
+	ld a, [wd0c1]
+	ld c, a
+	ld b, $1
+.loop_bitmasks
+	or a
+	jr z, .got_prize
+	sla b
+	dec a
+	jr .loop_bitmasks
+.got_prize
+	ld a, DUELVARS_PRIZES
+	get_turn_duelist_var
+	and b
+	ret z ; no prize card here
+
+	; open this card's page
+	ld a, c
+	add DUELVARS_PRIZE_CARDS
+	get_turn_duelist_var
+	call LoadCardDataToBuffer1_FromDeckIndex
+	call Set_OBJ_8x16
+	bank1call OpenCardPage_FromHand
+	scf
+	ret
+
+HandlePrizeCardPlayerSelection:
+	xor a
+	call GetFirstSetPrizeCard
+	ld [wd0c1], a
+
+.draw_screen
+	ldh a, [hWhoseTurn]
+	ld h, a
+	ld l, a
+	call Func_8302
+	call DrawWideTextBox
+	lb de, 1, 14
+	call InitTextPrinting
+	ldtx hl, PleaseChooseAPrizeText
+	call ProcessTextFromID
+	ld de, PickPrizeCardTransitionTable
+	ld hl, wTransitionTablePtr
+	ld [hl], e
+	inc hl
+	ld [hl], d
+.loop
+	ld a, $01
+	ld [wVBlankOAMCopyToggle], a
+	call DoFrame
+	ldh a, [hDPadHeld]
+	and PAD_START
+	jr z, .read_input
+	; start button
+	call OpenPrizeCardPageIfFaceUp
+	jr c, .draw_screen
+.read_input
+	call HandleMultiDirectionalMenu
+	jr nc, .loop
+	cp $ff
+	jr z, .loop
+	call ZeroObjectPositionsWithCopyToggleOn
+	ld a, [wd0c1]
+	ld c, a
+	ld b, $1
+.loop_bitmasks
+	or a
+	jr z, .got_prize
+	sla b
+	dec a
+	jr .loop_bitmasks
+.got_prize
+	ld a, DUELVARS_PRIZES
+	get_turn_duelist_var
+	and b
+	jr z, .loop ; this prize card has been removed
+	ld a, c
+	or $40
+	ret
+; 0x8d4b
+
+SECTION "Bank 2@4e34", ROMX[$4e34], BANK[$2]
+
+; gets the first prize card index that is set
+; beginning from index in register a
+; a = prize card index
+GetFirstSetPrizeCard:
+	push bc
+	push de
+	push hl
+	ld e, PRIZES_6
+	ld c, a
+	ldh a, [hWhoseTurn]
+	ld h, a
+	ld l, DUELVARS_PRIZES
+	ld d, [hl]
+.loop_prizes
+	call .GetPrizeMask
+	and d
+	jr nz, .done
+	dec e
+	jr nz, .next_prize
+	ld c, 0
+	jr .done
+.next_prize
+	inc c
+	ld a, PRIZES_6
+	cp c
+	jr nz, .loop_prizes
+	ld c, 0
+	jr .loop_prizes
+.done
+	ld a, c
+	pop hl
+	pop de
+	pop bc
+	ret
+
+; returns 1 shifted left by c bits
+.GetPrizeMask:
+	push bc
+	ld a, c
+	ld b, $1
+.loop
+	or a
+	jr z, .got_mask
+	sla b
+	dec a
+	jr .loop
+.got_mask
+	ld a, b
+	pop bc
+	ret
 
 GlossaryTransitionTable_10Topics:
 	cursor_transition $08, $28, $00, 4, 1, 5, 5 ; 0
@@ -355,9 +1041,6 @@ GlossaryTransitionTable_8Topics:
 	cursor_transition $58, $38, $00, 4, 6, 1, 1 ; 5
 	cursor_transition $58, $48, $00, 5, 7, 2, 2 ; 6
 	cursor_transition $58, $58, $00, 6, 4, 3, 3 ; 7
-; 0x8ee9
-
-SECTION "Bank 2@4ee9", ROMX[$4ee9], BANK[$2]
 
 ; copies DECK_SIZE number of cards from de to hl in SRAM
 CopyDeckFromSRAM:
@@ -376,17 +1059,17 @@ CopyDeckFromSRAM:
 	ret
 
 ; clears some WRAM addresses to act as
-; terminator bytes to wTempCardList and wCurDeckCards
+; terminating bytes to wTempCardList and wCurDeckCards
 WriteCardListsTerminatorBytes:
 	xor a
 	ld hl, wTempCardList
 	ld bc, $80
 	add hl, bc
-	ld [hl], a ; terminator byte
+	ld [hl], a ; terminating byte
 	ld hl, wCurDeckCards
 	ld bc, $80
 	add hl, bc
-	ld [hl], a ; terminator byte
+	ld [hl], a ; terminating byte
 	ret
 
 Func_8f10:
@@ -398,7 +1081,7 @@ Func_8f10:
 	ld [hli], a
 	ld [hli], a
 	ld [hl], a
-	ld [s0b7a1], a
+	ld [sUnnamedDeckCounter], a
 	call DisableSRAM
 ;	fallthrough
 
@@ -435,34 +1118,86 @@ PrepareMenuGraphics:
 	lb de, $3c, $bf
 	call SetupText
 	ret
-; 0x8f6b
 
-SECTION "Bank 2@4fb9", ROMX[$4fb9], BANK[$2]
+; inits the following deck building params from hl:
+; wMaxNumCardsAllowed
+; wd381
+; wSameNameCardsLimit
+; wIncludeCardsInDeck
+; wDeckConfigurationMenuHandlerFunction
+; wDeckConfigurationMenuTransitionTable
+InitDeckBuildingParams:
+	ld de, wMaxNumCardsAllowed
+	ld b, 8
+.loop
+	ld a, [hli]
+	ld [de], a
+	inc de
+	dec b
+	jr nz, .loop
+	ret
 
-Func_8fb9:
+DeckBuildingParams:
+	db DECK_CONFIG_BUFFER_SIZE
+	db DECK_SIZE
+	db MAX_NUM_SAME_NAME_CARDS
+	db TRUE ; whether to include deck cards
+	dw HandleDeckConfigurationMenu
+	dw DeckConfigurationMenu_TransitionTable
+
+DeckSelectionMenu:
+	ld hl, DeckBuildingParams
+	call InitDeckBuildingParams
+	ld a, $ff
+	call DrawDecksScreen
+	xor a
+
+.init_menu_params
+	ld hl, .MenuParameters
+	call InitializeMenuParameters
+	ldtx hl, PleaseSelectDeckText
+	call DrawWideTextBox_PrintText
+.loop_input
+	call DoFrame
+	jr c, .init_menu_params
+	call HandleStartButtonInDeckSelectionMenu
+	jr c, .init_menu_params
+	call HandleMenuInput
+	jr nc, .loop_input
+	ldh a, [hCurScrollMenuItem]
+	cp $ff
+	ret z ; B btn returns
+; A btn pressed on a deck
+	ld [wCurDeck], a
+	jp DeckSelectionSubMenu
+
+.MenuParameters:
+	menu_params 1, 2, 3, NUM_DECKS, SYM_CURSOR_R, SYM_SPACE, NULL
+
+HandleStartButtonInDeckSelectionMenu:
 	ldh a, [hDPadHeld]
-	and START
+	and PAD_START
 	ret z
 	ld a, [wCurMenuItem]
 	ld [wCurDeck], a
 	call CheckIfCurDeckIsEmpty
 	jp nc, .valid_deck ; can be jr
-	ld a, $ff
-	call PlayAcceptOrDeclineSFX
-	call Func_9215
+	ld a, MENU_CANCEL
+	call PlaySFXConfirmOrCancel
+	call PrintThereIsNoDeckHereText
 	scf
 	ret
 
 .valid_deck
-	ld a, SFX_01
-	call PlayAcceptOrDeclineSFX
+	ld a, MENU_CONFIRM
+	call PlaySFXConfirmOrCancel
 	call GetSRAMPointerToCurDeckCards
 	push hl
 	call GetSRAMPointerToCurDeck
 	pop de
 	call OpenDeckConfirmationMenu
-	ld a, $ff ; all decks
-	call DrawDeckSelectionMenu
+	ld a, ALL_DECKS
+	call DrawDecksScreen
 	ld a, [wCurDeck]
 	scf
 	ret
@@ -488,10 +1223,268 @@ OpenDeckConfirmationMenu:
 	ld [hl], a
 	call HandleDeckConfirmationMenu
 	ret
+; 0x9014
 
-SECTION "Bank 2@5215", ROMX[$5215], BANK[$2]
+SECTION "Bank 2@503f", ROMX[$503f], BANK[$2]
 
-Func_9215:
+; a - selected deck
+; handles the submenu when selecting a deck
+; (Modify Deck, Select Deck, Change Name and Cancel)
+DeckSelectionSubMenu:
+	call DrawWideTextBox
+	ld hl, DeckSelectScreenTextItems
+	call PlaceTextItems
+	call ResetCheckMenuCursorPositionAndBlink
+.loop_input:
+	call DoFrame
+	call HandleCheckMenuInput
+	jp nc, .loop_input
+	cp $ff
+	jr nz, .option_selected
+; B btn pressed
+; erase cursor and go back
+; to deck selection handling
+	call EraseCheckMenuCursor
+	ld a, [wCurDeck]
+	jp DeckSelectionMenu.init_menu_params
+
+.option_selected
+	ld a, [wCheckMenuCursorXPosition]
+	or a
+	jp nz, DeckSelectionSubMenu_SelectOrCancel
+	ld a, [wCheckMenuCursorYPosition]
+	or a
+	jp nz, .ChangeName
+
+	call GetSRAMPointerToCurDeckCards
+	ld e, l
+	ld d, h
+	ld hl, wCurDeckCards
+	call CopyDeckFromSRAM
+	ld de, wCurDeckName
+	call GetSRAMPointerToCurDeck
+	call CopyListFromHLToDEInSRAM
+	xor a
+	ld [wd121], a
+
+	call HandleDeckBuildScreen
+	jr nc, .asm_90cd
+	call EnableSRAM
+	ld hl, wCurDeckCards
+	call DecrementDeckCardsInCollection
+	call GetSRAMPointerToCurDeckCards
+	call AddDeckToCollection
+	ld de, wCurDeckCards
+	bank1call SaveDeckCards
+	call GetSRAMPointerToCurDeck
+	ld d, h
+	ld e, l
+	ld hl, wCurDeckName
+	call CopyListFromHLToDE
+	call GetSRAMPointerToCurDeck
+	ld a, [hl]
+	call DisableSRAM
+	or a
+	jr z, .get_input_deck_name
+	ld a, [hffbf]
+	or a
+	jr z, .asm_90cd
+	call EnableSRAM
+	ld de, wCurDeckCards
+	farcall SaveDeckDataToWRAM2
+	call DisableSRAM
+	farcall OpenDeckSaveMachineFromDeckBuilding
+.asm_90cd
+	ld a, ALL_DECKS
+	call DrawDecksScreen
+	ld a, [wCurDeck]
+	jp DeckSelectionMenu.init_menu_params
+
+.ChangeName
+	xor a
+	ld [hffbf], a
+	call CheckIfCurDeckIsEmpty
+	jp nc, .get_input_deck_name
+	call PrintThereIsNoDeckHereText
+	jp DeckSelectionMenu.init_menu_params
+
+.get_input_deck_name
+	ld de, wCurDeckName
+	call GetSRAMPointerToCurDeck
+	call CopyListFromHLToDEInSRAM
+	call InputCurDeckName
+	call GetSRAMPointerToCurDeck
+	ld d, h
+	ld e, l
+	ld hl, wCurDeckName
+	call CopyListFromHLToDEInSRAM
+	ld a, [hffbf]
+	or a
+	jr z, .asm_9119
+	call EnableSRAM
+	ld hl, wCurDeckName
+	ld de, wCurDeckCards
+	farcall SaveDeckDataToWRAM2
+	call DisableSRAM
+	farcall OpenDeckSaveMachineFromDeckBuilding
+.asm_9119
+	ld a, ALL_DECKS
+	call DrawDecksScreen
+	ld a, [wCurDeck]
+	jp DeckSelectionMenu.init_menu_params
+
+InputCurDeckName:
+	ld a, [wCurDeck]
+	or a
+	jr nz, .try_deck_2
+	ld hl, Deck1RenameText
+	jr .got_deck_ptr
+.try_deck_2
+	dec a
+	jr nz, .try_deck_3
+	ld hl, Deck2RenameText
+	jr .got_deck_ptr
+.try_deck_3
+	dec a
+	jr nz, .try_deck_4
+	ld hl, Deck3RenameText
+	jr .got_deck_ptr
+.try_deck_4
+	dec a
+	jr nz, .deck_5
+	ld hl, Deck4RenameText
+	jr .got_deck_ptr
+.deck_5
+	ld hl, Deck5RenameText
+.got_deck_ptr
+	ld a, DECK_NAME_SIZE_WO_SUFFIX
+	lb bc, 4, 1
+	ld de, wCurDeckName
+	farcall InputName
+	ld a, [wCurDeckName]
+	or a
+	ret nz
+	call .UnnamedDeck
+	ret
+
+; handles the naming of unnamed decks
+; inputs as the deck name "<player name> no XXX"
+; where XXX is the current unnamed deck counter
+.UnnamedDeck
+	ld hl, sUnnamedDeckCounter
+	call EnableSRAM
+	ld e, [hl]
+	inc hl
+	ld d, [hl]
+	push de
+	ld de, wCurDeckName
+	call CopyPlayerName
+	ld h, d
+	ld l, e
+	pop de
+
+	ld [hl], TX_HIRAGANA
+	inc hl
+	ldfw [hl], "の"
+	inc hl
+
+	push hl
+	ld h, d
+	ld l, e
+	call UnnamedDeckCounterToText
+	call DisableSRAM
+	pop hl
+
+	ld a, [wTempUnnamedDeckCounter]
+	ld [hl], TX_SYMBOL
+	inc hl
+	ld [hli], a
+	ld a, [wTempUnnamedDeckCounter + 1]
+	ld [hl], TX_SYMBOL
+	inc hl
+	ld [hli], a
+	ld a, [wTempUnnamedDeckCounter + 2]
+	ld [hl], TX_SYMBOL
+	inc hl
+	ld [hli], a
+	xor a
+	ld [hl], a
+
+; increment the unnamed deck counter
+	ld hl, sUnnamedDeckCounter
+	call EnableSRAM
+	ld e, [hl]
+	inc hl
+	ld d, [hl]
+; capped at 999
+	ld a, HIGH(MAX_UNNAMED_DECK_NUM)
+	cp d
+	jr nz, .incr_counter
+	ld a, LOW(MAX_UNNAMED_DECK_NUM)
+	cp e
+	jr nz, .incr_counter
+	; reset counter
+	ld de, 0
+.incr_counter
+	inc de
+	ld [hl], d
+	dec hl
+	ld [hl], e
+	call DisableSRAM
+	ret
+
+; handle deck selection sub-menu
+; the option is either "Select Deck" or "Cancel"
+; depending on the cursor Y pos
+DeckSelectionSubMenu_SelectOrCancel:
+	ld a, [wCheckMenuCursorYPosition]
+	or a
+	jp nz, CancelDeckSelectionSubMenu
+
+	call CheckIfCurDeckIsEmpty
+	jp nc, .SelectDeck
+	; invalid deck
+	call PrintThereIsNoDeckHereText
+	jp DeckSelectionMenu.init_menu_params
+
+.SelectDeck
+	call EnableSRAM
+	ld a, [sCurrentlySelectedDeck]
+	call DisableSRAM
+
+; draw empty rectangle on currently selected deck
+; i.e. erase the Hand Cards Gfx icon
+	ld h, $03
+	ld l, a
+	call HtimesL
+	ld e, l
+	inc e
+	ld d, 2
+	xor a
+	lb hl, 0, 0
+	lb bc, 2, 2
+	call FillRectangle
+
+; set current deck as the selected deck
+; and draw the Hand Cards Gfx icon
+	ld a, [wCurDeck]
+	call EnableSRAM
+	ld [sCurrentlySelectedDeck], a
+	call DisableSRAM
+	call DrawHandCardsTileOnCurDeck
+	call GetSRAMPointerToCurDeck
+	call EnableSRAM
+	call CopyDeckName
+	call DisableSRAM
+	xor a
+	ld [wTxRam2], a
+	ld [wTxRam2 + 1], a
+	ldtx hl, ChosenAsDuelingDeckText
+	call DrawWideTextBox_WaitForInput
+	ld a, [wCurDeck]
+	jp DeckSelectionMenu.init_menu_params
+
+PrintThereIsNoDeckHereText:
 	ldtx hl, ThereIsNoDeckHereText
 	call DrawWideTextBox_WaitForInput
 	ld a, [wCurDeck]
@@ -509,9 +1502,43 @@ CheckIfCurDeckIsEmpty:
 	ret nz
 	scf
 	ret
-; 0x922e
 
-SECTION "Bank 2@5265", ROMX[$5265], BANK[$2]
+; convert the number at hl to text (ascii) format and write it to wTempUnnamedDeckCounter
+UnnamedDeckCounterToText:
+	ld de, wTempUnnamedDeckCounter
+	ld bc, -100
+	call .get_digit
+	ld bc, -10
+	call .get_digit
+	ld bc, -1
+	call .get_digit
+	ret
+
+.get_digit
+	ld a, SYM_0 - 1
+.subtract_loop
+	inc a
+	add hl, bc
+	jr c, .subtract_loop
+	ld [de], a
+	inc de
+	ld a, l
+	sub c
+	ld l, a
+	ld a, h
+	sbc b
+	ld h, a
+	ret
+
+CancelDeckSelectionSubMenu:
+	ret
+
+DeckSelectScreenTextItems:
+	textitem  2, 14, ModifyDeckText
+	textitem 12, 14, ChooseAsDuelingDeckText
+	textitem  2, 16, RenameDeckText
+	textitem 12, 16, CancelDeckText
+	textitems_end
 
 GetSRAMPointerToCurDeck:
 	ld a, [wCurDeck]
@@ -536,30 +1563,217 @@ GetSRAMPointerToCurDeckCards:
 	pop de
 	pop af
 	ret
-; 0x9287
 
-SECTION "Bank 2@5328", ROMX[$5328], BANK[$2]
+ResetCheckMenuCursorPositionAndBlink:
+	xor a
+	ld [wCheckMenuCursorXPosition], a
+	ld [wCheckMenuCursorYPosition], a
+	ld [wScrollMenuCursorBlinkCounter], a
+	ret
 
-; play different sfx by a.
-; if a is 0xff play SFX_03 (usually following a B press),
-; else play SFX_02 (usually following an A press).
-PlayAcceptOrDeclineSFX:
+; handle player input in check menu
+; works out which cursor coordinate to go to
+; and sets carry flag if A or B are pressed
+; returns a =  $1 if A pressed
+; returns a = $ff if B pressed
+HandleCheckMenuInput:
+	xor a
+	ld [wMenuInputSFX], a
+	ld a, [wCheckMenuCursorXPosition]
+	ld d, a
+	ld a, [wCheckMenuCursorYPosition]
+	ld e, a
+	ldh a, [hDPadHeld]
+	or a
+	jr z, .no_pad
+	bit B_PAD_LEFT, a
+	jr nz, .horizontal
+	bit B_PAD_RIGHT, a
+	jr z, .check_vertical
+.horizontal
+	ld a, d
+	xor $01 ; flips x coordinate
+	ld d, a
+	jr .okay
+.check_vertical
+	bit B_PAD_UP, a
+	jr nz, .vertical
+	bit B_PAD_DOWN, a
+	jr z, .no_pad
+.vertical
+	ld a, e
+	xor $01 ; flips y coordinate
+	ld e, a
+.okay
+	ld a, SFX_CURSOR
+	ld [wMenuInputSFX], a
+	push de
+	call EraseCheckMenuCursor
+	pop de
+	ld a, d
+	ld [wCheckMenuCursorXPosition], a
+	ld a, e
+	ld [wCheckMenuCursorYPosition], a
+	xor a
+	ld [wScrollMenuCursorBlinkCounter], a
+.no_pad
+	ldh a, [hKeysPressed]
+	and PAD_A | PAD_B
+	jr z, .no_input
+	and PAD_A
+	jr nz, .a_press
+	ld a, MENU_CANCEL
+	call PlaySFXConfirmOrCancel
+	scf
+	ret
+
+.a_press
+	call DisplayCheckMenuCursor
+	ld a, MENU_CONFIRM
+	call PlaySFXConfirmOrCancel
+	scf
+	ret
+.no_input
+	ld a, [wMenuInputSFX]
+	or a
+	jr z, .check_blink
+	call PlaySFX
+
+.check_blink
+	ld hl, wScrollMenuCursorBlinkCounter
+	ld a, [hl]
+	inc [hl]
+	and %00001111
+	ret nz  ; only update cursor if blink's lower nibble is 0
+
+	ld a, SYM_CURSOR_R
+	bit 4, [hl] ; only draw cursor if blink counter's fourth bit is not set
+	jr z, DrawCheckMenuCursor
+
+; draws in the cursor position
+EraseCheckMenuCursor:
+	ld a, SYM_SPACE
+; fallthrough
+
+; draws in the cursor position
+; input:
+; a = tile byte to draw
+DrawCheckMenuCursor:
+	ld e, a
+	ld a, 10
+	ld l, a
+	ld a, [wCheckMenuCursorXPosition]
+	ld h, a
+	call HtimesL
+	ld a, l
+	add 1
+	ld b, a
+	ld a, [wCheckMenuCursorYPosition]
+	sla a
+	add 14
+	ld c, a
+	ld a, e
+	call WriteByteToBGMap0
+	or a
+	ret
+
+DisplayCheckMenuCursor:
+	ld a, SYM_CURSOR_R
+	jr DrawCheckMenuCursor
+
+; if a = MENU_CANCEL (-1), play SFX_CANCEL (usually following B button)
+; else SFX_CONFIRM (usually following A button)
+PlaySFXConfirmOrCancel:
 	push af
 	inc a
 	jr z, .cancel
-	ld a, SFX_02
+; confirm
+	ld a, SFX_CONFIRM
 	jr .play_sfx
 .cancel
-	ld a, SFX_03
+	ld a, SFX_CANCEL
 .play_sfx
 	call PlaySFX
 	pop af
 	ret
-; 0x9337
 
-SECTION "Bank 2@53bd", ROMX[$53bd], BANK[$2]
+Func_9337:
+	push hl
+	ld d, h
+	ld e, l
+	ld hl, wTempSavedDeckCards
+	call CopyDeckFromSRAM
+	call EnableSRAM
+	ld hl, wTempSavedDeckCards
+;	fallthrough
 
-DrawDeckSelectionMenu:
+; goes through whole deck in hl
+; for each card ID, goes to its corresponding
+; entry in sCardCollection and decrements its count
+_DecrementDeckCardsInCollection:
+	ld b, DECK_SIZE
+.loop
+	ld e, [hl]
+	inc hl
+	ld d, [hl]
+	call CheckIfCardIDIsZero
+	jr c, .done
+	inc hl
+	push hl
+	ld hl, sCardCollection
+	add hl, de
+	dec [hl]
+	pop hl
+	dec b
+	jr nz, .loop
+.done
+	pop hl
+	ret
+
+; goes through whole deck in hl
+; for each card ID, goes to its corresponding
+; entry in sCardCollection and decrements its count
+DecrementDeckCardsInCollection:
+	push hl
+	jr _DecrementDeckCardsInCollection
+; 0x9360
+
+SECTION "Bank 2@5397", ROMX[$5397], BANK[$2]
+
+; adds all cards in deck in hl to player's collection
+; Enables SRAM (contrary to this function in poketcg1)
+; hl = pointer to deck cards
+AddDeckToCollection:
+	push hl
+	ld d, h
+	ld e, l
+	ld hl, wTempSavedDeckCards
+	call CopyDeckFromSRAM
+	call EnableSRAM
+	ld hl, wTempSavedDeckCards
+	ld b, DECK_SIZE
+.loop_deck
+	ld e, [hl]
+	inc hl
+	ld d, [hl]
+	call CheckIfCardIDIsZero
+	jr c, .done
+	inc hl
+	push hl
+	ld hl, sCardCollection
+	add hl, de
+	inc [hl]
+	pop hl
+	dec b
+	jr nz, .loop_deck
+.done
+	pop hl
+	ret
+
+; draws the screen which shows the player's current
+; deck configurations
+; a = DECK_* flags to pick which deck names to show
+DrawDecksScreen:
 	ld [hffbf], a
 
 	call EmptyScreenAndLoadFontDuelAndHandCardsIcons
@@ -683,7 +1897,7 @@ DrawDeckSelectionMenu:
 	textitem 4,  5, Deck2Text ; "2・"
 	textitem 4,  8, Deck3Text ; "3・"
 	textitem 4, 11, Deck4Text ; "4・"
-	db $ff
+	textitems_end
 
 CopyDeckName:
 	ld de, wDefaultText
@@ -742,8 +1956,6 @@ DeckNameSuffix:
 	katakana "ッ"
 	katakana "キ"
 	done
-
-SECTION "Bank 2@5503", ROMX[$5503], BANK[$2]
 
 CopyListFromHLToDE:
 .loop
@@ -840,7 +2052,9 @@ AppendDeckName:
 	katakana "デ"
 	katakana "ッ"
 	katakana "キ"
-	db "<SPACE><SPACE><SPACE><SPACE><SPACE><SPACE><SPACE><SPACE><SPACE><SPACE>"
+REPT 10
+	db "<SPACE>"
+ENDR
 .text_end
 
 ; returns carry if the deck in hl
@@ -889,21 +2103,648 @@ DrawHandCardsTileAtDE:
 	lb bc, 2, 2
 	call FillRectangle
 	ret
-; 0x95d6
 
-SECTION "Bank 2@5a31", ROMX[$5a31], BANK[$2]
+HandleDeckBuildScreen:
+	xor a
+	ld [hffbf], a
+	call WriteCardListsTerminatorBytes
+	call CountNumberOfCardsForEachCardType
+.skip_count
+	call DrawCardTypeIconsAndPrintCardCounts
+
+	xor a
+	ld [wScrollMenuScrollOffset], a
+	ld [wCurCardTypeFilter], a ; FILTER_GRASS
+	call PrintFilteredCardList
+
+.skip_draw
+	ld hl, FiltersCardSelectionParams
+	call InitializeScrollMenuParameters
+.wait_input
+	call DoFrame
+	ldh a, [hDPadHeld]
+	and PAD_START
+	jr z, .no_start_btn_1
+	ld a, MENU_CONFIRM
+	call PlaySFXConfirmOrCancel
+	call ConfirmDeckConfiguration
+	ld a, [wCurCardTypeFilter]
+	ld [wTempCardTypeFilter], a
+	jr .wait_input
+
+.no_start_btn_1
+	ld a, [wCurCardTypeFilter]
+	ld b, a
+	ld a, [wTempCardTypeFilter]
+	cp b
+	jr z, .check_down_btn
+	; need to refresh the filtered card list
+	ld [wCurCardTypeFilter], a
+	ld hl, wScrollMenuScrollOffset
+	ld [hl], 0
+	call PrintFilteredCardList
+	ld a, NUM_FILTERS
+	ld [wNumMenuItems], a
+
+.check_down_btn
+	ldh a, [hDPadHeld]
+	and PAD_DOWN
+	jr z, .no_down_btn
+	call ConfirmSelectionAndReturnCarry
+	jr .jump_to_list
+
+.no_down_btn
+	call HandleCardSelectionInput
+	jr nc, .wait_input
+	ld a, [hCurMenuItem]
+	cp $ff
+	jp z, OpenDeckConfigurationMenu
+
+.jump_to_list
+	ld a, [wNumEntriesInCurFilter]
+	or a
+	jr z, .wait_input
+	xor a
+.wait_list_input
+	ld hl, $5a3a
+	call InitializeScrollMenuParameters
+	ld a, [wNumEntriesInCurFilter]
+	ld [wNumCardListEntries], a
+	ld hl, wNumVisibleCardListEntries
+	cp [hl]
+	jr nc, .ok
+	; if total number of entries is greater than or equal to
+	; the number of visible entries, then set number of cursor positions
+	; as number of visible entries
+	ld [wNumMenuItems], a
+.ok
+	ld hl, PrintDeckBuildingCardList
+	ld d, h
+	ld a, l
+	ld hl, wScrollMenuScrollFunc
+	ld [hli], a
+	ld [hl], d
+
+	ld a, $01
+	ld [wd119], a
+.loop_input
+	call DoFrame
+	ldh a, [hDPadHeld]
+	and PAD_START
+	jr z, .no_start_btn_2
+	ld a, MENU_CONFIRM
+	call PlaySFXConfirmOrCancel
+
+	; temporarily store current cursor position
+	; to retrieve it later
+	ld a, [wTempCardTypeFilter]
+	ld [wTempFilteredCardListNumCursorPositions], a
+	call ConfirmDeckConfiguration
+	ld a, [wTempFilteredCardListNumCursorPositions]
+	jr .wait_list_input
+
+.no_start_btn_2
+	ldh a, [hDPadHeld]
+	and PAD_UP
+	jr z, .asm_96a0
+	ld a, [wTempCardTypeFilter]
+	ld hl, wScrollMenuScrollOffset
+	add [hl]
+	jr nz, .asm_96a0
+	ld a, $ff
+	ld [hCurMenuItem], a
+	ld a, MENU_CANCEL
+	call PlaySFXConfirmOrCancel
+	jr .asm_96f3
+
+.asm_96a0
+	call HandleSelectUpAndDownInList
+	jr c, .loop_input
+	call HandleScrollListInput
+	jr c, .asm_96f3
+	jr .loop_input
+
+.asm_96ac
+	ld a, MENU_CONFIRM
+	call PlaySFXConfirmOrCancel
+	ld a, [wNumMenuItems]
+	ld [wTempScrollMenuNumVisibleItems], a
+	ld a, [wTempCardTypeFilter]
+	ld [wTempCurMenuItem], a
+	ld de, wTempCardList
+	ld hl, wCurCardListPtr
+	ld [hl], e
+	inc hl
+	ld [hl], d
+	call OpenCardPageFromCardList
+	call DrawCardTypeIconsAndPrintCardCounts
+
+	ld hl, FiltersCardSelectionParams
+	call InitializeScrollMenuParameters
+	ld a, [wCurCardTypeFilter]
+	ld [wTempCardTypeFilter], a
+	call DrawHorizontalListCursor_Visible
+	call PrintDeckBuildingCardList
+	ld hl, $5a3a
+	call InitializeScrollMenuParameters
+	ld a, [wTempScrollMenuNumVisibleItems]
+	ld [wNumMenuItems], a
+	ld a, [wTempCurMenuItem]
+	ld [wTempCardTypeFilter], a
+	jp .loop_input
+
+.asm_96f3
+	call DrawListCursor_Invisible
+	ld a, [wTempCardTypeFilter]
+	ld [wTempCurMenuItem], a
+	ld a, [hCurMenuItem]
+	cp $ff
+	jr nz, .asm_96ac
+	ld hl, FiltersCardSelectionParams
+	call InitializeScrollMenuParameters
+	ld a, [wCurCardTypeFilter]
+	ld [wTempCardTypeFilter], a
+	jp .wait_input
+
+OpenDeckConfigurationMenu:
+	xor a
+	ld [wd0c1], a
+	ld de, wDeckConfigurationMenuTransitionTable
+	ld hl, wTransitionTablePtr
+	ld a, [de]
+	ld [hli], a
+	inc de
+	ld a, [de]
+	ld [hl], a
+	ld a, $ff
+	ld [wd0c4], a
+
+.skip_init
+	xor a
+	ld [wScrollMenuCursorBlinkCounter], a
+	ld hl, wDeckConfigurationMenuHandlerFunction
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	jp hl
+
+HandleDeckConfigurationMenu:
+	call Func_98eb
+	lb de, 0, 0
+	lb bc, 20, 6
+	call DrawRegularTextBox
+	ld hl, DeckBuildMenuTextItems
+	call PlaceTextItems
+
+.do_frame
+	ld a, $01
+	ld [wVBlankOAMCopyToggle], a
+	call DoFrame
+	call HandleMultiDirectionalMenu
+	jr nc, .do_frame
+	ld [wd11d], a
+	cp $ff
+	jr nz, .asm_9769
+.draw_icons
+	call DrawCardTypeIconsAndPrintCardCounts
+	ld a, [wTempCurMenuItem]
+	ld [wTempCardTypeFilter], a
+	ld a, [wCurCardTypeFilter]
+	call PrintFilteredCardList
+	jp HandleDeckBuildScreen.skip_draw
+
+.asm_9769
+	push af
+	call HandleMultiDirectionalMenu.DrawCursor
+	ld a, $01
+	ld [wVBlankOAMCopyToggle], a
+	pop af
+	ld hl, .function_table
+	call JumpToFunctionInTable
+	jr OpenDeckConfigurationMenu.skip_init
+
+.function_table:
+	dw ConfirmDeckConfiguration
+	dw ModifyDeckConfiguration
+	dw ChangeDeckName
+	dw SaveDeckConfiguration
+	dw DismantleDeck
+	dw CancelDeckModifications
+
+ConfirmDeckConfiguration:
+	ld hl, wScrollMenuScrollOffset
+	ld a, [hl]
+	ld hl, wCardListVisibleOffsetBackup
+	ld [hl], a
+	call HandleDeckConfirmationMenu
+	ld hl, wCardListVisibleOffsetBackup
+	ld a, [hl]
+	ld hl, wScrollMenuScrollOffset
+	ld [hl], a
+	call DrawCardTypeIconsAndPrintCardCounts
+	ld hl, FiltersCardSelectionParams
+	call InitializeScrollMenuParameters
+	ld a, [wCurCardTypeFilter]
+	ld [wTempCardTypeFilter], a
+	call DrawHorizontalListCursor_Visible
+	ld a, [wCurCardTypeFilter]
+	call PrintFilteredCardList
+	ld a, [wd11d]
+	ld [wTempCardTypeFilter], a
+	ret
+
+ModifyDeckConfiguration:
+	add sp, $02
+	jr HandleDeckConfigurationMenu.draw_icons
+
+; returns carry set if player chose to go back
+CancelDeckModifications:
+; if deck was not changed, cancel modification immediately
+	call CheckIfCurrentDeckWasChanged
+	jr nc, .cancel_modification
+	ldtx hl, DeckBuildingQuitPromptText
+	call YesOrNoMenuWithText
+	jr c, SaveDeckConfiguration.go_back
+.cancel_modification
+	add sp, $02
+	or a
+	ret
+
+SaveDeckConfiguration:
+; handle deck configuration size
+	ld a, [wTotalCardCount]
+	cp DECK_SIZE
+	jp z, .ask_to_save_deck
+	ldtx hl, DeckBuildingWarningNot60CardsText
+	call DrawWideTextBox_WaitForInput
+	ldtx hl, DeckBuildingRevertPromptText
+	call YesOrNoMenuWithText
+	jr c, .print_deck_size_warning
+; return no carry
+	add sp, $02
+	or a
+	ret
+
+.print_deck_size_warning
+	ldtx hl, DeckBuildingWarningMustInclude60CardsText
+	call DrawWideTextBox_WaitForInput
+	jr .go_back
+
+.ask_to_save_deck
+	ldtx hl, DeckBuildingSavePromptText
+	call YesOrNoMenuWithText
+	jr c, .go_back
+	call CheckIfThereAreAnyBasicCardsInDeck
+	jr c, .ask_to_save_to_deck_machine
+	ldtx hl, DeckBuildingWarningNoBasicPokemonText
+	call DrawWideTextBox_WaitForInput
+	ldtx hl, DeckBuildingWarningMustIncludeBasicPokemonText
+	call DrawWideTextBox_WaitForInput
+
+.go_back
+	call DrawCardTypeIconsAndPrintCardCounts
+	call PrintDeckBuildingCardList
+	ld a, [wd11d]
+	ld [wCurScrollMenuItem], a
+	ret
+
+.ask_to_save_to_deck_machine
+	ldtx hl, DeckBuildingSaveToMachinePromptText
+	call YesOrNoMenuWithText
+	jr c, .set_carry
+	ld a, $01
+	ld [hffbf], a
+
+.set_carry
+	add sp, $02
+	scf
+	ret
+
+DismantleDeck:
+	ldtx hl, DeckBuildingDismantlePromptText
+	call YesOrNoMenuWithText
+	jr c, SaveDeckConfiguration.go_back
+	call CheckIfHasOtherValidDecks
+	jp nc, .Dismantle
+	ldtx hl, DeckBuildingWarningTheOnlyDeckNotDismantleableText
+	call DrawWideTextBox_WaitForInput
+	call EmptyScreen
+	ld hl, FiltersCardSelectionParams
+	call InitializeScrollMenuParameters
+	ld a, [wCurCardTypeFilter]
+	ld [wTempCardTypeFilter], a
+	call DrawHorizontalListCursor_Visible
+	call PrintDeckBuildingCardList
+	call EnableLCD
+	ld a, [wd11d]
+	ld [wCurScrollMenuItem], a
+	ret
+
+.Dismantle
+	call EnableSRAM
+	call GetSRAMPointerToCurDeck
+	ld a, [hl]
+	or a
+	jr z, .asm_9871
+	push hl
+	call GetSRAMPointerToCurDeckCards
+	call AddDeckToCollection
+	pop hl
+	ld a, $60
+	call ClearNBytesFromHL
+
+.asm_9871
+	ldtx hl, DeckBuildingRevertAndSaveToMachinePromptText
+	call YesOrNoMenuWithText
+	jr c, .asm_989d
+	ld a, [wCurDeckName]
+	or a
+	jr z, .asm_98a0
+	ld a, [wTotalCardCount]
+	cp DECK_SIZE
+	jp nz, .asm_98a0
+	call CheckIfThereAreAnyBasicCardsInDeck
+	jr nc, .asm_98a0
+	ld hl, wCurDeckName
+	ld de, wCurDeckCards
+	farcall SaveDeckDataToWRAM2
+	call DisableSRAM
+	farcall OpenDeckSaveMachineFromDeckBuilding
+.asm_989d
+	add sp, $02
+	ret
+.asm_98a0
+	ldtx hl, DeckBuildingWarningIncompleteCannotSaveToMachineText
+	call DrawWideTextBox_WaitForInput
+	jr .asm_989d
+
+ChangeDeckName:
+	call InputCurDeckName
+	add sp, $02
+	jp HandleDeckBuildScreen.skip_count
+
+; de - coordinates
+Func_98b0:
+	push de
+	push hl
+	ld hl, .Data_98e8
+	ld de, wDefaultText
+	call CopyListFromHLToDE
+	pop hl
+	call CopyListFromHLToDEInSRAM
+	ld hl, wDefaultText
+	call GetTextLengthInTiles
+	ld b, $00
+	ld hl, wDefaultText
+	add hl, bc
+	ld d, h
+	ld e, l
+	ld hl, .DeckNameSuffix
+	call CopyListFromHLToDE
+	pop de
+	ld hl, wDefaultText
+	call InitTextPrinting
+	call ProcessText
+	or a
+	ret
+
+.DeckNameSuffix
+	katakana "デ"
+	katakana "ッ"
+	katakana "キ"
+	katakana " "
+	done
+
+.Data_98e8:
+	katakana " "
+	done
+
+Func_98eb:
+	lb de, 0, 6
+	lb bc, 20, 12
+	call DrawRegularTextBox
+	ld hl, wCurDeckName
+	ld a, [hl]
+	or a
+	jr z, .asm_9910
+	lb de, 1, 6
+	call Func_98b0
+	ld hl, wCurDeckName
+	call GetTextLengthInTiles
+	ld a, 5
+	add b
+	lb de, 1, 6
+	call ZeroAttributesAtDE
+.asm_9910
+	ld hl, wCurDeckCards
+	farcall CheckDeck.asm_25461
+	lb de, 2, 8
+	call InitTextPrinting
+	ldtx hl, DeckDiagnosisBreakdownText
+	call ProcessTextFromID
+	ld a, [wDeckCheckEnergyCount]
+	lb de, 15, 8
+	call Func_9951
+	ld a, [wDeckCheckBasicCount]
+	lb de, 15, 10
+	call Func_9951
+	ld a, [wDeckCheckStage1Count]
+	lb de, 15, 12
+	call Func_9951
+	ld a, [wDeckCheckStage2Count]
+	lb de, 15, 14
+	call Func_9951
+	ld a, [wDeckCheckTrainerCount]
+	lb de, 15, 16
+	call Func_9951
+	ret
+
+Func_9951:
+	push de
+	ld hl, wDefaultText
+	call ConvertToNumericalDigits
+	ld [hl], $00
+	pop de
+	call InitTextPrinting
+	ld hl, wDefaultText
+	call ProcessText
+	ret
+
+; returns carry if current deck was changed
+; either through its card configuration or its name
+CheckIfCurrentDeckWasChanged:
+	ld a, [wTotalCardCount]
+	or a
+	jr z, .skip_size_check
+	cp DECK_SIZE
+	jr nz, .set_carry
+
+.skip_size_check
+	call GetSRAMPointerToCurDeckCards
+	ld d, h
+	ld e, l
+	ld hl, wTempCardCollection
+	call EnableSRAM
+	bank1call DecompressSRAMDeck
+	call DisableSRAM
+	ld a, $ff
+	ld [wTempCardCollection + DECK_SIZE_BYTES], a
+	ld [wTempCardCollection + DECK_SIZE_BYTES + 1], a
+	ld hl, wCurDeckCards
+.asm_998b
+	ld e, [hl]
+	inc hl
+	ld d, [hl]
+	inc hl
+	call CheckIfCardIDIsZero
+	jr c, .asm_99b7
+	push hl
+	ld hl, wTempCardCollection
+.asm_9998
+	ld c, [hl]
+	inc hl
+	ld b, [hl]
+	inc hl
+	ld a, b
+	cp $ff
+	ld a, c
+	jr nz, .asm_99a9
+	cp $ff
+	jr nz, .asm_99a9
+	pop hl
+	jr .asm_998b
+.asm_99a9
+	cp e
+	jr nz, .asm_9998
+	ld a, b
+	cp d
+	jr nz, .asm_9998
+	dec hl
+	xor a
+	ld [hld], a
+	ld [hl], a
+	pop hl
+	jr .asm_998b
+.asm_99b7
+	ld hl, wTempCardCollection
+.asm_99ba
+	ld e, [hl]
+	inc hl
+	ld d, [hl]
+	inc hl
+	cp16 $ffff
+	jr z, .asm_99d2
+	call CheckIfCardIDIsZero
+	jr nc, .set_carry
+	or a
+	jr nz, .set_carry
+	jr .asm_99ba
+.asm_99d2
+	call GetSRAMPointerToCurDeck
+	ld de, wCurDeckName
+	call EnableSRAM
+.loop_name
+	ld a, [de]
+	cp [hl]
+	jr nz, .set_carry
+	inc de
+	inc hl
+	or a
+	jr nz, .loop_name
+	call DisableSRAM
+	ret
+.set_carry
+	call DisableSRAM
+	scf
+	ret
+
+; returns carry if doesn't have a valid deck
+; aside from the current deck
+CheckIfHasOtherValidDecks:
+	ld hl, wDecksValid
+	lb bc, 0, 0
+.loop
+	inc b
+	ld a, NUM_DECKS
+	cp b
+	jr c, .check_has_cards
+	ld a, [hli]
+	or a
+	jr z, .loop
+	; is valid
+	inc c
+	ld a, 1
+	cp c
+	jr nc, .loop ; just 1 valid
+	; at least 2 decks are valid
+.no_carry
+	or a
+	ret
+
+.check_has_cards
+; doesn't have at least 2 valid decks
+; check if current deck is the only one
+; that is valid (i.e. has cards)
+	call GetSRAMPointerToCurDeckCards
+	call CheckIfDeckHasCards
+	jr c, .no_carry ; no cards
+	; has cards, is the only valid deck!
+	scf
+	ret
+
+CheckIfThereAreAnyBasicCardsInDeck:
+	ld hl, wCurDeckCards
+.loop_cards
+	ld e, [hl]
+	inc hl
+	ld d, [hl]
+	inc hl
+	call CheckIfCardIDIsZero
+	jr c, .no_carry
+	call LoadCardDataToBuffer1_FromCardID
+	jr c, .no_carry
+	ld a, [wLoadedCard1Type]
+	and TYPE_ENERGY
+	jr nz, .loop_cards
+	ld a, [wLoadedCard1Stage]
+	or a
+	jr nz, .loop_cards
+	scf
+	ret
+.no_carry
+	or a
+	ret
 
 FiltersCardSelectionParams:
-	db 1 ; x pos
-	db 1 ; y pos
-	db 0 ; y spacing
-	db 2 ; x spacing
-	db NUM_FILTERS ; num entries
-	db SYM_CURSOR_D ; visible cursor tile
-	db SYM_SPACE ; invisible cursor tile
-	dw NULL ; wCardListHandlerFunction
+	scrollmenu_params 1, 1, 0, 2, NUM_FILTERS, SYM_CURSOR_D, SYM_SPACE, NULL
 
-SECTION "Bank 2@5a8e", ROMX[$5a8e], BANK[$2]
+SECTION "Bank 2@5a43", ROMX[$5a43], BANK[$2]
+
+DeckConfigurationMenu_TransitionTable:
+	cursor_transition $10, $20, $00, $03, $03, $01, $02
+	cursor_transition $48, $20, $00, $04, $04, $02, $00
+	cursor_transition $80, $20, $00, $05, $05, $00, $01
+	cursor_transition $10, $30, $00, $00, $00, $04, $05
+	cursor_transition $48, $30, $00, $01, $01, $05, $03
+	cursor_transition $80, $30, $00, $02, $02, $03, $04
+
+; draws each card type icon in a line
+; the respective card counts underneath each icon
+; and prints"X/60" in the upper-right corner,
+; where X is the total card count
+DrawCardTypeIconsAndPrintCardCounts:
+	call PrepareMenuGraphics
+	lb bc, 0, 5
+	ld a, SYM_BOX_TOP
+	call FillBGMapLineWithA
+	call DrawCardTypeIcons
+	call PrintCardTypeCounts
+	lb de, 15, 0
+	call PrintTotalCardCount
+	lb de, 17, 0
+	call PrintSlashSixty
+	call EnableLCD
+	ret
 
 ; fills one line at coordinate bc in BG Map
 ; with the byte in register a
@@ -922,9 +2763,20 @@ FillBGMapLineWithA:
 	call WriteBBytesToDE
 	call BankswitchVRAM0
 	ret
-; 0x9aaa
 
-SECTION "Bank 2@5abb", ROMX[$5abb], BANK[$2]
+; saves the count of each type of card that is in wCurDeckCards
+; stores these values in wCardFilterCounts
+CountNumberOfCardsForEachCardType:
+	ld hl, wCardFilterCounts
+	ld de, CardTypeFilters
+.loop
+	ld a, [de]
+	cp -1
+	ret z
+	inc de
+	call CountNumberOfCardsOfType
+	ld [hli], a
+	jr .loop
 
 ; a = byte to write
 ; b = number of bytes
@@ -991,9 +2843,15 @@ DrawCardTypeIcons:
 	db ICON_TILE_TRAINER,   15, 2
 	db ICON_TILE_ENERGY,    17, 2
 	db $00
-; 0x9b18
 
-SECTION "Bank 2@5b31", ROMX[$5b31], BANK[$2]
+DeckBuildMenuTextItems:
+	textitem  2, 2, DeckBuildingConfirmText
+	textitem  9, 2, DeckBuildingContinueModifyingText
+	textitem 16, 2, DeckBuildingNameText
+	textitem  2, 4, DeckBuildingSaveText
+	textitem  9, 4, DeckBuildingDismantleText
+	textitem 16, 4, CancelDeckText
+	textitems_end
 
 ; prints "/60" to the coordinates given in de
 PrintSlashSixty:
@@ -1264,9 +3122,40 @@ Func_9c55:
 	pop bc
 	pop hl
 	ret
-; 0x9c80
 
-SECTION "Bank 2@5ca6", ROMX[$5ca6], BANK[$2]
+; appends text "X/Y", where X is the number of included cards
+; and Y is the total number of cards in storage of a given card ID
+; input:
+; e = card ID
+AppendOwnedCardCountAndStorageCountNumbers:
+	push af
+	push bc
+	push de
+	push hl
+; count how many bytes until $00
+.loop
+	ld a, [hl]
+	or a
+	jr z, .print
+	inc hl
+	jr .loop
+.print
+	push de
+	call GetCountOfCardInCurDeck
+	call ConvertToNumericalDigits
+	ld [hl], TX_SYMBOL
+	inc hl
+	ld [hl], SYM_SLASH
+	inc hl
+	pop de
+	call Func_9c55
+	call ConvertToNumericalDigits
+	ld [hl], TX_END
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
 
 ; determines the ones and tens digits in a for printing
 ; the ones place is added $20 (SYM_0) so that it maps to a numerical character
@@ -1319,9 +3208,56 @@ ConvertToNumericalDigits:
 	ld a, b
 	ld [hli], a
 	ret
-; 0x9cdc
 
-SECTION "Bank 2@5d1a", ROMX[$5d1a], BANK[$2]
+CountNumberOfCardsOfType:
+	push de
+	push hl
+	ld hl, $0
+	ld b, a
+	ld c, $00
+.loop_cards
+	push hl
+	push bc
+	ld bc, wCurDeckCards
+	add hl, bc
+	ld e, [hl]
+	inc hl
+	ld d, [hl]
+	pop bc
+	pop hl
+	inc hl
+	inc hl
+	call CheckIfCardIDIsZero
+	jr c, .done
+	call GetCardType
+	jr c, .done
+	push hl
+	ld l, a
+	ld a, b
+	and FILTER_ENERGY
+	cp FILTER_ENERGY
+	jr z, .check_energy
+	ld a, l
+	pop hl
+	cp b
+	jr nz, .loop_cards
+	jr .incr_count
+
+; counts all energy cards as the same
+.check_energy
+	ld a, l
+	pop hl
+	and TYPE_ENERGY
+	cp TYPE_ENERGY
+	jr nz, .loop_cards
+.incr_count
+	inc c
+	jr .loop_cards
+.done
+	ld a, c
+	pop hl
+	pop de
+	ret
 
 ; prints the card count of each individual card type
 ; assumes CountNumberOfCardsForEachCardType was already called
@@ -1349,9 +3285,48 @@ PrintCardTypeCounts:
 	ld hl, wDefaultText
 	call ProcessText
 	ret
-; 0x9d41
 
-SECTION "Bank 2@5d8c", ROMX[$5d8c], BANK[$2]
+PrintFilteredCardList:
+	push af
+	ld hl, CardTypeFilters
+	ld b, $00
+	ld c, a
+	add hl, bc
+	ld a, [hl]
+	push af
+
+; copy sCardCollection to wTempCardCollection
+	call EnableSRAM
+	ld hl, sCardCollection
+	ld de, wTempCardCollection
+	ld b, $00
+	call CopyBBytesFromHLToDE_Bank02
+	ld hl, $a200
+	ld de, $c100
+	ld b, $00
+	call CopyBBytesFromHLToDE_Bank02
+	call DisableSRAM
+
+	ld a, [wIncludeCardsInDeck]
+	or a
+	jr z, .ok
+	call GetSRAMPointerToCurDeckCards
+	ld d, h
+	ld e, l
+	call IncrementDeckCardsInTempCollection
+.ok
+	pop af
+	call CreateFilteredCardList
+	ld a, NUM_FILTERED_LIST_VISIBLE_CARDS
+	ld [wNumVisibleCardListEntries], a
+	lb de, 1, 7
+	ld hl, wCardListCoords
+	ld [hl], e
+	inc hl
+	ld [hl], d
+	call PrintDeckBuildingCardList
+	pop af
+	ret
 
 ; used to filter the cards in the deck building/card selection screen
 CardTypeFilters:
@@ -1393,31 +3368,118 @@ PrintTotalCardCount:
 	ld hl, wDefaultText
 	call ProcessText
 	ret
-; 0x9dbf
 
-SECTION "Bank 2@5e48", ROMX[$5e48], BANK[$2]
+; prints the name, level and storage count of the cards
+; that are visible in the list window
+; in the form:
+; CARD NAME/LEVEL X/Y
+; where X is the current count of that card
+; and Y is the storage count of that card
+PrintDeckBuildingCardList:
+	push bc
+	ld hl, wCardListCoords
+	ld e, [hl]
+	inc hl
+	ld d, [hl]
+	ld b, $13
+	ld c, e
+	dec c
+	ld a, [wScrollMenuScrollOffset]
+	or a
+	jr z, .no_cursor
+	ld a, SYM_CURSOR_U
+	jr .got_cursor_tile
+.no_cursor
+	ld a, SYM_SPACE
+.got_cursor_tile
+	call WriteByteToBGMap0
+
+; iterates by decreasing value in wNumVisibleCardListEntries
+; by 1 until it reaches 0
+	ld a, [wScrollMenuScrollOffset]
+	add a
+	ld c, a
+	ld b, $00
+	ld hl, wTempCardList
+	add hl, bc
+	ld a, [wNumVisibleCardListEntries]
+.loop_filtered_cards
+	push de
+	or a
+	jr z, .exit_loop
+	ld b, a
+	ld e, [hl]
+	inc hl
+	ld d, [hl]
+	inc hl
+	call CheckIfCardIDIsZero
+	jr c, .invalid_card
+	call AddCardIDToVisibleList
+	call LoadCardDataToBuffer1_FromCardID
+	ld a, 13
+	push bc
+	push hl
+	push de
+	call CopyCardNameAndLevel
+	pop de
+	call AppendOwnedCardCountAndStorageCountNumbers
+	pop hl
+	pop bc
+	pop de
+	push hl
+	call InitTextPrinting
+	ld hl, wDefaultText
+	jr .process_text
+
+.invalid_card
+	pop de
+	push hl
+	call InitTextPrinting
+	ld hl, Text_9e48
+.process_text
+	call ProcessText
+	pop hl
+
+	ld a, b
+	dec a
+	inc e
+	inc e
+	jr .loop_filtered_cards
+
+.exit_loop
+	ld a, [hli]
+	or a
+	jr nz, .can_scroll
+	ld a, [hli]
+	or a
+	jr z, .cannot_scroll
+.can_scroll
+	pop de
+; draw down cursor because
+; there are still more cards
+; to be scrolled down
+	xor a ; FALSE
+	ld [wUnableToScrollDown], a
+	ld a, SYM_CURSOR_D
+	jr .draw_cursor
+.cannot_scroll
+	pop de
+	ld a, TRUE
+	ld [wUnableToScrollDown], a
+	ld a, SYM_SPACE
+.draw_cursor
+	ld b, 19 ; x coord
+	ld c, e
+	dec c
+	dec c
+	call WriteByteToBGMap0
+	pop bc
+	ret
 
 Text_9e48:
+REPT 20
 	db "<SPACE>"
-	db "<SPACE>"
-	db "<SPACE>"
-	db "<SPACE>"
-	db "<SPACE>"
-	db "<SPACE>"
-	db "<SPACE>"
-	db "<SPACE>"
-	db "<SPACE>"
-	db "<SPACE>"
-	db "<SPACE>"
-	db "<SPACE>"
-	db "<SPACE>"
-	db "<SPACE>"
-	db "<SPACE>"
-	db "<SPACE>"
-	db "<SPACE>"
-	db "<SPACE>"
-	db "<SPACE>"
-	db "<SPACE>"
+ENDR
 	done
 
 ; returns carry if card ID in de is $0000
@@ -1484,14 +3546,7 @@ InitializeScrollMenuParameters:
 	ret
 
 DeckMachineSelectionParams:
-	db 1 ; x pos
-	db 2 ; y pos
-	db 2 ; y spacing
-	db 0 ; x spacing
-	db 5 ; num entries
-	db SYM_CURSOR_R ; visible cursor tile
-	db SYM_SPACE ; invisible cursor tile
-	dw NULL ; wCardListHandlerFunction
+	scrollmenu_params 1, 2, 2, 0, 5, SYM_CURSOR_R, SYM_SPACE, NULL
 ; 0x9eb5
 
 SECTION "Bank 2@5ebe", ROMX[$5ebe], BANK[$2]
@@ -1508,7 +3563,7 @@ HandleCardSelectionInput:
 	ld a, [wNumMenuItems]
 	ld c, a
 	ld a, [wCurScrollMenuItem]
-	bit D_LEFT_F, b
+	bit B_PAD_LEFT, b
 	jr z, .check_d_right
 	dec a
 	bit 7, a
@@ -1518,7 +3573,7 @@ HandleCardSelectionInput:
 	dec a
 	jr .got_cursor_pos
 .check_d_right
-	bit D_RIGHT_F, b
+	bit B_PAD_RIGHT, b
 	jr z, .handle_ab_btns
 	inc a
 	cp c
@@ -1539,22 +3594,22 @@ HandleCardSelectionInput:
 	ld a, [wCurScrollMenuItem]
 	ld [hCurMenuItem], a
 	ldh a, [hKeysPressed]
-	and A_BUTTON | B_BUTTON
+	and PAD_A | PAD_B
 	jr z, HandleCardSelectionCursorBlink
-	and A_BUTTON
+	and PAD_A
 	jr nz, ConfirmSelectionAndReturnCarry
 	; b button
-	ld a, $ff
+	ld a, -1
 	ld [hCurMenuItem], a
-	call PlayAcceptOrDeclineSFX
+	call PlaySFXConfirmOrCancel ; MENU_CANCEL
 	scf
 	ret
 
 ; outputs cursor position in e and selection in a
 ConfirmSelectionAndReturnCarry:
 	call DrawHorizontalListCursor_Visible
-	ld a, $01
-	call PlayAcceptOrDeclineSFX
+	ld a, MENU_CONFIRM
+	call PlaySFXConfirmOrCancel
 	ld a, [wCurScrollMenuItem]
 	ld e, a
 	ld a, [hCurMenuItem]
@@ -1623,11 +3678,11 @@ HandleScrollListInput:
 	ld a, [wNumMenuItems]
 	ld c, a
 	ld a, [wCurScrollMenuItem]
-	bit D_UP_F, b
+	bit B_PAD_UP, b
 	jr z, .check_d_down
 ; d_up
 	push af
-	ld a, SFX_01
+	ld a, SFX_CURSOR
 	ld [wMenuInputSFX], a
 	pop af
 	dec a
@@ -1648,11 +3703,11 @@ HandleScrollListInput:
 	jr .done_scroll
 
 .check_d_down
-	bit D_DOWN_F, b
+	bit B_PAD_DOWN, b
 	jr z, .asm_9fd8
 ; d_down
 	push af
-	ld a, SFX_01
+	ld a, SFX_CURSOR
 	ld [wMenuInputSFX], a
 	pop af
 	inc a
@@ -1691,13 +3746,13 @@ HandleScrollListInput:
 	ld a, [wd119]
 	or a
 	jr z, .asm_9ff4
-	bit D_LEFT_F, b
+	bit B_PAD_LEFT, b
 	jr z, .asm_9fea
 	call GetSelectedVisibleCardID
 	call RemoveCardFromDeckAndUpdateCount
 	jr .asm_9ff4
 .asm_9fea
-	bit D_RIGHT_F, b
+	bit B_PAD_RIGHT, b
 	jr z, .asm_9ff4
 	call GetSelectedVisibleCardID
 	call AddCardToDeckAndUpdateCount
@@ -1717,8 +3772,8 @@ HandleScrollListInput:
 	jr nc, .blink_cursor
 .selected
 	call DrawListCursor_Visible
-	ld a, $01
-	call PlayAcceptOrDeclineSFX
+	ld a, MENU_CONFIRM
+	call PlaySFXConfirmOrCancel
 	ld a, [wCurScrollMenuItem]
 	ld e, a
 	ld a, [hCurMenuItem]
@@ -1727,13 +3782,13 @@ HandleScrollListInput:
 
 .null
 	ldh a, [hKeysPressed]
-	and A_BUTTON | B_BUTTON
+	and PAD_A | PAD_B
 	jr z, .check_sfx
-	and A_BUTTON
+	and PAD_A
 	jr nz, .selected
-	ld a, $ff
+	ld a, -1
 	ld [hCurMenuItem], a
-	call PlayAcceptOrDeclineSFX
+	call PlaySFXConfirmOrCancel ; MENU_CANCEL
 	scf
 	ret
 
@@ -1820,7 +3875,7 @@ OpenCardPageFromCardList:
 .handle_input
 	ldh a, [hDPadHeld]
 	ld b, a
-	and A_BUTTON | B_BUTTON | SELECT | START
+	and PAD_A | PAD_B | PAD_SELECT | PAD_START
 	jp nz, .exit
 
 ; check d-pad
@@ -1832,7 +3887,7 @@ OpenCardPageFromCardList:
 	ld a, [wNumMenuItems]
 	ld c, a
 	ld a, [wCurScrollMenuItem]
-	bit D_UP_F, b
+	bit B_PAD_UP, b
 	jr z, .check_d_down
 	push af
 	ld a, TRUE
@@ -1850,7 +3905,7 @@ OpenCardPageFromCardList:
 	jr .reopen_card_page
 
 .check_d_down
-	bit D_DOWN_F, b
+	bit B_PAD_DOWN, b
 	jr z, .handle_regular_card_page_input
 	push af
 	ld a, TRUE
@@ -1976,7 +4031,7 @@ AddCardToDeckAndUpdateCount:
 	scf
 	ret z ; cannot add because player doesn't own more copies
 
-	ld a, SFX_01
+	ld a, SFX_CURSOR
 	call PlaySFX
 	push de
 	call .AddCardToCurDeck
@@ -2118,7 +4173,7 @@ RemoveCardFromDeckAndUpdateCount:
 	ret nc
 	push de
 	call PrintCardTypeCounts
-	ld de, $f00
+	lb de, 15, 0
 	call PrintTotalCardCount
 	pop de
 	call GetCountOfCardInCurDeck
@@ -2132,7 +4187,7 @@ RemoveCardFromDeck:
 	pop de
 	or a
 	ret z ; card is not in deck
-	ld a, SFX_01
+	ld a, SFX_CURSOR
 	call PlaySFX
 	push de
 	call .RemoveCard
@@ -2185,9 +4240,6 @@ RemoveCardFromDeck:
 	inc bc
 	ld [bc], a
 	ret
-; 0xa295
-
-SECTION "Bank 2@6295", ROMX[$6295], BANK[$2]
 
 UpdateConfirmationCardScreen:
 	ld hl, hffbb
@@ -2238,12 +4290,12 @@ HandleDeckConfirmationMenu:
 	call HandleJumpListInput
 	jr c, .loop_input
 	ldh a, [hDPadHeld]
-	and START
+	and PAD_START
 	jr z, .loop_input
 
 .selected_card
-	ld a, $01
-	call PlayAcceptOrDeclineSFX
+	ld a, MENU_CONFIRM
+	call PlaySFXConfirmOrCancel
 	ld a, [wCurScrollMenuItem]
 	ld [wced7], a
 
@@ -2264,14 +4316,7 @@ HandleDeckConfirmationMenu:
 	jr .selected_card
 
 .CardSelectionParams
-	db 0 ; x pos
-	db 5 ; y pos
-	db 2 ; y spacing
-	db 0 ; x spacing
-	db 7 ; num entries
-	db SYM_CURSOR_R ; visible cursor tile
-	db SYM_SPACE ; invisible cursor tile
-	dw NULL ; wCardListHandlerFunction
+	scrollmenu_params 0, 5, 2, 0, 7, SYM_CURSOR_R, SYM_SPACE, NULL
 
 ; handles the cases where player presses
 ; left or right to jump in a scrolling list
@@ -2281,9 +4326,9 @@ HandleJumpListInput:
 	ld a, [wScrollMenuScrollOffset]
 	ld c, a
 	ldh a, [hDPadHeld]
-	cp D_RIGHT
+	cp PAD_RIGHT
 	jr z, .d_right
-	cp D_LEFT
+	cp PAD_LEFT
 	jr z, .d_left
 	or a
 	ret
@@ -2312,7 +4357,7 @@ HandleJumpListInput:
 	ld [wScrollMenuScrollOffset], a
 	cp c
 	jr z, .no_scroll
-	ld a, SFX_01
+	ld a, SFX_CURSOR
 	call PlaySFX
 	ld hl, wScrollMenuScrollFunc
 	call CallIndirect
@@ -2330,9 +4375,9 @@ HandleSelectUpAndDownInList:
 	ld a, [wScrollMenuScrollOffset]
 	ld c, a
 	ldh a, [hDPadHeld]
-	cp SELECT | D_DOWN
+	cp PAD_SELECT | PAD_DOWN
 	jr z, .sel_down
-	cp SELECT | D_UP
+	cp PAD_SELECT | PAD_UP
 	jr z, .sel_up
 	or a
 	ret
@@ -2361,7 +4406,7 @@ HandleSelectUpAndDownInList:
 	ld [wScrollMenuScrollOffset], a
 	cp c
 	jr z, .set_carry
-	ld a, SFX_01
+	ld a, SFX_CURSOR
 	call PlaySFX
 	ld hl, wScrollMenuScrollFunc
 	call CallIndirect
@@ -2376,10 +4421,10 @@ ShowDeckInfoHeaderAndWaitForBButton:
 .wait_input
 	call DoFrame
 	ldh a, [hKeysPressed]
-	and B_BUTTON
+	and PAD_B
 	jr z, .wait_input
-	ld a, $ff
-	call PlayAcceptOrDeclineSFX
+	ld a, MENU_CANCEL
+	call PlaySFXConfirmOrCancel
 	ret
 
 ShowConfirmationCardScreen:
@@ -2827,6 +4872,35 @@ GetCardTypeIconPalette:
 	db $00, $ff
 ; 0xa603
 
+SECTION "Bank 2@66ef", ROMX[$66ef], BANK[$2]
+
+Func_a6ef:
+	xor a
+	ld [wScrollMenuScrollOffset], a
+	ld hl, wCurDeckCards
+	ld de, wTempSavedDeckCards
+	ld b, $82
+	call CopyBBytesFromHLToDE_Bank02
+	call Func_b90c
+	call Func_b81d
+	ret
+
+Func_a705:
+	ld hl, wCurDeckCards
+	ld a, $81
+	call ClearNBytesFromHL
+	ld a, $ff
+	ld [wCurDeck], a
+	ld hl, wCurDeckName
+	ld [hl], TX_END
+	ld hl, $6726
+	call InitDeckBuildingParams
+	ld a, $01
+	ld [wd121], a
+	call HandleDeckBuildScreen
+	ret
+; 0xa726
+
 SECTION "Bank 2@677f", ROMX[$677f], BANK[$2]
 
 CopyBBytesFromHLToDE_Bank02:
@@ -2837,19 +4911,134 @@ CopyBBytesFromHLToDE_Bank02:
 	dec b
 	jr nz, .loop
 	ret
-; 0xa786
 
-SECTION "Bank 2@689d", ROMX[$689d], BANK[$2]
+Func_a786:
+	call WriteCardListsTerminatorBytes
+	call PrintPlayersCardsHeaderInfo
+	xor a
+	ld [wScrollMenuScrollOffset], a
+	ld [wCurCardTypeFilter], a
+	call PrintFilteredCardSelectionList
+	call EnableLCD
+	xor a
+	ld hl, FiltersCardSelectionParams
+	call InitializeScrollMenuParameters
+.asm_a7a0
+	call DoFrame
+	ld a, [wCurCardTypeFilter]
+	ld b, a
+	ld a, [wTempCardTypeFilter]
+	cp b
+	jr z, .asm_a7ca
+	ld [wCurCardTypeFilter], a
+	ld hl, wScrollMenuScrollOffset
+	ld [hl], $00
+	call PrintFilteredCardSelectionList
+	ld hl, hffbb
+	ld [hl], $01
+	call PrintPlayersCardsText
+	ld hl, hffbb
+	ld [hl], $00
+	ld a, $09
+	ld [wNumMenuItems], a
+.asm_a7ca
+	ldh a, [hDPadHeld]
+	and PAD_DOWN
+	jr z, .asm_a7d5
+	call ConfirmSelectionAndReturnCarry
+	jr .asm_a7e2
+.asm_a7d5
+	call HandleCardSelectionInput
+	jr nc, .asm_a7a0
+	ld a, [hCurMenuItem]
+	cp $ff
+	jr nz, .asm_a7e2
+	ret
+.asm_a7e2
+	ld a, [wNumEntriesInCurFilter]
+	or a
+	jr z, .asm_a7a0
+	xor a
+	ld hl, GeneralCardListMenuParams
+	call InitializeScrollMenuParameters
+	ld a, [wNumEntriesInCurFilter]
+	ld [wNumCardListEntries], a
+	ld hl, wNumVisibleCardListEntries
+	cp [hl]
+	jr nc, .asm_a7fe
+	ld [wNumMenuItems], a
+.asm_a7fe
+	ld hl, GeneralCardListUpdateFunc
+	ld d, h
+	ld a, l
+	ld hl, wScrollMenuScrollFunc
+	ld [hli], a
+	ld [hl], d
+	xor a
+	ld [wd119], a
+.asm_a80c
+	call DoFrame
+	ldh a, [hDPadHeld]
+	and PAD_UP
+	jr z, .asm_a825
+	ld a, [wTempCardTypeFilter]
+	ld hl, wScrollMenuScrollOffset
+	add [hl]
+	jr nz, .asm_a825
+	ld a, $ff
+	ld [hCurMenuItem], a
+	jr .asm_a87e
+.asm_a825
+	call HandleSelectUpAndDownInList
+	jr c, .asm_a80c
+	call HandleScrollListInput
+	jr c, .asm_a87e
+	ldh a, [hDPadHeld]
+	and PAD_START
+	jr z, .asm_a80c
+.asm_a835
+	ld a, MENU_CONFIRM
+	call PlaySFXConfirmOrCancel
+	ld a, [wNumMenuItems]
+	ld [wTempScrollMenuNumVisibleItems], a
+	ld a, [wTempCardTypeFilter]
+	ld [wTempCurMenuItem], a
+	ld de, wTempCardList
+	ld hl, wCurCardListPtr
+	ld [hl], e
+	inc hl
+	ld [hl], d
+	call OpenCardPageFromCardList
+	call PrintPlayersCardsHeaderInfo
+	ld hl, FiltersCardSelectionParams
+	call InitializeScrollMenuParameters
+	ld a, [wCurCardTypeFilter]
+	ld [wTempCardTypeFilter], a
+	call DrawHorizontalListCursor_Visible
+	call PrintCardSelectionList
+	call EnableLCD
+	ld hl, GeneralCardListMenuParams
+	call InitializeScrollMenuParameters
+	ld a, [wTempScrollMenuNumVisibleItems]
+	ld [wNumMenuItems], a
+	ld a, [wTempCurMenuItem]
+	ld [wTempCardTypeFilter], a
+	jr .asm_a80c
+.asm_a87e
+	call DrawListCursor_Invisible
+	ld a, [wTempCardTypeFilter]
+	ld [wTempCurMenuItem], a
+	ld a, [hCurMenuItem]
+	cp $ff
+	jr nz, .asm_a835
+	ld hl, FiltersCardSelectionParams
+	call InitializeScrollMenuParameters
+	ld a, [wCurCardTypeFilter]
+	ld [wTempCardTypeFilter], a
+	jp .asm_a7a0
 
 GeneralCardListMenuParams:
-	db 1 ; x pos
-	db 5 ; y pos
-	db 2 ; y spacing
-	db 0 ; x spacing
-	db 7 ; num entries
-	db SYM_CURSOR_R ; visible cursor tile
-	db SYM_SPACE ; invisible cursor tile
-	dw NULL ; wCardListHandlerFunction
+	scrollmenu_params 1, 5, 2, 0, 7, SYM_CURSOR_R, SYM_SPACE, NULL
 
 GeneralCardListUpdateFunc:
 	ld a, $01
@@ -3898,18 +6087,18 @@ HandleCardAlbumCardPage:
 .handle_input
 	ldh a, [hDPadHeld]
 	ld b, a
-	and BUTTONS
+	and PAD_BUTTONS
 	jp nz, .exit
 	xor a ; FALSE
 	ld [wMenuInputSFX], a
 	ld a, [wNumMenuItems]
 	ld c, a
 	ld a, [wCurScrollMenuItem]
-	bit D_UP_F, b
+	bit B_PAD_UP, b
 	jr z, .check_d_down
 
 	push af
-	ld a, SFX_01
+	ld a, SFX_CURSOR
 	ld [wMenuInputSFX], a
 	ld a, [wCurScrollMenuItem]
 	ld hl, wScrollMenuScrollOffset
@@ -3931,10 +6120,10 @@ HandleCardAlbumCardPage:
 	jr .got_new_pos
 
 .check_d_down
-	bit D_DOWN_F, b
+	bit B_PAD_DOWN, b
 	jr z, .open_card_page
 	push af
-	ld a, SFX_01
+	ld a, SFX_CURSOR
 	ld [wMenuInputSFX], a
 	pop af
 	inc a
@@ -4062,10 +6251,10 @@ CardAlbum:
 .loop_input_empty_list
 	call DoFrame
 	ldh a, [hKeysPressed]
-	and B_BUTTON
+	and PAD_B
 	jr z, .loop_input_empty_list
-	ld a, $ff
-	call PlayAcceptOrDeclineSFX
+	ld a, MENU_CANCEL
+	call PlaySFXConfirmOrCancel
 	ld a, [wTempScrollMenuScrollOffset]
 	ld [wScrollMenuScrollOffset], a
 	ld a, [wTempScrollMenuItem]
@@ -4098,11 +6287,11 @@ CardAlbum:
 	call HandleJumpListInput
 	jr c, .loop
 	ldh a, [hDPadHeld]
-	and START
+	and PAD_START
 	jr z, .loop
 .open_card_page
-	ld a, $01
-	call PlayAcceptOrDeclineSFX
+	ld a, MENU_CONFIRM
+	call PlaySFXConfirmOrCancel
 	ld a, [wNumMenuItems]
 	ld [wTempScrollMenuNumVisibleItems], a
 	ld a, [wCurScrollMenuItem]
@@ -4151,22 +6340,10 @@ CardAlbum:
 	jp .booster_pack_menu
 
 .BoosterPackMenuParams:
-	db 3, 2 ; x,y offset
-	db 2 ; y separation
-	db 0 ; x separation
-	db 5 ; number of items
-	db SYM_CURSOR_R ; visible cursor
-	db SYM_SPACE ; invisible cursor
-	dw NULL ; update func
+	scrollmenu_params 3, 2, 2, 0, 5, SYM_CURSOR_R, SYM_SPACE, NULL
 
 .BoosterPackCardsMenuParams
-	db 1, 4 ; x,y offset
-	db 2 ; y separation
-	db 0 ; x separation
-	db 7 ; number of items
-	db SYM_CURSOR_R ; visible cursor
-	db SYM_SPACE ; invisible cursor
-	dw NULL ; update func
+	scrollmenu_params 1, 4, 2, 0, 7, SYM_CURSOR_R, SYM_SPACE, NULL
 
 .CountCardIDs:
 	ld hl, wBoosterPackCardList
@@ -4196,7 +6373,7 @@ CardAlbum:
 	call LoadSymbolsFont
 	call LoadDuelCardSymbolTiles
 	bank1call SetDefaultPalettes
-	ld de, $3cff
+	lb de, $3c, $ff
 	call SetupText
 	lb de, 1, 1
 	call InitTextPrinting
@@ -4469,7 +6646,7 @@ PrinterMenu_PokemonCards:
 	ld [wNumMenuItems], a
 .handle_input
 	ldh a, [hDPadHeld]
-	and D_DOWN
+	and PAD_DOWN
 	jr z, .asm_b33b
 ; d_down
 	call ConfirmSelectionAndReturnCarry
@@ -4510,7 +6687,7 @@ PrinterMenu_PokemonCards:
 .loop_frame_2
 	call DoFrame
 	ldh a, [hDPadHeld]
-	and D_UP
+	and PAD_UP
 	jr z, .asm_b38e
 	ld a, [wTempCardTypeFilter]
 	ld hl, wScrollMenuScrollOffset
@@ -4525,11 +6702,11 @@ PrinterMenu_PokemonCards:
 	call HandleScrollListInput
 	jr c, .asm_b3e7
 	ldh a, [hDPadHeld]
-	and START
+	and PAD_START
 	jr z, .loop_frame_2
 ; start btn
-	ld a, $01
-	call PlayAcceptOrDeclineSFX
+	ld a, MENU_CONFIRM
+	call PlaySFXConfirmOrCancel
 	ld a, [wNumMenuItems]
 	ld [wTempScrollMenuNumVisibleItems], a
 	ld a, [wTempCardTypeFilter]
@@ -4582,10 +6759,10 @@ PrinterMenu_PokemonCards:
 	call .Func_b45d
 	lb de, 1, 1
 	call InitTextPrinting
-	ld hl, $2f6
+	ldtx hl, PrintThisCardPromptYesNoText
 	call ProcessTextFromID
-	ld a, $01
-	ld hl, Data_ad05
+	ld a, 1
+	ld hl, PrinterMenu_Params
 	call InitializeScrollMenuParameters
 .loop_frame_3
 	call DoFrame
@@ -4636,15 +6813,8 @@ PrinterMenu_PokemonCards:
 	call BankswitchVRAM0
 	ret
 
-Data_ad05:
-	db 3 ; x pos
-	db 3 ; y pos
-	db 0 ; y spacing
-	db 4 ; x spacing
-	db 2 ; num entries
-	db SYM_CURSOR_R ; visible cursor tile
-	db SYM_SPACE ; invisible cursor tile
-	dw NULL ; wCardListHandlerFunction
+PrinterMenu_Params:
+	scrollmenu_params 3, 3, 0, 4, 2, SYM_CURSOR_R, SYM_SPACE, NULL
 
 PrinterMenu_CardList:
 	call WriteCardListsTerminatorBytes
@@ -4662,8 +6832,8 @@ PrinterMenu_CardList:
 	call InitTextPrinting
 	ldtx hl, PrintCardListPromptText
 	call ProcessTextFromID
-	ld a, $01
-	ld hl, Data_ad05
+	ld a, 1
+	ld hl, PrinterMenu_Params
 	call InitializeScrollMenuParameters
 .loop_frame
 	call DoFrame
@@ -4720,12 +6890,7 @@ PrinterMenu:
 	dw .QuitPrint
 
 .MenuParameters:
-	db 5, 2 ; cursor x, cursor y
-	db 2 ; y displacement between items
-	db 5 ; number of items
-	db SYM_CURSOR_R ; cursor tile number
-	db SYM_SPACE ; tile behind cursor
-	dw NULL ; function pointer if non-0
+	menu_params 5, 2, 2, 5, SYM_CURSOR_R, SYM_SPACE, NULL
 
 .PrintQuality:
 	ldtx hl, PrinterContrastSettingsPromptText
@@ -4755,14 +6920,280 @@ PrinterMenu:
 	jr .loop_input
 
 .PrinterQualityMenuParams
-	db 5, 16 ; x,y offset
-	db 0 ; y separation
-	db 2 ; x separation
-	db 5 ; number of items
-	db SYM_CURSOR_R ; visible cursor
-	db SYM_SPACE ; invisible cursor
-	dw NULL ; update func
-; 0xb57c
+	scrollmenu_params 5, 16, 0, 2, 5, SYM_CURSOR_R, SYM_SPACE, NULL
+
+Func_b57c:
+	push de
+	ld de, wCurDeckName
+	call CopyListFromHLToDE
+	pop de
+	ld hl, wCurDeckCards
+	call CopyDeckFromSRAM
+.asm_b58a
+	ld a, NUM_FILTERS
+	ld hl, wCardFilterCounts
+	call ClearNBytesFromHL
+	ld a, DECK_SIZE
+	ld [wTotalCardCount], a
+	ld hl, wCardFilterCounts
+	ld [hl], a
+	call Func_b5b1
+	ret
+
+Func_b59f:
+	push de
+	ld de, wCurDeckName
+	call CopyListFromHLToDEInSRAM
+	pop hl
+	ld de, wCurDeckCards
+	ld b, $80
+	call CopyBBytesFromHLToDE_Bank02
+	jr Func_b57c.asm_b58a
+
+Func_b5b1:
+	call SortCurDeckCardsByID
+	call CreateCurDeckUniqueCardList
+	xor a
+	ld [wScrollMenuScrollOffset], a
+.asm_b5bb
+	ld hl, $7621
+	call InitializeScrollMenuParameters
+	ld a, [wNumUniqueCards]
+	ld [wNumCardListEntries], a
+	cp $05
+	jr c, .asm_b5cd
+	ld a, $05
+.asm_b5cd
+	ld [wNumMenuItems], a
+	ld [wNumVisibleCardListEntries], a
+	call Func_b649
+	ld hl, wd38a
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	call DrawWideTextBox_PrintText
+	ld hl, PrintConfirmationCardList
+	ld d, h
+	ld a, l
+	ld hl, wScrollMenuScrollFunc
+	ld [hli], a
+	ld [hl], d
+	xor a
+	ld [wd119], a
+.asm_b5ed
+	call DoFrame
+	call HandleScrollListInput
+	jr c, .asm_b619
+	call HandleJumpListInput
+	jr c, .asm_b5ed
+	ldh a, [hDPadHeld]
+	and PAD_START
+	jr z, .asm_b5ed
+.asm_b600
+	ld a, MENU_CONFIRM
+	call PlaySFXConfirmOrCancel
+	ld a, [wTempCardTypeFilter]
+	ld [wced7], a
+	ld de, wUniqueDeckCardList
+	ld hl, wCurCardListPtr
+	ld [hl], e
+	inc hl
+	ld [hl], d
+	call OpenCardPageFromCardList
+	jr .asm_b5bb
+.asm_b619
+	ld a, [hCurMenuItem]
+	cp $ff
+	ret z
+	jr .asm_b600
+; 0xb621
+
+SECTION "Bank 2@7649", ROMX[$7649], BANK[$2]
+
+Func_b649:
+	call Func_b659
+	lb de, 3, 3
+	ld hl, wCardListCoords
+	ld [hl], e
+	inc hl
+	ld [hl], d
+	call PrintConfirmationCardList
+	ret
+
+Func_b659:
+	call EmptyScreenAndLoadFontDuelAndHandCardsIcons
+	call Func_b663
+	call EnableLCD
+	ret
+
+Func_b663:
+	ld a, [wCurDeckName]
+	or a
+	ret z
+	ld de, $1
+	call InitTextPrinting
+	ld a, [wCurDeck]
+	inc a
+	ld hl, wDefaultText
+	call ConvertToNumericalDigits
+	ld [hl], $77
+	inc hl
+	ld [hl], $00
+	ld hl, wDefaultText
+	call ProcessText
+	ld hl, wCurDeckName
+	ld de, wDefaultText
+	call CopyListFromHLToDE
+	ld hl, wDefaultText
+	call GetTextLengthInTiles
+	ld b, $00
+	ld hl, wDefaultText
+	add hl, bc
+	ld d, h
+	ld e, l
+	ld hl, DeckNameSuffix
+	call CopyListFromHLToDE
+	lb de, 3, 1
+	ld hl, wDefaultText
+	call InitTextPrinting
+	call ProcessText
+	ret
+; 0xb6ad
+
+SECTION "Bank 2@781d", ROMX[$781d], BANK[$2]
+
+Func_b81d:
+	xor a
+	ld hl, wc000
+	call ClearNBytesFromHL
+	xor a
+	ld hl, $c100
+	call ClearNBytesFromHL
+	ld hl, wTempSavedDeckCards
+	call Func_b84d
+	ld a, $ff
+	call Func_b860
+	ld a, $05
+	ld [wNumVisibleCardListEntries], a
+	lb de, 2, 3
+	ld hl, wCardListCoords
+	ld [hl], e
+	inc hl
+	ld [hl], d
+	ld a, SYM_BOX_RIGHT
+	ld [wCursorAlternateTile], a
+	call PrintCardSelectionList
+	ret
+
+Func_b84d:
+	ld bc, wc000
+.asm_b850
+	ld e, [hl]
+	inc hl
+	ld d, [hl]
+	call CheckIfCardIDIsZero
+	ret c
+	inc hl
+	push hl
+	ld h, d
+	ld l, e
+	add hl, bc
+	inc [hl]
+	pop hl
+	jr .asm_b850
+
+Func_b860:
+	push af
+	push bc
+	push de
+	push hl
+	push af
+	ld a, $51
+	ld hl, wUniqueDeckCardList
+	call ClearNBytesFromHL
+	ld a, $a0
+	ld hl, wTempCardList
+	call ClearNBytesFromHL
+	pop af
+	ld hl, $0
+	ld de, $0
+	ld b, a
+.asm_b87d
+	inc de
+	call GetCardType
+	jr c, .asm_b8bc
+	ld c, a
+	ld a, b
+	cp $ff
+	jr z, .asm_b89c
+	and $20
+	cp $20
+	jr z, .asm_b895
+	ld a, c
+	cp b
+	jr nz, .asm_b87d
+	jr .asm_b89c
+.asm_b895
+	ld a, c
+	and $08
+	cp $08
+	jr nz, .asm_b87d
+.asm_b89c
+	push bc
+	push hl
+	add hl, hl
+	ld bc, wTempCardList
+	add hl, bc
+	ld [hl], e
+	inc hl
+	ld [hl], d
+	ld hl, wc000
+	add hl, de
+	ld a, [hl]
+	and $7f
+	pop hl
+	or a
+	jr z, .asm_b8b9
+	push hl
+	ld bc, wUniqueDeckCardList
+	add hl, bc
+	ld [hl], a
+	pop hl
+	inc l
+.asm_b8b9
+	pop bc
+	jr .asm_b87d
+.asm_b8bc
+	ld a, l
+	ld [wNumEntriesInCurFilter], a
+	ld c, l
+	ld b, h
+	ld a, $ff
+	ld hl, wUniqueDeckCardList
+	add hl, bc
+	ld [hl], a
+	ld hl, wTempCardList
+	add hl, bc
+	add hl, bc
+	xor a
+	ld [hli], a
+	ld [hl], a
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+; 0xb8d6
+
+SECTION "Bank 2@790c", ROMX[$790c], BANK[$2]
+
+Func_b90c:
+	call PrepareMenuGraphics
+	lb de, 0, 0
+	lb bc, 20, 13
+	call DrawRegularTextBox
+	ret
+; 0xb919
 
 SECTION "Bank 2@7947", ROMX[$7947], BANK[$2]
 
@@ -4813,11 +7244,11 @@ DeckDiagnosisResult:
 	call HandleScrollListInput
 	jr c, .selection_made
 	ldh a, [hDPadHeld]
-	and START
+	and PAD_START
 	jr z, .loop_input
 .open_card_page
-	ld a, SFX_01
-	call PlayAcceptOrDeclineSFX
+	ld a, MENU_CONFIRM
+	call PlaySFXConfirmOrCancel
 	ld a, [wNumMenuItems]
 	ld [wTempScrollMenuNumVisibleItems], a
 	ld a, [wCurScrollMenuItem]
@@ -5006,11 +7437,18 @@ DeckDiagnosisResult:
 	pop bc
 	pop af
 	ret
-; 0xbaec
 
-SECTION "Bank 2@7af6", ROMX[$7af6], BANK[$2]
+Func_baec:
+	farcall Func_3ada1
+	ret
+
+HandleAutoDeckMenu:
+	farcall _HandleAutoDeckMenu
+	ret
 
 PrinterMenu_DeckConfiguration:
 	farcall _PrinterMenu_DeckConfiguration
 	ret
-; 0xbafb
+
+AutoDeckMachineMenuParams:
+	scrollmenu_params 4, 2, 2, 0, NUM_DECK_MACHINE_VISIBLE_DECKS, SYM_CURSOR_R, SYM_SPACE, NULL

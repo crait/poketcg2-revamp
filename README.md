@@ -21,7 +21,54 @@ Eventually, this ROM hack will include the following:
     - Unlock all cards from the beginning of the game
 - AI bug fixes and minor tweaks:
     - The AI no longer targets Mysterious Fossil/Clefairy Doll with Gust of Wind.
+    - Pawn's coin is changed to Chansey
+    - Heather's coin is changed to Oddish
+    - Morino's coin is changed to Oddish
+    - Rod's coin is changed to Charmander
+    - Yuki's coin is changed to Charmander
+    - Kanoko's coin is changed to Starmie
+    - Joshua's coin is changed to Starmie
+    - Amanda's coin is changed to Starmie
+    - Miyajima's coin is changed to Starmie
     - Jennifer's coin is changed to Pikachu
+    - Brandon's coin is changed to Pikachu
+    - Stephanie's coin is changed to Alakazam
+    - Miwa's coin is changed to Alakazam
+    - Ryoko's coin is changed to Alakazam
+    - Knights's coin is changed to Kabuto
+    - Andrew's coin is changed to Kabuto
+    - David's coin is changed to Golbat
+    - Yuta's coin is changed to Golbat
+    - Bishop's coin is changed to Golbat
+    - Nicholas's coin is changed to Magnemite
+    - Ichikawa's coin is changed to Magnemite
+    - Isaac's coin is changed to Magnemite
+    - Ken's coin is changed to Magmar
+    - John's coin is changed to Magmar
+    - Jonathan's coin is changed to Magmar
+    - Courtney's coin is changed to Magmar
+    - Adam's coin is changed to Ponyta
+    - Jes's coin is changed to Ponyta
+    - Joshua's coin is changed to Psyduck
+    - Kanzaki's coin is changed to Psyduck
+    - Rui's coin is changed to Psyduck
+    - Michael's coin is changed to Machamp
+    - Jessica's coin is changed to Machamp
+    - Grace's coin is changed to Machamp
+    - Chris's coin is changed to Machamp
+    - Tag's coin is changed to Snorlax
+    - Sara's coin is changed to Horsea
+    - Jack's coin is changed to Horsea
+    - Rick's coin is changed to Arbok
+    - Joseph's coin is changed to Arbok
+    - Miyuki's coin is changed to Arbok
+    - Matthew's coin is changed to Dugtrio
+    - Ryan's coin is changed to Dugtrio
+    - Goda's coin is changed to Dugtrio
+    - Robert's coin is changed to Gengar
+    - Yosuke's coin is changed to Gengar
+    - Daniel's coin is changed to Mew
+
 
 To see the full list of card changes, please see this [Google Doc](https://docs.google.com/document/d/1UGCQfLr3KFe3WxqPLA96xznlQi7rDZiSahNdYVIH8bE/edit?usp=sharing). Feel free to also leave comments with your thoughts and suggestions.
 

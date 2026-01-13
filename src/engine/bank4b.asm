@@ -1,5 +1,3 @@
-SECTION "Bank 4B@4000", ROMX[$4000], BANK[$4b]
-
 ; input:
 ; bc = PALETTE_* constant
 ; outputs pointer as b:hl
@@ -41,7 +39,7 @@ GetTilesetGfxPointer::
 
 ; bc = TILEMAP_* constant
 ; outputs pointer as b:hl
-GetTilemapGfxPointer:
+GetTilemapGfxPointer::
 	push af
 	sla c
 	rl b
@@ -133,7 +131,7 @@ GetFramesetPointer:
 
 ; bc = OWFRAMEGROUP_*
 ; a = direction
-GetOWObjectFrameset:
+GetOWObjectFrameset::
 	push af
 	push hl
 	sla c
@@ -176,7 +174,7 @@ Func_12c0b7:
 
 ; bc = TILEMAP_* constant
 ; de = OW coordinates
-Func_12c0ce:
+Func_12c0ce::
 	push af
 	push bc
 	push de
@@ -235,7 +233,7 @@ Func_12c0fc:
 ; output:
 ;  b = tilemap width
 ;  c = tilemap height
-LoadTilemap:
+LoadTilemap::
 	push af
 	push de
 	push hl
@@ -330,7 +328,7 @@ LoadTilemap:
 .next_row
 	ld h, d
 	ld l, e
-	ld bc, BG_MAP_WIDTH
+	ld bc, TILEMAP_WIDTH
 	add hl, bc
 	ld d, h
 	ld e, l
@@ -397,15 +395,15 @@ Func_12c1c1:
 	dec b
 	jr nz, .loop_cols
 	pop hl
-	ld bc, BG_MAP_WIDTH / 2
+	ld bc, TILEMAP_WIDTH / 2
 	add hl, bc
 	pop bc
 	dec c
 	jr nz, .loop_rows
 	ret
 
-; bc = map ID
-LoadOWMap:
+; bc = MAP_GFX_* ID
+LoadOWMap::
 	ld a, c
 	ld [wOWMap + 0], a
 	ld a, b
@@ -455,7 +453,7 @@ LoadOWMap:
 	inc hl
 	push hl
 	call GetPaletteGfxPointer
-	call Func_378c
+	call CopyCGBBGPalsFromSource_BeginWithPal2
 	pop hl
 
 	xor a
@@ -554,7 +552,7 @@ LoadSpriteAnimGfx::
 	pop bc
 	ret
 
-UpdateSpriteAnim:
+UpdateSpriteAnim::
 	push af
 	push bc
 	push de
@@ -702,14 +700,15 @@ WriteCurSpriteAnim:
 	ld bc, (SPRITEANIMSTRUCT_START_DELAY - SPRITEANIMSTRUCT_FLAGS) + 1
 	call CopyDataHLtoDE_SaveRegisters
 	ret
-; 0x12c3dc
 
-SECTION "Bank 4B@43e0", ROMX[$43e0], BANK[$4b]
+Func_12c3dc:
+	call Func_3bc1
+	ret
 
 ; input:
 ;  b:hl = tilemap pointer
 ;  de = coordinates
-LoadPortraitAttributeMap:
+LoadPortraitAttributeMap::
 	push af
 	push bc
 	push de
@@ -727,12 +726,12 @@ LoadPortraitAttributeMap:
 .asm_12c3f3
 	pop af
 	and a
-	ld a, 2 | (1 << OAM_TILE_BANK)
+	ld a, 2 | OAM_BANK1
 	jr z, .got_pal_and_tiles
 	ld a, c
 	add $30
 	ld c, a
-	ld a, 5 | (1 << OAM_TILE_BANK)
+	ld a, 5 | OAM_BANK1
 .got_pal_and_tiles
 	call LoadTilemap
 	pop hl
@@ -744,7 +743,7 @@ LoadPortraitAttributeMap:
 ; a = ?
 ; b = direction
 ; de = coordinates
-_LoadOWObject:
+_LoadOWObject::
 	push af
 	push bc
 	push de
@@ -756,7 +755,7 @@ _LoadOWObject:
 	ld [wda94 + 0], a
 	ld a, e
 	ld [wda94 + 1], a
-	farcall GetNextInactiveOWObject
+	farcall _GetNextInactiveOWObject
 	ld a, ACTIVE_OBJ
 	ld [hli], a ; OWOBJSTRUCT_FLAGS
 	ld a, [wda8c]
@@ -837,9 +836,116 @@ _LoadOWObject:
 	pop bc
 	pop af
 	ret
-; 0x12c49b
 
-SECTION "Bank 4B@707f", ROMX[$707f], BANK[$4b]
+Func_12c49b::
+	push af
+	push bc
+	push de
+	push hl
+	push af
+	push de
+	ld a, [wd693]
+	bit 2, a
+	jr nz, .checked_flag
+
+	ld bc, TILESET_SMALL_COINS
+	call GetTilesetGfxPointer
+	call Func_3c10
+	ld bc, PALETTE_13B
+	call GetPaletteGfxPointer
+	call Func_3c2e
+	ld a, [wd693]
+	set 2, a
+	ld [wd693], a
+	ld a, [wd693]
+	res 0, a
+	ld [wd693], a
+
+.checked_flag
+	pop de
+	pop af
+	ld c, a
+	ld b, 0
+	sla c
+	rl b
+	ld hl, .TilemapPointers
+	add hl, bc
+	ld c, [hl]
+	inc hl
+	ld b, [hl]
+	call GetTilemapGfxPointer
+	call Func_12c535
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+.TilemapPointers:
+	dw TILEMAP_1EB
+	dw TILEMAP_201
+	dw TILEMAP_1EC
+	dw TILEMAP_1ED
+	dw TILEMAP_1EE
+	dw TILEMAP_1EF
+	dw TILEMAP_1F0
+	dw TILEMAP_1F1
+	dw TILEMAP_202
+	dw TILEMAP_203
+	dw TILEMAP_204
+	dw TILEMAP_205
+	dw TILEMAP_206
+	dw TILEMAP_207
+	dw TILEMAP_208
+	dw TILEMAP_209
+	dw TILEMAP_20A
+	dw TILEMAP_20B
+	dw TILEMAP_20C
+	dw TILEMAP_20D
+	dw TILEMAP_20E
+	dw TILEMAP_20F
+	dw TILEMAP_210
+	dw TILEMAP_211
+	dw TILEMAP_1F2
+	dw TILEMAP_1F3
+	dw TILEMAP_1F4
+	dw TILEMAP_1F5
+	dw TILEMAP_1F6
+	dw TILEMAP_1F7
+	dw TILEMAP_1F8
+	dw TILEMAP_1F9
+	dw TILEMAP_1FA
+	dw TILEMAP_1FB
+	dw TILEMAP_1FC
+	dw TILEMAP_1FD
+	dw TILEMAP_1FE
+	dw TILEMAP_1FF
+	dw TILEMAP_200
+	dw TILEMAP_201
+
+Func_12c535:
+	push af
+	push bc
+	push de
+	push hl
+	ld a, 0
+	ld c, $80 ; Tiles1
+	call LoadTilemap
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+INCLUDE "data/gfx_pointers/tilemaps.asm"
+INCLUDE "data/gfx_pointers/tilesets.asm"
+INCLUDE "data/gfx_pointers/palettes.asm"
+INCLUDE "data/gfx_pointers/sprite_animations.asm"
+INCLUDE "data/gfx_pointers/framesets.asm"
+INCLUDE "data/gfx_pointers/ow_tile_frames.asm"
+INCLUDE "data/gfx_pointers/ow_animations.asm"
+
+INCLUDE "data/map_gfx.asm"
 
 Data_12f07f:
 	dw TILESET_MARK, SPRITE_ANIM_67, OWFRAMEGROUP_0E            ; OWSPRITE_MARK
@@ -919,7 +1025,7 @@ Data_12f07f:
 	dw TILESET_CHAP, SPRITE_ANIM_65, OWFRAMEGROUP_32            ; OWSPRITE_CHAP
 	dw TILESET_MAN, SPRITE_ANIM_60, OWFRAMEGROUP_2D             ; OWSPRITE_MAN
 	dw TILESET_PAPPY, SPRITE_ANIM_63, OWFRAMEGROUP_30           ; OWSPRITE_PAPPY
-	dw TILESET_GAMBLER, SPRITE_ANIM_62, OWFRAMEGROUP_2F         ; OWSPRITE_GAMBLER
+	dw TILESET_FIXER, SPRITE_ANIM_62, OWFRAMEGROUP_2F           ; OWSPRITE_FIXER
 	dw TILESET_GR_LAD, SPRITE_ANIM_5F, OWFRAMEGROUP_2C          ; OWSPRITE_GR_LAD
 	dw TILESET_GR_CHAP, SPRITE_ANIM_5F, OWFRAMEGROUP_2C         ; OWSPRITE_GR_CHAP
 	dw TILESET_MIYAJIMA, SPRITE_ANIM_5F, OWFRAMEGROUP_2C        ; OWSPRITE_MIYAJIMA

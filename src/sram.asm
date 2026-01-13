@@ -15,7 +15,7 @@ sTotalCardPopsDone:: ; a005
 sTextSpeed:: ; a006
 	ds $1
 
-s0a007:: ; a007
+sDuelAnimationsSetting:: ; a007
 	ds $1
 
 s0a008:: ; a008
@@ -27,7 +27,7 @@ sSkipDelayAllowed:: ; a009
 sClearedGame:: ; a00a
 	ds $1
 
-s0a00b:: ; a00b
+sCoinTossAnimationSetting:: ; a00b
 	ds $1
 
 sTextBoxFrameColor:: ; a00c
@@ -71,10 +71,11 @@ ENDR
 sCurrentlySelectedDeck:: ; b7a0
 	ds $1
 
-s0b7a1:: ; b7a1
-	ds $1
-
-	ds $1
+; keeps track of how many unnamed decks have been built
+; as they suffix the number ### in the form of "<PLYAYER>の###デッキ"
+; max number is MAX_UNNAMED_DECK_NUM
+sUnnamedDeckCounter:: ; b7a1
+	ds $2
 
 ; each bit represents whether the player has
 ; obtained a card from a given set

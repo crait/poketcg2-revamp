@@ -19,8 +19,6 @@ INCBIN "gfx/fonts/full_width/extra.1bpp"
 HalfWidthFont::
 INCBIN "gfx/fonts/half_width.1bpp"
 
-SECTION "Gfx 1@70b0", ROMX
-
 Pals_6f0b0::
 	rgb 31, 31, 31
 	rgb 21, 21, 16
@@ -47,6 +45,7 @@ Pals_6f0b0::
 	rgb 10, 10,  8
 	rgb  0,  0,  0
 
+Pals_6f0d8::
 	rgb 31, 31, 31
 	rgb 30, 29,  0
 	rgb 30,  3,  0
@@ -62,7 +61,7 @@ Pals_6f0b0::
 	rgb 27,  7,  3
 	rgb  0,  0,  0
 
-SECTION "Gfx 1@7150", ROMX
+SECTION "Gfx 1@7150", ROMX[$7150], BANK[$1b]
 
 SymbolsFont::
 INCBIN "gfx/fonts/symbols.2bpp"
@@ -71,8 +70,14 @@ SECTION "Card Gfx 1", ROMX
 
 CardGraphics::
 
-SECTION "Tilemaps 1", ROMX[$74f5], BANK[$4b]
+SECTION "Bank 4b", ROMX
+INCLUDE "engine/bank4b.asm"
+
+SECTION "Tilemaps 1", ROMX
 INCLUDE "data/maps/tilemaps1.asm"
+
+SECTION "Bank 4c", ROMX
+INCLUDE "engine/bank4c.asm"
 
 SECTION "Tilemaps 2", ROMX
 INCLUDE "data/maps/tilemaps2.asm"
@@ -107,9 +112,9 @@ GRIslandOAMGfx::
 	dw 27 ; length
 	INCBIN "gfx/overworld_map/gr_oam.2bpp"
 
-IshiharaVilla2Tileset::
+IshiharaVillaLibraryTileset::
 	dw 52 ; length
-	INCBIN "gfx/tilesets/ishihara_villa2.2bpp"
+	INCBIN "gfx/tilesets/ishihara_villa_library.2bpp"
 
 OWCoinsFortGfx::
 	dw 4 ; length
@@ -133,13 +138,13 @@ MasonLabMainTileset::
 	dw 148 ; length
 	INCBIN "gfx/tilesets/mason_lab_main.2bpp"
 
-MasonLabSide1Tileset::
+MasonLabComputerRoomTileset::
 	dw 134 ; length
-	INCBIN "gfx/tilesets/mason_lab_side1.2bpp"
+	INCBIN "gfx/tilesets/mason_lab_computer_room.2bpp"
 
-MasonLabSide2Tileset::
+MasonLabTrainingRoomTileset::
 	dw 97 ; length
-	INCBIN "gfx/tilesets/mason_lab_side2.2bpp"
+	INCBIN "gfx/tilesets/mason_lab_training_room.2bpp"
 
 IshiharaHouseTileset::
 	dw 66 ; length
@@ -383,9 +388,9 @@ GRAirportTileset::
 	dw 208 ; length
 	INCBIN "gfx/tilesets/gr_airport.2bpp"
 
-IshiharaVilla1Tileset::
+IshiharaVillaMainTileset::
 	dw 72 ; length
-	INCBIN "gfx/tilesets/ishihara_villa1.2bpp"
+	INCBIN "gfx/tilesets/ishihara_villa_main.2bpp"
 
 GameCenterEntranceTileset::
 	dw 74 ; length
@@ -879,7 +884,7 @@ OWRonaldGfx::
 	dw 20 ; length
 	INCBIN "gfx/overworld_sprites/ronald.2bpp"
 
-DuelPhysicalMovesGfx::
+DuelGlowGfx::
 	dw 9 ; length
 	INCBIN "gfx/duel/anims/glow.2bpp"
 
@@ -1005,7 +1010,7 @@ OWIsaacGfx::
 	dw 20 ; length
 	INCBIN "gfx/overworld_sprites/isaac.2bpp"
 
-DuelImpactGfx::
+DuelHitGfx::
 	dw 9 ; length
 	INCBIN "gfx/duel/anims/hit.2bpp"
 
@@ -1626,9 +1631,9 @@ OWPappyGfx::
 	dw 20 ; length
 	INCBIN "gfx/overworld_sprites/pappy.2bpp"
 
-OWGamblerGfx::
+OWFixerGfx::
 	dw 20 ; length
-	INCBIN "gfx/overworld_sprites/gambler.2bpp"
+	INCBIN "gfx/overworld_sprites/fixer.2bpp"
 
 OWGRLadGfx::
 	dw 20 ; length
@@ -1890,15 +1895,15 @@ DuelFireballsGfx::
 	dw 43 ; length
 	INCBIN "gfx/duel/anims/fireballs.2bpp"
 
-DuelBenchManipGfx::
+DuelBenchManipulationGfx::
 	dw 12 ; length
-	INCBIN "gfx/duel/anims/bench_manip.2bpp"
+	INCBIN "gfx/duel/anims/bench_manipulation.2bpp"
 
 DuelPsychicBeamGfx::
 	dw 49 ; length
 	INCBIN "gfx/duel/anims/psychic_beam.2bpp"
 
-DuelBenchPsychicBeamGfx::
+DuelPsychicBeamBenchGfx::
 	dw 34 ; length
 	INCBIN "gfx/duel/anims/psychic_beam_bench.2bpp"
 
@@ -1974,7 +1979,7 @@ DuelFocusBlastGfx::
 	dw 23 ; length
 	INCBIN "gfx/duel/anims/focus_blast.2bpp"
 
-DuelBenchFocusBlastGfx::
+DuelFocusBlastBenchGfx::
 	dw 12 ; length
 	INCBIN "gfx/duel/anims/focus_blast_bench.2bpp"
 
@@ -2467,21 +2472,6 @@ Frameset10A::
 	oamframe  3,  1,   0,   0
 	oamreset
 
-SECTION "Framesets 1", ROMX
-INCLUDE "data/framesets1.asm"
-
-SECTION "Framesets 2", ROMX
-INCLUDE "data/framesets2.asm"
-
-SECTION "OW Tile Frames 1", ROMX
-INCLUDE "data/ow_tile_frames1.asm"
-
-SECTION "OW Animations", ROMX
-INCLUDE "data/ow_animations.asm"
-
-SECTION "OW Tile Frames 2", ROMX
-INCLUDE "data/ow_tile_frames2.asm"
-
 SECTION "Palettes 2", ROMX
 INCLUDE "data/palettes2.asm"
 
@@ -2499,3 +2489,18 @@ INCLUDE "data/oam4.asm"
 
 SECTION "OAM 5", ROMX
 INCLUDE "data/oam5.asm"
+
+SECTION "Framesets 1", ROMX
+INCLUDE "data/framesets1.asm"
+
+SECTION "Framesets 2", ROMX
+INCLUDE "data/framesets2.asm"
+
+SECTION "OW Tile Frames 1", ROMX
+INCLUDE "data/ow_tile_frames1.asm"
+
+SECTION "OW Animations", ROMX
+INCLUDE "data/ow_animations.asm"
+
+SECTION "OW Tile Frames 2", ROMX
+INCLUDE "data/ow_tile_frames2.asm"

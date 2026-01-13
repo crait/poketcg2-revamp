@@ -63,8 +63,8 @@ StartMenu_ContinueFromDiary:
 	cp $03
 	jr z, .asm_c0ab
 	ld a, [wPlayerOWObject]
-	ld b, $01
-	farcall Func_10f16
+	ld b, TRUE
+	farcall SetOWObjectAnimStruct1Flag2
 	call Func_33b7
 	call Func_c29d
 	call Func_e9a7
@@ -87,8 +87,8 @@ StartMenu_ContinueFromDiary:
 
 .asm_c0ab
 	ld a, [wPlayerOWObject]
-	ld b, $01
-	farcall Func_10f16
+	ld b, TRUE
+	farcall SetOWObjectAnimStruct1Flag2
 	call Func_33b7
 	call Func_c29d
 	call Func_e9a7
@@ -106,7 +106,7 @@ StartMenu_ContinueFromDiary:
 	ld a, VAR_NPC_DECK_ID
 	call GetVarValue
 	ld [wNPCDuelDeckID], a
-	ld a, VAR_3D
+	ld a, VAR_DUEL_START_THEME
 	call GetVarValue
 	ld [wDuelStartTheme], a
 	call Func_3087
@@ -121,7 +121,7 @@ StartMenu_ContinueDuel:
 	call Func_eb16
 	ld a, [wPlayerOWObject]
 	ld b, $01
-	farcall Func_10f16
+	farcall SetOWObjectAnimStruct1Flag2
 	call Func_33b7
 	call EnablePlayTimeCounter
 	ld a, EVENT_F0
@@ -140,14 +140,11 @@ StartMenu_CardPop:
 	ccf
 	ret
 
+; jump to .PointerTable[a]
 Func_c12e::
 	sla a
 	ld hl, .PointerTable
-	add l
-	ld l, a
-	jr nc, .no_overflow
-	inc h
-.no_overflow
+	add_hl_a
 	ld a, [hli]
 	ld h, [hl]
 	ld l, a
@@ -156,28 +153,97 @@ Func_c12e::
 .PointerTable
 	dw Func_31a1 ; $00
 	dw Func_c162 ; $01
-	dw $417d     ; $02
-	dw $4169     ; $03
-	dw $4183     ; $04
+	dw Func_c17d ; $02
+	dw Func_c169 ; $03
+	dw Func_c183 ; $04
 	dw Func_31a8 ; $05
-	dw $4199     ; $06
+	dw Func_c199 ; $06
 	dw Func_c162 ; $07
-	dw $4163     ; $08
-	dw $4189     ; $09
+	dw Func_c163 ; $08
+	dw Func_c189 ; $09
 	dw Func_3234 ; $0a
-	dw $418f     ; $0b
+	dw Func_c18f ; $0b
 	dw Func_c162 ; $0c
 	dw Func_c162 ; $0d
 	dw Func_c162 ; $0e
-	dw $416f     ; $0f
-	dw $4175     ; $10
+	dw Func_c16f ; $0f
+	dw Func_c175 ; $10
 	dw $41a2     ; $11
 	dw $41a6     ; $12
 
 Func_c162:
 	ret
 
-SECTION "Bank 3@41c9", ROMX[$41c9], BANK[$3]
+; clear wd582
+Func_c163:
+	ld a, 0
+	ld [wd582], a
+	ret
+
+Func_c169:
+	ld a, 10
+	call WaitAFrames
+	ret
+
+Func_c16f:
+	ld a, SFX_WARP
+	call PlaySFX
+	ret
+
+Func_c175:
+	ld a, [wNextMusic]
+	farcall PlayAfterCurrentSong
+	ret
+
+Func_c17d:
+	ld a, $01
+	call Func_338f
+	ret
+
+Func_c183:
+	ld a, $01
+	call Func_33a3
+	ret
+
+; clear wd582, dupe of Func_c163
+Func_c189:
+	ld a, 0
+	ld [wd582], a
+	ret
+
+Func_c18f:
+	farcall PlayCurrentSong
+	ld a, 0
+	ld [wd582], a
+	ret
+
+; clear wd582, then Func_32f6
+Func_c199:
+	ld a, 0
+	ld [wd582], a
+	call Func_32f6
+	ret
+
+Func_c1a2:
+	call WaitPalFading
+	ret
+
+Func_c1a6:
+	call Func_3d0d
+	ld a, MUSIC_PAUSE_MENU
+	call PlaySong
+	farcall Func_10772
+	call Func_3d4a
+	jr nz, .asm_c1bc
+	call Func_3d16
+	jr .asm_c1c3
+.asm_c1bc
+	farcall PlayCurrentSong
+	call Func_3d4f
+.asm_c1c3
+	ld a, $00
+	ld [wd582], a
+	ret
 
 HandleStartMenu:
 	xor a
@@ -194,7 +260,9 @@ HandleStartMenu:
 	jr c, .no_saved_duel
 	ld hl, wd554
 	set 2, [hl]
-	ld a, VAR_04
+	; on second meeting, Ronald card pops with you
+	; and unlocks it in the start menu
+	ld a, VAR_TIMES_MET_RONALD
 	call GetVarValue
 	cp $02
 	jr c, .menu_config4
@@ -206,7 +274,7 @@ HandleStartMenu:
 	set 1, [hl]
 	jr .menu_config3
 .no_saved_duel
-	ld a, VAR_04
+	ld a, VAR_TIMES_MET_RONALD
 	call GetVarValue
 	cp $02
 	jr c, .menu_config1
@@ -276,10 +344,10 @@ Func_c24d:
 	ld [wd586], a
 	ld [wCurOWLocation], a
 	ld [wCurMusic], a
-	ld [wd611], a
-	ld [wd612], a
-	ld [wd613], a
-	ld [wd614], a
+	ld [wSentMailBitfield + 0], a
+	ld [wSentMailBitfield + 1], a
+	ld [wSentMailBitfield + 2], a
+	ld [wSentMailBitfield + 3], a
 	call Func_ebc6
 	jr nc, .asm_c299
 	call Func_eb39
@@ -552,10 +620,10 @@ Func_c439:
 	call SetVarValue
 	ld a, VAR_2B
 	call ZeroOutVarValue
-	ld a, $11
+	ld a, NUM_TCG_CHALLENGE_CUP_PRIZE_POOL
 	call Random
 	ld c, a
-	ld a, VAR_29
+	ld a, VAR_TCG_CHALLENGE_CUP_PRIZE_INDEX
 	call SetVarValue
 .skip
 	ret
@@ -585,33 +653,127 @@ Func_c477:
 	call SetVarValue
 	ld a, VAR_33
 	call ZeroOutVarValue
-	ld a, $11
+	ld a, NUM_GR_CHALLENGE_CUP_PRIZE_POOL
 	call Random
 	ld c, a
-	ld a, VAR_31
+	ld a, VAR_GR_CHALLENGE_CUP_PRIZE_INDEX
 	call SetVarValue
 .asm_c4b4
 	ret
 
-SECTION "Bank 3@4522", ROMX[$4522], BANK[$3]
+; load the NPC duelist header corresponding to register a into wCurrentNPCDuelistData
+LoadNPCDuelist:
+	push af
+	push bc
+	push de
+	push hl
+	ld c, a
+	ld de, NPCDuelistPointers
+.loop
+	ld a, [de]
+	ld l, a
+	inc de
+	ld a, [de]
+	inc de
+	ld h, a
+	or l
+	jr z, .not_found
+	ld a, [hl]
+	cp c
+	jr nz, .loop
+	ld de, wCurrentNPCDuelistData
+	ld bc, NPC_DUELIST_STRUCT_SIZE
+	call CopyDataHLtoDE_SaveRegisters
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+.not_found
+	debug_nop
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
 
-Func_c522:
+; for a = deck id,
+; return a = NPC_* constant corresponding to that deck
+GetNPCByDeck:
+	push bc
+	push de
+	push hl
+	ld b, a
+	ld de, NPCDuelistPointers
+.loop_duelists
+	ld a, [de]
+	ld l, a
+	inc de
+	ld a, [de]
+	inc de
+	ld h, a
+	or l
+	jr z, .not_found
+	ld c, MAX_NPC_DUELIST_DECKS
+	push hl
+	ld a, NPC_DUELIST_STRUCT_DECKS
+	add_hl_a
+.loop_decks
+	ld a, [hli]
+	cp b
+	jr z, .get_npc_id
+	dec c
+	jr nz, .loop_decks
+	pop hl
+	jr .loop_duelists
+.not_found
+	debug_nop
+	jr .done
+.get_npc_id
+	pop hl
+	ld a, [hl]
+.done
+	pop hl
+	pop de
+	pop bc
+	ret
+
+; return - a : number of coin pieces obtained
+CountGRCoinPiecesObtained:
+	push bc
+	ld b, EVENT_GOT_GR_COIN_PIECE_TOP_LEFT
+	ld c, 0 ; counter for how many pieces obtained
+.loop
+	ld a, b
+	call GetEventValue
+	jr z, .not_obtained
+	inc c ; obtained this piece
+.not_obtained
+	ld a, b
+	cp EVENT_GOT_GR_COIN_PIECE_BOTTOM_RIGHT
+	jr z, .done
+	inc b
+	jr .loop
+.done
+	ld a, c
+	pop bc
+	ret
+
+; for c = island and a = location,
+; return the location name in hl
+GetLocationName:
 	push af
 	push bc
 	ld b, a
 	ld a, c
-	ld hl, TextIDs_d171 ; TCG island
+	ld hl, TCGIslandLocationNamePointers
 	cp TCG_ISLAND
-	jr z, .got_text
-	ld hl, TextIDs_d18f ; GR island
-.got_text
+	jr z, .got_island
+	ld hl, GRIslandLocationNamePointers
+.got_island
 	ld a, b
 	sla a
-	add l
-	ld l, a
-	jr nc, .asm_c538
-	inc h
-.asm_c538
+	add_hl_a
 	ld a, [hli]
 	ld h, [hl]
 	ld l, a
@@ -619,183 +781,341 @@ Func_c522:
 	pop af
 	ret
 
-Func_c53e:
+; load the current island and location into c and a, then get the name
+GetCurrentLocationName:
 	push af
 	push bc
 	ld a, [wCurIsland]
 	ld c, a
 	ld a, [wCurOWLocation]
-	call Func_c522
+	call GetLocationName
 	pop bc
 	pop af
 	ret
-; 0xc54d
 
-SECTION "Bank 3@4651", ROMX[$4651], BANK[$3]
+; for de = receiving card id, return its long name in hl
+; the first half of this function and the next two are identical
+GetReceivingCardLongName:
+	push af
+	push bc
+	push de
+	ld hl, ReceiveCardTextPointers
+.loop_cards
+	ld a, [hli]
+	ld c, a
+	ld a, [hli]
+	ld b, a
+	cp16bc_long $ffff
+	jr z, .not_found
+	cp16bc_long de
+	jr z, .load_name
+	ld a, CARD_RECEIVE_STRUCT_TEXTS_SIZE
+	add_hl_a
+	jr .loop_cards
+.not_found
+	call LoadCardDataToBuffer1_FromCardID
+	ld a, 18
+	call CopyCardNameAndLevel
+	ld [hl], 0
+	ld bc, 0
+	jr .got_name
+.load_name
+	ld a, [hli]
+	ld c, a
+	ld a, [hli]
+	ld b, a
+	or c
+	jr z, .not_found
+	; fallthrough
+.got_name
+	ld l, c
+	ld h, b
+	pop de
+	pop bc
+	pop af
+	ret
+
+; for de = receiving card id, return its short name in hl
+GetReceivingCardShortName:
+	push af
+	push bc
+	push de
+	ld hl, ReceiveCardTextPointers
+.loop_cards
+	ld a, [hli]
+	ld c, a
+	ld a, [hli]
+	ld b, a
+	cp16bc_long $ffff
+	jr z, .not_found
+	cp16bc_long de
+	jr z, .load_short_name
+	ld a, CARD_RECEIVE_STRUCT_TEXTS_SIZE
+	add_hl_a
+	jr .loop_cards
+.not_found
+	call LoadCardDataToBuffer1_FromCardID
+	ld a, 18
+	call CopyCardNameAndLevel
+	ld [hl], 0
+	ld bc, 0
+	jr .got_short_name
+.load_short_name
+	inc hl
+	inc hl
+	ld a, [hli]
+	ld c, a
+	ld a, [hli]
+	ld b, a
+	or c
+	jr z, .not_found
+	; fallthrough
+.got_short_name
+	ld l, c
+	ld h, b
+	pop de
+	pop bc
+	pop af
+	ret
+
+; for de = receiving card id, return its "received" text in hl
+GetReceivedCardText:
+	push af
+	push bc
+	push de
+	ld hl, ReceiveCardTextPointers
+.loop_cards
+	ld a, [hli]
+	ld c, a
+	ld a, [hli]
+	ld b, a
+	cp16bc_long $ffff
+	jr z, .not_found
+	cp16bc_long de
+	jr z, .load_received_text
+	ld a, CARD_RECEIVE_STRUCT_TEXTS_SIZE
+	add_hl_a
+	jr .loop_cards
+.not_found
+	push hl
+	call GetReceivingCardShortName
+	call LoadTxRam2
+	pop hl
+	call LoadCardDataToBuffer1_FromCardID
+	ldtx bc, ReceivedPromotionalCardText_2
+	ld a, [wLoadedCard1Set]
+	cp PROMOTIONAL
+	jr z, .got_text
+	ldtx bc, ReceivedCardText_2
+	jr .got_text
+.load_received_text
+REPT CARD_RECEIVE_STRUCT_RECEIVED_TEXT - CARD_RECEIVE_STRUCT_TEXTS
+	inc hl
+ENDR
+	push hl
+	call GetReceivingCardShortName
+	call LoadTxRam2
+	pop hl
+	ld a, [hli]
+	ld c, a
+	ld a, [hli]
+	ld b, a
+	; check alt flag, load alt text if TRUE
+	ld a, [hli]
+	or a
+	jr z, .got_text
+	call GetEventValue
+	jr z, .got_text
+	ld a, [hli]
+	ld b, [hl]
+	ld c, a
+	; fallthrough
+.got_text
+	ld l, c
+	ld h, b
+	pop de
+	pop bc
+	pop af
+	ret
+
+Func_c63e:
+	call GetReceivedCardText
+	farcall Func_1d53a
+	ret
+
+Func_c646:
+	call AddCardToCollection
+	call GetReceivedCardText
+	farcall Func_1d53a
+	ret
 
 ; bank and offset table of data for Func_d421 and Func_33b7
-Data_c651::
-	dba Data_40462 ; $00
-	dba Data_30080 ; $01
-	dbw $10, $4db3 ; $02
-	dbw $0f, $4603 ; $03
-	dbw $0f, $47dc ; $04
-	dbw $0b, $4000 ; $05
-	dbw $0f, $4b88 ; $06
-	dbw $0f, $4c62 ; $07
-	dbw $0b, $4479 ; $08
-	dbw $0b, $4936 ; $09
-	dbw $0b, $4afa ; $0a
-	dbw $0b, $4d23 ; $0b
-	dbw $0b, $530a ; $0c
-	dbw $0b, $53c4 ; $0d
-	dbw $0b, $55f8 ; $0e
-	dbw $0b, $5930 ; $0f
-	dbw $0b, $5a26 ; $10
-	dbw $0b, $5c9f ; $11
-	dbw $0b, $606d ; $12
-	dbw $0f, $4ee6 ; $13
-	dbw $0b, $6163 ; $14
-	dbw $0b, $64b7 ; $15
-	dbw $0b, $663f ; $16
-	dbw $0b, $68e6 ; $17
-	dbw $0b, $6cc8 ; $18
-	dbw $0b, $6dc5 ; $19
-	dbw $0b, $7012 ; $1a
-	dbw $0b, $74ff ; $1b
-	dbw $0b, $75fc ; $1c
-	dbw $0b, $77ca ; $1d
-	dbw $0d, $4575 ; $1e
-	dbw $0d, $4773 ; $1f
-	dbw $0f, $519e ; $20
-	dbw $0f, $52d7 ; $21
-	dbw $10, $5592 ; $22
-	dbw $0b, $7cd5 ; $23
-	dbw $0f, $55d1 ; $24
-	dbw $0f, $5d58 ; $25
-	dbw $0b, $7e45 ; $26
-	dbw $0d, $4aaf ; $27
-	dbw $10, $5be9 ; $28
-	dbw $0f, $6698 ; $29
-	dbw $0f, $68e0 ; $2a
-	dbw $0f, $6cea ; $2b
-	dbw $0f, $6efa ; $2c
-	dbw $0d, $4ba8 ; $2d
-	dbw $0d, $4e4d ; $2e
-	dbw $0f, $704c ; $2f
-	dbw $0f, $71f2 ; $30
-	dbw $0d, $509f ; $31
-	dbw $0f, $73c2 ; $32
-	dbw $0c, $518a ; $33
-	dbw $0c, $5324 ; $34
-	dbw $10, $5e8e ; $35
-	dbw $0c, $53ce ; $36
-	dbw $0d, $5288 ; $37
-	dbw $10, $65cf ; $38
-	dbw $0c, $54fe ; $39
-	dbw $0c, $55d8 ; $3a
-	dbw $0c, $5785 ; $3b
-	dbw $0c, $5973 ; $3c
-	dbw $0c, $5b29 ; $3d
-	dbw $0d, $54a2 ; $3e
-	dbw $0c, $5cbf ; $3f
-	dbw $0c, $5dd2 ; $40
-	dbw $0c, $5fad ; $41
-	dbw $0c, $6148 ; $42
-	dbw $0c, $641e ; $43
-	dbw $0c, $6531 ; $44
-	dbw $0c, $6696 ; $45
-	dbw $0c, $6804 ; $46
-	dbw $0c, $696d ; $47
-	dbw $0c, $6beb ; $48
-	dbw $0c, $6e20 ; $49
-	dbw $0c, $6f5b ; $4a
-	dbw $0f, $75ab ; $4b
-	dbw $0c, $70c0 ; $4c
-	dbw $0d, $55de ; $4d
-	dbw $0d, $580f ; $4e
-	dbw $0c, $724d ; $4f
-	dbw $0c, $7357 ; $50
-	dbw $0d, $5989 ; $51
-	dbw $10, $6e2b ; $52
-	dbw $0c, $7506 ; $53
-	dbw $0c, $75da ; $54
-	dbw $0c, $762f ; $55
-	dbw $0c, $7723 ; $56
-	dbw $0c, $7766 ; $57
-	dbw $0c, $77bb ; $58
-	dbw $0c, $7822 ; $59
-	dbw $0c, $7928 ; $5a
-	dbw $0c, $797d ; $5b
-	dbw $0c, $79b2 ; $5c
-	dbw $0c, $7a19 ; $5d
-	dbw $0c, $7ab4 ; $5e
-	dbw $0c, $7b1b ; $5f
-	dbw $0c, $7ba4 ; $60
-	dbw $0d, $5c10 ; $61
-	dbw $0c, $7bf9 ; $62
-	dbw $0d, $5c9a ; $63
-	dbw $0f, $77b5 ; $64
-	dbw $0c, $7d2e ; $65
-	dbw $10, $6e80 ; $66
-	dbw $0c, $7d63 ; $67
-	dbw $0f, $7884 ; $68
-	dbw $0d, $5d36 ; $69
-	dbw $0d, $5f14 ; $6a
-	dbw $0d, $6097 ; $6b
-	dbw $0d, $6173 ; $6c
-	dbw $0d, $631f ; $6d
-	dbw $0d, $6c9b ; $6e
-	dbw $0c, $7d98 ; $6f
-	dbw $0d, $6f9a ; $70
-	dbw $0d, $7365 ; $71
-	dbw $0d, $75df ; $72
-	dbw $10, $6ed5 ; $73
+; table corresponds to MAP_* IDs (do not confuse with MAP_GFX_*)
+MapHeaderPtrs::
+	dba OverworldTcg_MapHeader
+	dba OverworldGr_MapHeader
+	dba MasonLaboratoryMain_MapHeader
+	dba MasonLaboratoryComputerRoom_MapHeader
+	dba MasonLaboratoryTrainingRoom_MapHeader
+	dba IshiharasHouse_MapHeader
+	dba LightningClubEntrance_MapHeader
+	dba LightningClubLobby_MapHeader
+	dba LightningClub_MapHeader
+	dba PsychicClubEntrance_MapHeader
+	dba PsychicClubLobby_MapHeader
+	dba PsychicClub_MapHeader
+	dba RockClubEntrance_MapHeader
+	dba RockClubLobby_MapHeader
+	dba RockClub_MapHeader
+	dba FightingClubEntrance_MapHeader
+	dba FightingClubLobby_MapHeader
+	dba FightingClub_MapHeader
+	dba GrassClubEntrance_MapHeader
+	dba GrassClubLobby_MapHeader
+	dba GrassClub_MapHeader
+	dba ScienceClubEntrance_MapHeader
+	dba ScienceClubLobby_MapHeader
+	dba ScienceClub_MapHeader
+	dba WaterClubEntrance_MapHeader
+	dba WaterClubLobby_MapHeader
+	dba WaterClub_MapHeader
+	dba FireClubEntrance_MapHeader
+	dba FireClubLobby_MapHeader
+	dba FireClub_MapHeader
+	dba TcgAirportEntrance_MapHeader
+	dba TcgAirport_MapHeader
+	dba TcgChallengeHallEntrance_MapHeader
+	dba TcgChallengeHallLobby_MapHeader
+	dba TcgChallengeHall_MapHeader
+	dba PokemonDomeEntrance_MapHeader
+	dba PokemonDome_MapHeader
+	dba PokemonDomeBack_MapHeader
+	dba OverheadIslands_MapHeader
+	dba GrAirportEntrance_MapHeader
+	dba GrAirport_MapHeader
+	dba IshiharasVillaMain_MapHeader
+	dba IshiharasVillaLibrary_MapHeader
+	dba GameCenterEntrance_MapHeader
+	dba GameCenterLobby_MapHeader
+	dba GameCenter1_MapHeader
+	dba GameCenter2_MapHeader
+	dba CardDungeonPawn_MapHeader
+	dba CardDungeonKnight_MapHeader
+	dba CardDungeonBishop_MapHeader
+	dba CardDungeonRook_MapHeader
+	dba CardDungeonQueen_MapHeader
+	dba SealedFortEntrance_MapHeader
+	dba SealedFort_MapHeader
+	dba GrChallengeHallEntrance_MapHeader
+	dba GrChallengeHallLobby_MapHeader
+	dba GrChallengeHall_MapHeader
+	dba GrassFortEntrance_MapHeader
+	dba GrassFortLobby_MapHeader
+	dba GrassFortMidori_MapHeader
+	dba GrassFortYuta_MapHeader
+	dba GrassFortMiyuki_MapHeader
+	dba GrassFortMorino_MapHeader
+	dba LightningFortEntrance_MapHeader
+	dba LightningFortLobby_MapHeader
+	dba LightningFortRenna_MapHeader
+	dba LightningFortIchikawa_MapHeader
+	dba LightningFortCatherine_MapHeader
+	dba FireFortEntrance_MapHeader
+	dba FireFortLobby_MapHeader
+	dba FireFortJes_MapHeader
+	dba FireFortYuki_MapHeader
+	dba FireFortShoko_MapHeader
+	dba FireFortHidero_MapHeader
+	dba WaterFortEntrance_MapHeader
+	dba WaterFortLobby_MapHeader
+	dba WaterFortMiyajima_MapHeader
+	dba WaterFortSenta_MapHeader
+	dba WaterFortAira_MapHeader
+	dba WaterFortKanoko_MapHeader
+	dba FightingFortEntrance_MapHeader
+	dba FightingFort_MapHeader
+	dba FightingFortMaze1_MapHeader
+	dba FightingFortMaze2_MapHeader
+	dba FightingFortMaze3_MapHeader
+	dba FightingFortMaze4_MapHeader
+	dba FightingFortMaze5_MapHeader
+	dba FightingFortMaze6_MapHeader
+	dba FightingFortMaze7_MapHeader
+	dba FightingFortMaze8_MapHeader
+	dba FightingFortMaze9_MapHeader
+	dba FightingFortMaze10_MapHeader
+	dba FightingFortMaze11_MapHeader
+	dba FightingFortMaze12_MapHeader
+	dba FightingFortMaze13_MapHeader
+	dba FightingFortMaze14_MapHeader
+	dba FightingFortMaze15_MapHeader
+	dba FightingFortMaze16_MapHeader
+	dba FightingFortMaze17_MapHeader
+	dba FightingFortMaze18_MapHeader
+	dba FightingFortMaze19_MapHeader
+	dba FightingFortMaze20_MapHeader
+	dba FightingFortMaze21_MapHeader
+	dba FightingFortMaze22_MapHeader
+	dba FightingFortBasement_MapHeader
+	dba FightingFortGoda_MapHeader
+	dba FightingFortGrace_MapHeader
+	dba PsychicStrongholdEntrance_MapHeader
+	dba PsychicStrongholdLobby_MapHeader
+	dba PsychicStronghold_MapHeader
+	dba PsychicStrongholdMami_MapHeader
+	dba ColorlessAltarEntrance_MapHeader
+	dba ColorlessAltar_MapHeader
+	dba GrCastleEntrance_MapHeader
+	dba GrCastle_MapHeader
+	dba GrCastleBiruritchi_MapHeader
 
-SECTION "Bank 3@5171", ROMX[$5171], BANK[$3]
+INCLUDE "data/npc_duelists.asm"
+INCLUDE "data/booster_lists.asm"
+INCLUDE "data/card_receive_texts.asm"
 
-TextIDs_d171:
-	tx Text09b6 ; OWMAP_MASON_LABORATORY
-	tx Text09b7 ; OWMAP_ISHIHARAS_HOUSE
-	tx Text09b8 ; OWMAP_LIGHTNING_CLUB
-	tx Text09b9 ; OWMAP_PSYCHIC_CLUB
-	tx Text09ba ; OWMAP_ROCK_CLUB
-	tx Text09bb ; OWMAP_FIGHTING_CLUB
-	tx Text09bc ; OWMAP_GRASS_CLUB
-	tx Text09bd ; OWMAP_SCIENCE_CLUB
-	tx Text09be ; OWMAP_WATER_CLUB
-	tx Text09bf ; OWMAP_FIRE_CLUB
-	tx Text09c0 ; OWMAP_TCG_AIRPORT
-	tx Text09c1 ; OWMAP_TCG_CHALLENGE_HALL
-	tx Text09c2 ; OWMAP_POKEMON_DOME
+TCGIslandLocationNamePointers:
+	tx MapMasonLabText         ; OWMAP_MASON_LABORATORY
+	tx MapIshiharasHouseText   ; OWMAP_ISHIHARAS_HOUSE
+	tx MapLightningClubText    ; OWMAP_LIGHTNING_CLUB
+	tx MapPsychicClubText      ; OWMAP_PSYCHIC_CLUB
+	tx MapRockClubText         ; OWMAP_ROCK_CLUB
+	tx MapFightingClubText     ; OWMAP_FIGHTING_CLUB
+	tx MapGrassClubText        ; OWMAP_GRASS_CLUB
+	tx MapScienceClubText      ; OWMAP_SCIENCE_CLUB
+	tx MapWaterClubText        ; OWMAP_WATER_CLUB
+	tx MapFireClubText         ; OWMAP_FIRE_CLUB
+	tx MapTCGAirportText       ; OWMAP_TCG_AIRPORT
+	tx MapTCGChallengeHallText ; OWMAP_TCG_CHALLENGE_HALL
+	tx MapPokemonDomeText      ; OWMAP_POKEMON_DOME
 	dw NULL
-	tx Text09b5
+	tx MapOpeningText
 
-TextIDs_d18f:
-	tx Text09c3 ; OWMAP_GR_AIRPORT
-	tx Text09c4 ; OWMAP_ISHIHARAS_VILLA
-	tx Text09c5 ; OWMAP_GAME_CENTER
-	tx Text09c6 ; OWMAP_SEALED_FORT
-	tx Text09c7 ; OWMAP_GR_CHALLENGE_HALL
-	tx Text09c8 ; OWMAP_GR_GRASS_FORT
-	tx Text09c9 ; OWMAP_GR_LIGHTNING_FORT
-	tx Text09ca ; OWMAP_GR_FIRE_FORT
-	tx Text09cb ; OWMAP_GR_WATER_FORT
-	tx Text09cc ; OWMAP_GR_FIGHTING_FORT
-	tx Text09cd ; OWMAP_GR_PSYCHIC_STRONGHOLD
-	tx Text09ce ; OWMAP_COLORLESS_ALTAR
-	tx Text09cf ; OWMAP_GR_CASTLE
-	tx Drew7CardsText ; $0069, weird
-; 0xd1ab
+GRIslandLocationNamePointers:
+	tx MapGRAirportText           ; OWMAP_GR_AIRPORT
+	tx MapIshiharasVillaText      ; OWMAP_ISHIHARAS_VILLA
+	tx MapGameCenterText          ; OWMAP_GAME_CENTER
+	tx MapSealedFortText          ; OWMAP_SEALED_FORT
+	tx MapGRChallengeHallText     ; OWMAP_GR_CHALLENGE_HALL
+	tx MapGRGrassFortText         ; OWMAP_GR_GRASS_FORT
+	tx MapGRLightningFortText     ; OWMAP_GR_LIGHTNING_FORT
+	tx MapGRFireFortText          ; OWMAP_GR_FIRE_FORT
+	tx MapGRWaterFortText         ; OWMAP_GR_WATER_FORT
+	tx MapGRFightingFortText      ; OWMAP_GR_FIGHTING_FORT
+	tx MapGRPsychicStrongholdText ; OWMAP_GR_PSYCHIC_STRONGHOLD
+	tx MapGRColorlessAltarText    ; OWMAP_COLORLESS_ALTAR
+	tx MapGRCastleText            ; OWMAP_GR_CASTLE
+
+INCLUDE "data/challenge_cup.asm"
+; 0xd1ed
 
 SECTION "Bank 3@5299", ROMX[$5299], BANK[$3]
 
 Func_d299::
 	push af
 	ldh a, [hKeysHeld]
-	bit A_BUTTON_F, a
+	bit B_PAD_A, a
 	jr z, .skip_nop
-	bit B_BUTTON_F, a
+	bit B_PAD_B, a
 	jr z, .skip_nop
 	nop
 	nop
@@ -828,9 +1148,9 @@ Func_d299::
 	xor a
 	farcall Func_10d40
 	ld a, $01
-	farcall Func_10413
+	farcall SetOWScrollState
 	ld b, $00
-	ld a, [wd58a]
+	ld a, [wCurMapGfx]
 	ld c, a
 	farcall LoadOWMap
 	ld a, [wd58f]
@@ -843,9 +1163,9 @@ Func_d299::
 	farcall LoadOWObjectInMap
 	farcall StopOWObjectAnimation
 	farcall SetOWObjectAsScrollTarget
-	farcall Func_10eff
+	farcall SetOWObjectFlag5_WithID
 	ld b, $01
-	farcall Func_10f16
+	farcall SetOWObjectAnimStruct1Flag2
 	ld a, $00
 	ld [wd582], a
 	xor a
@@ -867,7 +1187,7 @@ Func_d299::
 	call Func_3154
 	ld a, [wd583]
 	bit 1, a
-	jr nz, .asm_d357
+	jr nz, .start_duel
 	bit 0, a
 	jr z, .asm_d333
 	ld a, $04
@@ -875,14 +1195,14 @@ Func_d299::
 	ld a, $0f
 	call Func_3154
 	ret
-.asm_d357
+.start_duel
 	ld a, [wNPCDuelDeckID]
 	ld c, a
 	ld a, VAR_NPC_DECK_ID
 	call SetVarValue
 	ld a, [wDuelStartTheme]
 	ld c, a
-	ld a, VAR_3D
+	ld a, VAR_DUEL_START_THEME
 	call SetVarValue
 	ld a, EVENT_02
 	call MaxOutEventValue
@@ -922,7 +1242,7 @@ Func_d299::
 	res 7, [hl]
 	jp .asm_d333
 
-; a = ?
+; a = map id
 ; b = direction
 ; de = coordinates
 Func_d3c4:
@@ -946,19 +1266,15 @@ Func_d3c4:
 Func_d3e9::
 	ld a, [wPlayerOWObject]
 	push af
-	farcall Func_10da7
+	farcall GetOWObjectTilePosition
 	pop af
 	push de
-	farcall Func_10dcb
+	farcall GetOWObjectAnimStruct1Flag0And1
 	pop de
 	ld a, b
 	rlca
 	ld hl, .data
-	add l
-	ld l, a
-	jr nc, .no_overflow
-	inc h
-.no_overflow
+	add_hl_a
 	ld a, [hli]
 	add d
 	ld d, a
@@ -973,11 +1289,11 @@ Func_d3e9::
 	db  0,  1
 	db -1,  0
 
-Func_d411:
+PCMenu:
 	call PauseSong
-	ld a, MUSIC_PCMAINMENU
+	ld a, MUSIC_PC_MAIN_MENU
 	call PlaySong
-	farcall Func_110c6
+	farcall _PCMenu
 	call ResumeSong
 	ret
 
@@ -989,7 +1305,7 @@ Func_d421::
 	add c ; *3
 	ld c, a
 	rl b
-	ld hl, Data_c651
+	ld hl, MapHeaderPtrs
 	add hl, bc
 	ld a, [hli]
 	ld c, a     ; bank
@@ -997,7 +1313,7 @@ Func_d421::
 	ld h, [hl]  ;
 	ld l, a
 	ld a, c
-	ld de, wd58a
+	ld de, wCurMapGfx
 	ld bc, $5
 	call CopyFarHLToDE
 	ld a, [wd586]
@@ -1008,7 +1324,7 @@ Func_d421::
 	ld [wd585], a
 	ret
 
-; a = OW object ID
+; a = NPC_* ID
 ; de = target position
 SetOWObjectTargetPosition:
 	ld [wd595], a
@@ -1059,7 +1375,7 @@ SetOWObjectTargetPosition:
 	ld b, WEST
 .got_x_dir
 	ld a, [wd595]
-	farcall SetOWObjectDirection
+	farcall _SetOWObjectDirection
 	ld a, 1
 	ld [wOWObjYVelocity], a
 	ld a, [wOWObjTargetY]
@@ -1110,7 +1426,7 @@ SetOWObjectTargetPosition:
 	ld b, NORTH
 .got_y_dir
 	ld a, [wd595]
-	farcall SetOWObjectDirection
+	farcall _SetOWObjectDirection
 	ld a, 1
 	ld [wOWObjXVelocity], a
 	ld a, [wOWObjTargetX]
@@ -1355,7 +1671,7 @@ ClearEvents:
 	push bc
 	push hl
 	ld hl, wEventVars
-	ld bc, $68
+	ld bc, EVENT_VAR_BYTES + GENERAL_VAR_BYTES
 .loop
 	xor a
 	ld [hli], a
@@ -1373,13 +1689,14 @@ Func_d683:
 	ld a, EVENT_EE
 	call ZeroOutEventValue
 	ld a, VAR_3B
-	ld c, $00
+	ld c, 0
 	call SetVarValue
 	ret
 
 GetStackEventValue:
 	call GetByteAfterCall
 ;	fallthrough
+
 GetEventValue::
 	push bc
 	push hl
@@ -1409,7 +1726,7 @@ GetEventValue::
 	xor a
 	ret
 
-Func_d6b8:
+GetStackVarValue:
 	call GetByteAfterCall
 ;	fallthrough
 
@@ -1435,6 +1752,7 @@ GetVarValue:
 MaxStackEventValue:
 	call GetByteAfterCall
 ;	fallthrough
+
 MaxOutEventValue::
 	push bc
 	push hl
@@ -1448,19 +1766,21 @@ MaxOutEventValue::
 SetStackEventFalse:
 	call GetByteAfterCall
 ;	fallthrough
+
 ZeroOutEventValue::
 	push bc
 	push hl
 	call GetEventVar
-	ld c, $00
+	ld c, 0
 	call SetEventValue
 	pop hl
 	pop bc
 	ret
 
-Func_d6f0:
+SetStackVarFalse:
 	call GetByteAfterCall
 ;	fallthrough
+
 ZeroOutVarValue:
 	push bc
 	ld c, 0
@@ -1468,7 +1788,7 @@ ZeroOutVarValue:
 	pop bc
 	ret
 
-Func_d6fb:
+SetStackVarValue:
 	call GetByteAfterCall
 ;	fallthrough
 
@@ -1569,9 +1889,9 @@ GetByteAfterCall:
 ; mask - which bits in the byte hold the value
 EventVarMasks:
 	db $00, %00000001 ; EVENT_PLAYER_GENDER
-	db $00, %00000010 ; EVENT_01
+	db $00, %00000010 ; EVENT_MASONS_LAB_CHALLENGE_MACHINE_STATE
 	db $00, %00000100 ; EVENT_02
-	db $00, %00001000 ; EVENT_03
+	db $00, %00001000 ; EVENT_MASONS_LAB_CHALLENGE_MACHINE_STATE_DUMMY
 	db $01, %00000001 ; EVENT_GOT_CHANSEY_COIN
 	db $01, %00000010 ; EVENT_GOT_ODDISH_COIN
 	db $01, %00000100 ; EVENT_GOT_CHARMANDER_COIN
@@ -1580,12 +1900,12 @@ EventVarMasks:
 	db $01, %00100000 ; EVENT_GOT_ALAKAZAM_COIN
 	db $01, %01000000 ; EVENT_GOT_KABUTO_COIN
 	db $02, %00001111 ; EVENT_GOT_GR_COIN
-	db $02, %00000001 ; EVENT_GOT_GR_COIN_PIECE_1
-	db $02, %00000010 ; EVENT_GOT_GR_COIN_PIECE_2
-	db $02, %00000100 ; EVENT_GOT_GR_COIN_PIECE_3
-	db $02, %00001000 ; EVENT_GOT_GR_COIN_PIECE_4
-	db $02, %00010000 ; EVENT_GOT_MAGNEMITE_COIN
-	db $02, %00100000 ; EVENT_GOT_GOLBAT_COIN
+	db $02, %00000001 ; EVENT_GOT_GR_COIN_PIECE_TOP_LEFT
+	db $02, %00000010 ; EVENT_GOT_GR_COIN_PIECE_TOP_RIGHT
+	db $02, %00000100 ; EVENT_GOT_GR_COIN_PIECE_BOTTOM_LEFT
+	db $02, %00001000 ; EVENT_GOT_GR_COIN_PIECE_BOTTOM_RIGHT
+	db $02, %00010000 ; EVENT_GOT_GOLBAT_COIN
+	db $02, %00100000 ; EVENT_GOT_MAGNEMITE_COIN
 	db $02, %01000000 ; EVENT_GOT_MAGMAR_COIN
 	db $02, %10000000 ; EVENT_GOT_PSYDUCK_COIN
 	db $03, %00000001 ; EVENT_GOT_MACHAMP_COIN
@@ -1600,219 +1920,219 @@ EventVarMasks:
 	db $04, %00000010 ; EVENT_GOT_GENGAR_COIN
 	db $04, %00000100 ; EVENT_GOT_RAICHU_COIN
 	db $04, %00001000 ; EVENT_GOT_LUGIA_COIN
-	db $05, %00000001 ; EVENT_20
-	db $05, %00000010 ; EVENT_21
-	db $05, %00000100 ; EVENT_22
-	db $05, %00001000 ; EVENT_23
-	db $06, %00000001 ; EVENT_24
-	db $06, %00000010 ; EVENT_25
-	db $06, %00000100 ; EVENT_26
-	db $06, %00001000 ; EVENT_27
-	db $07, %00000001 ; EVENT_28
-	db $07, %00000010 ; EVENT_29
-	db $07, %00000100 ; EVENT_2A
-	db $07, %00001000 ; EVENT_2B
-	db $07, %00010000 ; EVENT_2C
-	db $08, %00000001 ; EVENT_2D
-	db $08, %00000010 ; EVENT_2E
-	db $08, %00000100 ; EVENT_2F
-	db $08, %00001000 ; EVENT_30
-	db $09, %00000001 ; EVENT_31
-	db $09, %00000010 ; EVENT_32
-	db $09, %00000100 ; EVENT_33
-	db $09, %00001000 ; EVENT_34
+	db $05, %00000001 ; EVENT_TALKED_TO_GENE
+	db $05, %00000010 ; EVENT_TALKED_TO_MATTHEW
+	db $05, %00000100 ; EVENT_TALKED_TO_RYAN
+	db $05, %00001000 ; EVENT_TALKED_TO_ANDREW
+	db $06, %00000001 ; EVENT_TALKED_TO_MITCH
+	db $06, %00000010 ; EVENT_TALKED_TO_MICHAEL
+	db $06, %00000100 ; EVENT_TALKED_TO_CHRIS
+	db $06, %00001000 ; EVENT_TALKED_TO_JESSICA
+	db $07, %00000001 ; EVENT_TALKED_TO_NIKKI
+	db $07, %00000010 ; EVENT_TALKED_TO_BRITTANY
+	db $07, %00000100 ; EVENT_TALKED_TO_KRISTIN
+	db $07, %00001000 ; EVENT_TALKED_TO_HEATHER
+	db $07, %00010000 ; EVENT_BEAT_BRITTANY
+	db $08, %00000001 ; EVENT_TALKED_TO_RICK
+	db $08, %00000010 ; EVENT_TALKED_TO_DAVID
+	db $08, %00000100 ; EVENT_TALKED_TO_JOSEPH
+	db $08, %00001000 ; EVENT_TALKED_TO_ERIK
+	db $09, %00000001 ; EVENT_TALKED_TO_AMY
+	db $09, %00000010 ; EVENT_TALKED_TO_JOSHUA
+	db $09, %00000100 ; EVENT_TALKED_TO_SARA
+	db $09, %00001000 ; EVENT_TALKED_TO_AMANDA
 	db $09, %00010000 ; EVENT_35
 	db $09, %00100000 ; EVENT_36
-	db $0a, %00000001 ; EVENT_37
-	db $0a, %00000010 ; EVENT_38
-	db $0a, %00000100 ; EVENT_39
-	db $0a, %00001000 ; EVENT_3A
-	db $0a, %00010000 ; EVENT_3B
-	db $0b, %00000001 ; EVENT_3C
-	db $0b, %00000010 ; EVENT_3D
-	db $0b, %00000100 ; EVENT_3E
-	db $0b, %00001000 ; EVENT_3F
-	db $0c, %00000001 ; EVENT_40
-	db $0c, %00000010 ; EVENT_41
-	db $0c, %00000100 ; EVENT_42
-	db $0c, %00001000 ; EVENT_43
-	db $0c, %00100000 ; EVENT_44
-	db $0c, %01000000 ; EVENT_45
-	db $0d, %00000001 ; EVENT_46
-	db $0d, %00000010 ; EVENT_47
-	db $0d, %00000100 ; EVENT_48
-	db $0d, %00001000 ; EVENT_49
-	db $0d, %00010000 ; EVENT_4A
-	db $0d, %00100000 ; EVENT_4B
-	db $0d, %01000000 ; EVENT_4C
-	db $0d, %10000000 ; EVENT_4D
-	db $0e, %00000001 ; EVENT_4E
-	db $0e, %00000010 ; EVENT_4F
-	db $0e, %00000100 ; EVENT_50
-	db $0e, %00001000 ; EVENT_51
-	db $0e, %00010000 ; EVENT_52
-	db $0e, %00100000 ; EVENT_53
-	db $0e, %01000000 ; EVENT_54
-	db $0f, %00000001 ; EVENT_55
-	db $0f, %00000010 ; EVENT_56
-	db $0f, %00000100 ; EVENT_57
-	db $0f, %00001000 ; EVENT_58
-	db $0f, %00010000 ; EVENT_59
-	db $0f, %00100000 ; EVENT_5A
-	db $0f, %01000000 ; EVENT_5B
-	db $0f, %10000000 ; EVENT_5C
-	db $10, %00000001 ; EVENT_5D
-	db $10, %00000010 ; EVENT_5E
-	db $10, %00000100 ; EVENT_5F
-	db $10, %00001000 ; EVENT_60
-	db $10, %00010000 ; EVENT_61
-	db $10, %00100000 ; EVENT_62
-	db $10, %01000000 ; EVENT_63
-	db $10, %10000000 ; EVENT_64
-	db $11, %00000001 ; EVENT_65
-	db $11, %00000010 ; EVENT_66
-	db $11, %00000100 ; EVENT_67
-	db $11, %00001000 ; EVENT_68
-	db $11, %00010000 ; EVENT_69
-	db $11, %00100000 ; EVENT_6A
-	db $12, %00000001 ; EVENT_6B
-	db $12, %00000010 ; EVENT_6C
-	db $12, %00000100 ; EVENT_6D
-	db $12, %00001000 ; EVENT_6E
-	db $12, %00010000 ; EVENT_6F
-	db $12, %00100000 ; EVENT_70
-	db $12, %01000000 ; EVENT_71
-	db $12, %10000000 ; EVENT_72
-	db $13, %00000001 ; EVENT_73
-	db $13, %00000010 ; EVENT_74
-	db $14, %00000001 ; EVENT_75
-	db $14, %00000010 ; EVENT_76
-	db $14, %00000100 ; EVENT_77
-	db $14, %00001000 ; EVENT_78
-	db $14, %00010000 ; EVENT_79
-	db $14, %00100000 ; EVENT_7A
-	db $14, %00111000 ; EVENT_7B
-	db $14, %01000000 ; EVENT_7C
-	db $14, %10000000 ; EVENT_7D
-	db $15, %00000001 ; EVENT_7E
-	db $16, %00000001 ; EVENT_7F
-	db $16, %00000010 ; EVENT_80
-	db $16, %00000100 ; EVENT_81
-	db $16, %00001000 ; EVENT_82
-	db $16, %00010000 ; EVENT_83
-	db $17, %00000001 ; EVENT_84
-	db $18, %00000001 ; EVENT_85
-	db $18, %00000010 ; EVENT_86
-	db $18, %00000100 ; EVENT_87
-	db $18, %00001000 ; EVENT_88
-	db $18, %00010000 ; EVENT_89
-	db $18, %00100000 ; EVENT_8A
-	db $18, %01000000 ; EVENT_8B
-	db $18, %10000000 ; EVENT_8C
-	db $19, %00000001 ; EVENT_8D
-	db $19, %00000010 ; EVENT_8E
-	db $19, %00000100 ; EVENT_8F
-	db $19, %00001000 ; EVENT_90
+	db $0a, %00000001 ; EVENT_TALKED_TO_ISAAC
+	db $0a, %00000010 ; EVENT_TALKED_TO_JENNIFER
+	db $0a, %00000100 ; EVENT_TALKED_TO_NICHOLAS
+	db $0a, %00001000 ; EVENT_TALKED_TO_BRANDON
+	db $0a, %00010000 ; EVENT_BEAT_NICHOLAS
+	db $0b, %00000001 ; EVENT_TALKED_TO_KEN
+	db $0b, %00000010 ; EVENT_TALKED_TO_JOHN
+	db $0b, %00000100 ; EVENT_TALKED_TO_ADAM
+	db $0b, %00001000 ; EVENT_TALKED_TO_JONATHAN
+	db $0c, %00000001 ; EVENT_TALKED_TO_MURRAY
+	db $0c, %00000010 ; EVENT_TALKED_TO_ROBERT
+	db $0c, %00000100 ; EVENT_TALKED_TO_DANIEL
+	db $0c, %00001000 ; EVENT_TALKED_TO_STEPHANIE
+	db $0c, %00100000 ; EVENT_BEAT_MURRAY
+	db $0c, %01000000 ; EVENT_WALKED_INTO_MURRAYS_CLUB_ROOM
+	db $0d, %00000001 ; EVENT_TALKED_TO_MIDORI
+	db $0d, %00000010 ; EVENT_TALKED_TO_YUTA
+	db $0d, %00000100 ; EVENT_TALKED_TO_MIYUKI
+	db $0d, %00001000 ; EVENT_TALKED_TO_MORINO
+	db $0d, %00010000 ; EVENT_FREED_RICK
+	db $0d, %00100000 ; EVENT_YUTAS_ROOM_DOOR_STATE
+	db $0d, %01000000 ; EVENT_MIYUKIS_ROOM_DOOR_STATE
+	db $0d, %10000000 ; EVENT_BEAT_MORINO
+	db $0e, %00000001 ; EVENT_TALKED_TO_RENNA
+	db $0e, %00000010 ; EVENT_TALKED_TO_ICHIKAWA
+	db $0e, %00000100 ; EVENT_TALKED_TO_CATHERINE
+	db $0e, %00001000 ; EVENT_TALKED_TO_TAP
+	db $0e, %00010000 ; EVENT_RENNAS_ROOM_DOOR_STATE
+	db $0e, %00100000 ; EVENT_ICHIKAWAS_ROOM_DOOR_STATE
+	db $0e, %01000000 ; EVENT_BEAT_CATHERINE
+	db $0f, %00000001 ; EVENT_TALKED_TO_JES
+	db $0f, %00000010 ; EVENT_TALKED_TO_YUKI
+	db $0f, %00000100 ; EVENT_TALKED_TO_SHOKO
+	db $0f, %00001000 ; EVENT_TALKED_TO_HIDERO
+	db $0f, %00010000 ; EVENT_JES_ROOM_DOOR_STATE
+	db $0f, %00100000 ; EVENT_YUKIS_ROOM_DOOR_STATE
+	db $0f, %01000000 ; EVENT_SHOKOS_ROOM_DOOR_STATE
+	db $0f, %10000000 ; EVENT_BEAT_HIDERO
+	db $10, %00000001 ; EVENT_TALKED_TO_MIYAJIMA
+	db $10, %00000010 ; EVENT_TALKED_TO_SENTA
+	db $10, %00000100 ; EVENT_TALKED_TO_AIRA
+	db $10, %00001000 ; EVENT_TALKED_TO_KANOKO
+	db $10, %00010000 ; EVENT_MIYAJIMAS_ROOM_DOOR_STATE
+	db $10, %00100000 ; EVENT_SENTAS_ROOM_BRIDGE_STATE
+	db $10, %01000000 ; EVENT_AIRAS_ROOM_BRIDGE_STATE
+	db $10, %10000000 ; EVENT_BEAT_KANOKO
+	db $11, %00000001 ; EVENT_TALKED_TO_KAMIYA
+	db $11, %00000010 ; EVENT_TALKED_TO_GODA
+	db $11, %00000100 ; EVENT_TALKED_TO_GRACE
+	db $11, %00001000 ; EVENT_BEAT_KAMIYA
+	db $11, %00010000 ; EVENT_FREED_MITCH
+	db $11, %00100000 ; EVENT_GRACES_ROOM_CHEST_STATE
+	db $12, %00000001 ; EVENT_TALKED_TO_MIWA
+	db $12, %00000010 ; EVENT_TALKED_TO_KEVIN
+	db $12, %00000100 ; EVENT_TALKED_TO_YOSUKE
+	db $12, %00001000 ; EVENT_TALKED_TO_RYOKO
+	db $12, %00010000 ; EVENT_TALKED_TO_MAMI
+	db $12, %00100000 ; EVENT_BEAT_MIWA
+	db $12, %01000000 ; EVENT_BEAT_KEVIN
+	db $12, %10000000 ; EVENT_BEAT_YOSUKE
+	db $13, %00000001 ; EVENT_BEAT_RYOKO
+	db $13, %00000010 ; EVENT_BEAT_MAMI
+	db $14, %00000001 ; EVENT_TALKED_TO_NISHIJIMA
+	db $14, %00000010 ; EVENT_TALKED_TO_ISHII
+	db $14, %00000100 ; EVENT_TALKED_TO_SAMEJIMA
+	db $14, %00001000 ; EVENT_BEAT_NISHIJIMA
+	db $14, %00010000 ; EVENT_BEAT_ISHII
+	db $14, %00100000 ; EVENT_BEAT_SAMEJIMA
+	db $14, %00111000 ; EVENT_BEAT_COLORLESS_ALTAR_MEMBERS
+	db $14, %01000000 ; EVENT_TALKED_TO_NISHIJIMA_2
+	db $14, %10000000 ; EVENT_TALKED_TO_ISHII_2
+	db $15, %00000001 ; EVENT_TALKED_TO_SAMEJIMA_2
+	db $16, %00000001 ; EVENT_TALKED_TO_KANZAKI
+	db $16, %00000010 ; EVENT_TALKED_TO_RUI
+	db $16, %00000100 ; EVENT_BEAT_KANZAKI
+	db $16, %00001000 ; EVENT_BEAT_RUI
+	db $16, %00010000 ; EVENT_MET_GR_GAL_ISHIHARAS_VILLA
+	db $17, %00000001 ; EVENT_TALKED_TO_BIRURITCHI
+	db $18, %00000001 ; EVENT_TALKED_TO_TRADE_NPC_ROCK_CLUB
+	db $18, %00000010 ; EVENT_TALKED_TO_TRADE_NPC_FIGHTING_CLUB
+	db $18, %00000100 ; EVENT_TALKED_TO_TRADE_NPC_FIRE_CLUB
+	db $18, %00001000 ; EVENT_TALKED_TO_TRADE_NPC_LIGHTNING_CLUB
+	db $18, %00010000 ; EVENT_TALKED_TO_TRADE_NPC_PSYCHIC_CLUB
+	db $18, %00100000 ; EVENT_TALKED_TO_TRADE_NPC_TCG_CHALLENGE_HALL
+	db $18, %01000000 ; EVENT_TALKED_TO_TRADE_NPC_GRASS_FORT
+	db $18, %10000000 ; EVENT_TALKED_TO_TRADE_NPC_LIGHTNING_FORT
+	db $19, %00000001 ; EVENT_TALKED_TO_TRADE_NPC_GR_CHALLENGE_HALL
+	db $19, %00000010 ; EVENT_TALKED_TO_TRADE_NPC_FIRE_FORT
+	db $19, %00000100 ; EVENT_TALKED_TO_TRADE_NPC_WATER_FORT
+	db $19, %00001000 ; EVENT_TALKED_TO_TRADE_NPC_PSYCHIC_STRONGHOLD
 	db $19, %00010000 ; EVENT_91
 	db $19, %00100000 ; EVENT_92
-	db $19, %01000000 ; EVENT_93
+	db $19, %01000000 ; EVENT_TALKED_TO_SAM
 	db $19, %10000000 ; EVENT_94
-	db $1a, %00000001 ; EVENT_95
-	db $1a, %00000010 ; EVENT_96
-	db $1a, %00000100 ; EVENT_97
-	db $1b, %00000001 ; EVENT_98
-	db $1b, %00000010 ; EVENT_99
-	db $1b, %00000100 ; EVENT_9A
-	db $1b, %00001000 ; EVENT_9B
-	db $1b, %00010000 ; EVENT_9C
-	db $1b, %00100000 ; EVENT_9D
-	db $1b, %01000000 ; EVENT_9E
-	db $1b, %10000000 ; EVENT_9F
-	db $1c, %00000001 ; EVENT_A0
-	db $1c, %00000010 ; EVENT_A1
-	db $1c, %00000100 ; EVENT_A2
-	db $1d, %00000001 ; EVENT_A3
-	db $1d, %00000010 ; EVENT_A4
-	db $1d, %00000100 ; EVENT_A5
-	db $1d, %00001000 ; EVENT_A6
+	db $1a, %00000001 ; EVENT_TALKED_TO_ISHIHARA
+	db $1a, %00000010 ; EVENT_BATTLED_ISHIHARA
+	db $1a, %00000100 ; EVENT_TALKED_TO_ISHIHARA_POST_GAME
+	db $1b, %00000001 ; EVENT_MET_GR1_ROCK_CLUB
+	db $1b, %00000010 ; EVENT_MET_GR4_LIGHTNING_CLUB
+	db $1b, %00000100 ; EVENT_MET_GR4_PSYCHIC_CLUB
+	db $1b, %00001000 ; EVENT_MET_YUKI_FIRE_FORT
+	db $1b, %00010000 ; EVENT_MET_FIGHTING_FORT_MEMBERS
+	db $1b, %00100000 ; EVENT_MET_PSYCHIC_STRONGHOLD_MEMBERS
+	db $1b, %01000000 ; EVENT_MET_MAMI_AND_ROD
+	db $1b, %10000000 ; EVENT_MET_COLORLESS_ALTAR_MEMBERS
+	db $1c, %00000001 ; EVENT_MET_BIRURITCHI_AND_ADMINS
+	db $1c, %00000010 ; EVENT_GR_CASTLE_STAIRS_RUI_ROADBLOCK
+	db $1c, %00000100 ; EVENT_MET_RONALD_GAME_CENTER
+	db $1d, %00000001 ; EVENT_TALKED_TO_GR1_FIGHTING_CLUB
+	db $1d, %00000010 ; EVENT_TALKED_TO_GR2_SCIENCE_GRASS_CLUB
+	db $1d, %00000100 ; EVENT_TALKED_TO_GR3_WATER_CLUB
+	db $1d, %00001000 ; EVENT_TALKED_TO_GR4_PSYCHIC_CLUB
 	db $1d, %00010000 ; EVENT_A7
-	db $1d, %00100000 ; EVENT_A8
-	db $1d, %01000000 ; EVENT_A9
-	db $1d, %10000000 ; EVENT_AA
-	db $1e, %00000001 ; EVENT_AB
-	db $1e, %00000010 ; EVENT_AC
-	db $1e, %00000100 ; EVENT_AD
-	db $1e, %00001000 ; EVENT_AE
-	db $1e, %00010000 ; EVENT_AF
-	db $1e, %00100000 ; EVENT_B0
+	db $1d, %00100000 ; EVENT_OBTAINED_TWO_GR_COIN_PIECES
+	db $1d, %01000000 ; EVENT_TALKED_TO_GR5_POKEMON_DOME
+	db $1d, %10000000 ; EVENT_TALKED_TO_GR5_TCG_AIRPORT
+	db $1e, %00000001 ; EVENT_TRADED_CARDS_ROCK_CLUB
+	db $1e, %00000010 ; EVENT_TRADED_CARDS_FIGHTING_CLUB
+	db $1e, %00000100 ; EVENT_TRADED_CARDS_FIRE_CLUB
+	db $1e, %00001000 ; EVENT_TRADED_CARDS_LIGHTNING_CLUB
+	db $1e, %00010000 ; EVENT_TRADED_CARDS_PSYCHIC_CLUB
+	db $1e, %00100000 ; EVENT_TRADED_CARDS_TCG_CHALLENGE_HALL
 	db $1e, %01000000 ; EVENT_B1
 	db $1e, %10000000 ; EVENT_B2
-	db $1f, %00000001 ; EVENT_B3
-	db $1f, %00000010 ; EVENT_B4
-	db $1f, %00000100 ; EVENT_B5
-	db $1f, %00001000 ; EVENT_B6
-	db $1f, %00010000 ; EVENT_B7
-	db $1f, %00100000 ; EVENT_B8
-	db $20, %00000001 ; EVENT_B9
-	db $20, %00000010 ; EVENT_BA
+	db $1f, %00000001 ; EVENT_TRADED_CARDS_GRASS_FORT
+	db $1f, %00000010 ; EVENT_TRADED_CARDS_LIGHTNING_FORT
+	db $1f, %00000100 ; EVENT_TRADED_CARDS_GR_CHALLENGE_HALL
+	db $1f, %00001000 ; EVENT_TRADED_CARDS_FIRE_FORT
+	db $1f, %00010000 ; EVENT_TRADED_CARDS_WATER_FORT
+	db $1f, %00100000 ; EVENT_TRADED_CARDS_PSYCHIC_STRONGHOLD
+	db $20, %00000001 ; EVENT_GODAS_ROOM_CAGE_STATE
+	db $20, %00000010 ; EVENT_MIDORIS_ROOM_CAGE_STATE
 	db $21, %00000001 ; EVENT_BB
 	db $21, %00000010 ; EVENT_BC
 	db $21, %00000100 ; EVENT_BD
-	db $21, %00001000 ; EVENT_BE
-	db $21, %00010000 ; EVENT_BF
-	db $21, %00100000 ; EVENT_C0
-	db $21, %01000000 ; EVENT_C1
-	db $21, %10000000 ; EVENT_C2
-	db $22, %00000001 ; EVENT_C3
-	db $22, %00000010 ; EVENT_C4
-	db $22, %00000100 ; EVENT_C5
-	db $22, %00001000 ; EVENT_C6
-	db $23, %00000001 ; EVENT_C7
-	db $23, %00000010 ; EVENT_C8
-	db $23, %00000100 ; EVENT_C9
-	db $23, %00011000 ; EVENT_CA
-	db $23, %00001000 ; EVENT_CB
-	db $23, %00010000 ; EVENT_CC
-	db $23, %00100000 ; EVENT_CD
-	db $24, %00000011 ; EVENT_CE
-	db $24, %00000001 ; EVENT_CF
-	db $24, %00000010 ; EVENT_D0
-	db $24, %00000100 ; EVENT_D1
-	db $25, %00000001 ; EVENT_D2
-	db $25, %00000010 ; EVENT_D3
-	db $25, %00000100 ; EVENT_D4
-	db $25, %00001000 ; EVENT_D5
-	db $25, %00010000 ; EVENT_D6
-	db $25, %00100000 ; EVENT_D7
-	db $25, %01000000 ; EVENT_D8
-	db $26, %00000001 ; EVENT_D9
-	db $26, %00000010 ; EVENT_DA
+	db $21, %00001000 ; EVENT_ENTERED_GRAND_MASTER_CUP
+	db $21, %00010000 ; EVENT_FREED_COURTNEY
+	db $21, %00100000 ; EVENT_FREED_STEVE
+	db $21, %01000000 ; EVENT_FREED_JACK
+	db $21, %10000000 ; EVENT_FREED_ROD
+	db $22, %00000001 ; EVENT_GOT_CHIPS_FROM_GAME_CENTER_ATTENDANT
+	db $22, %00000010 ; EVENT_TALKED_TO_SLOT_MACHINE_WOMAN
+	db $22, %00000100 ; EVENT_TALKED_TO_COIN_TOSS_BOY
+	db $22, %00001000 ; EVENT_C5
+	db $23, %00000001 ; EVENT_LIGHTNING_FORT_ENTRANCE_DOOR_STATE
+	db $23, %00000010 ; EVENT_FIRE_FORT_ENTRANCE_DOOR_STATE
+	db $23, %00000100 ; EVENT_WATER_FORT_ENTRANCE_DOOR_STATE
+	db $23, %00011000 ; EVENT_FIGHTING_FORT_ENTRANCE_DOOR_STATE
+	db $23, %00001000 ; EVENT_INSERTED_LEFT_COIN_IN_FIGHTING_FORT_DOOR
+	db $23, %00010000 ; EVENT_INSERTED_RIGHT_COIN_IN_FIGHTING_FORT_DOOR
+	db $23, %00100000 ; EVENT_CAN_TRAVEL_PAST_FIGHTING_FORT
+	db $24, %00000011 ; EVENT_GR_CASTLE_ENTRANCE_DOOR_STATE
+	db $24, %00000001 ; EVENT_INSERTED_LEFT_COIN_IN_GR_CASTLE_DOOR
+	db $24, %00000010 ; EVENT_INSERTED_RIGHT_COIN_IN_GR_CASTLE_DOOR
+	db $24, %00000100 ; EVENT_SEALED_FORT_DOOR_STATE
+	db $25, %00000001 ; EVENT_OPENED_CHEST_GRACES_ROOM
+	db $25, %00000010 ; EVENT_OPENED_CHEST_FIGHTING_FORT_1
+	db $25, %00000100 ; EVENT_OPENED_CHEST_FIGHTING_FORT_2
+	db $25, %00001000 ; EVENT_OPENED_CHEST_FIGHTING_FORT_3
+	db $25, %00010000 ; EVENT_OPENED_CHEST_FIGHTING_FORT_4
+	db $25, %00100000 ; EVENT_OPENED_CHEST_FIGHTING_FORT_5
+	db $25, %01000000 ; EVENT_OPENED_CHEST_FIGHTING_FORT_BASEMENT
+	db $26, %00000001 ; EVENT_SHORT_GR_ISLAND_FLYOVER_SEQUENCE
+	db $26, %00000010 ; EVENT_BEAT_GRAND_MASTER_CUP
 	db $26, %00000100 ; EVENT_DB
-	db $27, %00000001 ; EVENT_DC
-	db $27, %00000010 ; EVENT_DD
-	db $28, %00000001 ; EVENT_DE
-	db $28, %00000010 ; EVENT_DF
-	db $28, %00000100 ; EVENT_E0
-	db $28, %00001000 ; EVENT_E1
-	db $28, %00010000 ; EVENT_E2
-	db $28, %00100000 ; EVENT_E3
-	db $28, %01000000 ; EVENT_E4
-	db $28, %10000000 ; EVENT_E5
-	db $29, %00000001 ; EVENT_E6
-	db $29, %00000010 ; EVENT_E7
-	db $29, %00000100 ; EVENT_E8
-	db $29, %00001000 ; EVENT_E9
-	db $29, %00010000 ; EVENT_EA
+	db $27, %00000001 ; EVENT_GHOST_MASTER_STATUES_STATE
+	db $27, %00000010 ; EVENT_BATTLED_TOBICHAN
+	db $28, %00000001 ; EVENT_BATTLED_EIJI
+	db $28, %00000010 ; EVENT_BATTLED_MAGICIAN
+	db $28, %00000100 ; EVENT_BATTLED_TOSHIRON
+	db $28, %00001000 ; EVENT_BATTLED_PIERROT
+	db $28, %00010000 ; EVENT_BATTLED_ANNA
+	db $28, %00100000 ; EVENT_BATTLED_DEE
+	db $28, %01000000 ; EVENT_BATTLED_MASQUERADE
+	db $28, %10000000 ; EVENT_BATTLED_YUI
+	db $29, %00000001 ; EVENT_TALKED_TO_PAWN
+	db $29, %00000010 ; EVENT_TALKED_TO_KNIGHT
+	db $29, %00000100 ; EVENT_TALKED_TO_BISHOP
+	db $29, %00001000 ; EVENT_TALKED_TO_ROOK
+	db $29, %00010000 ; EVENT_TALKED_TO_QUEEN
 	db $2a, %00000001 ; EVENT_EB
 	db $2a, %00000010 ; EVENT_EC
-	db $2b, %00000001 ; EVENT_ED
+	db $2b, %00000001 ; EVENT_SET_UNTIL_MAP_RELOAD_1
 	db $2b, %00000010 ; EVENT_EE
 	db $2b, %00000100 ; EVENT_EF
 	db $33, %00000001 ; EVENT_F0
-	db $33, %00000010 ; EVENT_F1
+	db $33, %00000010 ; EVENT_SET_UNTIL_MAP_RELOAD_2
 	db $33, %00000100 ; EVENT_F2
 	db $33, %00001000 ; EVENT_F3
-	db $33, %00010000 ; EVENT_F4
+	db $33, %00010000 ; EVENT_ISHIHARA_CARD_TRADE_STATE
 	db $33, %00100000 ; EVENT_F5
 
 ; extra events?
@@ -1821,7 +2141,7 @@ GeneralVarMasks:
 	db $01, %00000011 ; VAR_01
 	db $01, %00111100 ; VAR_02
 	db $01, %11000000 ; VAR_03
-	db $02, %00001111 ; VAR_04
+	db $02, %00001111 ; VAR_TIMES_MET_RONALD
 	db $03, %00000011 ; VAR_05
 	db $03, %00001100 ; VAR_06
 	db $03, %00110000 ; VAR_07
@@ -1833,17 +2153,17 @@ GeneralVarMasks:
 	db $06, %00011100 ; VAR_0D
 	db $06, %11100000 ; VAR_0E
 	db $07, %00001111 ; VAR_0F
-	db $08, %11111111 ; VAR_10
-	db $09, %11111111 ; VAR_11
-	db $0a, %11111111 ; VAR_12
-	db $0b, %11111111 ; VAR_13
-	db $0c, %11111111 ; VAR_14
-	db $0d, %11111111 ; VAR_15
-	db $0e, %11111111 ; VAR_16
-	db $0f, %11111111 ; VAR_17
-	db $10, %11111111 ; VAR_18
-	db $11, %11111111 ; VAR_19
-	db $12, %11111111 ; VAR_1A
+	db $08, %11111111 ; VAR_GRANDMASTERCUP_PRIZE_INDEX_0
+	db $09, %11111111 ; VAR_GRANDMASTERCUP_PRIZE_INDEX_1
+	db $0a, %11111111 ; VAR_GRANDMASTERCUP_PRIZE_INDEX_2
+	db $0b, %11111111 ; VAR_GRANDMASTERCUP_PRIZE_INDEX_3
+	db $0c, %11111111 ; VAR_GRANDMASTERCUP_OPPONENT_DECK_0
+	db $0d, %11111111 ; VAR_GRANDMASTERCUP_OPPONENT_DECK_1
+	db $0e, %11111111 ; VAR_GRANDMASTERCUP_OPPONENT_DECK_2
+	db $0f, %11111111 ; VAR_GRANDMASTERCUP_OPPONENT_DECK_3
+	db $10, %11111111 ; VAR_GRANDMASTERCUP_OPPONENT_DECK_4
+	db $11, %11111111 ; VAR_GRANDMASTERCUP_OPPONENT_DECK_5
+	db $12, %11111111 ; VAR_GRANDMASTERCUP_OPPONENT_DECK_6
 	db $13, %11111111 ; VAR_1B
 	db $14, %11111111 ; VAR_1C
 	db $15, %11111111 ; VAR_1D
@@ -1851,14 +2171,14 @@ GeneralVarMasks:
 	db $17, %00000011 ; VAR_1F
 	db $17, %00111100 ; VAR_20
 	db $18, %00000111 ; VAR_21
-	db $18, %11110000 ; VAR_22
+	db $18, %11110000 ; VAR_IMAKUNI_BLACK_WIN_COUNT
 	db $19, %00000001 ; VAR_23
 	db $19, %11110000 ; VAR_24
 	db $1a, %00001111 ; VAR_25
 	db $1a, %11110000 ; VAR_26
 	db $1b, %00001111 ; VAR_27
 	db $1b, %01110000 ; VAR_28
-	db $1c, %00011111 ; VAR_29
+	db $1c, %00011111 ; VAR_TCG_CHALLENGE_CUP_PRIZE_INDEX
 	db $1d, %00001111 ; VAR_2A
 	db $1d, %00110000 ; VAR_2B
 	db $1d, %11000000 ; VAR_2C
@@ -1866,7 +2186,7 @@ GeneralVarMasks:
 	db $1f, %11111111 ; VAR_2E
 	db $20, %11111111 ; VAR_2F
 	db $21, %00000111 ; VAR_30
-	db $21, %11111000 ; VAR_31
+	db $21, %11111000 ; VAR_GR_CHALLENGE_CUP_PRIZE_INDEX
 	db $22, %00001111 ; VAR_32
 	db $22, %00110000 ; VAR_33
 	db $23, %00000111 ; VAR_34
@@ -1878,10 +2198,356 @@ GeneralVarMasks:
 	db $29, %00000111 ; VAR_3A
 	db $2a, %11111111 ; VAR_3B
 	db $2b, %11111111 ; VAR_NPC_DECK_ID
-	db $2c, %11111111 ; VAR_3D
+	db $2c, %11111111 ; VAR_DUEL_START_THEME
 	db $33, %11111111 ; VAR_3E
 
-SECTION "Bank 3@5bbd", ROMX[$5bbd], BANK[$3]
+; clear 8 bytes from wd606
+ZeroOutBytes_wd606:
+	push af
+	push hl
+	xor a
+	ld hl, wd606
+REPT wD606_STRUCT_SIZE - 1
+	ld [hli], a
+ENDR
+	ld [hl], a
+	pop hl
+	pop af
+	ret
+
+; set n, [wd606 + m], where a = 8m + n
+SetBit_wd606:
+	push af
+	push bc
+	push hl
+	push af
+	ld hl, wd606
+REPT 3
+	srl a
+ENDR
+	add_hl_a
+	pop af
+	and 7
+	inc a
+	ld c, a
+	ld b, 1
+.loop_bitmask
+	dec c
+	jr z, .got_bitmask
+	sla b
+	jr .loop_bitmask
+.got_bitmask
+	ld a, [hl]
+	or b
+	ld [hl], a
+	pop hl
+	pop bc
+	pop af
+	ret
+
+; res n, [wd606 + m], where a = 8m + n
+ClearBit_wd606:
+	push af
+	push bc
+	push hl
+	push af
+	ld hl, wd606
+REPT 3
+	srl a
+ENDR
+	add_hl_a
+	pop af
+	and 7
+	inc a
+	ld c, a
+	ld b, 1
+.loop_bitmask
+	dec c
+	jr z, .got_bitmask
+	sla b
+	jr .loop_bitmask
+.got_bitmask
+	ld a, b
+	cpl
+	and [hl]
+	ld [hl], a
+	pop hl
+	pop bc
+	pop af
+	ret
+
+; bit n, [wd606 + m], where a = 8m + n
+CheckBit_wd606:
+	push bc
+	push hl
+	push af
+	push af
+	ld hl, wd606
+REPT 3
+	srl a
+ENDR
+	add_hl_a
+	pop af
+	and 7
+	inc a
+	ld c, a
+	ld b, 1
+.loop_bitmask
+	dec c
+	jr z, .got_bitmask
+	sla b
+	jr .loop_bitmask
+.got_bitmask
+	ld a, [hl]
+	and b
+	pop bc
+	ld a, b
+	pop hl
+	pop bc
+	ret
+
+; jump to .check_pointers[a], set carry if the event is set, clear carry if not
+CheckTCGIslandMilestoneEvents:
+	push bc
+	push de
+	push hl
+	sla a
+	ld hl, .check_pointers
+	add_hl_a
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	jp hl
+
+.jump_set_carry:
+	jp .set_carry
+
+.check_four_tcgisland_coins:
+	ld a, EVENT_GOT_KABUTO_COIN
+	call GetEventValue
+	push af
+	ld a, EVENT_GOT_ODDISH_COIN
+	call GetEventValue
+	push af
+	ld a, EVENT_GOT_STARMIE_COIN
+	call GetEventValue
+	push af
+	ld a, EVENT_GOT_ALAKAZAM_COIN
+	call GetEventValue
+	push af
+	ld c, 4
+	xor a
+	ld d, a
+	; fallthrough
+.loop_bitmask_1
+	sla d
+	pop af
+	jr z, .next_1
+	set 0, d
+	; fallthrough
+.next_1
+	dec c
+	jr nz, .loop_bitmask_1
+	ld a, d
+	or a
+	jp nz, .set_carry
+	jp .clear_carry
+
+.check_gr_coin_top_left:
+	ld a, EVENT_GOT_GR_COIN_PIECE_TOP_LEFT
+	call GetEventValue
+	jp nz, .set_carry
+	jp .clear_carry
+
+.check_gr_coin_top_right:
+	ld a, EVENT_GOT_GR_COIN_PIECE_TOP_RIGHT
+	call GetEventValue
+	jp nz, .set_carry
+	jp .clear_carry
+
+.check_starmie_coin:
+	ld a, EVENT_GOT_STARMIE_COIN
+	call GetEventValue
+	jp nz, .set_carry
+	jp .clear_carry
+
+.check_gr_coin_bottom_left:
+	ld a, EVENT_GOT_GR_COIN_PIECE_BOTTOM_LEFT
+	call GetEventValue
+	jp nz, .set_carry
+	jp .clear_carry
+
+.check_pikachu_coin:
+	ld a, EVENT_GOT_PIKACHU_COIN
+	call GetEventValue
+	jp nz, .set_carry
+	jp .clear_carry
+
+.check_gr_coin_bottom_right:
+	ld a, EVENT_GOT_GR_COIN_PIECE_BOTTOM_RIGHT
+	call GetEventValue
+	jp nz, .set_carry
+	jp .clear_carry
+
+.check_grand_master_cup_or_challenge_machine:
+	ld a, EVENT_BEAT_GRAND_MASTER_CUP
+	call GetEventValue
+	push af
+	ld a, EVENT_MASONS_LAB_CHALLENGE_MACHINE_STATE
+	call GetEventValue
+	push af
+	ld c, 2
+	xor a
+	ld d, a
+	; fallthrough
+.loop_bitmask_2
+	sla d
+	sla d
+	pop af
+	jr z, .next_2
+	set 0, d
+	set 1, d
+	; fallthrough
+.next_2
+	dec c
+	jr nz, .loop_bitmask_2
+	ld a, d
+	or a
+	jp nz, .set_carry
+	jp .clear_carry
+
+.check_event_db:
+	ld a, EVENT_DB
+	call GetEventValue
+	jp nz, .set_carry
+	jp .clear_carry
+
+.set_carry:
+	pop hl
+	pop de
+	pop bc
+	scf
+	ret
+
+.clear_carry:
+	pop hl
+	pop de
+	pop bc
+	scf
+	ccf
+	ret
+
+.check_pointers:
+	dw .jump_set_carry
+	dw .check_four_tcgisland_coins
+	dw .check_gr_coin_top_left
+	dw .check_gr_coin_top_right
+	dw .check_starmie_coin
+	dw .check_gr_coin_bottom_left
+	dw .check_pikachu_coin
+	dw .check_gr_coin_bottom_right
+	dw .check_grand_master_cup_or_challenge_machine
+	dw .check_event_db
+
+; jump to .check_pointers[a], set carry if the event is set, clear carry if not
+CheckGRIslandMilestoneEvents:
+	push bc
+	push de
+	push hl
+	sla a
+	ld hl, .check_pointers
+	add_hl_a
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	jp hl
+
+.check_golbat_coin:
+	ld a, EVENT_GOT_GOLBAT_COIN
+	call GetEventValue
+	jp nz, .set_carry
+	jp .clear_carry
+
+.check_magnemite_coin:
+	ld a, EVENT_GOT_MAGNEMITE_COIN
+	call GetEventValue
+	jp nz, .set_carry
+	jp .clear_carry
+
+.check_psyduck_coin:
+	ld a, EVENT_GOT_PSYDUCK_COIN
+	call GetEventValue
+	jp nz, .set_carry
+	jp .clear_carry
+
+.check_magmar_coin:
+	ld a, EVENT_GOT_MAGMAR_COIN
+	call GetEventValue
+	jp nz, .set_carry
+	jp .clear_carry
+
+.check_machamp_coin:
+	ld a, EVENT_GOT_MACHAMP_COIN
+	call GetEventValue
+	jp nz, .set_carry
+	jp .clear_carry
+
+.check_mew_coin:
+	ld a, EVENT_GOT_MEW_COIN
+	call GetEventValue
+	jp nz, .set_carry
+	jp .clear_carry
+
+.check_snorlax_coin:
+	ld a, EVENT_GOT_SNORLAX_COIN
+	call GetEventValue
+	jp nz, .set_carry
+	jp .clear_carry
+
+.check_rui_roadblock:
+	ld a, EVENT_GR_CASTLE_STAIRS_RUI_ROADBLOCK
+	call GetEventValue
+	jp nz, .set_carry
+	jp .clear_carry
+
+.check_battled_ishihara:
+	ld a, EVENT_BATTLED_ISHIHARA
+	call GetEventValue
+	jp nz, .set_carry
+	jp .clear_carry
+
+.check_challenge_machine:
+	ld a, EVENT_MASONS_LAB_CHALLENGE_MACHINE_STATE
+	call GetEventValue
+	jp nz, .set_carry
+	jp .clear_carry
+
+.set_carry:
+	pop hl
+	pop de
+	pop bc
+	scf
+	ret
+
+.clear_carry:
+	pop hl
+	pop de
+	pop bc
+	scf
+	ccf
+	ret
+
+.check_pointers:
+	dw .check_golbat_coin
+	dw .check_magnemite_coin
+	dw .check_psyduck_coin
+	dw .check_magmar_coin
+	dw .check_machamp_coin
+	dw .check_mew_coin
+	dw .check_snorlax_coin
+	dw .check_rui_roadblock
+	dw .check_battled_ishihara
+	dw .check_challenge_machine
 
 GetNumberOfDeckDiagnosisStepsUnlocked:
 	push bc
@@ -1895,7 +2561,7 @@ GetNumberOfDeckDiagnosisStepsUnlocked:
 	call GetEventValue
 	jr z, .got_num_steps
 	inc c
-	ld a, EVENT_GOT_GOLBAT_COIN
+	ld a, EVENT_GOT_MAGNEMITE_COIN
 	call GetEventValue
 	jr z, .got_num_steps
 	inc c
@@ -1904,176 +2570,1914 @@ GetNumberOfDeckDiagnosisStepsUnlocked:
 	pop bc
 	ret
 
-Func_dbdb::
+; clear wScriptBufferIndex
+; then copy 32 bytes from the script source to wScriptBuffer
+ReloadScriptBuffer::
 	xor a
-	ld [wd61a], a
-	ld hl, wd61b
+	ld [wScriptBufferIndex], a
+	ld hl, wScriptPointer
 	ld a, [hli]
 	ld h, [hl]
 	ld l, a
-	ld de, wd61e
-	ld bc, $20
-	ld a, [wd619]
+	ld de, wScriptBuffer
+	ld bc, SCRIPT_BUFFER_SIZE
+	ld a, [wScriptBank]
 	call CopyFarHLToDE
 	ret
 
-Func_dbf2::
-	ld hl, wd61a
+; for n = [wScriptBufferIndex],
+; get the table index m = [wScriptBuffer + n],
+; jump to OverworldScriptTable[m]
+; applying m in two steps rather than sla, even though m < 128
+RunOverworldScript::
+	ld hl, wScriptBufferIndex
 	ld a, [hl]
-	ld hl, wd61e
-	add l
-	ld l, a
-	jr nc, .asm_dbfe
-	inc h
-.asm_dbfe
+	ld hl, wScriptBuffer
+	add_hl_a
 	ld a, [hl]
 	ld d, a
-	ld hl, .PointerTable
-	add l
-	ld l, a
-	jr nc, .asm_dc08
-	inc h
-.asm_dc08
+	ld hl, OverworldScriptTable
+	add_hl_a
 	ld a, d
-	add l
-	ld l, a
-	jr nc, .asm_dc0e
-	inc h
-.asm_dc0e
+	add_hl_a
 	ld a, [hli]
 	ld h, [hl]
 	ld l, a
 	jp hl
 
-.PointerTable
-	dw $5d91
-	dw $5d9c
-	dw $5da6
-	dw $5dad
-	dw $5db9
-	dw $5dd1
-	dw $5de3
-	dw $5e01
-	dw $5e1f
-	dw $5e30
-	dw $5e3b
-	dw $5e46
-	dw $5e51
-	dw $5e5c
-	dw $5e76
-	dw $5e7f
-	dw $5e88
-	dw $5e9d
-	dw $5ea8
-	dw $5eb4
-	dw $5ec4
-	dw $5ed4
-	dw $5eeb
-	dw $5ef5
-	dw $5f03
-	dw $5f11
-	dw $5f1e
-	dw $5f2f
-	dw $5f45
-	dw $5f54
-	dw $5f63
-	dw $5f6d
-	dw $5f87
-	dw $5f9b
-	dw $5fb5
-	dw $5fd0
-	dw $5fdc
-	dw $5fe8
-	dw $5ff3
-	dw $6004
-	dw $601e
-	dw $604f
-	dw $6070
-	dw $608e
-	dw $60b2
-	dw $60c7
-	dw $60da
-	dw $60ed
-	dw $60f3
-	dw $60f9
-	dw $6115
-	dw $6131
-	dw $613c
-	dw $6147
-	dw $616d
-	dw $617b
-	dw $61a0
-	dw $61ae
-	dw $61be
-	dw $61ce
-	dw $61de
-	dw $6209
-	dw $6217
-	dw $6242
-	dw $624c
-	dw $6256
-	dw $636b
-	dw $637b
-	dw $638b
-	dw $6394
-	dw $63a1
-	dw $63ac
-	dw $63c3
-	dw $63cc
-	dw $63da
-	dw $63e8
-	dw $63f8
-	dw $6424
-	dw $6450
-	dw $6466
-	dw $647e
-	dw $64dd
-	dw $64fc
-	dw $6509
-	dw $6512
-	dw $6527
-	dw $6531
-	dw $65d7
-	dw $65e3
-	dw $65eb
-	dw $65f6
-	dw $6601
-	dw $660d
-	dw $6613
-	dw $664e
-	dw $6672
-	dw $667f
-	dw $6689
-	dw $6697
-	dw $66b1
-	dw $66ce
-	dw $670e
-	dw $6724
-	dw $673a
-	dw $6746
-	dw $6752
-	dw $6764
-	dw $6775
-	dw $6786
-	dw $679c
-	dw $67ab
-	dw $67d0
-	dw $67df
-	dw $67e6
-	dw $67ed
-	dw $67f7
-	dw $6801
-	dw $680f
-	dw $6816
-	dw $681d
-	dw $6847
-	dw $684e
-	dw $685b
-	dw $686a
-	dw $6871
-	dw $687d
+OverworldScriptTable:
+	dw ScriptCommand_EndScript                        ; $00
+	dw ScriptCommand_01                               ; $01
+	dw ScriptCommand_02                               ; $02
+	dw ScriptCommand_PrintText                        ; $03
+	dw ScriptCommand_PrintVariableText                ; $04
+	dw ScriptCommand_PrintNPCText                     ; $05
+	dw ScriptCommand_PrintVariableNPCText             ; $06
+	dw ScriptCommand_AskQuestion                      ; $07
+	dw ScriptCommand_ScriptJump                       ; $08
+	dw ScriptCommand_ScriptJump_b0nz                  ; $09
+	dw ScriptCommand_ScriptJump_b0z                   ; $0a
+	dw ScriptCommand_ScriptJump_b1nz                  ; $0b
+	dw ScriptCommand_ScriptJump_b1z                   ; $0c
+	dw ScriptCommand_CompareLoadedVar                 ; $0d
+	dw ScriptCommand_SetEvent                         ; $0e
+	dw ScriptCommand_ResetEvent                       ; $0f
+	dw ScriptCommand_CheckEvent                       ; $10
+	dw ScriptCommand_SetVar                           ; $11
+	dw ScriptCommand_GetVar                           ; $12
+	dw ScriptCommand_IncVar                           ; $13
+	dw ScriptCommand_DecVar                           ; $14
+	dw ScriptCommand_LoadNPC                          ; $15
+	dw ScriptCommand_UnloadNPC                        ; $16
+	dw ScriptCommand_SetPlayerDirection               ; $17
+	dw ScriptCommand_SetActiveNPCDirection            ; $18
+	dw ScriptCommand_DoFrames                         ; $19
+	dw ScriptCommand_LoadTilemap                      ; $1a
+	dw ScriptCommand_ShowCardReceivedScreen           ; $1b
+	dw ScriptCommand_SetPlayerPosition                ; $1c
+	dw ScriptCommand_SetActiveNPCPosition             ; $1d
+	dw ScriptCommand_SetScrollState                   ; $1e
+	dw ScriptCommand_ScrollToPosition                 ; $1f
+	dw ScriptCommand_SetActiveNPC                     ; $20
+	dw ScriptCommand_SetPlayerPositionAndDirection    ; $21
+	dw ScriptCommand_SetNPCPositionAndDirection       ; $22
+	dw ScriptCommand_FadeIn                           ; $23
+	dw ScriptCommand_FadeOut                          ; $24
+	dw ScriptCommand_SetNPCDirection                  ; $25
+	dw ScriptCommand_SetNPCPosition                   ; $26
+	dw ScriptCommand_SetActiveNPCPositionAndDirection ; $27
+	dw ScriptCommand_AnimatePlayerMovement            ; $28
+	dw ScriptCommand_AnimateNPCMovement               ; $29
+	dw ScriptCommand_AnimateActiveNPCMovement         ; $2a
+	dw ScriptCommand_MovePlayer                       ; $2b
+	dw ScriptCommand_MoveNPC                          ; $2c
+	dw ScriptCommand_MoveActiveNPC                    ; $2d
+	dw ScriptCommand_StartDuel                        ; $2e
+	dw ScriptCommand_WaitForPlayerAnimation           ; $2f
+	dw ScriptCommand_WaitForFade                      ; $30
+	dw ScriptCommand_GetCardCountInCollectionAndDecks ; $31
+	dw ScriptCommand_GetCardCountInCollection         ; $32
+	dw ScriptCommand_GiveCard                         ; $33
+	dw ScriptCommand_TakeCard                         ; $34
+	dw ScriptCommand_NPCAskQuestion                   ; $35
+	dw ScriptCommand_GetPlayerDirection               ; $36
+	dw ScriptCommand_CompareVar                       ; $37
+	dw ScriptCommand_GetActiveNPCDirection            ; $38
+	dw ScriptCommand_ScrollToActiveNPC                ; $39
+	dw ScriptCommand_ScrollToPlayer                   ; $3a
+	dw ScriptCommand_ScrollToNPC                      ; $3b
+	dw ScriptCommand_SpinActiveNPC                    ; $3c
+	dw ScriptCommand_RestoreActiveNPCDirection        ; $3d
+	dw ScriptCommand_SpinActiveNPCReverse             ; $3e
+	dw ScriptCommand_ResetNPCFlag6                    ; $3f
+	dw ScriptCommand_SetNPCFlag6                      ; $40
+	dw ScriptCommand_DuelRequirementCheck             ; $41
+	dw ScriptCommand_GetActiveNPCOppositeDirection    ; $42
+	dw ScriptCommand_GetPlayerOppositeDirection       ; $43
+	dw ScriptCommand_PlaySFX                          ; $44
+	dw ScriptCommand_PlaySFXAndWait                   ; $45
+	dw ScriptCommand_SetTextRAM2                      ; $46
+	dw ScriptCommand_SetVariableTextRAM2              ; $47
+	dw ScriptCommand_WaitForNPCAnimation              ; $48
+	dw ScriptCommand_GetPlayerXPosition               ; $49
+	dw ScriptCommand_GetPlayerYPosition               ; $4a
+	dw ScriptCommand_RestoreNPCDirection              ; $4b
+	dw ScriptCommand_SpinNPC                          ; $4c
+	dw ScriptCommand_SpinNPCReverse                   ; $4d
+	dw ScriptCommand_PushVar                          ; $4e
+	dw ScriptCommand_PopVar                           ; $4f
+	dw ScriptCommand_ScriptCall                       ; $50
+	dw ScriptCommand_ScriptRet                        ; $51
+	dw ScriptCommand_GiveCoin                         ; $52
+	dw ScriptCommand_BackupActiveNPC                  ; $53
+	dw ScriptCommand_LoadPlayer                       ; $54
+	dw ScriptCommand_UnloadPlayer                     ; $55
+	dw ScriptCommand_GiveBoosterPacks                 ; $56
+	dw ScriptCommand_GetRandom                        ; $57
+	dw ScriptCommand_58                               ; $58
+	dw ScriptCommand_SetTextRAM3                      ; $59
+	dw ScriptCommand_QuitScript                       ; $5a
+	dw ScriptCommand_PlaySong                         ; $5b
+	dw ScriptCommand_ResumeSong                       ; $5c
+	dw ScriptCommand_ScriptCallfar                    ; $5d
+	dw ScriptCommand_ScriptRetfar                     ; $5e
+	dw ScriptCommand_CardPop                          ; $5f
+	dw ScriptCommand_PlaySongNext                     ; $60
+	dw ScriptCommand_SetTextRAM2b                     ; $61
+	dw ScriptCommand_SetVariableTextRAM2b             ; $62
+	dw ScriptCommand_ReplaceNPC                       ; $63
+	dw ScriptCommand_SendMail                         ; $64
+	dw ScriptCommand_CheckNPCLoaded                   ; $65
+	dw ScriptCommand_GiveDeck                         ; $66
+	dw ScriptCommand_67                               ; $67
+	dw ScriptCommand_68                               ; $68
+	dw ScriptCommand_PrintNPCTextInstant              ; $69
+	dw ScriptCommand_VarAdd                           ; $6a
+	dw ScriptCommand_VarSub                           ; $6b
+	dw ScriptCommand_ReceiveCard                      ; $6c
+	dw ScriptCommand_GetGameCenterChips               ; $6d
+	dw ScriptCommand_CompareLoadedVarWord             ; $6e
+	dw ScriptCommand_GetGameCenterBankedChips         ; $6f
+	dw ScriptCommand_GameCenter                       ; $70
+	dw ScriptCommand_71                               ; $71
+	dw ScriptCommand_GiveChips                        ; $72
+	dw ScriptCommand_TakeChips                        ; $73
+	dw ScriptCommand_LoadTextRAM3                     ; $74
+	dw ScriptCommand_DepositChips                     ; $75
+	dw ScriptCommand_WithdrawChips                    ; $76
+	dw ScriptCommand_LinkDuel                         ; $77
+	dw ScriptCommand_WaitSong                         ; $78
+	dw ScriptCommand_LoadPalette                      ; $79
+	dw ScriptCommand_SetSpriteFrameset                ; $7a
+	dw ScriptCommand_WaitSFX                          ; $7b
+	dw ScriptCommand_PrintTextWideTextbox             ; $7c
+	dw ScriptCommand_WaitInput                        ; $7d
 
-SECTION "Bank 3@6883", ROMX[$6883], BANK[$3]
+; add a to [wScriptPointer]
+; if [wScriptBufferIndex] + a < 32, add a to [wScriptBufferIndex] too
+; else ReloadScriptBuffer
+IncreaseScriptPointer:
+	ld c, a
+	ld hl, wScriptPointer
+	add_at_hl_a
+	ld a, c
+	ld hl, wScriptBufferIndex
+	add [hl]
+	cp SCRIPT_BUFFER_SIZE
+	jr nc, .fallback
+	ld [hl], a
+	ret
+.fallback
+	call ReloadScriptBuffer
+	ret
+
+ReloadScriptBuffer_Done:
+	ret
+
+IncreaseScriptPointerBy1:
+	ld a, 1
+	jr IncreaseScriptPointer
+
+IncreaseScriptPointerBy2:
+	ld a, 2
+	jr IncreaseScriptPointer
+
+IncreaseScriptPointerBy3:
+	ld a, 3
+	jr IncreaseScriptPointer
+
+IncreaseScriptPointerBy4:
+	ld a, 4
+	jr IncreaseScriptPointer
+
+IncreaseScriptPointerBy5:
+	ld a, 5
+	jr IncreaseScriptPointer
+
+; get 2 db args or 1 dw arg:
+; for j = [wScriptBufferIndex] + a,
+; if j + 1 < 32, bc = [dw wScriptBuffer + j], a = (b | c)
+; else call ReloadScriptBuffer and retry
+Get2ScriptArgs:
+.loop
+	push af
+	ld hl, wScriptBufferIndex
+	add [hl]
+	inc a
+	cp SCRIPT_BUFFER_SIZE
+	jr nc, .fallback
+	pop bc
+	dec a
+	ld hl, wScriptBuffer
+	add_hl_a
+	ld a, [hli]
+	ld b, [hl]
+	ld c, a
+	or b
+	ret
+.fallback
+	call ReloadScriptBuffer
+	pop af
+	jr .loop
+
+Get2ScriptArgs_IncrIndexBy1:
+	ld a, 1
+	jr Get2ScriptArgs
+
+Get2ScriptArgs_IncrIndexBy2:
+	ld a, 2
+	jr Get2ScriptArgs
+
+Get2ScriptArgs_IncrIndexBy3:
+	ld a, 3
+	jr Get2ScriptArgs
+
+; get 1 db arg:
+; for j = [wScriptBufferIndex] + a,
+; if j < 32, a = [wScriptBuffer + j] (with flags)
+; else call ReloadScriptBuffer and retry
+Get1ScriptArg:
+.loop
+	push af
+	ld hl, wScriptBufferIndex
+	add [hl]
+	cp SCRIPT_BUFFER_SIZE
+	jr nc, .fallback
+	pop bc
+	ld hl, wScriptBuffer
+	add_hl_a
+	ld a, [hl]
+	or a
+	ret
+.fallback
+	call ReloadScriptBuffer
+	pop af
+	jr .loop
+
+Get1ScriptArg_IncrIndexBy1:
+	ld a, 1
+	jr Get1ScriptArg
+
+Get1ScriptArg_IncrIndexBy2:
+	ld a, 2
+	jr Get1ScriptArg
+
+Get1ScriptArg_IncrIndexBy3:
+	ld a, 3
+	jr Get1ScriptArg
+
+Get1ScriptArg_IncrIndexBy4:
+	ld a, 4
+	jr Get1ScriptArg
+
+ScriptCommand_EndScript:
+	ld a, [wScriptFlags]
+	set 7, a
+	ld [wScriptFlags], a
+	jp IncreaseScriptPointerBy1
+
+ScriptCommand_01:
+	call DoFrame
+	farcall Func_11002
+	jp IncreaseScriptPointerBy1
+
+ScriptCommand_02:
+	farcall Func_1101d
+	jp IncreaseScriptPointerBy1
+
+ScriptCommand_PrintText:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld l, c
+	ld h, b
+	farcall PrintScrollableText_NoTextBoxLabelVRAM0
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_PrintVariableText:
+	ld hl, wScriptFlags
+	bit 0, [hl]
+	jr z, .use_text_2
+; use text 1
+	call Get2ScriptArgs_IncrIndexBy1
+	jr .next
+.use_text_2
+	call Get2ScriptArgs_IncrIndexBy3
+.next
+	ld l, c
+	ld h, b
+	farcall PrintScrollableText_NoTextBoxLabelVRAM0
+	jp IncreaseScriptPointerBy5
+
+ScriptCommand_PrintNPCText:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld hl, wScriptNPCName
+	ld a, [hli]
+	ld d, [hl]
+	ld e, a
+	ld l, c
+	ld h, b
+	farcall PrintScrollableText_WithTextBoxLabelVRAM0
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_PrintVariableNPCText:
+	ld hl, wScriptFlags
+	bit 0, [hl]
+	jr z, .use_text_2
+; use text 1
+	call Get2ScriptArgs_IncrIndexBy1
+	jr .next
+.use_text_2
+	call Get2ScriptArgs_IncrIndexBy3
+; fallthrough
+.next
+	ld hl, wScriptNPCName
+	ld a, [hli]
+	ld d, [hl]
+	ld e, a
+	ld l, c
+	ld h, b
+	farcall PrintScrollableText_WithTextBoxLabelVRAM0
+	jp IncreaseScriptPointerBy5
+
+ScriptCommand_AskQuestion:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld l, c
+	ld h, b
+	push hl
+	call Get1ScriptArg_IncrIndexBy3
+	pop hl
+	farcall DrawWideTextBox_PrintTextWithYesOrNoMenu
+	ld hl, wScriptFlags
+	or a
+	jr nz, .no
+; yes
+	set 0, [hl]
+	jp IncreaseScriptPointerBy4
+.no
+	res 0, [hl]
+	jp IncreaseScriptPointerBy4
+
+ScriptCommand_ScriptJump:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld a, c
+	ld [wScriptPointer], a
+	ld a, b
+	ld [wScriptPointer + 1], a
+	call ReloadScriptBuffer
+	jp ReloadScriptBuffer_Done
+
+ScriptCommand_ScriptJump_b0nz:
+	ld hl, wScriptFlags
+	bit 0, [hl]
+; yes
+	jp nz, ScriptCommand_ScriptJump
+; no
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_ScriptJump_b0z:
+	ld hl, wScriptFlags
+	bit 0, [hl]
+; no
+	jp z, ScriptCommand_ScriptJump
+; yes
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_ScriptJump_b1nz:
+	ld hl, wScriptFlags
+	bit 1, [hl]
+; invalid
+	jp nz, ScriptCommand_ScriptJump
+; valid
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_ScriptJump_b1z:
+	ld hl, wScriptFlags
+	bit 1, [hl]
+; valid
+	jp z, ScriptCommand_ScriptJump
+; invalid
+	jp IncreaseScriptPointerBy3
+
+; for x = [wScriptBuffer + [wScriptBufferIndex] + 1],
+; set bit 0 at wScriptFlags if x = [wScriptLoadedVar],
+; set bit 1 at wScriptFlags if x > [wScriptLoadedVar],
+; else reset both bits,
+; then IncreaseScriptPointerBy2
+ScriptCommand_CompareLoadedVar:
+	call Get1ScriptArg_IncrIndexBy1
+	ld c, a
+	ld a, [wScriptLoadedVar]
+	ld hl, wScriptFlags
+	res 0, [hl]
+	res 1, [hl]
+	cp c
+	jr nz, .not_equal
+	set 0, [hl]
+.not_equal
+	jr nc, .no_carry
+	set 1, [hl]
+.no_carry
+	jp IncreaseScriptPointerBy2
+
+ScriptCommand_SetEvent:
+	call Get1ScriptArg_IncrIndexBy1
+	call MaxOutEventValue
+	jp IncreaseScriptPointerBy2
+
+ScriptCommand_ResetEvent:
+	call Get1ScriptArg_IncrIndexBy1
+	call ZeroOutEventValue
+	jp IncreaseScriptPointerBy2
+
+ScriptCommand_CheckEvent:
+	call Get1ScriptArg_IncrIndexBy1
+	call GetEventValue
+	ld hl, wScriptFlags
+	jr z, .set
+; reset
+	res 0, [hl]
+	jp IncreaseScriptPointerBy2
+.set
+	set 0, [hl]
+	jp IncreaseScriptPointerBy2
+
+ScriptCommand_SetVar:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld a, c
+	ld c, b
+	call SetVarValue
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_GetVar:
+	call Get1ScriptArg_IncrIndexBy1
+	call GetVarValue
+	ld [wScriptLoadedVar], a
+	jp IncreaseScriptPointerBy2
+
+; inc VAR_* constant value
+ScriptCommand_IncVar:
+	call Get1ScriptArg_IncrIndexBy1
+	push af
+	call GetVarValue
+	inc a
+	ld c, a
+	pop af
+	call SetVarValue
+	jp IncreaseScriptPointerBy2
+
+; dec VAR_* constant value
+ScriptCommand_DecVar:
+	call Get1ScriptArg_IncrIndexBy1
+	push af
+	call GetVarValue
+	dec a
+	ld c, a
+	pop af
+	call SetVarValue
+	jp IncreaseScriptPointerBy2
+
+ScriptCommand_LoadNPC:
+	call Get1ScriptArg_IncrIndexBy1
+	push af
+	call Get2ScriptArgs_IncrIndexBy2
+	ld d, c
+	ld e, b
+	push de
+	call Get1ScriptArg_IncrIndexBy4
+	ld b, a
+	pop de
+	pop af
+	farcall LoadOWObjectInMap
+	jp IncreaseScriptPointerBy5
+
+ScriptCommand_UnloadNPC:
+	call Get1ScriptArg_IncrIndexBy1
+	farcall ClearOWObject
+	jp IncreaseScriptPointerBy2
+
+ScriptCommand_SetPlayerDirection:
+	call Get1ScriptArg_IncrIndexBy1
+	ld b, a
+	ld a, [wPlayerOWObject]
+	farcall SetOWObjectDirection
+	jp IncreaseScriptPointerBy2
+
+ScriptCommand_SetActiveNPCDirection:
+	call Get1ScriptArg_IncrIndexBy1
+	ld b, a
+	ld a, [wScriptNPC]
+	farcall SetOWObjectDirection
+	jp IncreaseScriptPointerBy2
+
+ScriptCommand_DoFrames:
+	call Get1ScriptArg_IncrIndexBy1
+	ld c, a
+.delay_loop
+	call DoFrame
+	dec c
+	jr nz, .delay_loop
+	jp IncreaseScriptPointerBy2
+
+ScriptCommand_LoadTilemap:
+	call Get2ScriptArgs_IncrIndexBy1
+	push bc
+	call Get2ScriptArgs_IncrIndexBy3
+	ld d, c
+	ld e, b
+	pop bc
+	farcall Func_12c0ce
+	jp IncreaseScriptPointerBy5
+
+ScriptCommand_ShowCardReceivedScreen:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld e, c
+	ld d, b
+	farcall Func_1022a
+	call Func_c63e
+	farcall Func_10252
+	call WaitPalFading
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_SetPlayerPosition:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld d, c
+	ld e, b
+	ld a, [wPlayerOWObject]
+	farcall SetOWObjectTilePosition
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_SetActiveNPCPosition:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld d, c
+	ld e, b
+	ld a, [wScriptNPC]
+	farcall SetOWObjectTilePosition
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_SetScrollState:
+	call Get1ScriptArg_IncrIndexBy1
+	farcall SetOWScrollState
+	jp IncreaseScriptPointerBy2
+
+ScriptCommand_ScrollToPosition:
+	call Get2ScriptArgs_IncrIndexBy1
+	sla c
+	sla b
+	ld d, c
+	ld e, b
+	farcall Func_104ad
+.delay_loop
+	call DoFrame
+	farcall CheckOWScroll
+	or a
+	jr nz, .delay_loop
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_SetActiveNPC:
+	call Get1ScriptArg_IncrIndexBy1
+	ld [wScriptNPC], a
+	call Get2ScriptArgs_IncrIndexBy2
+	ld a, c
+	ld [wScriptNPCName], a
+	ld a, b
+	ld [wScriptNPCName + 1], a
+	jp IncreaseScriptPointerBy4
+
+ScriptCommand_SetPlayerPositionAndDirection:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld d, c
+	ld e, b
+	ld a, [wPlayerOWObject]
+	farcall SetOWObjectTilePosition
+	call Get1ScriptArg_IncrIndexBy3
+	ld b, a
+	ld a, [wPlayerOWObject]
+	farcall SetOWObjectDirection
+	jp IncreaseScriptPointerBy4
+
+ScriptCommand_SetNPCPositionAndDirection:
+	call Get1ScriptArg_IncrIndexBy1
+	push af
+	call Get2ScriptArgs_IncrIndexBy2
+	ld d, c
+	ld e, b
+	pop af
+	push af
+	farcall SetOWObjectTilePosition
+	call Get1ScriptArg_IncrIndexBy4
+	ld b, a
+	pop af
+	farcall SetOWObjectDirection
+	jp IncreaseScriptPointerBy5
+
+ScriptCommand_FadeIn:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld a, b
+	ld b, c
+	farcall StartPalFadeFromBlackOrWhite
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_FadeOut:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld a, b
+	ld b, c
+	farcall StartPalFadeToBlackOrWhite
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_SetNPCDirection:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld a, c
+	farcall SetOWObjectDirection
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_SetNPCPosition:
+	call Get1ScriptArg_IncrIndexBy1
+	push af
+	call Get2ScriptArgs_IncrIndexBy2
+	ld d, c
+	ld e, b
+	pop af
+	farcall SetOWObjectTilePosition
+	jp IncreaseScriptPointerBy4
+
+ScriptCommand_SetActiveNPCPositionAndDirection:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld d, c
+	ld e, b
+	ld a, [wScriptNPC]
+	farcall SetOWObjectTilePosition
+	call Get1ScriptArg_IncrIndexBy3
+	ld b, a
+	ld a, [wScriptNPC]
+	farcall SetOWObjectDirection
+	jp IncreaseScriptPointerBy4
+
+ScriptCommand_AnimatePlayerMovement:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld a, b
+	ld b, c
+	ld c, a
+	ld a, [wPlayerOWObject]
+	farcall StartOWObjectAnimation
+	farcall ResetOWObjectFlag5_WithID
+	farcall Func_10e3c
+.delay_loop
+	call DoFrame
+	ld a, [wPlayerOWObject]
+	farcall GetOWObjectSpriteAnimFlags
+	bit 5, a
+	jr nz, .delay_loop
+	ld a, [wPlayerOWObject]
+	farcall StopOWObjectAnimation
+	farcall SetOWObjectFlag5_WithID
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_AnimateNPCMovement:
+	call Get1ScriptArg_IncrIndexBy1
+	push af
+	call Get2ScriptArgs_IncrIndexBy2
+	ld a, b
+	ld b, c
+	ld c, a
+	pop af
+	push af
+	farcall Func_10e3c
+.delay_loop
+	call DoFrame
+	pop af
+	push af
+	farcall GetOWObjectSpriteAnimFlags
+	bit 5, a
+	jr nz, .delay_loop
+	pop af
+	jp IncreaseScriptPointerBy4
+
+ScriptCommand_AnimateActiveNPCMovement:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld a, b
+	ld b, c
+	ld c, a
+	ld a, [wScriptNPC]
+	farcall Func_10e3c
+.delay_loop
+	call DoFrame
+	ld a, [wScriptNPC]
+	farcall GetOWObjectSpriteAnimFlags
+	bit 5, a
+	jr nz, .delay_loop
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_MovePlayer:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld l, c
+	ld h, b
+	ld a, [wScriptBank]
+	ld b, a
+	ld a, [wPlayerOWObject]
+	farcall MoveNPC
+	farcall ResetOWObjectFlag5_WithID
+	call Get1ScriptArg_IncrIndexBy3
+	or a
+	jr z, .not_set
+	ld a, [wPlayerOWObject]
+	farcall StartOWObjectAnimation
+.not_set
+	jp IncreaseScriptPointerBy4
+
+ScriptCommand_MoveNPC:
+	call Get1ScriptArg_IncrIndexBy1
+	push af
+	call Get2ScriptArgs_IncrIndexBy2
+	ld l, c
+	ld h, b
+	ld a, [wScriptBank]
+	ld b, a
+	pop af
+	farcall MoveNPC
+	jp IncreaseScriptPointerBy4
+
+ScriptCommand_MoveActiveNPC:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld l, c
+	ld h, b
+	ld a, [wScriptBank]
+	ld b, a
+	ld a, [wScriptNPC]
+	farcall MoveNPC
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_StartDuel:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld a, c
+	ld [wNPCDuelDeckID], a
+	ld a, b
+	ld [wDuelStartTheme], a
+	ld hl, wd583
+	set 1, [hl]
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_WaitForPlayerAnimation:
+	call Func_3340
+	jp IncreaseScriptPointerBy1
+
+ScriptCommand_WaitForFade:
+	call WaitPalFading
+	jp IncreaseScriptPointerBy1
+
+ScriptCommand_GetCardCountInCollectionAndDecks:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld e, c
+	ld d, b
+	call GetCardCountInCollectionAndDecks
+	ld [wScriptLoadedVar], a
+	jr c, .set
+; reset
+	ld hl, wScriptFlags
+	res 0, [hl]
+	jr .done
+.set
+	ld hl, wScriptFlags
+	set 0, [hl]
+.done
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_GetCardCountInCollection:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld e, c
+	ld d, b
+	call GetCardCountInCollection
+	ld [wScriptLoadedVar], a
+	jr c, .set
+	ld hl, wScriptFlags
+; reset
+	res 0, [hl]
+	jr .done
+.set
+	ld hl, wScriptFlags
+	set 0, [hl]
+.done
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_GiveCard:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld e, c
+	ld d, b
+	call AddCardToCollection
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_TakeCard:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld e, c
+	ld d, b
+	call RemoveCardFromCollection
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_NPCAskQuestion:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld l, c
+	ld h, b
+	push hl
+	ld hl, wScriptNPCName
+	ld a, [hli]
+	ld d, [hl]
+	ld e, a
+	push de
+	call Get1ScriptArg_IncrIndexBy3
+	pop de
+	pop hl
+	farcall PrintScrollableText_WithTextBoxLabelWithYesOrNoMenu
+	ld hl, wScriptFlags
+	or a
+	jr nz, .reset
+; set
+	set 0, [hl]
+	jp IncreaseScriptPointerBy4
+.reset
+	res 0, [hl]
+	jp IncreaseScriptPointerBy4
+
+ScriptCommand_GetPlayerDirection:
+	ld a, [wPlayerOWObject]
+	farcall GetOWObjectAnimStruct1Flag0And1
+	ld a, b
+	ld [wScriptLoadedVar], a
+	jp IncreaseScriptPointerBy1
+
+ScriptCommand_CompareVar:
+	call Get1ScriptArg_IncrIndexBy1
+	call GetVarValue
+	push af
+	call Get1ScriptArg_IncrIndexBy2
+	ld c, a
+	pop af
+	cp c
+	push af
+	ld hl, wScriptFlags
+	jr z, .equal
+; not equal
+	res 0, [hl]
+	jr .bit0_done
+.equal
+	set 0, [hl]
+.bit0_done
+	pop af
+	jr c, .carry
+; no carry
+	res 1, [hl]
+	jr .bit1_done
+.carry
+	set 1, [hl]
+.bit1_done
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_GetActiveNPCDirection:
+	ld a, [wScriptNPC]
+	farcall GetOWObjectAnimStruct1Flag0And1
+	ld a, b
+	ld [wScriptLoadedVar], a
+	jp IncreaseScriptPointerBy1
+
+ScriptCommand_ScrollToActiveNPC:
+	ld a, [wScriptNPC]
+	farcall SetOWObjectAsScrollTarget
+	ld a, 1
+	farcall SetOWScrollState
+	jp IncreaseScriptPointerBy1
+
+ScriptCommand_ScrollToPlayer:
+	ld a, [wPlayerOWObject]
+	farcall SetOWObjectAsScrollTarget
+	ld a, 1
+	farcall SetOWScrollState
+	jp IncreaseScriptPointerBy1
+
+ScriptCommand_ScrollToNPC:
+	call Get1ScriptArg_IncrIndexBy1
+	farcall SetOWObjectAsScrollTarget
+	ld a, 1
+	farcall SetOWScrollState
+	jp IncreaseScriptPointerBy2
+
+ScriptCommand_SpinActiveNPC:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld d, b
+	ld e, c
+.delay_loop_d
+	ld c, 4
+.delay_loop_c
+	push de
+.delay_loop_e
+	call DoFrame
+	dec e
+	jr nz, .delay_loop_e
+	ld a, [wScriptNPC]
+	farcall GetOWObjectAnimStruct1Flag0And1
+	inc b
+	ld a, b
+	and 3
+	ld b, a
+	ld a, [wScriptNPC]
+	farcall SetOWObjectDirection
+	pop de
+	dec c
+	jr nz, .delay_loop_c
+	dec d
+	jr nz, .delay_loop_d
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_RestoreActiveNPCDirection:
+	ld a, [wScriptLoadedVar]
+	ld b, a
+	ld a, [wScriptNPC]
+	farcall SetOWObjectDirection
+	jp IncreaseScriptPointerBy1
+
+ScriptCommand_SpinActiveNPCReverse:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld d, b
+	ld e, c
+.delay_loop_d
+	ld c, 4
+.delay_loop_c
+	push de
+.delay_loop_e
+	call DoFrame
+	dec e
+	jr nz, .delay_loop_e
+	ld a, [wScriptNPC]
+	farcall GetOWObjectAnimStruct1Flag0And1
+	dec b
+	ld a, b
+	and 3
+	ld b, a
+	ld a, [wScriptNPC]
+	farcall SetOWObjectDirection
+	pop de
+	dec c
+	jr nz, .delay_loop_c
+	dec d
+	jr nz, .delay_loop_d
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_ResetNPCFlag6:
+	call Get1ScriptArg_IncrIndexBy1
+	farcall ResetOWObjectSpriteAnimFlag6
+	jp IncreaseScriptPointerBy2
+
+ScriptCommand_SetNPCFlag6:
+	call Get1ScriptArg_IncrIndexBy1
+	farcall SetOWObjectSpriteAnimFlag6
+	jp IncreaseScriptPointerBy2
+
+ScriptCommand_DuelRequirementCheck:
+	call ResetDuelDeckRequirementStatus
+	call Get1ScriptArg_IncrIndexBy1
+	ld hl, DuelRequirementFunctionMap
+	call Func_344c
+	jp IncreaseScriptPointerBy2
+
+ResetDuelDeckRequirementStatus:
+	ld hl, wScriptFlags
+	res 1, [hl]
+	ret
+
+DuelDeckRequirementFailed:
+	ld hl, wScriptFlags
+	set 1, [hl]
+	ret
+
+; GR Grass
+DuelMiyukiRequirement:
+	ld a, STICKY_POISON_GAS_DECK_ID
+	jp CheckDuelDeckRequirementWithNPCDeckID
+
+; GR Lightning
+DuelRennaRequirement:
+	ld a, CHAIN_LIGHTNING_BY_PIKACHU_DECK_ID
+	jp CheckDuelDeckRequirementWithNPCDeckID
+
+DuelIchikawaRequirement:
+	ld a, THIS_IS_THE_POWER_OF_ELECTRICITY_DECK_ID
+	jr CheckDuelDeckRequirementWithNPCDeckID
+
+; GR Fire
+DuelYukiRequirement:
+	ld a, FIREBALL_DECK_ID
+	jr CheckDuelDeckRequirementWithNPCDeckID
+
+DuelShokoRequirement:
+	ld a, EEVEE_SHOWDOWN_DECK_ID
+	jr CheckDuelDeckRequirementWithNPCDeckID
+
+; GR Water
+DuelMiyajimaRequirement:
+	ld a, WHIRLPOOL_SHOWER_DECK_ID
+	jr CheckDuelDeckRequirementWithNPCDeckID
+
+DuelSentaRequirement:
+	ld a, PARALYZED_PARALYZED_DECK_ID
+	jr CheckDuelDeckRequirementWithNPCDeckID
+
+; GR Fighting
+DuelGodaRequirement:
+	ld a, ROCK_BLAST_DECK_ID
+	jr CheckDuelDeckRequirementWithNPCDeckID
+
+DuelGraceRequirement:
+	ld a, FULL_STRENGTH_DECK_ID
+	jr CheckDuelDeckRequirementWithNPCDeckID
+
+; GR Psychic
+DuelMiwaRequirement:
+	ld a, DIRECT_HIT_DECK_ID
+	jr CheckDuelDeckRequirementWithNPCDeckID
+
+DuelYosukeRequirement:
+	ld a, BAD_DREAM_DECK_ID
+	jr CheckDuelDeckRequirementWithNPCDeckID
+
+DuelRyokoRequirement:
+	ld a, POKEMON_POWER_DECK_ID
+	jr CheckDuelDeckRequirementWithNPCDeckID
+
+; GR Castle
+DuelKanzakiRequirement:
+	ld a, BAD_GUYS_DECK_ID
+	jr CheckDuelDeckRequirementWithNPCDeckID
+
+; Colorless Altar
+DuelNishijimaRequirement_Reroll:
+	ld a, 3
+	call Random
+	ld c, a
+	ld e, a
+	ld a, VAR_05
+	call SetVarValue
+	ld a, SNORLAX_GUARD_DECK_ID
+	jr CheckDuelDeckRequirementWithNPCDeckID_TxRam2
+
+DuelNishijimaRequirement_Use:
+	ld a, VAR_05
+	call GetVarValue
+	ld e, a
+	ld a, SNORLAX_GUARD_DECK_ID
+	jr CheckDuelDeckRequirementWithNPCDeckID_TxRam2
+
+DuelIshiiRequirement_Reroll:
+	ld a, 3
+	call Random
+	ld c, a
+	ld e, a
+	ld a, VAR_06
+	call SetVarValue
+	ld a, EYE_OF_THE_STORM_DECK_ID
+	jr CheckDuelDeckRequirementWithNPCDeckID_TxRam2
+
+DuelIshiiRequirement_Use:
+	ld a, VAR_06
+	call GetVarValue
+	ld e, a
+	ld a, EYE_OF_THE_STORM_DECK_ID
+	jr CheckDuelDeckRequirementWithNPCDeckID_TxRam2
+
+DuelSamejimaRequirement_Reroll:
+	ld a, 3
+	call Random
+	ld c, a
+	ld e, a
+	ld a, VAR_07
+	call SetVarValue
+	ld a, SUDDEN_GROWTH_DECK_ID
+	jr CheckDuelDeckRequirementWithNPCDeckID_TxRam2
+
+DuelSamejimaRequirement_Use:
+	ld a, VAR_07
+	call GetVarValue
+	ld e, a
+	ld a, SUDDEN_GROWTH_DECK_ID
+	jr CheckDuelDeckRequirementWithNPCDeckID_TxRam2
+
+CheckDuelDeckRequirementWithNPCDeckID:
+	farcall LoadDeckIDData
+	xor a
+	ld e, a
+	farcall CheckDuelDeckRequirement
+	call c, DuelDeckRequirementFailed
+	ret
+
+CheckDuelDeckRequirementWithNPCDeckID_TxRam2:
+	push de
+	farcall LoadDeckIDData
+	pop de
+	farcall CheckDuelDeckRequirement
+	push af
+	call LoadTxRam2
+	ld a, l
+	ld [wTxRam2_b], a
+	ld a, h
+	ld [wTxRam2_b + 1], a
+	pop af
+	call c, DuelDeckRequirementFailed
+	ret
+
+DuelRequirementFunctionMap:
+	key_func DUEL_REQUIREMENT_MIYUKI, DuelMiyukiRequirement
+	key_func DUEL_REQUIREMENT_RENNA, DuelRennaRequirement
+	key_func DUEL_REQUIREMENT_ICHIKAWA, DuelIchikawaRequirement
+	key_func DUEL_REQUIREMENT_YUKI, DuelYukiRequirement
+	key_func DUEL_REQUIREMENT_SHOKO, DuelShokoRequirement
+	key_func DUEL_REQUIREMENT_MIYAJIMA, DuelMiyajimaRequirement
+	key_func DUEL_REQUIREMENT_SENTA, DuelSentaRequirement
+	key_func DUEL_REQUIREMENT_GODA, DuelGodaRequirement
+	key_func DUEL_REQUIREMENT_GRACE, DuelGraceRequirement
+	key_func DUEL_REQUIREMENT_MIWA, DuelMiwaRequirement
+	key_func DUEL_REQUIREMENT_YOSUKE, DuelYosukeRequirement
+	key_func DUEL_REQUIREMENT_RYOKO, DuelRyokoRequirement
+	key_func DUEL_REQUIREMENT_NISHIJIMA_REROLL, DuelNishijimaRequirement_Reroll
+	key_func DUEL_REQUIREMENT_NISHIJIMA_USE, DuelNishijimaRequirement_Use
+	key_func DUEL_REQUIREMENT_ISHII_REROLL, DuelIshiiRequirement_Reroll
+	key_func DUEL_REQUIREMENT_ISHII_USE, DuelIshiiRequirement_Use
+	key_func DUEL_REQUIREMENT_SAMEJIMA_REROLL, DuelSamejimaRequirement_Reroll
+	key_func DUEL_REQUIREMENT_SAMEJIMA_USE, DuelSamejimaRequirement_Use
+	key_func DUEL_REQUIREMENT_KANZAKI, DuelKanzakiRequirement
+	db $ff
+
+ScriptCommand_GetActiveNPCOppositeDirection:
+	ld a, [wScriptNPC]
+	farcall GetOWObjectAnimStruct1Flag0And1
+	ld a, b
+	xor SPRITE_ANIM_STRUCT1_FLAG1
+	ld [wScriptLoadedVar], a
+	jp IncreaseScriptPointerBy1
+
+ScriptCommand_GetPlayerOppositeDirection:
+	ld a, [wPlayerOWObject]
+	farcall GetOWObjectAnimStruct1Flag0And1
+	ld a, b
+	xor SPRITE_ANIM_STRUCT1_FLAG1
+	ld [wScriptLoadedVar], a
+	jp IncreaseScriptPointerBy1
+
+ScriptCommand_PlaySFX:
+	call Get1ScriptArg_IncrIndexBy1
+	call PlaySFX
+	jp IncreaseScriptPointerBy2
+
+ScriptCommand_PlaySFXAndWait:
+	call Get1ScriptArg_IncrIndexBy1
+	call PlaySFX
+	farcall WaitForSFXToFinish
+	jp IncreaseScriptPointerBy2
+
+ScriptCommand_SetTextRAM2:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld l, c
+	ld h, b
+	call LoadTxRam2
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_SetVariableTextRAM2:
+	ld hl, wScriptFlags
+	bit 0, [hl]
+	jr z, .use_text_2
+; use text 1
+	call Get2ScriptArgs_IncrIndexBy1
+	jr .next
+.use_text_2
+	call Get2ScriptArgs_IncrIndexBy3
+.next
+	ld l, c
+	ld h, b
+	call LoadTxRam2
+	jp IncreaseScriptPointerBy5
+
+ScriptCommand_WaitForNPCAnimation:
+	call Get1ScriptArg_IncrIndexBy1
+	call WaitForOWObjectAnimation
+	jp IncreaseScriptPointerBy2
+
+ScriptCommand_GetPlayerXPosition:
+	ld a, [wPlayerOWObject]
+	farcall GetOWObjectTilePosition
+	ld a, d
+	ld [wScriptLoadedVar], a
+	jp IncreaseScriptPointerBy1
+
+ScriptCommand_GetPlayerYPosition:
+	ld a, [wPlayerOWObject]
+	farcall GetOWObjectTilePosition
+	ld a, e
+	ld [wScriptLoadedVar], a
+	jp IncreaseScriptPointerBy1
+
+ScriptCommand_RestoreNPCDirection:
+	call Get1ScriptArg_IncrIndexBy1
+	push af
+	ld a, [wScriptLoadedVar]
+	ld b, a
+	pop af
+	farcall SetOWObjectDirection
+	jp IncreaseScriptPointerBy2
+
+ScriptCommand_SpinNPC:
+	call Get1ScriptArg_IncrIndexBy1
+	push af
+	call Get2ScriptArgs_IncrIndexBy2
+	ld d, b
+	ld e, c
+	pop af
+.delay_loop_d
+	ld c, 4
+.delay_loop_c
+	push de
+	push af
+.delay_loop_e
+	call DoFrame
+	dec e
+	jr nz, .delay_loop_e
+	farcall GetOWObjectAnimStruct1Flag0And1
+	inc b
+	ld a, b
+	and 3
+	ld b, a
+	pop af
+	farcall SetOWObjectDirection
+	pop de
+	dec c
+	jr nz, .delay_loop_c
+	dec d
+	jr nz, .delay_loop_d
+	jp IncreaseScriptPointerBy4
+
+ScriptCommand_SpinNPCReverse:
+	call Get1ScriptArg_IncrIndexBy1
+	push af
+	call Get2ScriptArgs_IncrIndexBy2
+	ld d, b
+	ld e, c
+	pop af
+.delay_loop_d
+	ld c, 4
+.delay_loop_c
+	push de
+	push af
+.delay_loop_e
+	call DoFrame
+	dec e
+	jr nz, .delay_loop_e
+	farcall GetOWObjectAnimStruct1Flag0And1
+	dec b
+	ld a, b
+	and 3
+	ld b, a
+	pop af
+	farcall SetOWObjectDirection
+	pop de
+	dec c
+	jr nz, .delay_loop_c
+	dec d
+	jr nz, .delay_loop_d
+	jp IncreaseScriptPointerBy4
+
+ScriptCommand_PushVar:
+	ld hl, wScriptStack
+	ld a, [wScriptStackOffset]
+	dec a
+	ld [wScriptStackOffset], a
+	add_hl_a
+	ld a, [wScriptLoadedVar]
+	ld [hl], a
+	jp IncreaseScriptPointerBy1
+
+ScriptCommand_PopVar:
+	ld hl, wScriptStack
+	ld a, [wScriptStackOffset]
+	push af
+	add_hl_a
+	ld a, [hl]
+	ld [wScriptLoadedVar], a
+	pop af
+	inc a
+	ld [wScriptStackOffset], a
+	jp IncreaseScriptPointerBy1
+
+ScriptCommand_ScriptCall:
+	call Get1ScriptArg_IncrIndexBy3
+	ld hl, wScriptFlags
+	cp b0nz
+	jr z, .b0nz
+	cp b0z
+	jr z, .b0z
+	cp b1nz
+	jr z, .b1nz
+	cp b1z
+	jr z, .b1z
+	jr .do_call
+.b0nz
+	bit 0, [hl]
+	jr nz, .do_call
+	jr .skip_call
+.b0z
+	bit 0, [hl]
+	jr z, .do_call
+	jr .skip_call
+.b1nz
+	bit 1, [hl]
+	jr nz, .do_call
+	jr .skip_call
+.b1z
+	bit 1, [hl]
+	jr z, .do_call
+.skip_call
+	jp IncreaseScriptPointerBy4
+.do_call
+	call Get2ScriptArgs_IncrIndexBy1
+	push bc
+	call IncreaseScriptPointerBy4
+	ld hl, wScriptStack
+	ld a, [wScriptStackOffset]
+	dec a
+	dec a
+	ld [wScriptStackOffset], a
+	add_hl_a
+	ld a, [wScriptPointer]
+	ld [hli], a
+	ld a, [wScriptPointer + 1]
+	ld [hl], a
+	pop bc
+	ld a, c
+	ld [wScriptPointer], a
+	ld a, b
+	ld [wScriptPointer + 1], a
+	call ReloadScriptBuffer
+	jp ReloadScriptBuffer_Done
+
+ScriptCommand_ScriptRet:
+	ld hl, wScriptStack
+	ld a, [wScriptStackOffset]
+	inc a
+	inc a
+	ld [wScriptStackOffset], a
+	add_hl_a
+	dec hl
+	ld a, [hld]
+	ld [wScriptPointer + 1], a
+	ld a, [hl]
+	ld [wScriptPointer], a
+	call ReloadScriptBuffer
+	jp ReloadScriptBuffer_Done
+
+ScriptCommand_GiveCoin:
+	call Get1ScriptArg_IncrIndexBy1
+	farcall GiveCoin
+	call WaitPalFading
+	jp IncreaseScriptPointerBy2
+
+ScriptCommand_BackupActiveNPC:
+	ld a, [wScriptNPC]
+	ld [wScriptLoadedVar], a
+	jp IncreaseScriptPointerBy1
+
+ScriptCommand_LoadPlayer:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld d, c
+	ld e, b
+	push de
+	call Get1ScriptArg_IncrIndexBy3
+	ld b, a
+	pop de
+	ld a, [wPlayerOWObject]
+	farcall LoadOWObjectInMap
+	jp IncreaseScriptPointerBy4
+
+ScriptCommand_UnloadPlayer:
+	ld a, [wPlayerOWObject]
+	farcall ClearOWObject
+	jp IncreaseScriptPointerBy1
+
+ScriptCommand_GiveBoosterPacks:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld l, c
+	ld h, b
+	ld a, [hli]
+	cp BOOSTERS_GIVE_ALL
+	jr z, .give_all
+	cp BOOSTERS_GIVE_N
+	jr z, .give_n
+	cp BOOSTERS_GIVE_RANDOM
+	jr z, .give_random
+	jp IncreaseScriptPointerBy3
+
+; give all boosters in the list, by first counting the length of the list
+.give_all
+	push hl
+	xor a
+	ld c, a
+.loop_count_length
+	ld a, [hli]
+	cp $ff
+	jr z, .counted_length
+	inc c
+	jr .loop_count_length
+.counted_length
+	pop hl
+	ld a, c
+	ld [wNumBoosterPacksToGive], a ; = list size
+	jr .give_boosters
+
+.give_random
+	ld a, [hli] ; read N before the list
+	call Random
+	inc a
+	ld [wNumBoosterPacksToGive], a ; = random [1,N]
+	jr .copy
+.give_n
+	ld a, [hli] ; read N before the list
+	ld [wNumBoosterPacksToGive], a ; = N
+.copy
+	ld de, wBoosterPackList
+	xor a
+	ld c, a
+.loop_copy_and_count
+	ld a, [hli]
+	cp $ff
+	jr z, .copied_and_counted
+	ld [de], a
+	inc de
+	inc c
+	jr .loop_copy_and_count
+
+.copied_and_counted
+	ld a, c
+	ld [wBoosterPackCount], a ; = list size
+	ld de, wBoosterPacksToGive
+	ld a, [wNumBoosterPacksToGive]
+	ld c, a
+.loop_random_copy
+	ld a, [wBoosterPackCount]
+	call Random
+	ld hl, wBoosterPackList
+	add_hl_a
+	ld a, [hl]
+	ld [de], a
+	inc de
+	dec c
+	jr nz, .loop_random_copy
+
+	ld a, [wNumBoosterPacksToGive]
+	ld c, a
+.sort
+	ld a, [wNumBoosterPacksToGive]
+	ld b, a
+	ld hl, wBoosterPacksToGive
+	ld de, wBoosterPacksToGive
+	inc de
+.loop_sort
+	dec b
+	jr z, .consumed_count
+	ld a, [de]
+	cp [hl]
+	jr c, .skip_swap
+	ld a, [de]
+	push af
+	ld a, [hl]
+	ld [de], a
+	pop af
+	ld [hl], a
+.skip_swap
+	inc hl
+	inc de
+	jr .loop_sort
+.consumed_count
+	dec c
+	jr nz, .sort
+
+	ld hl, wBoosterPacksToGive
+.give_boosters
+	farcall Func_1022a
+	ld a, [wNumBoosterPacksToGive]
+	ld c, a
+	xor a
+	ld b, a
+.loop_boosters
+	ld a, [hli]
+	farcall GiveBoosterPacks
+	inc b
+	dec c
+	jr nz, .loop_boosters
+	farcall Func_10252
+	call WaitPalFading
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_GetRandom:
+	call Get1ScriptArg_IncrIndexBy1
+	call Random
+	ld [wScriptLoadedVar], a
+	jp IncreaseScriptPointerBy2
+
+ScriptCommand_58:
+	ld a, $12
+	call Func_3154
+	jp IncreaseScriptPointerBy1
+
+ScriptCommand_SetTextRAM3:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld l, c
+	ld h, b
+	call LoadTxRam3
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_QuitScript:
+	ld a, [wScriptFlags]
+	set 6, a
+	ld [wScriptFlags], a
+	jp IncreaseScriptPointerBy1
+
+ScriptCommand_PlaySong:
+	call PauseSong
+	call Get1ScriptArg_IncrIndexBy1
+	call PlaySong
+	jp IncreaseScriptPointerBy2
+
+ScriptCommand_ResumeSong:
+	call ResumeSong
+	jp IncreaseScriptPointerBy1
+
+ScriptCommand_ScriptCallfar:
+	call Get1ScriptArg_IncrIndexBy3
+	push af
+	call Get2ScriptArgs_IncrIndexBy1
+	push bc
+	call IncreaseScriptPointerBy4
+	ld hl, wScriptStack
+	ld a, [wScriptStackOffset]
+	dec a
+	dec a
+	dec a
+	ld [wScriptStackOffset], a
+	add_hl_a
+	ld a, [wScriptPointer]
+	ld [hli], a
+	ld a, [wScriptPointer + 1]
+	ld [hli], a
+	ld a, [wScriptBank]
+	ld [hl], a
+	pop bc
+	ld a, c
+	ld [wScriptPointer], a
+	ld a, b
+	ld [wScriptPointer + 1], a
+	pop af
+	ld [wScriptBank], a
+	call ReloadScriptBuffer
+	jp ReloadScriptBuffer_Done
+
+ScriptCommand_ScriptRetfar:
+	ld hl, wScriptStack
+	ld a, [wScriptStackOffset]
+	inc a
+	inc a
+	inc a
+	ld [wScriptStackOffset], a
+	add_hl_a
+	dec hl
+	ld a, [hld]
+	ld [wScriptBank], a
+	ld a, [hld]
+	ld [wScriptPointer + 1], a
+	ld a, [hl]
+	ld [wScriptPointer], a
+	call ReloadScriptBuffer
+	jp ReloadScriptBuffer_Done
+
+ScriptCommand_CardPop:
+	call Get1ScriptArg_IncrIndexBy1
+	farcall Func_1f7f1
+	call WaitPalFading
+	jp IncreaseScriptPointerBy2
+
+ScriptCommand_PlaySongNext:
+	call Get1ScriptArg_IncrIndexBy1
+	farcall PlayAfterCurrentSong
+	jp IncreaseScriptPointerBy2
+
+ScriptCommand_SetTextRAM2b:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld a, c
+	ld [wTxRam2_b], a
+	ld a, b
+	ld [wTxRam2_b + 1], a
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_SetVariableTextRAM2b:
+	ld hl, wScriptFlags
+	bit 0, [hl]
+	jr z, .use_text_2
+; use text 1
+	call Get2ScriptArgs_IncrIndexBy1
+	jr .next
+.use_text_2
+	call Get2ScriptArgs_IncrIndexBy3
+.next
+	ld a, c
+	ld [wTxRam2_b], a
+	ld a, b
+	ld [wTxRam2_b + 1], a
+	jp IncreaseScriptPointerBy5
+
+ScriptCommand_ReplaceNPC:
+	call Get1ScriptArg_IncrIndexBy1
+	farcall GetOWObjectTilePosition
+	push de
+	farcall GetOWObjectAnimStruct1Flag0And1
+	push bc
+	farcall ClearOWObject
+	call Get1ScriptArg_IncrIndexBy2
+	pop bc
+	pop de
+	farcall LoadOWObjectInMap
+	jp IncreaseScriptPointerBy3
+
+; for the buffer value n,
+; - if n = 0 or n >= NUM_UNIQUE_MAILS_IN_GAME, skip
+; - else, set bit (m-1) of [dw hl] and AddMailToQueue, where
+;   - hl = wSentMailBitfield and m = n    if 0 < n <= 16,
+;   - hl = wSentMailBitfield + 2 and m = n-16 if 16 < n < NUM_UNIQUE_MAILS_IN_GAME,
+; then IncreaseScriptPointerBy2
+ScriptCommand_SendMail:
+	call Get1ScriptArg_IncrIndexBy1
+	or a
+	jr z, .done ; 0 is an invalid mail number
+
+	cp NUM_UNIQUE_MAILS_IN_GAME
+	jr nc, .done ; mail > NUM_UNIQUE_MAILS_IN_GAME is another invalid mail number
+
+	ld hl, wSentMailBitfield
+	cp $10 + 1
+	jr c, .set_bitfield
+	inc hl
+	inc hl ; wSentMailBitfield + 2
+	sub $10
+.set_bitfield
+	ld de, 1
+.set_bitfield_loop
+	dec a
+	jr z, .got_bitfield
+	sla e
+	rl d
+	jr .set_bitfield_loop
+.got_bitfield
+	ld a, [hli] ; wSentMailBitfield or wSentMailBitfield + 2
+	ld c, a
+	ld a, [hld]
+	ld b, a
+	ld a, c
+	and e
+	jr nz, .checked_bit
+	ld a, b
+	and d
+.checked_bit
+	; if the bit is set then we have already sent this mail before. do not send again
+	jr nz, .done
+
+	; if we got here, this mail has never been sent before.
+	; set the appropriate bit in the bitfield, and send the mail
+	ld a, c
+	or e
+	ld c, a
+	ld a, b
+	or d
+	ld b, a
+	ld a, c
+	ld [hli], a
+	ld [hl], b
+	call Get1ScriptArg_IncrIndexBy1
+	farcall AddMailToQueue
+.done
+	jp IncreaseScriptPointerBy2
+
+ScriptCommand_CheckNPCLoaded:
+	call Get1ScriptArg_IncrIndexBy1
+	farcall CheckOWObjectPointerWithID
+	ld hl, wScriptFlags
+	jr nz, .valid
+; invalid
+	set 1, [hl]
+	jp IncreaseScriptPointerBy2
+.valid
+	res 1, [hl]
+	jp IncreaseScriptPointerBy2
+
+ScriptCommand_GiveDeck:
+	call Get1ScriptArg_IncrIndexBy1
+	farcall Func_1acbf
+	ld hl, wScriptFlags
+	jr c, .invalid
+; valid
+	res 1, [hl]
+	jp IncreaseScriptPointerBy2
+.invalid
+	set 1, [hl]
+	jp IncreaseScriptPointerBy2
+
+ScriptCommand_67:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld a, c
+	ld c, b
+	farcall Set3FromwDD75
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_68:
+.delay_loop
+	call DoFrame
+	farcall GetwDD75
+	jr nz, .delay_loop
+	jp IncreaseScriptPointerBy1
+
+ScriptCommand_PrintNPCTextInstant:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld hl, wScriptNPCName
+	ld a, [hli]
+	ld d, [hl]
+	ld e, a
+	ld l, c
+	ld h, b
+	farcall PrintTextInLabelledScrollableTextBox
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_VarAdd:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld a, c
+	call GetVarValue
+	add b
+	ld b, a
+	ld a, c
+	ld c, b
+	call SetVarValue
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_VarSub:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld a, c
+	call GetVarValue
+	sub b
+	ld b, a
+	ld a, c
+	ld c, b
+	call SetVarValue
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_ReceiveCard:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld e, c
+	ld d, b
+	farcall Func_1022a
+	call Func_c646
+	farcall Func_10252
+	call WaitPalFading
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_GetGameCenterChips:
+	farcall GetGameCenterChips
+	ld a, c
+	ld [wScriptLoadedVar], a
+	ld a, b
+	ld [wScriptLoadedVar + 1], a
+	jp IncreaseScriptPointerBy1
+
+ScriptCommand_CompareLoadedVarWord:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld a, [wScriptLoadedVar]
+	ld e, a
+	ld a, [wScriptLoadedVar + 1]
+	ld d, a
+	ld hl, wScriptFlags
+	res 0, [hl]
+	res 1, [hl]
+	cp16_long bc
+	jr nz, .not_equal
+	set 0, [hl]
+.not_equal
+	jr nc, .no_carry
+	set 1, [hl]
+.no_carry
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_GetGameCenterBankedChips:
+	farcall GetGameCenterBankedChips
+	ld a, c
+	ld [wScriptLoadedVar], a
+	ld a, b
+	ld [wScriptLoadedVar + 1], a
+	jp IncreaseScriptPointerBy1
+
+ScriptCommand_GameCenter:
+	farcall Func_114af
+	jp IncreaseScriptPointerBy1
+
+ScriptCommand_71:
+	farcall Func_114f9
+	jp IncreaseScriptPointerBy1
+
+ScriptCommand_GiveChips:
+	call Get2ScriptArgs_IncrIndexBy1
+	farcall IncreaseChipsSmoothly
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_TakeChips:
+	call Get2ScriptArgs_IncrIndexBy1
+	farcall DecreaseChipsSmoothly
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_LoadTextRAM3:
+	ld a, [wScriptLoadedVar]
+	ld l, a
+	ld a, [wScriptLoadedVar + 1]
+	ld h, a
+	call LoadTxRam3
+	jp IncreaseScriptPointerBy1
+
+ScriptCommand_DepositChips:
+	farcall DepositChips
+	jp IncreaseScriptPointerBy1
+
+ScriptCommand_WithdrawChips:
+	farcall WithdrawChips
+	jp IncreaseScriptPointerBy1
+
+ScriptCommand_LinkDuel:
+	ld a, EVENT_SET_UNTIL_MAP_RELOAD_2
+	call ZeroOutEventValue
+	ld hl, wScriptFlags
+	res 1, [hl]
+	farcall Func_1d99e
+	cp $ff
+	jr z, .set
+	or a
+	jr nz, .ok
+	ld a, EVENT_SET_UNTIL_MAP_RELOAD_2
+	call MaxOutEventValue
+	jr .done
+.ok
+	jr .done
+.set
+	ld hl, wScriptFlags
+	set 1, [hl]
+.done
+	farcall PlayCurrentSong
+	jp IncreaseScriptPointerBy1
+
+ScriptCommand_WaitSong:
+	farcall WaitSong
+	jp IncreaseScriptPointerBy1
+
+ScriptCommand_LoadPalette:
+	call Get2ScriptArgs_IncrIndexBy1
+	farcall GetPalettesWithID
+	call FlushAllPalettes
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_SetSpriteFrameset:
+	call Get1ScriptArg_IncrIndexBy1
+	push af
+	call Get2ScriptArgs_IncrIndexBy2
+	pop af
+	farcall SetAndInitOWObjectFrameset
+	jp IncreaseScriptPointerBy4
+
+ScriptCommand_WaitSFX:
+	farcall WaitForSFXToFinish
+	jp IncreaseScriptPointerBy1
+
+ScriptCommand_PrintTextWideTextbox:
+	call Get2ScriptArgs_IncrIndexBy1
+	ld l, c
+	ld h, b
+	farcall PrintTextInWideTextBox
+	jp IncreaseScriptPointerBy3
+
+ScriptCommand_WaitInput:
+	call WaitForWideTextBoxInput
+	jp IncreaseScriptPointerBy1
 
 ; returns carry if no save data
 Func_e883:
@@ -2452,22 +4856,19 @@ Func_eb39:
 
 	ld hl, wde0d
 	xor a
+REPT 4
 	ld [hli], a
-	ld [hli], a
-	ld [hli], a
-	ld [hli], a
+ENDR
 	ld hl, wde11
 	xor a
+REPT 4
 	ld [hli], a
-	ld [hli], a
-	ld [hli], a
-	ld [hli], a
+ENDR
 	ld hl, wde15
 	xor a
+REPT 4
 	ld [hli], a
-	ld [hli], a
-	ld [hli], a
-	ld [hli], a
+ENDR
 
 	ld a, $01
 	ld [wde15 + 0], a
@@ -2498,16 +4899,14 @@ Func_eb97:
 	call Func_ec6c
 	ld hl, wde0d
 	xor a
+REPT 4
 	ld [hli], a
-	ld [hli], a
-	ld [hli], a
-	ld [hli], a
+ENDR
 	ld hl, wde11
 	xor a
+REPT 4
 	ld [hli], a
-	ld [hli], a
-	ld [hli], a
-	ld [hli], a
+ENDR
 	call Func_ec38
 	ret
 
@@ -2556,25 +4955,13 @@ Func_ebc6:
 	ld e, a
 	ld a, [wde15 + 1]
 	ld d, a
-	ld a, d
-	cp $00
-	jr c, .asm_ec1d
-	jr nz, .asm_ec1d
-	ld a, e
-	cp $00
-.asm_ec1d
+	cp16_long 0
 	jr z, .asm_ec36
 	ld a, [wde15 + 2]
 	ld e, a
 	ld a, [wde15 + 3]
 	ld d, a
-	ld a, d
-	cp $00
-	jr c, .asm_ec31
-	jr nz, .asm_ec31
-	ld a, e
-	cp $00
-.asm_ec31
+	cp16_long 0
 	jr z, .asm_ec36
 	scf
 	ccf
@@ -2688,10 +5075,9 @@ Func_ec94:
 	or c
 	jr nz, .asm_ecd5
 	pop hl
+REPT 4
 	inc hl
-	inc hl
-	inc hl
-	inc hl
+ENDR
 	jr .asm_ecbf
 .asm_ed03
 	pop af
@@ -2761,10 +5147,9 @@ Func_ed0b:
 	or c
 	jr nz, .asm_ed47
 	pop hl
+REPT 4
 	inc hl
-	inc hl
-	inc hl
-	inc hl
+ENDR
 	jr .asm_ed31
 .asm_ed74
 	pop af
@@ -2833,13 +5218,506 @@ Func_ed7c:
 	or c
 	jr nz, .asm_edb8
 	pop hl
+REPT 4
 	inc hl
-	inc hl
-	inc hl
-	inc hl
+ENDR
 	jr .asm_eda2
 .asm_ede4
 	pop af
 	call BankswitchSRAM
 	call DisableSRAM
 	ret
+; 0xedec
+
+SECTION "Bank 3@6f40", ROMX[$6f40], BANK[$3]
+
+Func_ef40:
+	or a
+	jr nz, .asm_ef54
+	ld a, $31
+	ld [wRemainingIntroCards], a
+	ld a, $ed
+	ld [wFilteredListPtr], a
+	ld a, $51
+	ld [wFilteredListPtr+1], a
+	jr .asm_ef63
+.asm_ef54
+	ld a, $25
+	ld [wRemainingIntroCards], a
+	ld a, $4f
+	ld [wFilteredListPtr], a
+	ld a, $52
+	ld [wFilteredListPtr+1], a
+.asm_ef63
+	ld e, $05
+	ld d, VAR_35
+	ld c, $ff
+.asm_ef69
+	ld a, d
+	call SetVarValue
+	inc d
+	dec e
+	jr nz, .asm_ef69
+	ld c, $00
+.asm_ef73
+	ld b, $01
+	ld a, c
+	or a
+.asm_ef77
+	jr z, .asm_ef7e
+	sla b
+	dec a
+	jr .asm_ef77
+.asm_ef7e
+	call Func_ef97
+	call Func_efb3
+	jr c, .asm_ef7e
+	push bc
+	ld d, a
+	ld a, VAR_35
+	add c
+	ld c, d
+	call SetVarValue
+	pop bc
+	inc c
+	ld a, $05
+	cp c
+	jr nz, .asm_ef73
+	ret
+
+Func_ef97:
+.loop
+	ld a, [wFilteredListPtr]
+	ld l, a
+	ld a, [wFilteredListPtr+1]
+	ld h, a
+	ld a, [wRemainingIntroCards]
+	call Random
+	sla a
+	add_hl_a
+	inc hl
+	ld a, [hld]
+	and b
+	jr z, .loop
+	ld a, [hl]
+	ret
+
+Func_efb3:
+	ld d, a
+	call GetNPCByDeck
+	ld l, a
+	ld e, VAR_35
+.asm_efba
+	ld a, e
+	call GetVarValue
+	cp $ff
+	jr z, .asm_efcc
+	call GetNPCByDeck
+	inc e
+	cp l
+	jr nz, .asm_efba
+	ld a, d
+	scf
+	ret
+.asm_efcc
+	ld a, d
+	scf
+	ccf
+	ret
+
+Func_efd0:
+	ld c, $05
+	ld a, VAR_35
+	ld hl, wddf9
+.asm_efd7
+	push af
+	call GetVarValue
+	call GetNPCByDeck
+	call LoadNPCDuelist
+	ld de, wCurrentNPCDuelistData + NPC_DUELIST_STRUCT_TITLE_NAME
+	ld a, [de]
+	ld [hli], a
+	inc de
+	ld a, [de]
+	ld [hli], a
+	ld de, wCurrentNPCDuelistData + NPC_DUELIST_STRUCT_DIALOG_NAME
+	ld a, [de]
+	ld [hli], a
+	inc de
+	ld a, [de]
+	ld [hli], a
+	pop af
+	inc a
+	dec c
+	jr nz, .asm_efd7
+	ret
+
+Func_eff7:
+	call Func_ec38
+	ld a, VAR_34
+	call GetVarValue
+	dec a
+	ld c, a
+	ld a, VAR_35
+	add c
+	call GetVarValue
+	ld [wNPCDuelDeckID], a
+	ld hl, wd583
+	set 1, [hl]
+	ret
+
+; return bc = prize card id
+; at TCGChallengeCupPromoPrizes[VAR_TCG_CHALLENGE_CUP_PRIZE_INDEX]
+GetTCGChallengeCupPrizeCardID:
+	push af
+	push hl
+	ld a, VAR_TCG_CHALLENGE_CUP_PRIZE_INDEX
+	call GetVarValue
+	sla a
+	ld hl, TCGChallengeCupPromoPrizes
+	add_hl_a
+	ld a, [hli]
+	ld b, [hl]
+	ld c, a
+	pop hl
+	pop af
+	ret
+
+; return hl = prize card name
+; at TCGChallengeCupPromoPrizes[VAR_TCG_CHALLENGE_CUP_PRIZE_INDEX]
+GetTCGChallengeCupPrizeCardName:
+	push af
+	push bc
+	push de
+	call GetTCGChallengeCupPrizeCardID
+	ld e, c
+	ld d, b
+	call GetReceivingCardShortName
+	pop de
+	pop bc
+	pop af
+	ret
+
+; return bc = prize card id
+; at GRChallengeCupPromoPrizes[VAR_GR_CHALLENGE_CUP_PRIZE_INDEX]
+GetGRChallengeCupPrizeCardID:
+	push af
+	push hl
+	ld a, VAR_GR_CHALLENGE_CUP_PRIZE_INDEX
+	call GetVarValue
+	sla a
+	ld hl, GRChallengeCupPromoPrizes
+	add_hl_a
+	ld a, [hli]
+	ld b, [hl]
+	ld c, a
+	pop hl
+	pop af
+	ret
+
+; return hl = prize card name
+; at GRChallengeCupPromoPrizes[VAR_GR_CHALLENGE_CUP_PRIZE_INDEX]
+GetGRChallengeCupPrizeCardName:
+	push af
+	push bc
+	push de
+	call GetGRChallengeCupPrizeCardID
+	ld e, c
+	ld d, b
+	call GetReceivingCardLongName
+	pop de
+	pop bc
+	pop af
+	ret
+; 0xf05c
+
+SECTION "Bank 3@7063", ROMX[$7063], BANK[$3]
+
+Func_f063:
+	ld b, d
+	farcall SetFrameFuncAndFadeFromWhite
+	call FlushAllPalettes
+	lb de, 2, 1
+	ld b, $00
+	call Func_f085
+	ld b, $08
+	call Func_f085
+	farcall FadeToWhiteAndUnsetFrameFunc
+	farcall Func_10252
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+; b - ?
+; de - coordinates
+Func_f085:
+	push de
+	push bc
+	ld b, d
+	ld c, e
+	call BCCoordToBGMap0Address
+	pop bc
+	ld d, $00
+	ld c, $10
+.asm_f091
+	push bc
+	ld c, $10
+	push hl
+.asm_f095
+	xor a
+	call BankswitchVRAM
+	ei
+	di
+	call WaitForLCDOff
+	ld [hl], d
+	ei
+	ld a, BANK("VRAM1")
+	call BankswitchVRAM
+	ei
+	di
+	call WaitForLCDOff
+	xor a
+	or b
+	ld [hli], a
+	ei
+	inc d
+	dec c
+	jr nz, .asm_f095
+	pop hl
+	ld bc, $20
+	add hl, bc
+	pop bc
+	dec c
+	jr nz, .asm_f091
+	ld c, PAD_A | PAD_B
+	farcall WaitForButtonPress
+	pop de
+	ret
+; 0xf0c3
+
+SECTION "Bank 3@725a", ROMX[$725a], BANK[$3]
+
+DebugMenuEffectViewer:
+	push af
+	push bc
+	push de
+	push hl
+	farcall SetFadePalsFrameFunc
+	xor a
+	ld [wAnimationsDisabled], a
+	farcall StartFadeToWhite
+	farcall WaitPalFading_Bank07
+	farcall Func_10d40
+	farcall SetInitialGraphicsConfiguration
+	lb de, 0, 0
+	lb bc, 20, 18
+	ld h, $00
+	ld l, $00
+	farcall FillBoxInBGMap
+	lb de, 0, 12
+	lb bc, 20, 6
+	call DrawRegularTextBoxVRAM0
+	call DebugEffectViewer_PlaceTextItems
+	call ChangeAnimationPlayerSideOnStartPress.initialize
+	call ChangeEffectNumberOnDpadPress.initialize
+	call Func_3d0d
+	push af
+	ld a, MUSIC_DUEL_THEME_CLUB_MEMBER
+	call SetMusic
+	pop af
+	farcall StartFadeFromWhite
+	farcall WaitPalFading_Bank07
+	ld a, NUM_COINS
+	call Random
+	ld [wOppCoin], a
+.button_handling_loop
+	call DoFrame
+	call CancelAnimationOnBPress
+	call ChangeAnimationPlayerSideOnStartPress
+	call ChangeEffectNumberOnDpadPress
+	call PlayAnimationOnAPress
+	call DebugPrintAnimBufferCurPosAndSize
+	call ChangeDebugViewerStateText
+	ldh a, [hKeysPressed]
+	and PAD_SELECT
+	jr z, .button_handling_loop
+	call FinishQueuedAnimations
+	farcall StartFadeToWhite
+	farcall WaitPalFading_Bank07
+	call Func_3d16
+	farcall UnsetFadePalsFrameFunc
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+PlayAnimationOnAPress:
+	ldh a, [hKeysPressed]
+	and PAD_A
+	ret z
+	ld a, [wDebugSelectedAnimNumber]
+	and a
+	ret z
+	cp DUEL_ANIM_DAMAGE_HUD
+	jr z, .play
+	cp DUEL_ANIM_DAMAGE_HUD
+	ret nc
+.play
+	call FinishQueuedAnimations
+	call ResetAnimationQueue
+	ld a, [wDebugSelectedAnimNumber]
+	ld [wCurAnimation], a
+	ld a, [wDebugDuelAnimationScreen]
+	ld [wDuelAnimationScreen], a
+	ld a, [wDebugAnimDuelistSide]
+	ld [wDuelAnimDuelistSide], a
+	ld a, [wDebugDuelAnimLocationParam]
+	ld [wDuelAnimLocationParam], a
+	ld a, $ff
+	call Random ; pick random damage number to show
+	ld c, a
+	ld b, $00
+	ld hl, wDuelAnimDamage
+	ld [hl], c
+	inc hl
+	ld [hl], b
+	ld a, %111
+	ld [wDuelAnimEffectiveness], a
+	call LoadDuelAnimationToBuffer
+	ret
+
+DebugEffectViewer_PlaceTextItems:
+	ld hl, .text_items
+	call PlaceTextItemsVRAM0
+	ret
+
+.text_items
+	textitem 10, 14, DebugEffectViewerStartButtonSwapText
+	textitem 14, 15, DebugEffectViewerAButtonPlayText
+	textitem 14, 16, DebugEffectViewerBButtonStopText
+	textitem  2, 13, DebugEffectViewerAnimationNumberText
+	textitems_end
+
+ChangeAnimationPlayerSideOnStartPress:
+	ldh a, [hKeysPressed]
+	and PAD_START
+	ret z
+	push af
+	ld a, SFX_CONFIRM
+	call CallPlaySFX
+	pop af
+	ld b, OPPONENT_TURN
+	ld c, DUEL_ANIM_SCREEN_MAIN_SCENE
+	ldtx hl, DebugEffectViewerRightToLeftText
+	ld a, [wDebugAnimDuelistSide]
+	cp PLAYER_TURN
+	jr z, .asm_f361
+.initialize
+	ld b, PLAYER_TURN
+	ld c, DUEL_ANIM_SCREEN_MAIN_SCENE
+	ldtx hl, DebugEffectViewerLeftToRightText
+.asm_f361
+	ld a, b
+	ld [wDebugAnimDuelistSide], a
+	ld a, c
+	ld [wDebugDuelAnimationScreen], a
+	lb de, 2, 14
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	ret
+
+ChangeEffectNumberOnDpadPress:
+	ldh a, [hDPadHeld]
+	and PAD_UP
+	jr z, .check_down
+	ld b, 10
+	jr .update_anim
+.check_down
+	ldh a, [hDPadHeld]
+	and PAD_DOWN
+	jr z, .check_left
+	ld b, -10
+	jr .update_anim
+.check_left
+	ldh a, [hDPadHeld]
+	and PAD_LEFT
+	jr z, .check_right
+	ld b, -1
+	jr .update_anim
+.check_right
+	ldh a, [hDPadHeld]
+	and PAD_RIGHT
+	ret z
+	ld b, 1
+	jr .update_anim
+.initialize
+	ld b, 0
+.update_anim
+	ld a, [wDebugSelectedAnimNumber]
+	add b
+	and $ff
+	ld [wDebugSelectedAnimNumber], a
+	ld l, a
+	ld h, 0
+	lb de, 3, 13
+	ld a, 3
+	ld b, FALSE
+	farcall PrintNumber
+	ret
+
+CancelAnimationOnBPress:
+	ldh a, [hKeysPressed]
+	and PAD_B
+	ret z
+	push af
+	ld a, SFX_CANCEL
+	call CallPlaySFX
+	pop af
+	call FinishQueuedAnimations
+	ret
+
+DebugPrintAnimBufferCurPosAndSize:
+	push af
+	push bc
+	push de
+	push hl
+	farcall GetwDuelAnimBufferCurPos
+	ld l, a
+	ld h, 0
+	lb de, 2, 16
+	ld a, 2
+	ld b, FALSE
+	farcall PrintNumber
+	farcall GetwDuelAnimBufferSize
+	ld l, a
+	ld h, 0
+	lb de, 5, 16
+	ld a, 2
+	ld b, FALSE
+	farcall PrintNumber
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+ChangeDebugViewerStateText:
+	push af
+	push bc
+	push de
+	push hl
+	call CheckAnyAnimationPlaying
+	ldtx hl, DebugEffectViewerPlayingStateText
+	jr c, .asm_f3fd
+	ldtx hl, DebugEffectViewerStopStateText
+.asm_f3fd
+	lb de, 13, 13
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+; 0xf408

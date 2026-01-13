@@ -149,11 +149,44 @@ Func_1c08b::
 	pop bc
 	pop af
 	ret
-; 0x1c0b2
+
+Func_1c0b2:
+	push bc
+	push de
+	push hl
+	ld hl, $40da
+	ld c, $09
+	ld b, $00
+.asm_1c0bc
+	push hl
+	ld a, [wOWMap]
+	ld e, a
+	ld a, [hli]
+	cp e
+	jr nz, .asm_1c0ce
+	ld a, [wOWMap + 1]
+	ld e, a
+	ld a, [hl]
+	cp e
+	jr nz, .asm_1c0ce
+	inc b
+.asm_1c0ce
+	pop hl
+	inc hl
+	inc hl
+	dec c
+	jr nz, .asm_1c0bc
+	ld a, b
+	and a
+	pop hl
+	pop de
+	pop bc
+	ret
+; 0x1c0da
 
 SECTION "Bank 7@40ec", ROMX[$40ec], BANK[$7]
 
-Func_1c0ec::
+GetPlayerPortrait::
 	push bc
 	push de
 	push hl
@@ -161,17 +194,17 @@ Func_1c0ec::
 	farcall GetEventValue
 	jr nz, .female
 ; male
-	ld a, NPC_MARK
-	jr .asm_1c0fd
+	ld a, PORTRAIT_MARK
+	jr .got_portrait
 .female
-	ld a, NPC_MINT
-.asm_1c0fd
+	ld a, PORTRAIT_MINT
+.got_portrait
 	pop hl
 	pop de
 	pop bc
 	ret
 
-; converts NPC_* in a
+; converts *_PIC in a
 ; into PORTRAIT_* constant
 GetDuelistPortrait::
 	push bc
@@ -186,103 +219,352 @@ GetDuelistPortrait::
 	ret
 
 .PortraitIDs
-	db PORTRAIT_MARK          ; NPC_MARK
-	db PORTRAIT_MINT          ; NPC_MINT
-	db PORTRAIT_MARK_LINK     ; NPC_MARK_LINK
-	db PORTRAIT_MINT_LINK     ; NPC_MINT_LINK
-	db PORTRAIT_RONALD        ; NPC_RONALD
-	db PORTRAIT_SAM           ; NPC_SAM
-	db PORTRAIT_AARON         ; NPC_AARON
-	db PORTRAIT_ISHIHARA      ; NPC_ISHIHARA
-	db PORTRAIT_IMAKUNI_BLACK ; NPC_IMAKUNI_BLACK
-	db PORTRAIT_IMAKUNI_RED   ; NPC_IMAKUNI_RED
-	db PORTRAIT_ISAAC         ; NPC_ISAAC
-	db PORTRAIT_JENNIFER      ; NPC_JENNIFER
-	db PORTRAIT_NICHOLAS      ; NPC_NICHOLAS
-	db PORTRAIT_BRANDON       ; NPC_BRANDON
-	db PORTRAIT_MURRAY        ; NPC_MURRAY
-	db PORTRAIT_STEPHANIE     ; NPC_STEPHANIE
-	db PORTRAIT_DANIEL        ; NPC_DANIEL
-	db PORTRAIT_ROBERT        ; NPC_ROBERT
-	db PORTRAIT_GENE          ; NPC_GENE
-	db PORTRAIT_MATTHEW       ; NPC_MATTHEW
-	db PORTRAIT_RYAN          ; NPC_RYAN
-	db PORTRAIT_ANDREW        ; NPC_ANDREW
-	db PORTRAIT_MITCH         ; NPC_MITCH
-	db PORTRAIT_MICHAEL       ; NPC_MICHAEL
-	db PORTRAIT_CHRIS         ; NPC_CHRIS
-	db PORTRAIT_JESSICA       ; NPC_JESSICA
-	db PORTRAIT_NIKKI         ; NPC_NIKKI
-	db PORTRAIT_BRITTANY      ; NPC_BRITTANY
-	db PORTRAIT_KRISTIN       ; NPC_KRISTIN
-	db PORTRAIT_HEATHER       ; NPC_HEATHER
-	db PORTRAIT_RICK          ; NPC_RICK
-	db PORTRAIT_JOSEPH        ; NPC_JOSEPH
-	db PORTRAIT_DAVID         ; NPC_DAVID
-	db PORTRAIT_ERIK          ; NPC_ERIK
-	db PORTRAIT_AMY           ; NPC_AMY
-	db PORTRAIT_JOSHUA        ; NPC_JOSHUA
-	db PORTRAIT_SARA          ; NPC_SARA
-	db PORTRAIT_AMANDA        ; NPC_AMANDA
-	db PORTRAIT_KEN           ; NPC_KEN
-	db PORTRAIT_JOHN          ; NPC_JOHN
-	db PORTRAIT_ADAM          ; NPC_ADAM
-	db PORTRAIT_JONATHAN      ; NPC_JONATHAN
-	db PORTRAIT_COURTNEY      ; NPC_COURTNEY
-	db PORTRAIT_STEVE         ; NPC_STEVE
-	db PORTRAIT_JACK          ; NPC_JACK
-	db PORTRAIT_ROD           ; NPC_ROD
-	db PORTRAIT_EIJI          ; NPC_EIJI
-	db PORTRAIT_MAGICIAN      ; NPC_MAGICIAN
-	db PORTRAIT_YUI           ; NPC_YUI
-	db PORTRAIT_TOSHIRON      ; NPC_TOSHIRON
-	db PORTRAIT_PIERROT       ; NPC_PIERROT
-	db PORTRAIT_ANNA          ; NPC_ANNA
-	db PORTRAIT_DEE           ; NPC_DEE
-	db PORTRAIT_MASQUERADE    ; NPC_MASQUERADE
-	db PORTRAIT_PAWN          ; NPC_PAWN
-	db PORTRAIT_KNIGHT        ; NPC_KNIGHT
-	db PORTRAIT_BISHOP        ; NPC_BISHOP
-	db PORTRAIT_ROOK          ; NPC_ROOK
-	db PORTRAIT_QUEEN         ; NPC_QUEEN
-	db PORTRAIT_GR_1          ; NPC_GR_1
-	db PORTRAIT_GR_2          ; NPC_GR_2
-	db PORTRAIT_GR_3          ; NPC_GR_3
-	db PORTRAIT_GR_4          ; NPC_GR_4
-	db PORTRAIT_MIDORI        ; NPC_MIDORI
-	db PORTRAIT_YUTA          ; NPC_YUTA
-	db PORTRAIT_MIYUKI        ; NPC_MIYUKI
-	db PORTRAIT_MORINO        ; NPC_MORINO
-	db PORTRAIT_RENNA         ; NPC_RENNA
-	db PORTRAIT_ICHIKAWA      ; NPC_ICHIKAWA
-	db PORTRAIT_CATHERINE     ; NPC_CATHERINE
-	db PORTRAIT_TAP           ; NPC_TAP
-	db PORTRAIT_JES           ; NPC_JES
-	db PORTRAIT_YUKI          ; NPC_YUKI
-	db PORTRAIT_SHOKO         ; NPC_SHOKO
-	db PORTRAIT_HIDERO        ; NPC_HIDERO
-	db PORTRAIT_MIYAJIMA      ; NPC_MIYAJIMA
-	db PORTRAIT_SENTA         ; NPC_SENTA
-	db PORTRAIT_AIRA          ; NPC_AIRA
-	db PORTRAIT_KANOKO        ; NPC_KANOKO
-	db PORTRAIT_GODA          ; NPC_GODA
-	db PORTRAIT_GRACE         ; NPC_GRACE
-	db PORTRAIT_KAMIYA        ; NPC_KAMIYA
-	db PORTRAIT_MIWA          ; NPC_MIWA
-	db PORTRAIT_KEVIN         ; NPC_KEVIN
-	db PORTRAIT_YOSUKE        ; NPC_YOSUKE
-	db PORTRAIT_RYOKO         ; NPC_RYOKO
-	db PORTRAIT_MAMI          ; NPC_MAMI
-	db PORTRAIT_NISHIJIMA     ; NPC_NISHIJIMA
-	db PORTRAIT_ISHII         ; NPC_ISHII
-	db PORTRAIT_SAMEJIMA      ; NPC_SAMEJIMA
-	db PORTRAIT_KANZAKI       ; NPC_KANZAKI
-	db PORTRAIT_RUI           ; NPC_RUI
-	db PORTRAIT_BIRURITCHI    ; NPC_BIRURITCHI
-	db PORTRAIT_GR_X          ; NPC_GR_X
-	db PORTRAIT_TOBICHAN      ; NPC_TOBICHAN
-	db PORTRAIT_DR_MASON      ; NPC_DR_MASON
+	db PORTRAIT_MARK          ; MARK_PIC
+	db PORTRAIT_MINT          ; MINT_PIC
+	db PORTRAIT_MARK_LINK     ; MARK_LINK_PIC
+	db PORTRAIT_MINT_LINK     ; MINT_LINK_PIC
+	db PORTRAIT_RONALD        ; RONALD_PIC
+	db PORTRAIT_SAM           ; SAM_PIC
+	db PORTRAIT_AARON         ; AARON_PIC
+	db PORTRAIT_ISHIHARA      ; ISHIHARA_PIC
+	db PORTRAIT_IMAKUNI_BLACK ; IMAKUNI_BLACK_PIC
+	db PORTRAIT_IMAKUNI_RED   ; IMAKUNI_RED_PIC
+	db PORTRAIT_ISAAC         ; ISAAC_PIC
+	db PORTRAIT_JENNIFER      ; JENNIFER_PIC
+	db PORTRAIT_NICHOLAS      ; NICHOLAS_PIC
+	db PORTRAIT_BRANDON       ; BRANDON_PIC
+	db PORTRAIT_MURRAY        ; MURRAY_PIC
+	db PORTRAIT_STEPHANIE     ; STEPHANIE_PIC
+	db PORTRAIT_DANIEL        ; DANIEL_PIC
+	db PORTRAIT_ROBERT        ; ROBERT_PIC
+	db PORTRAIT_GENE          ; GENE_PIC
+	db PORTRAIT_MATTHEW       ; MATTHEW_PIC
+	db PORTRAIT_RYAN          ; RYAN_PIC
+	db PORTRAIT_ANDREW        ; ANDREW_PIC
+	db PORTRAIT_MITCH         ; MITCH_PIC
+	db PORTRAIT_MICHAEL       ; MICHAEL_PIC
+	db PORTRAIT_CHRIS         ; CHRIS_PIC
+	db PORTRAIT_JESSICA       ; JESSICA_PIC
+	db PORTRAIT_NIKKI         ; NIKKI_PIC
+	db PORTRAIT_BRITTANY      ; BRITTANY_PIC
+	db PORTRAIT_KRISTIN       ; KRISTIN_PIC
+	db PORTRAIT_HEATHER       ; HEATHER_PIC
+	db PORTRAIT_RICK          ; RICK_PIC
+	db PORTRAIT_JOSEPH        ; JOSEPH_PIC
+	db PORTRAIT_DAVID         ; DAVID_PIC
+	db PORTRAIT_ERIK          ; ERIK_PIC
+	db PORTRAIT_AMY           ; AMY_PIC
+	db PORTRAIT_JOSHUA        ; JOSHUA_PIC
+	db PORTRAIT_SARA          ; SARA_PIC
+	db PORTRAIT_AMANDA        ; AMANDA_PIC
+	db PORTRAIT_KEN           ; KEN_PIC
+	db PORTRAIT_JOHN          ; JOHN_PIC
+	db PORTRAIT_ADAM          ; ADAM_PIC
+	db PORTRAIT_JONATHAN      ; JONATHAN_PIC
+	db PORTRAIT_COURTNEY      ; COURTNEY_PIC
+	db PORTRAIT_STEVE         ; STEVE_PIC
+	db PORTRAIT_JACK          ; JACK_PIC
+	db PORTRAIT_ROD           ; ROD_PIC
+	db PORTRAIT_EIJI          ; EIJI_PIC
+	db PORTRAIT_MAGICIAN      ; MAGICIAN_PIC
+	db PORTRAIT_YUI           ; YUI_PIC
+	db PORTRAIT_TOSHIRON      ; TOSHIRON_PIC
+	db PORTRAIT_PIERROT       ; PIERROT_PIC
+	db PORTRAIT_ANNA          ; ANNA_PIC
+	db PORTRAIT_DEE           ; DEE_PIC
+	db PORTRAIT_MASQUERADE    ; MASQUERADE_PIC
+	db PORTRAIT_PAWN          ; PAWN_PIC
+	db PORTRAIT_KNIGHT        ; KNIGHT_PIC
+	db PORTRAIT_BISHOP        ; BISHOP_PIC
+	db PORTRAIT_ROOK          ; ROOK_PIC
+	db PORTRAIT_QUEEN         ; QUEEN_PIC
+	db PORTRAIT_GR_1          ; GR_1_PIC
+	db PORTRAIT_GR_2          ; GR_2_PIC
+	db PORTRAIT_GR_3          ; GR_3_PIC
+	db PORTRAIT_GR_4          ; GR_4_PIC
+	db PORTRAIT_MIDORI        ; MIDORI_PIC
+	db PORTRAIT_YUTA          ; YUTA_PIC
+	db PORTRAIT_MIYUKI        ; MIYUKI_PIC
+	db PORTRAIT_MORINO        ; MORINO_PIC
+	db PORTRAIT_RENNA         ; RENNA_PIC
+	db PORTRAIT_ICHIKAWA      ; ICHIKAWA_PIC
+	db PORTRAIT_CATHERINE     ; CATHERINE_PIC
+	db PORTRAIT_TAP           ; TAP_PIC
+	db PORTRAIT_JES           ; JES_PIC
+	db PORTRAIT_YUKI          ; YUKI_PIC
+	db PORTRAIT_SHOKO         ; SHOKO_PIC
+	db PORTRAIT_HIDERO        ; HIDERO_PIC
+	db PORTRAIT_MIYAJIMA      ; MIYAJIMA_PIC
+	db PORTRAIT_SENTA         ; SENTA_PIC
+	db PORTRAIT_AIRA          ; AIRA_PIC
+	db PORTRAIT_KANOKO        ; KANOKO_PIC
+	db PORTRAIT_GODA          ; GODA_PIC
+	db PORTRAIT_GRACE         ; GRACE_PIC
+	db PORTRAIT_KAMIYA        ; KAMIYA_PIC
+	db PORTRAIT_MIWA          ; MIWA_PIC
+	db PORTRAIT_KEVIN         ; KEVIN_PIC
+	db PORTRAIT_YOSUKE        ; YOSUKE_PIC
+	db PORTRAIT_RYOKO         ; RYOKO_PIC
+	db PORTRAIT_MAMI          ; MAMI_PIC
+	db PORTRAIT_NISHIJIMA     ; NISHIJIMA_PIC
+	db PORTRAIT_ISHII         ; ISHII_PIC
+	db PORTRAIT_SAMEJIMA      ; SAMEJIMA_PIC
+	db PORTRAIT_KANZAKI       ; KANZAKI_PIC
+	db PORTRAIT_RUI           ; RUI_PIC
+	db PORTRAIT_BIRURITCHI    ; BIRURITCHI_PIC
+	db PORTRAIT_GR_X          ; GR_X_PIC
+	db PORTRAIT_TOBICHAN      ; TOBICHAN_PIC
+	db PORTRAIT_DR_MASON      ; DR_MASON_PIC
 ; 0x1c116
+
+SECTION "Bank 7@416e", ROMX[$416e], BANK[$7]
+
+PauseMenuConfigScreen:
+	farcall Func_1022a
+	call ShowConfigMenu
+	farcall Func_10252
+	ret
+
+ShowConfigMenu:
+	push af
+	push bc
+	push de
+	push hl
+	call LoadSavedOptions
+	call DrawAndHandleConfigMenu
+	call SaveConfigMenuChoicesToSRAM
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+DrawAndHandleConfigMenu:
+	farcall ClearSpriteAnimsAndSetInitialGraphicsConfiguration
+	call DrawConfigMenu
+	farcall SetFrameFuncAndFadeFromWhite
+	call HandleConfigMenu
+	farcall FadeToWhiteAndUnsetFrameFunc
+	ret
+
+DrawConfigMenu:
+	lb de, 0, 0
+	lb bc, 20, 4
+	call DrawRegularTextBoxVRAM0
+	lb de, 0, 4
+	lb bc, 20, 4
+	call DrawRegularTextBoxVRAM0
+	lb de, 0, 8
+	lb bc, 20, 4
+	call DrawRegularTextBoxVRAM0
+	lb de, 0, 12
+	lb bc, 20, 4
+	call DrawRegularTextBoxVRAM0
+	ld b, $07
+	ld hl, $44ee
+	lb de, 1, 17
+	call LoadMenuBoxParams
+	ld b, $07
+	ld hl, $4476
+	lb de, 6, 2
+	call LoadMenuBoxParams
+	ld a, [wMessageSpeedSetting]
+	call DrawMenuBox
+	ld b, $07
+	ld hl, $449a
+	lb de, 1, 6
+	call LoadMenuBoxParams
+	ld a, [wDuelAnimationsSetting]
+	call DrawMenuBox
+	ld b, $07
+	ld hl, $44b6
+	lb de, 1, 10
+	call LoadMenuBoxParams
+	ld a, [wCoinTossAnimationSetting]
+	call DrawMenuBox
+	ld b, $07
+	ld hl, $44ce
+	lb de, 1, 14
+	call LoadMenuBoxParams
+	ld a, [wTextBoxFrameColor]
+	call DrawMenuBox
+	ldtx hl, ConfigMessageSpeedText
+	lb de, 1, 0
+	call Func_2c4b
+	ldtx hl, ConfigDuelAnimationText
+	lb de, 1, 4
+	call Func_2c4b
+	ldtx hl, ConfigCoinAnimationText
+	lb de, 1, 8
+	call Func_2c4b
+	ldtx hl, ConfigFrameColorText
+	lb de, 1, 12
+	call Func_2c4b
+	ldtx hl, ConfigMessageSpeedSlowLabelText
+	lb de, 2, 2
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	ldtx hl, ConfigMessageSpeedFastLabelText
+	lb de, 16, 2
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	ldtx hl, ConfigExitText
+	lb de, 2, 17
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	ret
+
+HandleConfigMenu:
+	ld a, [wSelectedConfigSubmenu]
+	ld c, a
+	inc a
+	dec a
+	jr z, .exit_menu_box
+	dec a
+	jr z, .message_speed_box
+	dec a
+	jr z, .duel_animations_box
+	dec a
+	jr z, .coin_toss_animation_box
+	dec a
+	jr z, .frame_color_box
+.exit_menu_box
+	ld c, 0
+	call HandleConfigExitMenuBox
+	jr nc, .done
+	push af
+	ld a, SFX_CURSOR
+	call CallPlaySFX
+	pop af
+	ldh a, [hKeysPressed]
+	and PAD_B
+	jr nz, .done
+	ldh a, [hKeysHeld]
+	and PAD_UP
+	jr nz, .frame_color_box
+.message_speed_box
+	ld c, 1
+	call HandleMessageSpeedSettingMenuBox
+	push af
+	ld a, SFX_CURSOR
+	call CallPlaySFX
+	pop af
+	ldh a, [hKeysPressed]
+	and PAD_B
+	jr nz, .done
+	ldh a, [hKeysHeld]
+	and PAD_UP
+	jr nz, .exit_menu_box
+.duel_animations_box
+	ld c, 2
+	call HandleDuelAnimationsSettingMenuBox
+	push af
+	ld a, SFX_CURSOR
+	call CallPlaySFX
+	pop af
+	ldh a, [hKeysPressed]
+	and PAD_B
+	jr nz, .done
+	ldh a, [hKeysHeld]
+	and PAD_UP
+	jr nz, .message_speed_box
+.coin_toss_animation_box
+	ld c, 3
+	call HandleCoinTossAnimationSettingMenuBox
+	push af
+	ld a, SFX_CURSOR
+	call CallPlaySFX
+	pop af
+	ldh a, [hKeysPressed]
+	and PAD_B
+	jr nz, .done
+	ldh a, [hKeysHeld]
+	and PAD_UP
+	jr nz, .duel_animations_box
+.frame_color_box
+	ld c, 4
+	call HandleTextBoxFrameColorSettingMenuBox
+	push af
+	ld a, SFX_CURSOR
+	call CallPlaySFX
+	pop af
+	ldh a, [hKeysPressed]
+	and PAD_B
+	jr nz, .done
+	ldh a, [hKeysHeld]
+	and PAD_UP
+	jr nz, .coin_toss_animation_box
+	jp .exit_menu_box
+.done
+	push af
+	ld a, SFX_CONFIRM
+	call CallPlaySFX
+	pop af
+	ld a, c
+	ld [wSelectedConfigSubmenu], a
+	ret
+
+HandleMessageSpeedSettingMenuBox:
+	ld b, $07
+	ld hl, $4476
+	lb de, 6, 2
+	ld a, [wMessageSpeedSetting]
+	call LoadMenuBoxParams
+	ld a, 8
+	call SetMenuBoxDelay
+	ld a, [wMessageSpeedSetting]
+	call HandleMenuBox
+	ld [wMessageSpeedSetting], a
+	ret
+
+HandleDuelAnimationsSettingMenuBox:
+	ld b, $07
+	ld hl, $449a
+	lb de, 1, 6
+	ld a, [wDuelAnimationsSetting]
+	call LoadMenuBoxParams
+	ld a, 8
+	call SetMenuBoxDelay
+	ld a, [wDuelAnimationsSetting]
+	call HandleMenuBox
+	ld [wDuelAnimationsSetting], a
+	ret
+
+HandleCoinTossAnimationSettingMenuBox:
+	ld b, $07
+	ld hl, $44b6
+	lb de, 1, 10
+	ld a, [wCoinTossAnimationSetting]
+	call LoadMenuBoxParams
+	ld a, 8
+	call SetMenuBoxDelay
+	ld a, [wCoinTossAnimationSetting]
+	call HandleMenuBox
+	ld [wCoinTossAnimationSetting], a
+	ret
+
+HandleTextBoxFrameColorSettingMenuBox:
+	ld b, $07
+	ld hl, $44ce
+	lb de, 1, 14
+	ld a, [wTextBoxFrameColor]
+	call LoadMenuBoxParams
+	ld a, 8
+	call SetMenuBoxDelay
+	ld a, [wTextBoxFrameColor]
+	call HandleMenuBox
+	ld [wTextBoxFrameColor], a
+	ret
+
+HandleConfigExitMenuBox:
+	ld b, $07
+	ld hl, $44ee
+	lb de, 1, 17
+	xor a
+	call LoadMenuBoxParams
+	ld a, 8
+	call SetMenuBoxDelay
+	xor a
+	call HandleMenuBox
+	ret
+; 0x1c379
 
 SECTION "Bank 7@4395", ROMX[$4395], BANK[$7]
 
@@ -298,24 +580,24 @@ LoadSavedOptions:
 .LoadTextSpeed:
 	ld a, [sTextSpeed]
 	ld [wTextSpeed], a
-	call Func_1c448
+	call ConvertTextSpeedToMessageSpeedSetting
 	ld b, a
 	ld a, 4
 	sub b
-	ld [wd9d5], a
+	ld [wMessageSpeedSetting], a
 	ret
 
 .LoadDuelAnimation:
-	ld a, [s0a007]
-	ld [wd9d3], a
+	ld a, [sDuelAnimationsSetting]
+	ld [wDuelAnimationsSetting], a
 	srl a
 	and $01
 	ld [wAnimationsDisabled], a
 	ret
 
 .LoadCoinTossAnimation:
-	ld a, [s0a00b]
-	ld [wd9d4], a
+	ld a, [sCoinTossAnimationSetting]
+	ld [wCoinTossAnimationSetting], a
 	ret
 
 .LoadTextFrameColor:
@@ -323,28 +605,28 @@ LoadSavedOptions:
 	ld [wTextBoxFrameColor], a
 	ret
 
-Func_1c3d5:
+SaveConfigMenuChoicesToSRAM:
 	call EnableSRAM
-	call Func_1c3e8
-	call Func_1c3f9
-	call Func_1c417
+	call SaveMessageSpeed
+	call SaveDuelAnimationsSetting
+	call SaveCoinTossAnimationSetting
 	call SaveTextBoxFrameColor
 	call DisableSRAM
 	ret
 
-Func_1c3e8:
-	ld a, [wd9d5]
+SaveMessageSpeed:
+	ld a, [wMessageSpeedSetting]
 	ld b, a
-	ld a, $04
+	ld a, 4
 	sub b
-	call Func_1c438
+	call ConvertMessageSpeedSettingToTextSpeed
 	ld [sTextSpeed], a
 	ld [wTextSpeed], a
 	ret
 
-Func_1c3f9:
-	ld a, [wd9d3]
-	ld [s0a007], a
+SaveDuelAnimationsSetting:
+	ld a, [wDuelAnimationsSetting]
+	ld [sDuelAnimationsSetting], a
 	push af
 	srl a
 	and $01
@@ -359,11 +641,11 @@ Func_1c3f9:
 	ret
 
 .data
-	db $00, $01, $01
+	db 0, 1, 1
 
-Func_1c417:
-	ld a, [wd9d4]
-	ld [s0a00b], a
+SaveCoinTossAnimationSetting:
+	ld a, [wCoinTossAnimationSetting]
+	ld [sCoinTossAnimationSetting], a
 	ret
 
 SaveTextBoxFrameColor:
@@ -371,17 +653,19 @@ SaveTextBoxFrameColor:
 	ld [sTextBoxFrameColor], a
 	ret
 
-Func_1c425:
-	ld a, $02
-	ld [wd9d5], a
+InitDefaultConfigMenuSettings:
+	ld a, 2
+	ld [wMessageSpeedSetting], a
 	xor a
-	ld [wd9d4], a
-	ld [wd9d3], a
+	ld [wCoinTossAnimationSetting], a
+	ld [wDuelAnimationsSetting], a
 	ld [wTextBoxFrameColor], a
-	ld [wd9d0], a
+	ld [wSelectedConfigSubmenu], a
 	ret
 
-Func_1c438:
+; a - message speed setting
+; ret - a: text speed (in frames to wait between printing)
+ConvertMessageSpeedSettingToTextSpeed:
 	push bc
 	ld c, a
 	ld b, $00
@@ -392,9 +676,11 @@ Func_1c438:
 	ret
 
 .data
-	db $00, $01, $02, $04, $06
+	db 0, 1, 2, 4, 6
 
-Func_1c448:
+; a - text speed (in frames to wait between printing)
+; ret - a: message speed setting
+ConvertTextSpeedToMessageSpeedSetting:
 	push bc
 	ld c, a
 	ld b, $00
@@ -405,10 +691,221 @@ Func_1c448:
 	ret
 
 .data
-	db $00, $01, $02
-; 0x1c456
+	; values correspond to the 0,1,2,4,6 values just above
+	db 0, 1, 2, 0, 3, 0, 4
+; 0x1c45a
 
-SECTION "Bank 7@46bb", ROMX[$46bb], BANK[$7]
+SECTION "Bank 7@4502", ROMX[$4502], BANK[$7]
+
+PauseMenuDiaryScreen:
+	farcall Func_1022a
+	call PushRegistersAndShowDiaryScreen
+	farcall Func_10252
+	ret
+
+PushRegistersAndShowDiaryScreen:
+	push af
+	push bc
+	push de
+	push hl
+	call ShowDiaryScreen
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+ShowDiaryScreen:
+	farcall ClearSpriteAnimsAndSetInitialGraphicsConfiguration
+	farcall ClearSpriteAnims
+	call DrawDiaryStatusBox
+	farcall SetFadePalsFrameFunc
+	call StartFadeFromWhite
+	call WaitPalFading_Bank07
+	ld c, $00
+	call DrawSavePromptAndWaitForInput
+	call StartFadeToWhite
+	call WaitPalFading_Bank07
+	farcall UnsetFadePalsFrameFunc
+	ret
+
+DrawDiaryStatusBox:
+	lb de, 0, 0
+	lb bc, 20, 12
+	call DrawRegularTextBoxVRAM0
+	lb de, 0, 12
+	lb bc, 20, 6
+	call DrawRegularTextBoxVRAM0
+	ld hl, .TextItems
+	call PlaceTextItemsVRAM0
+	lb bc, 1, 3
+	call DrawPlayerPortrait
+	ldtx hl, PlayerDiaryTitleText
+	lb de, 5, 1
+	call PrintTextNoDelay_InitVRAM0
+	ldtx hl, TxRam1Text
+	lb de, 11, 4
+	call PrintTextNoDelay_InitVRAM0
+	call CountEventCoinsObtained
+	ld l, a
+	ld h, $00
+	lb de, 16, 6
+	ld a, $02
+	ld b, TRUE
+	call PrintNumber
+	lb de, 13, 10
+	farcall PrintPlayTime
+	lb de, 12, 8
+	farcall PrintCardAlbumProgress
+	ret
+
+.TextItems:
+	textitem  7,  4, PlayerDiaryNameText
+	textitem  7,  6, PlayerDiaryEventCoinText
+	textitem 18,  6, PlayerDiaryCardsUnitText
+	textitem  7,  8, PlayerDiaryAlbumText
+	textitem  7, 10, PlayerDiaryPlayTimeText
+	textitems_end
+
+; c - ?
+DrawSavePromptAndWaitForInput:
+	push bc
+	push de
+	push hl
+	ldtx hl, PlayerDiaryPromptText
+	xor a
+	farcall DrawWideTextBox_PrintTextWithYesOrNoMenu
+	jr c, .asm_1c5ca
+	ld a, c
+	and a
+	jr nz, .asm_1c5b9
+	call Func_1c5d6
+	jr .asm_1c5bc
+.asm_1c5b9
+	call Func_3b1e
+.asm_1c5bc
+	push af
+	ld a, SFX_SAVE_GAME
+	call CallPlaySFX
+	pop af
+	ldtx hl, PlayerDiarySavedText
+	scf
+	ccf
+	jr .asm_1c5ce
+.asm_1c5ca
+	ldtx hl, PlayerDiaryCancelledText
+	scf
+.asm_1c5ce
+	farcall PrintScrollableText_NoTextBoxLabelVRAM0
+	pop hl
+	pop de
+	pop bc
+	ret
+
+Func_1c5d6:
+	push af
+	push bc
+	push de
+	push hl
+	farcall Func_10ed3
+	farcall Func_105de
+	call Func_3b1e
+	farcall Func_10ea7
+	farcall Func_1059f
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+PauseMenuStatusScreen:
+	farcall Func_1022a
+	call PushRegistersAndShowStatusScreen
+	farcall Func_10252
+	ret
+
+PushRegistersAndShowStatusScreen:
+	push af
+	push bc
+	push de
+	push hl
+	call ShowStatusScreen
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+ShowStatusScreen:
+	farcall ClearSpriteAnimsAndSetInitialGraphicsConfiguration
+	farcall ClearSpriteAnims
+	call DisableLCD
+	call DrawStatusScreenTopBox
+	call DrawStatusScreenBottomBox
+	call EnableLCD
+	farcall SetFrameFuncAndFadeFromWhite
+	ld c, PAD_A | PAD_B
+	farcall WaitForButtonPress
+	farcall FadeToWhiteAndUnsetFrameFunc
+	ret
+
+DrawStatusScreenTopBox:
+	lb de, 0, 0
+	lb bc, 20, 8
+	call DrawRegularTextBoxVRAM0
+	ld hl, .TextItems
+	call PlaceTextItemsVRAM0
+	lb bc, 1, 1
+	call DrawPlayerPortrait
+	ldtx hl, TxRam1Text
+	lb de, 11, 2
+	call PrintTextNoDelay_InitVRAM0
+	lb de, 13, 6
+	farcall PrintPlayTime
+	lb de, 12, 4
+	farcall PrintCardAlbumProgress
+	ret
+
+.TextItems:
+	textitem 7, 2, PlayerDiaryNameText
+	textitem 7, 4, PlayerDiaryAlbumText
+	textitem 7, 6, PlayerDiaryPlayTimeText
+	textitems_end
+
+DrawStatusScreenBottomBox:
+	lb de, 0, 8
+	lb bc, 20, 10
+	call DrawRegularTextBoxVRAM0
+	lb de, 1, 8
+	lb bc, 9, 1
+	farcall FillBoxInBGMapWithZero
+	ld hl, .TextItems
+	call PlaceTextItemsVRAM0
+	call Func_1dfb5
+	call GetCoinName
+	lb de, 4, 12
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	call Func_1dfb5
+	add $28
+	lb de, 28, 108
+	call CreateCoinAnimation
+	call CheckObtainedGRCoinPieces
+	add $40
+	lb de, 28, 140
+	call CreateCoinAnimation
+	call CheckObtainedGRCoinPieces
+	and a
+	jr z, .asm_1c6b1
+	ldtx hl, PlayerStatusGRCoinText
+	lb de, 4, 14
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+.asm_1c6b1
+	ret
+
+.TextItems:
+	textitem 1,  8, PlayerStatusEventCoinTitleText
+	textitem 4, 10, PlayerStatusCurrentCoinText
+	textitems_end
 
 SetAllPaletteFadeConfigsToEnabled:
 	call SetAllBGPaletteFadeConfigsToEnabled
@@ -875,9 +1372,6 @@ StartPalFadeToBlackOrWhite::
 	ld a, 8
 	ld [wPaletteFadeCounter], a
 	ret
-; 0x1c93c
-
-SECTION "Bank 7@493c", ROMX[$493c], BANK[$7]
 
 ; returns nz if palettes are still fading
 CheckPalFading::
@@ -1214,9 +1708,9 @@ Func_1cacf:
 	ld b, a
 	ld a, [wMenuBoxHeight]
 	ld c, a
-	farcall Func_10abf
+	farcall ResetActiveSpriteAnimFlag6WithinArea
 	call DoFrame
-	farcall Func_10342
+	farcall CopyBGMapFromVRAMToWRAM
 	pop de
 	pop bc
 	pop af
@@ -1226,8 +1720,8 @@ Func_1caf1:
 	push af
 	push bc
 	push de
-	farcall Func_103b6
-	farcall Func_10b18
+	farcall CopyBGMapFromWRAMToVRAM
+	farcall SetActiveSpriteAnimFlag6WithinArea
 	pop de
 	pop bc
 	pop af
@@ -1263,7 +1757,7 @@ DrawMenuBox:
 	call DrawRegularTextBoxVRAM0
 	jr .print_items
 .asm_1cb31
-	call Func_38ad
+	call DrawLabeledTextBoxVRAM0
 
 .print_items
 	ld a, [wMenuBoxNumItems]
@@ -1286,7 +1780,7 @@ DrawMenuBox:
 	ld a, [hli]
 	ld h, [hl]
 	ld l, a
-	call Func_35af
+	call InitTextPrinting_ProcessTextFromIDVRAM0
 	pop de
 	pop bc
 	inc c
@@ -1381,7 +1875,7 @@ HandleMenuBox:
 
 .UpPress:
 	ldh a, [hDPadHeld]
-	and D_UP
+	and PAD_UP
 	ret z
 	ld a, [wMenuBoxHasHorizontalScroll]
 	ld l, a ; unused
@@ -1395,7 +1889,7 @@ HandleMenuBox:
 	add h ; warp around
 .no_overflow_1
 	push af
-	ld a, SFX_01
+	ld a, SFX_CURSOR
 	call CallPlaySFX
 	pop af
 	call .UnfocusItem
@@ -1404,7 +1898,7 @@ HandleMenuBox:
 
 .DownPress:
 	ldh a, [hDPadHeld]
-	and D_DOWN
+	and PAD_DOWN
 	ret z
 	ld a, [wMenuBoxHasHorizontalScroll]
 	ld l, a ; unused
@@ -1419,7 +1913,7 @@ HandleMenuBox:
 	sub h ; warp around
 .no_overflow_2
 	push af
-	ld a, SFX_01
+	ld a, SFX_CURSOR
 	call CallPlaySFX
 	pop af
 	call .UnfocusItem
@@ -1428,7 +1922,7 @@ HandleMenuBox:
 
 .LeftPress:
 	ldh a, [hDPadHeld]
-	and D_LEFT
+	and PAD_LEFT
 	ret z
 	ld a, [wMenuBoxHasHorizontalScroll]
 	and a
@@ -1440,7 +1934,7 @@ HandleMenuBox:
 	add h
 .no_overflow_3
 	push af
-	ld a, SFX_01
+	ld a, SFX_CURSOR
 	call CallPlaySFX
 	pop af
 	call .UnfocusItem
@@ -1449,7 +1943,7 @@ HandleMenuBox:
 
 .RightPress:
 	ldh a, [hDPadHeld]
-	and D_RIGHT
+	and PAD_RIGHT
 	ret z
 	ld a, [wMenuBoxHasHorizontalScroll]
 	and a
@@ -1462,7 +1956,7 @@ HandleMenuBox:
 	sub h
 .no_overflow_4
 	push af
-	ld a, SFX_01
+	ld a, SFX_CURSOR
 	call CallPlaySFX
 	pop af
 	call .UnfocusItem
@@ -1523,7 +2017,7 @@ HandleMenuBox:
 	call BankswitchVRAM
 	pop af
 	call WriteByteToBGMap0
-	ld a, $01
+	ld a, BANK("VRAM1")
 	call BankswitchVRAM
 	ld a, $80 ; priority
 	call WriteByteToBGMap0
@@ -1617,9 +2111,69 @@ HandleMenuBox:
 GetMenuBoxFocusedItem:
 	ld a, [wMenuBoxFocusedItem]
 	ret
-; 0x1cd17
 
-SECTION "Bank 7@4d6f", ROMX[$4d6f], BANK[$7]
+SetMenuBoxFocusedItem:
+	ld [wMenuBoxFocusedItem], a
+	ret
+
+SetwDA37:
+	push af
+	ld a, 1
+	ld [wda37], a
+	pop af
+	ret
+
+SetMenuBoxNumItems:
+	ld [wMenuBoxNumItems], a
+	ret
+
+; a - delay to set
+SetMenuBoxDelay:
+	ld [wMenuBoxDelay], a
+	ret
+
+GetGameCenterBankedChips:
+	push af
+	ld a, [wGameCenterBankedChips]
+	ld c, a
+	ld a, [wGameCenterBankedChips + 1]
+	ld b, a
+	pop af
+	ret
+
+WithdrawChips:
+	push af
+	push bc
+	ld a, [wGameCenterBankedChips]
+	ld c, a
+	ld a, [wGameCenterBankedChips + 1]
+	ld b, a
+	farcall IncreaseChipsSmoothly
+	xor a
+	ld [wGameCenterBankedChips], a
+	ld [wGameCenterBankedChips + 1], a
+	pop bc
+	pop af
+	ret
+
+DepositChips:
+	push af
+	push bc
+	farcall GetGameCenterChips
+	farcall DecreaseChipsSmoothly
+	ld a, c
+	ld [wGameCenterBankedChips], a
+	ld a, b
+	ld [wGameCenterBankedChips + 1], a
+	pop bc
+	pop af
+	ret
+
+Func_1cd63:
+	farcall Func_1022a
+	call ShowStartMenu
+	farcall Func_10252
+	ret
 
 ; outputs in a what option the player chose
 ShowStartMenu:
@@ -1628,7 +2182,7 @@ ShowStartMenu:
 	push hl
 	ld [wStartMenuConfiguration], a
 	push af
-	ld a, MUSIC_PCMAINMENU
+	ld a, MUSIC_PC_MAIN_MENU
 	call SetMusic
 	pop af
 	call .HandleMenu
@@ -1640,7 +2194,7 @@ ShowStartMenu:
 
 .HandleMenu:
 	farcall ClearSpriteAnimsAndSetInitialGraphicsConfiguration
-	ld de, $4090
+	lb de, $40, $90
 	call SetupText
 	call .DrawMenu
 	farcall SetFrameFuncAndFadeFromWhite
@@ -1656,7 +2210,7 @@ ShowStartMenu:
 	jr z, .skip_portrait_and_name
 
 ; draw player portrait
-	call Func_1c0ec
+	call GetPlayerPortrait
 	add 0
 	lb bc, 13, 1
 	ld e, EMOTION_NORMAL
@@ -1672,7 +2226,7 @@ ShowStartMenu:
 	ld d, a
 	ld e, 8
 	ldtx hl, TxRam1Text
-	call Func_35bf
+	call PrintTextNoDelay_InitVRAM0
 
 .skip_portrait_and_name
 	ld a, [wStartMenuConfiguration]
@@ -1715,97 +2269,47 @@ ShowStartMenu:
 	dw .Config4Params ; STARTMENU_CONFIG_4
 
 .Config0Params
-	db TRUE ; ?
-	db 12, 4 ; width, height
-	db SYM_CURSOR_R ; blink cursor symbol
-	db SYM_SPACE ; space symbol
-	db SYM_CURSOR_R ; default cursor symbol
-	db SYM_CURSOR_R ; selection cursor symbol
-	db A_BUTTON ; press keys
-	db $00 ; held keys
-	db FALSE ; has horizontal scroll
-	db 0 ; vertical step
-	dw StartMenuBoxUpdate ; update function
-	dw NULL ; label text ID
-
+	menubox_params TRUE, 12, 4, \
+		SYM_CURSOR_R, SYM_SPACE, SYM_CURSOR_R, SYM_CURSOR_R, \
+		PAD_A, 0, FALSE, 0, StartMenuBoxUpdate, NULL
 	textitem 2, 2, MainMenuNewGameText
-	db $ff ; end
+	textitems_end
 
 .Config1Params
-	db TRUE ; ?
-	db 12, 6 ; width, height
-	db SYM_CURSOR_R ; blink cursor symbol
-	db SYM_SPACE ; space symbol
-	db SYM_CURSOR_R ; default cursor symbol
-	db SYM_CURSOR_R ; selection cursor symbol
-	db A_BUTTON ; press keys
-	db $00 ; held keys
-	db FALSE ; has horizontal scroll
-	db 1 ; vertical step
-	dw StartMenuBoxUpdate ; update function
-	dw NULL ; label text ID
-
+	menubox_params TRUE, 12, 6, \
+		SYM_CURSOR_R, SYM_SPACE, SYM_CURSOR_R, SYM_CURSOR_R, \
+		PAD_A, 0, FALSE, 1, StartMenuBoxUpdate, NULL
 	textitem 2, 2, MainMenuContinueFromDiaryText
 	textitem 2, 4, MainMenuNewGameText
-	db $ff ; end
+	textitems_end
 
 .Config2Params
-	db TRUE ; ?
-	db 12, 8 ; width, height
-	db SYM_CURSOR_R ; blink cursor symbol
-	db SYM_SPACE ; space symbol
-	db SYM_CURSOR_R ; default cursor symbol
-	db SYM_CURSOR_R ; selection cursor symbol
-	db A_BUTTON ; press keys
-	db $00 ; held keys
-	db FALSE ; has horizontal scroll
-	db 1 ; vertical step
-	dw StartMenuBoxUpdate ; update function
-	dw NULL ; label text ID
-
+	menubox_params TRUE, 12, 8, \
+		SYM_CURSOR_R, SYM_SPACE, SYM_CURSOR_R, SYM_CURSOR_R, \
+		PAD_A, 0, FALSE, 1, StartMenuBoxUpdate, NULL
 	textitem 2, 2, MainMenuCardPopText
 	textitem 2, 4, MainMenuContinueFromDiaryText
 	textitem 2, 6, MainMenuNewGameText
-	db $ff ; end
+	textitems_end
 
 .Config3Params
-	db TRUE ; ?
-	db 12, 10 ; width, height
-	db SYM_CURSOR_R ; blink cursor symbol
-	db SYM_SPACE ; space symbol
-	db SYM_CURSOR_R ; default cursor symbol
-	db SYM_CURSOR_R ; selection cursor symbol
-	db A_BUTTON ; press keys
-	db $00 ; held keys
-	db FALSE ; has horizontal scroll
-	db 1 ; vertical step
-	dw StartMenuBoxUpdate ; update function
-	dw NULL ; label text ID
-
+	menubox_params TRUE, 12, 10, \
+		SYM_CURSOR_R, SYM_SPACE, SYM_CURSOR_R, SYM_CURSOR_R, \
+		PAD_A, 0, FALSE, 1, StartMenuBoxUpdate, NULL
 	textitem 2, 2, MainMenuCardPopText
 	textitem 2, 4, MainMenuContinueFromDiaryText
 	textitem 2, 6, MainMenuNewGameText
 	textitem 2, 8, MainMenuContinueDuelText
-	db $ff ; end
+	textitems_end
 
 .Config4Params
-	db TRUE ; ?
-	db 12, 8 ; width, height
-	db SYM_CURSOR_R ; blink cursor symbol
-	db SYM_SPACE ; space symbol
-	db SYM_CURSOR_R ; default cursor symbol
-	db SYM_CURSOR_R ; selection cursor symbol
-	db A_BUTTON ; press keys
-	db $00 ; held keys
-	db FALSE ; has horizontal scroll
-	db 1 ; vertical step
-	dw StartMenuBoxUpdate ; update function
-	dw NULL ; label text ID
-
+	menubox_params TRUE, 12, 8, \
+		SYM_CURSOR_R, SYM_SPACE, SYM_CURSOR_R, SYM_CURSOR_R, \
+		PAD_A, 0, FALSE, 1, StartMenuBoxUpdate, NULL
 	textitem 2, 2, MainMenuContinueFromDiaryText
 	textitem 2, 4, MainMenuNewGameText
 	textitem 2, 6, MainMenuContinueDuelText
-	db $ff ; end
+	textitems_end
 
 _StartMenuBoxUpdate::
 	push af
@@ -1886,17 +2390,17 @@ _StartMenuBoxUpdate::
 .NewGame:
 	lb de, 1, 12
 	ldtx hl, MainMenuNewGameDialogText
-	call Func_35af
+	call InitTextPrinting_ProcessTextFromIDVRAM0
 	ret
 
 .ContinueFromDiary:
-	farcall Func_c53e
+	farcall GetCurrentLocationName
 	call LoadTxRam2
 	ldtx hl, TxRam2TextPadded
 	lb de, 1, 10
 	call Func_2c4b
 	ld hl, .TextItems
-	call Func_35cf
+	call PlaceTextItemsVRAM0
 
 	; print number of event coins
 	; obtained by the player
@@ -1919,18 +2423,18 @@ _StartMenuBoxUpdate::
 	textitem 15, 12, PlayerDiaryCardsUnitText
 	textitem  3, 14, PlayerDiaryAlbumText
 	textitem  3, 16, PlayerDiaryPlayTimeText
-	db $ff
+	textitems_end
 
 .CardPop:
 	lb de, 1, 12
 	ldtx hl, MainMenuCardPopDialogText
-	call Func_35af
+	call InitTextPrinting_ProcessTextFromIDVRAM0
 	ret
 
 .ContinueDuel:
 	lb de, 1, 12
 	ldtx hl, MainMenuContinueDuelDialogText
-	call Func_35af
+	call InitTextPrinting_ProcessTextFromIDVRAM0
 	ret
 
 HandleStartMenuBox:
@@ -1941,13 +2445,13 @@ HandleStartMenuBox:
 	ld [wMenuCursorPosition], a
 	jr c, .selected
 	push af
-	ld a, SFX_02
+	ld a, SFX_CONFIRM
 	call CallPlaySFX
 	pop af
 	ret
 .selected
 	push af
-	ld a, SFX_03
+	ld a, SFX_CANCEL
 	call CallPlaySFX
 	pop af
 	ret
@@ -2021,7 +2525,7 @@ AskToContinueFromDiaryInsteadOfDuel:
 	tx MainMenuContinueFromDiaryInsteadOfDuelWarning2Text
 	tx MainMenuContinueFromDiaryInsteadOfDuelWarning3Text
 	tx MainMenuContinueFromDiaryInsteadOfDuelWarning4Text
-	tx $ffff
+	dw $ffff
 
 ConfirmPlayerNameAndGender:
 	push bc
@@ -2049,13 +2553,13 @@ ConfirmPlayerNameAndGender:
 	lb bc, 20, 6
 	call DrawRegularTextBoxVRAM0
 	ld hl, .TextItems
-	call Func_35cf
+	call PlaceTextItemsVRAM0
 	lb bc, 12, 3
 	call DrawPlayerPortrait
 	; print name
 	ldtx hl, TxRam1Text
 	lb de, 5, 4
-	call Func_35bf
+	call PrintTextNoDelay_InitVRAM0
 	; print gender
 	farcall GetPlayerGender
 	and a
@@ -2064,22 +2568,19 @@ ConfirmPlayerNameAndGender:
 	ldtx hl, PlayerGenderFemaleText
 .got_gender_text
 	lb de, 5, 8
-	call Func_35af
+	call InitTextPrinting_ProcessTextFromIDVRAM0
 	ret
 
 .TextItems:
 	textitem 2, 2, PlayerDiaryNameText
 	textitem 2, 6, PlayerGenderText
-	db $ff
+	textitems_end
 
 .ShowYesOrNoMenu:
 	ldtx hl, IsThisOKText_2
 	ld a, $1
 	farcall DrawWideTextBox_PrintTextWithYesOrNoMenu
 	ret
-; 0x1d081
-
-SECTION "Bank 7@5081", ROMX[$5081], BANK[$7]
 
 ; a = COIN_* constant
 CheckIfCoinWasObtained:
@@ -2104,8 +2605,8 @@ CheckIfCoinWasObtained:
 	db EVENT_GOT_PIKACHU_COIN    ; COIN_PIKACHU
 	db EVENT_GOT_ALAKAZAM_COIN   ; COIN_ALAKAZAM
 	db EVENT_GOT_KABUTO_COIN     ; COIN_KABUTO
-	db EVENT_GOT_MAGNEMITE_COIN  ; COIN_MAGNEMITE
 	db EVENT_GOT_GOLBAT_COIN     ; COIN_GOLBAT
+	db EVENT_GOT_MAGNEMITE_COIN  ; COIN_MAGNEMITE
 	db EVENT_GOT_MAGMAR_COIN     ; COIN_MAGMAR
 	db EVENT_GOT_PSYDUCK_COIN    ; COIN_PSYDUCK
 	db EVENT_GOT_MACHAMP_COIN    ; COIN_MACHAMP
@@ -2132,9 +2633,9 @@ CountEventCoinsObtained:
 .loop
 	push af
 	call CheckIfCoinWasObtained
-	jr z, .next
+	jr z, .got_coin
 	inc b
-.next
+.got_coin
 	pop af
 	inc a
 	dec c
@@ -2144,34 +2645,170 @@ CountEventCoinsObtained:
 	pop hl
 	pop bc
 	ret
-; 0x1d0c2
 
-SECTION "Bank 7@5198", ROMX[$5198], BANK[$7]
+; return in a the total number of pieces in possession
+CountGRCoinPiecesObtained_2:
+	push bc
+	ld c, 0
+	ld a, EVENT_GOT_GR_COIN_PIECE_BOTTOM_RIGHT
+	farcall GetEventValue
+	jr z, .checked_bottom_right
+	inc c
+.checked_bottom_right
+	ld a, EVENT_GOT_GR_COIN_PIECE_BOTTOM_LEFT
+	farcall GetEventValue
+	jr z, .checked_bottom_left
+	inc c
+.checked_bottom_left
+	ld a, EVENT_GOT_GR_COIN_PIECE_TOP_RIGHT
+	farcall GetEventValue
+	jr z, .checked_top_right
+	inc c
+.checked_top_right
+	ld a, EVENT_GOT_GR_COIN_PIECE_TOP_LEFT
+	farcall GetEventValue
+	jr z, .checked_top_left
+	inc c
+.checked_top_left
+	ld a, c
+	pop bc
+	ret
+
+; return in hl the coin text at .CoinTable[a]
+GetCoinName:
+	push af
+	push bc
+	ld c, a
+	ld b, 0
+	sla c
+	rl b
+	ld hl, .CoinTable
+	add hl, bc
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	pop bc
+	pop af
+	ret
+
+.CoinTable:
+	tx ChanseyCoinText     ; COIN_CHANSEY
+	tx GRCoinText          ; COIN_GR
+	tx GrassCoinText       ; COIN_ODDISH
+	tx FireCoinText        ; COIN_CHARMANDER
+	tx WaterCoinText       ; COIN_STARMIE
+	tx LightningCoinText   ; COIN_PIKACHU
+	tx PsychicCoinText     ; COIN_ALAKAZAM
+	tx RockCoinText        ; COIN_KABUTO
+	tx GRGrassCoinText     ; COIN_GOLBAT
+	tx GRLightningCoinText ; COIN_MAGNEMITE
+	tx GRFireCoinText      ; COIN_MAGMAR
+	tx GRWaterCoinText     ; COIN_PSYDUCK
+	tx GRFightingCoinText  ; COIN_MACHAMP
+	tx GRPsychicCoinText   ; COIN_MEW
+	tx GRColorlessCoinText ; COIN_SNORLAX
+	tx GRKingCoinText      ; COIN_TOGEPI
+	tx PonytaCoinText      ; COIN_PONYTA
+	tx HorseaCoinText      ; COIN_HORSEA
+	tx ArbokCoinText       ; COIN_ARBOK
+	tx JigglypuffCoinText  ; COIN_JIGGLYPUFF
+	tx DugtrioCoinText     ; COIN_DUGTRIO
+	tx GengarCoinText      ; COIN_GENGAR
+	tx RaichuCoinText      ; COIN_RAICHU
+	tx LugiaCoinText       ; COIN_LUGIA
+	tx GRCoinText          ; COIN_GR_START
+	tx GRCoinPiece1Text    ; COIN_GR_PIECE1
+	tx GRCoinPiece2Text    ; COIN_GR_PIECE2
+	tx GRCoinText          ; COIN_GR_PIECE1 | COIN_GR_PIECE2
+	tx GRCoinPiece3Text    ; COIN_GR_PIECE3
+	tx GRCoinText          ; COIN_GR_PIECE1 | COIN_GR_PIECE3
+	tx GRCoinText          ; COIN_GR_PIECE2 | COIN_GR_PIECE3
+	tx GRCoinText          ; COIN_GR_PIECE1 | COIN_GR_PIECE2 | COIN_GR_PIECE3
+	tx GRCoinPiece4Text    ; COIN_GR_PIECE4
+	tx GRCoinText          ; COIN_GR_PIECE1 | COIN_GR_PIECE4
+	tx GRCoinText          ; COIN_GR_PIECE2 | COIN_GR_PIECE4
+	tx GRCoinText          ; COIN_GR_PIECE1 | COIN_GR_PIECE2 | COIN_GR_PIECE4
+	tx GRCoinText          ; COIN_GR_PIECE3 | COIN_GR_PIECE4
+	tx GRCoinText          ; COIN_GR_PIECE1 | COIN_GR_PIECE3 | COIN_GR_PIECE4
+	tx GRCoinText          ; COIN_GR_PIECE2 | COIN_GR_PIECE3 | COIN_GR_PIECE4
+	; no COIN_GR_PIECE1 | COIN_GR_PIECE2 | COIN_GR_PIECE3 | COIN_GR_PIECE4
+
+; set bit 0--3 of a for each piece obtained
+CheckObtainedGRCoinPieces:
+	push bc
+	push de
+	ld b, 0
+	ld a, EVENT_GOT_GR_COIN_PIECE_BOTTOM_RIGHT
+	farcall GetEventValue
+	sla a
+	sla a
+	sla a
+	or b
+	ld b, a
+	ld a, EVENT_GOT_GR_COIN_PIECE_BOTTOM_LEFT
+	farcall GetEventValue
+	sla a
+	sla a
+	or b
+	ld b, a
+	ld a, EVENT_GOT_GR_COIN_PIECE_TOP_RIGHT
+	farcall GetEventValue
+	sla a
+	or b
+	ld b, a
+	ld a, EVENT_GOT_GR_COIN_PIECE_TOP_LEFT
+	farcall GetEventValue
+	or b
+	and COIN_GR_PIECE1 | COIN_GR_PIECE2 | COIN_GR_PIECE3 | COIN_GR_PIECE4
+	pop de
+	pop bc
+	ret
+
+; a = COIN_* constant
+; for a non-GR Coin, keep a if already obtained, return a = COIN_GR_START if not
+; for GR Coin, return a = (bit 0--3 for each piece) + COIN_GR_START
+GetCoinPossessionStatus:
+	push bc
+	ld b, a
+	cp COIN_GR
+	jr z, .check_gr_coin
+; another coin
+	call CheckIfCoinWasObtained
+	jr nz, .got_value
+; not yet obtained
+	ld b, COIN_GR_START
+.got_value
+	ld a, b
+	jr .done
+.check_gr_coin
+	call CheckObtainedGRCoinPieces
+	add COIN_GR_START
+.done
+	pop bc
+	ret
 
 ; input:
-; - a = coin to load
+; - a = COIN_* constant
 ; - de = coordinates
-Func_1d198:
+CreateCoinAnimation:
 	push af
 	push bc
 	push de
 	push hl
 	ld c, a
-	ld b, $00
+	ld b, 0
+REPT 3 ; *8
 	sla c
 	rl b
-	sla c
-	rl b
-	sla c
-	rl b ; *8
+ENDR
 	ld hl, .SpriteAnimGfxParams
 	add hl, bc
-	ld c, $00
-	cp $28
-	jr c, .asm_1d1b7
-	ld c, $02
-.asm_1d1b7
-	ld b, $07
+	ld c, 0
+	cp NUM_COIN_GFX
+	jr c, .got_obj_slot
+	ld c, 2
+.got_obj_slot
+	ld b, BANK(.SpriteAnimGfxParams)
 	ld a, $ff
 	call CreateSpriteAnim
 	pop hl
@@ -2181,46 +2818,46 @@ Func_1d198:
 	ret
 
 .SpriteAnimGfxParams:
-	dw TILESET_CHANSEY_COIN,    SPRITE_ANIM_85, FRAMESET_112, PALETTE_13C ; $00
-	dw TILESET_GR_COIN,         SPRITE_ANIM_85, FRAMESET_112, PALETTE_143 ; $01
-	dw TILESET_ODDISH_COIN,     SPRITE_ANIM_85, FRAMESET_112, PALETTE_13D ; $02
-	dw TILESET_CHARMANDER_COIN, SPRITE_ANIM_85, FRAMESET_112, PALETTE_13E ; $03
-	dw TILESET_STARMIE_COIN,    SPRITE_ANIM_85, FRAMESET_112, PALETTE_13F ; $04
-	dw TILESET_PIKACHU_COIN,    SPRITE_ANIM_85, FRAMESET_112, PALETTE_140 ; $05
-	dw TILESET_ALAKAZAM_COIN,   SPRITE_ANIM_85, FRAMESET_112, PALETTE_141 ; $06
-	dw TILESET_KABUTO_COIN,     SPRITE_ANIM_85, FRAMESET_112, PALETTE_142 ; $07
-	dw TILESET_GOLBAT_COIN,     SPRITE_ANIM_85, FRAMESET_112, PALETTE_144 ; $08
-	dw TILESET_MAGNEMITE_COIN,  SPRITE_ANIM_85, FRAMESET_112, PALETTE_145 ; $09
-	dw TILESET_MAGMAR_COIN,     SPRITE_ANIM_85, FRAMESET_112, PALETTE_146 ; $0a
-	dw TILESET_PSYDUCK_COIN,    SPRITE_ANIM_85, FRAMESET_112, PALETTE_147 ; $0b
-	dw TILESET_MACHAMP_COIN,    SPRITE_ANIM_85, FRAMESET_112, PALETTE_148 ; $0c
-	dw TILESET_MEW_COIN,        SPRITE_ANIM_85, FRAMESET_112, PALETTE_149 ; $0d
-	dw TILESET_SNORLAX_COIN,    SPRITE_ANIM_85, FRAMESET_112, PALETTE_14A ; $0e
-	dw TILESET_TOGEPI_COIN,     SPRITE_ANIM_85, FRAMESET_112, PALETTE_14B ; $0f
-	dw TILESET_PONYTA_COIN,     SPRITE_ANIM_85, FRAMESET_112, PALETTE_14C ; $10
-	dw TILESET_HORSEA_COIN,     SPRITE_ANIM_85, FRAMESET_112, PALETTE_14D ; $11
-	dw TILESET_ARBOK_COIN,      SPRITE_ANIM_85, FRAMESET_112, PALETTE_14E ; $12
-	dw TILESET_JIGGLYPUFF_COIN, SPRITE_ANIM_85, FRAMESET_112, PALETTE_14F ; $13
-	dw TILESET_DUGTRIO_COIN,    SPRITE_ANIM_85, FRAMESET_112, PALETTE_150 ; $14
-	dw TILESET_GENGAR_COIN,     SPRITE_ANIM_85, FRAMESET_112, PALETTE_151 ; $15
-	dw TILESET_RAICHU_COIN,     SPRITE_ANIM_85, FRAMESET_112, PALETTE_152 ; $16
-	dw TILESET_LUGIA_COIN,      SPRITE_ANIM_85, FRAMESET_112, PALETTE_153 ; $17
-	dw TILESET_GR_COIN,         SPRITE_ANIM_85, FRAMESET_112, PALETTE_13C ; $18
-	dw TILESET_GR_PIECES,       SPRITE_ANIM_AC, FRAMESET_118, PALETTE_143 ; $19
-	dw TILESET_GR_PIECES,       SPRITE_ANIM_AC, FRAMESET_119, PALETTE_143 ; $1a
-	dw TILESET_GR_COIN,         SPRITE_ANIM_85, FRAMESET_112, PALETTE_13C ; $1b
-	dw TILESET_GR_PIECES,       SPRITE_ANIM_AC, FRAMESET_11A, PALETTE_143 ; $1c
-	dw TILESET_GR_COIN,         SPRITE_ANIM_85, FRAMESET_112, PALETTE_13C ; $1d
-	dw TILESET_GR_COIN,         SPRITE_ANIM_85, FRAMESET_112, PALETTE_13C ; $1e
-	dw TILESET_GR_COIN,         SPRITE_ANIM_85, FRAMESET_112, PALETTE_13C ; $1f
-	dw TILESET_GR_PIECES,       SPRITE_ANIM_AC, FRAMESET_11B, PALETTE_143 ; $20
-	dw TILESET_GR_COIN,         SPRITE_ANIM_85, FRAMESET_112, PALETTE_13C ; $21
-	dw TILESET_GR_COIN,         SPRITE_ANIM_85, FRAMESET_112, PALETTE_13C ; $22
-	dw TILESET_GR_COIN,         SPRITE_ANIM_85, FRAMESET_112, PALETTE_13C ; $23
-	dw TILESET_GR_COIN,         SPRITE_ANIM_85, FRAMESET_112, PALETTE_13C ; $24
-	dw TILESET_GR_COIN,         SPRITE_ANIM_85, FRAMESET_112, PALETTE_13C ; $25
-	dw TILESET_GR_COIN,         SPRITE_ANIM_85, FRAMESET_112, PALETTE_13C ; $26
-	dw TILESET_GR_COIN,         SPRITE_ANIM_85, FRAMESET_112, PALETTE_13C ; $27
+	dw TILESET_CHANSEY_COIN,    SPRITE_ANIM_85, FRAMESET_112, PALETTE_13C ; COIN_CHANSEY
+	dw TILESET_GR_COIN,         SPRITE_ANIM_85, FRAMESET_112, PALETTE_143 ; COIN_GR
+	dw TILESET_ODDISH_COIN,     SPRITE_ANIM_85, FRAMESET_112, PALETTE_13D ; COIN_ODDISH
+	dw TILESET_CHARMANDER_COIN, SPRITE_ANIM_85, FRAMESET_112, PALETTE_13E ; COIN_CHARMANDER
+	dw TILESET_STARMIE_COIN,    SPRITE_ANIM_85, FRAMESET_112, PALETTE_13F ; COIN_STARMIE
+	dw TILESET_PIKACHU_COIN,    SPRITE_ANIM_85, FRAMESET_112, PALETTE_140 ; COIN_PIKACHU
+	dw TILESET_ALAKAZAM_COIN,   SPRITE_ANIM_85, FRAMESET_112, PALETTE_141 ; COIN_ALAKAZAM
+	dw TILESET_KABUTO_COIN,     SPRITE_ANIM_85, FRAMESET_112, PALETTE_142 ; COIN_KABUTO
+	dw TILESET_GOLBAT_COIN,     SPRITE_ANIM_85, FRAMESET_112, PALETTE_144 ; COIN_GOLBAT
+	dw TILESET_MAGNEMITE_COIN,  SPRITE_ANIM_85, FRAMESET_112, PALETTE_145 ; COIN_MAGNEMITE
+	dw TILESET_MAGMAR_COIN,     SPRITE_ANIM_85, FRAMESET_112, PALETTE_146 ; COIN_MAGMAR
+	dw TILESET_PSYDUCK_COIN,    SPRITE_ANIM_85, FRAMESET_112, PALETTE_147 ; COIN_PSYDUCK
+	dw TILESET_MACHAMP_COIN,    SPRITE_ANIM_85, FRAMESET_112, PALETTE_148 ; COIN_MACHAMP
+	dw TILESET_MEW_COIN,        SPRITE_ANIM_85, FRAMESET_112, PALETTE_149 ; COIN_MEW
+	dw TILESET_SNORLAX_COIN,    SPRITE_ANIM_85, FRAMESET_112, PALETTE_14A ; COIN_SNORLAX
+	dw TILESET_TOGEPI_COIN,     SPRITE_ANIM_85, FRAMESET_112, PALETTE_14B ; COIN_TOGEPI
+	dw TILESET_PONYTA_COIN,     SPRITE_ANIM_85, FRAMESET_112, PALETTE_14C ; COIN_PONYTA
+	dw TILESET_HORSEA_COIN,     SPRITE_ANIM_85, FRAMESET_112, PALETTE_14D ; COIN_HORSEA
+	dw TILESET_ARBOK_COIN,      SPRITE_ANIM_85, FRAMESET_112, PALETTE_14E ; COIN_ARBOK
+	dw TILESET_JIGGLYPUFF_COIN, SPRITE_ANIM_85, FRAMESET_112, PALETTE_14F ; COIN_JIGGLYPUFF
+	dw TILESET_DUGTRIO_COIN,    SPRITE_ANIM_85, FRAMESET_112, PALETTE_150 ; COIN_DUGTRIO
+	dw TILESET_GENGAR_COIN,     SPRITE_ANIM_85, FRAMESET_112, PALETTE_151 ; COIN_GENGAR
+	dw TILESET_RAICHU_COIN,     SPRITE_ANIM_85, FRAMESET_112, PALETTE_152 ; COIN_RAICHU
+	dw TILESET_LUGIA_COIN,      SPRITE_ANIM_85, FRAMESET_112, PALETTE_153 ; COIN_LUGIA
+	dw TILESET_GR_COIN,         SPRITE_ANIM_85, FRAMESET_112, PALETTE_13C ; COIN_GR_START
+	dw TILESET_GR_PIECES,       SPRITE_ANIM_AC, FRAMESET_118, PALETTE_143 ; COIN_GR_PIECE1
+	dw TILESET_GR_PIECES,       SPRITE_ANIM_AC, FRAMESET_119, PALETTE_143 ; COIN_GR_PIECE2
+	dw TILESET_GR_COIN,         SPRITE_ANIM_85, FRAMESET_112, PALETTE_13C ; COIN_GR_PIECE1 | COIN_GR_PIECE2
+	dw TILESET_GR_PIECES,       SPRITE_ANIM_AC, FRAMESET_11A, PALETTE_143 ; COIN_GR_PIECE3
+	dw TILESET_GR_COIN,         SPRITE_ANIM_85, FRAMESET_112, PALETTE_13C ; COIN_GR_PIECE1 | COIN_GR_PIECE3
+	dw TILESET_GR_COIN,         SPRITE_ANIM_85, FRAMESET_112, PALETTE_13C ; COIN_GR_PIECE2 | COIN_GR_PIECE3
+	dw TILESET_GR_COIN,         SPRITE_ANIM_85, FRAMESET_112, PALETTE_13C ; COIN_GR_PIECE1 | COIN_GR_PIECE2 | COIN_GR_PIECE3
+	dw TILESET_GR_PIECES,       SPRITE_ANIM_AC, FRAMESET_11B, PALETTE_143 ; COIN_GR_PIECE4
+	dw TILESET_GR_COIN,         SPRITE_ANIM_85, FRAMESET_112, PALETTE_13C ; COIN_GR_PIECE1 | COIN_GR_PIECE4
+	dw TILESET_GR_COIN,         SPRITE_ANIM_85, FRAMESET_112, PALETTE_13C ; COIN_GR_PIECE2 | COIN_GR_PIECE4
+	dw TILESET_GR_COIN,         SPRITE_ANIM_85, FRAMESET_112, PALETTE_13C ; COIN_GR_PIECE1 | COIN_GR_PIECE2 | COIN_GR_PIECE4
+	dw TILESET_GR_COIN,         SPRITE_ANIM_85, FRAMESET_112, PALETTE_13C ; COIN_GR_PIECE3 | COIN_GR_PIECE4
+	dw TILESET_GR_COIN,         SPRITE_ANIM_85, FRAMESET_112, PALETTE_13C ; COIN_GR_PIECE1 | COIN_GR_PIECE3 | COIN_GR_PIECE4
+	dw TILESET_GR_COIN,         SPRITE_ANIM_85, FRAMESET_112, PALETTE_13C ; COIN_GR_PIECE2 | COIN_GR_PIECE3 | COIN_GR_PIECE4
+	dw TILESET_GR_COIN,         SPRITE_ANIM_85, FRAMESET_112, PALETTE_13C ; COIN_GR_PIECE1 | COIN_GR_PIECE2 | COIN_GR_PIECE3 | COIN_GR_PIECE4
 	dw TILESET_SMALL_COINS,     SPRITE_ANIM_AD, FRAMESET_120, PALETTE_13B ; $28
 	dw TILESET_SMALL_COINS,     SPRITE_ANIM_AD, FRAMESET_146, PALETTE_13B ; $29
 	dw TILESET_SMALL_COINS,     SPRITE_ANIM_AD, FRAMESET_121, PALETTE_13B ; $2a
@@ -2262,7 +2899,8 @@ Func_1d198:
 	dw TILESET_SMALL_COINS,     SPRITE_ANIM_AD, FRAMESET_145, PALETTE_13B ; $4e
 	dw TILESET_SMALL_COINS,     SPRITE_ANIM_AD, FRAMESET_146, PALETTE_13B ; $4f
 
-Func_1d443:
+; use FRAMESET_($112 + a)
+SetAndInitCoinAnimation:
 	push af
 	push bc
 	push de
@@ -2273,7 +2911,7 @@ Func_1d443:
 	add hl, bc
 	ld b, h
 	ld c, l
-	farcall Func_10bc4
+	farcall GetSpriteAnimBuffer
 	farcall SetAndInitSpriteAnimFrameset
 	xor a
 	farcall SetSpriteAnimFrameIndex
@@ -2284,9 +2922,13 @@ Func_1d443:
 	pop bc
 	pop af
 	ret
-; 0x1d46a
 
-SECTION "Bank 7@5475", ROMX[$5475], BANK[$7]
+Func_1d46a:
+	push hl
+	farcall GetSpriteAnimBuffer
+	farcall CheckIsSpriteAnimAnimating
+	pop hl
+	ret
 
 ; a = $0: initializes values for new save
 ; a = $1: reads values from SRAM
@@ -2308,8 +2950,8 @@ Func_1d475:
 	ld a, EVENT_GOT_CHANSEY_COIN
 	farcall MaxOutEventValue
 
-	farcall Func_1157c
-	call Func_1eca5
+	farcall ClearGameCenterChips
+	call InitializeMailboxWRAM
 	call Func_1d7a1
 	call Func_1d9f9
 	call Func_1dcb7
@@ -2319,17 +2961,17 @@ Func_1d475:
 	farcall ClearCardPopNameList
 
 	call EnableAnimations
-	call Func_1e767
+	call ClearwMinicomMenuCursorPosition
 	farcall Func_111f0
-	call Func_1c425
-	call Func_1c3d5
+	call InitDefaultConfigMenuSettings
+	call SaveConfigMenuChoicesToSRAM
 	call LoadSavedOptions
 	ret
 
 .Read:
 	call LoadSavedOptions
 	ld a, $01
-	farcall Func_108c9
+	farcall SetwD8A1
 	ret
 
 ShowOWMapLocationBox:
@@ -2366,7 +3008,7 @@ ShowOWMapLocationBox:
 	ld b, BANK(Pals_1d50d)
 	ld c, $00
 	ld hl, Pals_1d50d
-	call Func_3861
+	call CopyCGBBGPalsFromSource_WithPalOffset
 	ret
 
 Pals_1d50d:
@@ -2381,9 +3023,6 @@ Pals_1d50d:
 	rgb 31, 31, 31
 	rgb 31,  0,  0
 	rgb  1,  0,  5
-; 0x1d51d
-
-SECTION "Bank 7@551e", ROMX[$551e], BANK[$7]
 
 Func_1d51e:
 	push af
@@ -2394,7 +3033,259 @@ Func_1d51e:
 	call SetWindowOff
 	pop af
 	ret
-; 0x1d52e
+
+Func_1d52e:
+	farcall Func_1022a
+	call Func_1d53a
+	farcall Func_10252
+	ret
+
+Func_1d53a:
+	push af
+	push bc
+	push de
+	push hl
+	farcall SetFrameFuncAndFadeFromWhite
+	farcall SetFadePalsFrameFunc
+	call Func_3d1f
+	farcall _ShowReceivedCardScreen
+	call Func_3d32
+	farcall UnsetFadePalsFrameFunc
+	farcall FadeToWhiteAndUnsetFrameFunc
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+Func_1d55d:
+	farcall Func_11002
+	call Func_1d594
+	call Func_1d5aa
+	jr c, .asm_1d57c
+	farcall Func_1101d
+	farcall Func_1022a
+	call Func_1d584
+	farcall Func_10252
+	farcall Func_11002
+.asm_1d57c
+	call Func_1d59f
+	farcall Func_1101d
+	ret
+
+Func_1d584:
+	push af
+	push bc
+	push de
+	push hl
+	xor a
+	ld [wdb18], a
+	call Func_1d5b4
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+Func_1d594:
+	ldtx de, ReceptionistText
+	ldtx hl, GameCenterPrizeExchangeWelcomeText
+	farcall PrintScrollableText_WithTextBoxLabelVRAM0
+	ret
+
+Func_1d59f:
+	ldtx de, ReceptionistText
+	ldtx hl, GameCenterPrizeExchangeComeAgainText
+	farcall PrintScrollableText_WithTextBoxLabelVRAM0
+	ret
+
+Func_1d5aa:
+	ldtx hl, GameCenterPrizeExchangePromptText
+	ld a, $01
+	farcall PrintScrollableText_WithTextBoxLabelWithYesOrNoMenu
+	ret
+
+Func_1d5b4:
+	farcall ClearSpriteAnimsAndSetInitialGraphicsConfiguration
+	call Func_1d5c7
+	farcall SetFrameFuncAndFadeFromWhite
+	call Func_1d66e
+	farcall FadeToWhiteAndUnsetFrameFunc
+	ret
+
+Func_1d5c7:
+	call Func_1d779
+	ld de, $0
+	ld b, $07
+	ld hl, $564a
+	call LoadMenuBoxParams
+	ld a, [wdb18]
+	call DrawMenuBox
+	ldtx hl, PlayersChipsText
+	lb de, 1, 0
+	call Func_2c4b
+	lb de, 14, 0
+	lb bc, 5, 1
+	farcall FillBoxInBGMapWithZero
+	ldtx hl, PlayerDiaryCardsUnitText
+	lb de, 18, 0
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	farcall GetGameCenterChips
+	lb de, 14, 0
+	ld h, b
+	ld l, c
+	ld a, $04
+	ld b, TRUE
+	call PrintNumber
+	ld hl, wdb1a
+	ld e, $02
+	ld c, $05
+.asm_1d60e
+	ld a, [hli]
+	call Func_1d618
+	inc e
+	inc e
+	dec c
+	jr nz, .asm_1d60e
+	ret
+
+Func_1d618:
+	push af
+	push bc
+	push de
+	push hl
+	ld hl, $57a6
+	add a
+	add a
+	ld c, a
+	ld b, $00
+	add hl, bc
+	push hl
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	ld d, $02
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	pop hl
+	inc hl
+	inc hl
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	ld a, $04
+	ld b, TRUE
+	ld d, $0e
+	call PrintNumber
+	ld d, $12
+	ldtx hl, PlayerDiaryCardsUnitText
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+; 0x1d64a
+
+SECTION "Bank 7@566e", ROMX[$566e], BANK[$7]
+
+Func_1d66e:
+.asm_1d66e
+	lb de, 1, 14
+	ldtx hl, GameCenterPrizeExchangeChoosePrizeText
+	farcall PrintTextInWideTextBox
+	ld a, [wdb18]
+	call HandleMenuBox
+	ld [wdb18], a
+	jr c, .asm_1d68c
+	push af
+	ld a, SFX_CONFIRM
+	call CallPlaySFX
+	pop af
+	jr .asm_1d695
+.asm_1d68c
+	push af
+	ld a, SFX_CANCEL
+	call CallPlaySFX
+	pop af
+	jr .asm_1d6b2
+.asm_1d695
+	ldtx hl, GameCenterPrizeExchangeConfirmText
+	ld a, $01
+	farcall DrawWideTextBox_PrintTextWithYesOrNoMenu
+	jr c, .asm_1d6b2
+	call Func_1d6be
+	jr c, .asm_1d6b2
+	farcall ClearSpriteAnimsAndSetInitialGraphicsConfiguration
+	call Func_1d5c7
+	call StartFadeFromWhite
+	call WaitPalFading_Bank07
+.asm_1d6b2
+	ldtx hl, GameCenterPrizeExchangeQuitConfirmText
+	ld a, $01
+	farcall DrawWideTextBox_PrintTextWithYesOrNoMenu
+	jr c, .asm_1d66e
+	ret
+
+Func_1d6be:
+	ld a, [wdb18]
+	ld c, a
+	ld b, $00
+	ld hl, wdb1a
+	add hl, bc
+	ld a, [hl]
+	ld [wdb19], a
+	add a
+	add a
+	ld c, a
+	ld b, $00
+	ld hl, $57a6
+	add hl, bc
+	inc hl
+	inc hl
+	ld e, [hl]
+	inc hl
+	ld d, [hl]
+	farcall GetGameCenterChips
+	call CompareBCAndDE
+	jr c, .asm_1d6fc
+	ld b, d
+	ld c, e
+	farcall SubtractChips
+	call StartFadeToWhite
+	call WaitPalFading_Bank07
+	ld a, [wdb19]
+	ld hl, $5704
+	call CallMappedFunction
+	call WaitPalFading_Bank07
+	ret
+.asm_1d6fc
+	ldtx hl, GameCenterNotEnoughChipsText
+	farcall PrintScrollableText_NoTextBoxLabelVRAM0
+	ret
+; 0x1d704
+
+SECTION "Bank 7@5779", ROMX[$5779], BANK[$7]
+
+Func_1d779:
+	ld a, [wdb1f]
+	add a
+	ld c, a
+	ld b, $00
+	ld hl, $5793
+	add hl, bc
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	ld de, wdb1a
+	ld c, $05
+.asm_1d78c
+	ld a, [hli]
+	ld [de], a
+	inc de
+	dec c
+	jr nz, .asm_1d78c
+	ret
+; 0x1d793
 
 SECTION "Bank 7@57a1", ROMX[$57a1], BANK[$7]
 
@@ -2404,24 +3295,1006 @@ Func_1d7a1:
 	ret
 ; 0x1d7a6
 
-SECTION "Bank 7@59f9", ROMX[$59f9], BANK[$7]
+SECTION "Bank 7@57be", ROMX[$57be], BANK[$7]
+
+Func_1d7be:
+	farcall Func_1022a
+	call Func_1d7ca
+	farcall Func_10252
+	ret
+
+Func_1d7ca:
+	push de
+	push hl
+	push af
+	ld a, $03
+	call CallSetVolume
+	pop af
+	call Func_1d813
+	push af
+	ld a, $07
+	call CallSetVolume
+	pop af
+	call Func_1d7ec
+	ld hl, wdb21
+	ld c, [hl]
+	inc hl
+	ld b, [hl]
+	ld a, [wdb20]
+	pop hl
+	pop de
+	ret
+
+Func_1d7ec:
+	ld a, [wdb20]
+	add a
+	ld c, a
+	ld b, $00
+	add hl, bc
+	ld a, [hli]
+	ld [wdb21], a
+	ld a, [hl]
+	ld [wdb21 + 1], a
+	ret
+; 0x1d7fd
+
+SECTION "Bank 7@5813", ROMX[$5813], BANK[$7]
+
+Func_1d813:
+	farcall ClearSpriteAnimsAndSetInitialGraphicsConfiguration
+	call Func_1d886
+	farcall SetFrameFuncAndFadeFromWhite
+.asm_1d81e
+	ld c, $00
+.asm_1d820
+	ld a, $00
+	call SetAndInitCoinAnimation
+.asm_1d825
+	call UpdateRNGSources
+	call DoFrame
+	ldh a, [hKeysPressed]
+	and PAD_A
+	jr z, .asm_1d825
+	call UpdateRNGSources
+	and $01
+	ld b, a
+	push af
+	ld a, SFX_COIN_TOSS
+	call CallPlaySFX
+	pop af
+	ld a, b
+	add $01
+	call SetAndInitCoinAnimation
+.asm_1d844
+	call DoFrame
+	call Func_1d46a
+	jr nz, .asm_1d844
+	ld a, b
+	and $01
+	jr nz, .asm_1d85a
+	push af
+	ld a, SFX_COIN_TOSS_POSITIVE
+	call CallPlaySFX
+	pop af
+	jr .asm_1d861
+.asm_1d85a
+	push af
+	ld a, SFX_COIN_TOSS_NEGATIVE
+	call CallPlaySFX
+	pop af
+.asm_1d861
+	ld a, b
+	call Func_1d8c6
+	ld a, $3c
+	call DoAFrames_WithPreCheck
+	ld a, b
+	and a
+	jr nz, .asm_1d874
+	inc c
+	ld a, c
+	cp $0a
+	jr nz, .asm_1d820
+.asm_1d874
+	ld a, c
+	ld [wdb20], a
+	cp $03
+	jr nc, .asm_1d881
+	call Func_1d8df
+	jr nc, .asm_1d81e
+.asm_1d881
+	farcall FadeToWhiteAndUnsetFrameFunc
+	ret
+
+Func_1d886:
+	push af
+	push bc
+	push de
+	push hl
+	farcall ClearSpriteAnims
+	call Func_1dfb5
+	ld de, $5858
+	call CreateCoinAnimation
+	ld a, $03
+	call SetAndInitCoinAnimation
+	lb de, 0, 12
+	lb bc, 20, 6
+	call DrawRegularTextBoxVRAM0
+	ldtx hl, GameCenterCoinFlipTitleText
+	lb de, 1, 12
+	call Func_2c4b
+	ldtx hl, GameCenterCoinFlipDialogText
+	lb de, 1, 14
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	lb de, 0, 0
+	lb bc, 20, 4
+	farcall FillBoxInBGMapWithZero
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+Func_1d8c6:
+	push af
+	push bc
+	and a
+	jr nz, .asm_1d8cf
+	ld a, SCENE_COIN_TOSS_RESULT_1
+	jr .asm_1d8d1
+.asm_1d8cf
+	ld a, SCENE_COIN_TOSS_RESULT_2
+.asm_1d8d1
+	ld b, c
+	sla b
+	ld c, $00
+	call LoadScene
+	call FlushAllPalettes
+	pop bc
+	pop af
+	ret
+
+Func_1d8df:
+	lb de, 0, 0
+	lb bc, 8, 4
+	farcall FillBoxInBGMapWithZero
+	call DoFrame
+	farcall Func_114af
+	ldtx hl, GameCenterCoinFlipRetryPromptText
+	ldtx de, AttendantText
+	ld a, $01
+	farcall PrintScrollableText_WithTextBoxLabelWithYesOrNoMenu
+	jr c, .asm_1d914
+	farcall GetGameCenterChips
+	ld a, b
+	or c
+	jr z, .asm_1d91d
+	ld bc, 1
+	farcall DecreaseChipsSmoothly
+	ld a, 60
+	call DoAFrames_WithPreCheck
+	scf
+	ccf
+.asm_1d914
+	farcall Func_114f9
+	ret c
+	call Func_1d886
+	ret
+.asm_1d91d
+	ldtx hl, GameCenterCoinFlipAttendantNotEnoughChipsText
+	ldtx de, AttendantText
+	farcall PrintScrollableText_WithTextBoxLabelVRAM0
+	scf
+	jr .asm_1d914
+; 0x1d92a
+
+SECTION "Bank 7@596e", ROMX[$596e], BANK[$7]
+
+OWInteractionSlotMachine:
+	farcall Func_1022a
+	call SlotMachine
+	farcall Func_10252
+	ret
+
+; a - chips per bet
+SlotMachine:
+	push af
+	push bc
+	push de
+	push hl
+	ld [wdb2f], a
+	farcall AskToPlaySlots
+	jr c, .done ; jump if player chose not to play
+	push af
+	ld a, $03
+	call CallSetVolume
+	pop af
+	farcall StartSlotMachine
+	push af
+	ld a, $07
+	call CallSetVolume
+	pop af
+.done
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+Func_1d99e:
+	farcall Func_1022a
+	call _PlayLinkDuelAndGetResult
+	farcall Func_10252
+	ret
+
+_PlayLinkDuelAndGetResult:
+	push bc
+	push de
+	push hl
+	farcall _SetUpAndStartLinkDuel
+	scf
+	ccf
+	ld a, [wDuelResult]
+	and a
+	jr z, .done
+; set carry if DUEL_LOSS
+	scf
+.done
+	pop hl
+	pop de
+	pop bc
+	ret
+
+Func_1d9be:
+	push af
+	push bc
+	push de
+	push hl
+	farcall Func_11002
+	call Func_1d9ff
+	call Func_1da45
+	jr c, .asm_1d9ed
+	ld a, [wdc06]
+	cp $04
+	jr z, .asm_1d9ed
+	call Func_1da1f
+	call Func_1da2a
+	jr c, .asm_1d9ed
+	call Func_3d0d
+	push af
+	ld a, MUSIC_CARD_POP
+	call SetMusic
+	pop af
+	call Func_1dac1
+	call Func_3d16
+.asm_1d9ed
+	call Func_1da14
+	farcall Func_1101d
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
 
 Func_1d9f9:
 	ld a, $04
 	ld [wdc06], a
 	ret
-; 0x1d9ff
 
-SECTION "Bank 7@5cb7", ROMX[$5cb7], BANK[$7]
+Func_1d9ff:
+	ldtx hl, GiftCenterWelcomeText
+	ldtx de, ReceptionistText
+	farcall PrintScrollableText_WithTextBoxLabelVRAM0
+	ldtx hl, GiftCenterServicePromptText
+	ldtx de, ReceptionistText
+	farcall PrintScrollableText_WithTextBoxLabelVRAM0
+	ret
+
+Func_1da14:
+	ldtx hl, GiftCenterComeAgainText
+	ldtx de, ReceptionistText
+	farcall PrintScrollableText_WithTextBoxLabelVRAM0
+	ret
+
+Func_1da1f:
+	ldtx hl, GiftCenterServiceAcknowledgementText
+	ldtx de, ReceptionistText
+	farcall PrintScrollableText_WithTextBoxLabelVRAM0
+	ret
+
+Func_1da2a:
+	ldtx hl, GiftCenterServiceSaveRequestText
+	ldtx de, ReceptionistText
+	farcall PrintScrollableText_WithTextBoxLabelVRAM0
+	ld c, $01
+	call DrawSavePromptAndWaitForInput
+	ret nc
+	ldtx hl, GiftCenterServiceUnavailableSaveRequiredText
+	ldtx de, ReceptionistText
+	farcall PrintScrollableText_WithTextBoxLabelVRAM0
+	ret
+
+Func_1da45:
+	call Func_1da4f
+	call Func_1da88
+	call Func_1dabd
+	ret
+
+Func_1da4f:
+	ld de, $400
+	ld b, $07
+	ld hl, $5a64
+	call LoadMenuBoxParams
+	ld a, [wdc06]
+	call Func_1cacf
+	call DrawMenuBox
+	ret
+; 0x1da64
+
+SECTION "Bank 7@5a88", ROMX[$5a88], BANK[$7]
+
+Func_1da88:
+	ld a, [wdc06]
+	call HandleMenuBox
+	ld [wdc06], a
+	push af
+	add a
+	ld c, a
+	ld b, $00
+	ld hl, $5ab5
+	add hl, bc
+	ld a, [hli]
+	ld [wTxRam2], a
+	ld a, [hl]
+	ld [wTxRam2 + 1], a
+	pop af
+	jr c, .asm_1daad
+	push af
+	ld a, SFX_CONFIRM
+	call CallPlaySFX
+	pop af
+	ret
+.asm_1daad
+	push af
+	ld a, SFX_CANCEL
+	call CallPlaySFX
+	pop af
+	ret
+; 0x1dab5
+
+SECTION "Bank 7@5abd", ROMX[$5abd], BANK[$7]
+
+Func_1dabd:
+	call Func_1caf1
+	ret
+
+Func_1dac1:
+	ld a, [wdc06]
+	ld hl, $5acb
+	call CallMappedFunction
+	ret
+; 0x1dacb
+
+SECTION "Bank 7@5b63", ROMX[$5b63], BANK[$7]
+
+GiveCoin:
+	farcall Func_1022a
+	call Func_1db6f
+	farcall Func_10252
+	ret
+
+Func_1db6f:
+	push af
+	push bc
+	push de
+	push hl
+	ld [wIncomingCoin], a
+	call Func_1db81
+	call Func_1dc0a
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+Func_1db81:
+	farcall ClearSpriteAnimsAndSetInitialGraphicsConfiguration
+	call DisableLCD
+	call Func_1dbee
+	call EnableLCD
+	farcall SetFrameFuncAndFadeFromWhite
+	call Func_3d0d
+	ld a, [wIncomingCoin]
+	cp COIN_GR_START
+	jr c, .not_coin_gr
+	ld a, COIN_GR
+	ld [wIncomingCoin], a
+	xor a
+	jr .got_frames
+
+.not_coin_gr
+	push af
+	ld a, SFX_COIN_TOSS
+	call CallPlaySFX
+	pop af
+	ld a, 1
+	call SetAndInitCoinAnimation
+	ld a, 52
+
+.got_frames
+	ldtx hl, ObtainedCoinText
+	farcall PrintTextInWideTextBox
+	call DoAFrames_WithPreCheck
+	push af
+	ld a, MUSIC_MEDAL
+	call Func_3d09
+	pop af
+	call WaitForSongToFinish
+	ld a, 60
+	call DoAFrames_WithPreCheck
+	call Func_3d16
+	call WaitForWideTextBoxInput
+	farcall FadeToWhiteAndUnsetFrameFunc
+	ld a, [wd693]
+	set 0, a
+	ld [wd693], a
+	ld a, [wd693]
+	res 2, a
+	ld [wd693], a
+	ld a, [wd693]
+	res 1, a
+	ld [wd693], a
+	ret
+
+Func_1dbee:
+	ld a, [wIncomingCoin]
+	lb de, 88, 88
+	call CreateCoinAnimation
+	lb de,  0, 12
+	lb bc, 20,  6
+	call DrawRegularTextBoxVRAM0
+	ld a, [wIncomingCoin]
+	call GetCoinName
+	call LoadTxRam2
+	ret
+
+Func_1dc0a:
+	farcall ClearSpriteAnimsAndSetInitialGraphicsConfiguration
+	call Func_1dc52
+	farcall SetFrameFuncAndFadeFromWhite
+	xor a
+	ld [wdc0b], a
+.delay_loop
+	call DoFrame
+	call Func_1dc2a
+	ldh a, [hKeysPressed]
+	and PAD_A | PAD_B
+	jr z, .delay_loop
+	farcall FadeToWhiteAndUnsetFrameFunc
+	ret
+
+Func_1dc2a:
+	ld a, [wdc0b]
+	and $10
+	push af
+	call z, .asm_1dc3c
+	pop af
+	call nz, .asm_1dc47
+	ld hl, wdc0b
+	inc [hl]
+	ret
+
+.asm_1dc3c:
+	ld a, [wIncomingCoin]
+	call GetCoinPossessionStatus
+	farcall Func_12c49b
+	ret
+
+.asm_1dc47:
+	ld hl, 0
+	lb bc, 3, 3
+	farcall FillBoxInBGMapWithZero
+	ret
+
+Func_1dc52:
+	lb de,  0, 0
+	lb bc, 20, 8
+	call DrawRegularTextBoxVRAM0
+	call CountEventCoinsObtained
+	ld l, a
+	ld h, 0
+	call LoadTxRam3
+	ldtx hl, ObtainedCoinTotalNumberText
+	ld a, [wIncomingCoin]
+	cp COIN_GR
+	jr nz, .got_coin_and_text
+
+	call CheckObtainedGRCoinPieces
+	cp $f
+	jr z, .got_coin_and_text
+
+	call CountGRCoinPiecesObtained_2
+	ld l, a
+	ld h, 0
+	call LoadTxRam3
+	ldtx hl, ObtainedGRCoinPieceTotalNumberText
+
+.got_coin_and_text
+	lb de, 1, 2
+	call PrintTextNoDelay_InitVRAM0
+	call Func_1dd08
+	ld a, [wIncomingCoin]
+	call GetCoinType
+	push af
+	ld a, b
+	ld [wCoinPage], a
+	pop af
+	call Func_1dd89
+	ret
+
+PauseMenuCoinScreen:
+	farcall Func_1022a
+	call ShowCoinMenuWithoutIncomingCoin
+	farcall Func_10252
+	ret
+
+ShowCoinMenuWithoutIncomingCoin::
+	push af
+	push bc
+	push de
+	push hl
+	ld a, -1
+	ld [wIncomingCoin], a
+	call CoinMenu
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
 
 Func_1dcb7:
 	xor a
-	ld [wdc08], a
-	ld [wdc09], a
+	ld [wSelectedCoin], a
+	ld [wCoinPage], a
 	ret
-; 0x1dcbf
 
-SECTION "Bank 7@5fb9", ROMX[$5fb9], BANK[$7]
+CoinMenu:
+	farcall ClearSpriteAnimsAndSetInitialGraphicsConfiguration
+	farcall ClearSpriteAnims
+	call DisableLCD
+	call Func_1dce3
+	call EnableLCD
+	farcall SetFrameFuncAndFadeFromWhite
+	call Func_1deac
+	push af
+	ld a, SFX_CONFIRM
+	call CallPlaySFX
+	pop af
+	farcall FadeToWhiteAndUnsetFrameFunc
+	ret
+
+Func_1dce3:
+	lb de,  0, 0
+	lb bc, 20, 8
+	call DrawRegularTextBoxVRAM0
+	ldtx hl, PlayerCoinSelectText
+	lb de,  1, 2
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	ld a, [wSelectedCoin]
+	call GetCoinType
+	push af
+	ld a, b
+	ld [wCoinPage], a
+	pop af
+	call Func_1dd89
+	call Func_1dd08
+	ret
+
+Func_1dd08:
+	push af
+	push bc
+	push de
+	push hl
+	ld a, [wSelectedCoin]
+	ldtx hl, PlayerStatusCurrentCoinText
+	lb de,  4, 4
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	lb de,  4, 6
+	lb bc, 12, 1
+	farcall FillBoxInBGMapWithZero
+	call GetCoinName
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	ld a, [wSelectedCoin]
+	lb de,  1, 4
+	farcall Func_12c49b
+	call Func_1dd3a
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+; each coin settings page
+Func_1dd3a:
+	push af
+	push bc
+	push de
+	push hl
+	ld a, [wSelectedCoin]
+	call GetCoinType
+	ld c, a
+	ld a, [wCoinPage]
+	cp b
+	jr z, .got_index
+	ld c, 8
+.got_index
+	ld a, c
+	add a
+	ld c, a
+	ld b, 0
+	ld hl, .CoordTable
+	add hl, bc
+	ld d, [hl]
+	inc hl
+	ld e, [hl]
+	ld b, BANK(.SpriteAnimGfxParams)
+	ld hl, .SpriteAnimGfxParams
+	ld a, 0
+	ld c, 0
+	call CreateSpriteAnim
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+.CoordTable:
+	db   8,  88 ; $0
+	db  48,  88 ; $1
+	db  88,  88 ; $2
+	db 128,  88 ; $3
+	db   8, 120 ; $4
+	db  48, 120 ; $5
+	db  88, 120 ; $6
+	db 128, 120 ; $7
+	db 160, 160 ; $8
+
+.SpriteAnimGfxParams:
+	dw TILESET_WINDOW
+	dw SPRITE_ANIM_9D
+	dw FRAMESET_117
+	dw PALETTE_16B
+
+Func_1dd84:
+	farcall ClearSpriteAnims
+	ret
+
+; coin settings pages
+Func_1dd89:
+	push af
+	push bc
+	push hl
+	push af
+	push bc
+	lb de, 0, 10
+	ld b, BANK(_CoinPageMenuParams)
+	ld hl, _CoinPageMenuParams
+	call LoadMenuBoxParams
+	call DrawMenuBox
+	pop bc
+	push bc
+	ld c, b
+	ld b, 0
+	sla c
+	ld hl, _CoinPageTextTable
+	add hl, bc
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	lb de, 6, 8
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	pop bc
+	push bc
+	ld c, b
+	ld b, 0
+	sla c
+	sla c
+	ld hl, _CoinPageCoordTable
+	add hl, bc
+	ld d, [hl]
+	inc hl
+	ld e, [hl]
+	lb bc, 0, 8
+	call Func_383b
+	inc hl
+	ld d, [hl]
+	inc hl
+	ld e, [hl]
+	lb bc, 19, 8
+	call Func_383b
+	pop bc
+	call Func_1dd3a
+	ld c, b
+	ld b, 0
+	sla c
+	ld hl, _CoinPageListTable
+	add hl, bc
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	pop af
+	ld b, a
+	ld a, 8
+	sub b
+	ld b, a
+	ld c, 8
+.loop_show_coin
+	push bc
+	push hl
+	ld a, [hli]
+	call GetCoinPossessionStatus
+	ld d, [hl]
+	inc hl
+	ld e, [hl]
+	farcall Func_12c49b
+	ld a, c
+	cp b
+	jr nz, .next_coin
+	ld a, d
+	ld [wCoinPageXCoordinate], a
+	ld a, e
+	ld [wCoinPageYCoordinate], a
+.next_coin
+	pop hl
+	ld bc, 3
+	add hl, bc
+	pop bc
+	dec c
+	jr nz, .loop_show_coin
+	ld a, [wCoinPageXCoordinate]
+	ld d, a
+	ld a, [wCoinPageYCoordinate]
+	ld e, a
+	pop hl
+	pop bc
+	pop af
+	ret
+
+Func_1de16:
+	call CheckObtainedGRCoinPieces
+	add COIN_GR_START
+	ret
+
+_CoinPageMenuParams:
+	menubox_params FALSE, 20, 7, \
+		SYM_CURSOR_R, SYM_SPACE, SYM_CURSOR_R, SYM_CURSOR_R, \
+		PAD_A, PAD_B, TRUE, 4, Func_1def1, NULL
+	textitem  1,  1, SingleSpaceText
+	textitem  6,  1, SingleSpaceText
+	textitem 11,  1, SingleSpaceText
+	textitem 16,  1, SingleSpaceText
+	textitem  1,  5, SingleSpaceText
+	textitem  6,  5, SingleSpaceText
+	textitem 11,  5, SingleSpaceText
+	textitem 16,  5, SingleSpaceText
+	textitems_end
+
+_CoinPageTextTable:
+	tx EventCoinPage1Text
+	tx EventCoinPage2Text
+	tx EventCoinPage3Text
+
+; see also: wCoinPageXCoordinate, wCoinPageYCoordinate
+_CoinPageListTable:
+	dw .page1
+	dw .page2
+	dw .page3
+; coin, x, y
+.page1:
+	db COIN_CHANSEY,     1, 10
+	db COIN_GR,          6, 10
+	db COIN_ODDISH,     11, 10
+	db COIN_CHARMANDER, 16, 10
+	db COIN_STARMIE,     1, 14
+	db COIN_PIKACHU,     6, 14
+	db COIN_ALAKAZAM,   11, 14
+	db COIN_KABUTO,     16, 14
+.page2:
+	db COIN_GOLBAT,      1, 10
+	db COIN_MAGNEMITE,   6, 10
+	db COIN_MAGMAR,     11, 10
+	db COIN_PSYDUCK,    16, 10
+	db COIN_MACHAMP,     1, 14
+	db COIN_MEW,         6, 14
+	db COIN_SNORLAX,    11, 14
+	db COIN_TOGEPI,     16, 14
+.page3:
+	db COIN_PONYTA,      1, 10
+	db COIN_HORSEA,      6, 10
+	db COIN_ARBOK,      11, 10
+	db COIN_JIGGLYPUFF, 16, 10
+	db COIN_DUGTRIO,     1, 14
+	db COIN_GENGAR,      6, 14
+	db COIN_RAICHU,     11, 14
+	db COIN_LUGIA,      16, 14
+
+_CoinPageCoordTable:
+	db  0,  0, 15, 0
+	db 15, 32, 15, 0
+	db 15, 32,  0, 0
+
+Func_1deac:
+	push af
+	push bc
+	push de
+	push hl
+	ld a, [wSelectedCoin]
+.asm_1deb3
+	call GetCoinType
+	push af
+	ld a, b
+	ld [wCoinPage], a
+	pop af
+	call HandleMenuBox
+	jr c, .asm_1dec6
+	call Func_1decb
+	jr .asm_1deb3
+.asm_1dec6
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+; COIN_* constant at [wCoinPage] * 8 + a
+Func_1decb:
+	ld b, a
+	ld a, [wCoinPage]
+REPT 3 ; *8
+	add a
+ENDR
+	add b
+	ld b, a
+	call CheckIfCoinWasObtained
+	ld a, b
+	jr nz, .exists
+	push af
+	ld a, SFX_DENIED
+	call CallPlaySFX
+	pop af
+	ret
+.exists
+	push af
+	ld a, SFX_COIN_TOSS
+	call CallPlaySFX
+	pop af
+	ld a, b
+	ld [wSelectedCoin], a
+	call Func_1dd08
+	ret
+
+Func_1def1::
+	push af
+	push bc
+	push de
+	push hl
+	call Func_1df10
+	call GetMenuBoxFocusedItem
+	and 3
+	and a
+	call z, Func_1df60
+	call GetMenuBoxFocusedItem
+	and 3
+	cp 3
+	call z, Func_1df36
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+Func_1df10:
+	ldh a, [hKeysPressed]
+	and PAD_SELECT
+	ret z
+
+	push af
+	ld a, SFX_CURSOR
+	call CallPlaySFX
+	pop af
+	ld a, [wCoinPage]
+	inc a
+	cp 3
+	jr c, .got_value
+	xor a
+.got_value
+	ld [wCoinPage], a
+	ld b, a
+	call GetMenuBoxFocusedItem
+	call Func_1df89
+	call SetMenuBoxFocusedItem
+	call SetwDA37
+	ret
+
+Func_1df36:
+	ldh a, [hDPadHeld]
+	and PAD_RIGHT
+	ret z
+	ld a, [wCoinPage]
+	cp 2
+	jr z, .done
+	push af
+	ld a, SFX_CURSOR
+	call CallPlaySFX
+	pop af
+	ld a, [wCoinPage]
+	inc a
+	ld [wCoinPage], a
+	ld b, a
+	call GetMenuBoxFocusedItem
+	sub 3
+	call Func_1df89
+	call SetMenuBoxFocusedItem
+.done
+	call SetwDA37
+	ret
+
+Func_1df60:
+	ldh a, [hDPadHeld]
+	and PAD_LEFT
+	ret z
+
+	ld a, [wCoinPage]
+	and a
+	jr z, .done
+	push af
+	ld a, SFX_CURSOR
+	call CallPlaySFX
+	pop af
+	ld a, [wCoinPage]
+	dec a
+	ld [wCoinPage], a
+	ld b, a
+	call GetMenuBoxFocusedItem
+	add 3
+	call Func_1df89
+	call SetMenuBoxFocusedItem
+.done
+	call SetwDA37
+	ret
+
+Func_1df89:
+	call Func_1dd84
+	push af
+	ld a,  8
+	ldh [hWX], a
+	ld a, 80
+	ldh [hWY], a
+	call SetWindowOn
+	pop af
+	call DoFrame
+	call Func_1dd89
+	push af
+	call SetWindowOff
+	pop af
+	ret
+
+; a = COIN_* constant
+; return its COIN_TYPE_* in a and b
+GetCoinType:
+	cp COIN_GR_START
+	jr c, .found_coin
+	ld a, COIN_GR
+.found_coin
+	ld b, a
+	srl b
+	srl b
+	srl b
+	and 7
+	ret
+
+Func_1dfb5:
+	ld a, [wSelectedCoin]
+	ret
 
 Func_1dfb9::
 	push af
@@ -2431,7 +4304,7 @@ Func_1dfb9::
 	ld a, $01 ; unused
 	farcall ClearSpriteAnims
 	xor a
-	farcall Func_108c9
+	farcall SetwD8A1
 	xor a
 	ld [wDuelAnimBufferSize], a
 	ld [wDuelAnimBufferCurPos], a
@@ -2597,7 +4470,7 @@ Func_1e088::
 	push de
 	push hl
 	ld c, NUM_SPRITE_ANIM_STRUCTS
-	farcall Func_10bc4
+	farcall GetSpriteAnimBuffer
 .loop_sprite_anims
 	farcall Func_10ab7
 	bit 7, a
@@ -2605,7 +4478,7 @@ Func_1e088::
 	farcall CheckIsSpriteAnimAnimating
 	jr nz, .next_sprite_anim
 	; clear animation
-	farcall Func_10b71
+	farcall _ClearSpriteAnimFlags
 	ld a, [wNumActiveAnimations]
 	dec a
 	ld [wNumActiveAnimations], a
@@ -2761,7 +4634,7 @@ Func_1e171:
 	ld a, [wAnimationPalette + 1]
 	ld b, a
 	farcall GetPaletteGfxPointer
-	farcall Func_10908
+	farcall LoadGfxPalettesFrom0
 	pop hl
 
 .asm_1e1d7
@@ -2788,7 +4661,7 @@ Func_1e171:
 	ld a, [wAnimFlags]
 	and SPRITE_ANIM_FLAG_UNSKIPPABLE
 	jr nz, .animation_enabled
-	farcall Func_10b71
+	farcall _ClearSpriteAnimFlags
 	jr .done
 
 .animation_enabled
@@ -2855,11 +4728,11 @@ PlayCoinAnimation:
 	ld a, [wOppCoin]
 .got_coin
 	lb de, 80, 80
-	call Func_1d198
+	call CreateCoinAnimation
 	ld a, [wCurAnimation]
 	sub DUEL_ANIM_COIN_SPIN
-	call Func_1d443
-	farcall Func_10bc4
+	call SetAndInitCoinAnimation
+	farcall GetSpriteAnimBuffer
 	ret
 
 Func_1e279:
@@ -3100,7 +4973,15 @@ AnimationCoordinates:
 	db  88, 40, $ff ^ (SPRITE_ANIM_FLAG_CENTERED | SPRITE_ANIM_FLAG_8x16 | SPRITE_ANIM_FLAG_UNSKIPPABLE) ; $d
 	db  56, 40, $ff ^ (SPRITE_ANIM_FLAG_CENTERED | SPRITE_ANIM_FLAG_8x16 | SPRITE_ANIM_FLAG_UNSKIPPABLE) ; $e
 	db  24, 40, $ff ^ (SPRITE_ANIM_FLAG_CENTERED | SPRITE_ANIM_FLAG_8x16 | SPRITE_ANIM_FLAG_UNSKIPPABLE) ; $f
-; 0x1e409
+
+GetwDuelAnimBufferSize:
+	ld a, [wDuelAnimBufferSize]
+	ret
+
+GetwDuelAnimBufferCurPos:
+	ld a, [wDuelAnimBufferCurPos]
+	ret
+; 0x1e411
 
 SECTION "Bank 7@6419", ROMX[$6419], BANK[$7]
 
@@ -3413,7 +5294,7 @@ Func_1e5a2::
 SECTION "Bank 7@65f8", ROMX[$65f8], BANK[$7]
 
 RunDuelFromSRAM:
-	farcall Func_10cfe
+	farcall Stub_10cfe
 	farcall Func_1109f
 	farcall Func_1022a
 	bank1call StartDuelFromSRAM
@@ -3428,7 +5309,7 @@ Func_1e60c:
 	farcall ClearSpriteAnimsAndSetInitialGraphicsConfiguration
 
 	; show opponent portrait
-	ld a, [wOpponentNPCID]
+	ld a, [wOpponentPicID]
 	lb bc, 7, 3
 	ld e, EMOTION_NORMAL
 	call DrawNPCPortrait
@@ -3451,7 +5332,7 @@ Func_1e60c:
 	ld [wTxRam2_b + 0], a
 	ld a, [wOpponentDeckName + 1]
 	ld [wTxRam2_b + 1], a
-	ld a, [wcd0f]
+	ld a, [wDuelistIntroText]
 	dec a
 	add a ; *2
 	ld c, a
@@ -3461,7 +5342,7 @@ Func_1e60c:
 	ld a, [hli]
 	ld h, [hl]
 	ld l, a
-	farcall Func_1107c
+	farcall PrintTextInWideTextBox
 
 	call WaitForSongToFinish
 	call WaitForWideTextBoxInput
@@ -3481,7 +5362,7 @@ Func_1e60c:
 	tx DuelistIntroScienceClubMemberText
 	tx DuelistIntroWaterClubMemberText
 	tx DuelistIntroFireClubMemberText
-	tx DuelistIntroLightingClubMasterText
+	tx DuelistIntroLightningClubMasterText
 	tx DuelistIntroPsychicClubMasterText
 	tx DuelistIntroRockClubMasterText
 	tx DuelistIntroFightingClubMasterText
@@ -3500,17 +5381,17 @@ Func_1e60c:
 	tx DuelistIntroGRFireFortMemberText
 	tx DuelistIntroGRWaterFortMemberText
 	tx DuelistIntroGRFightingFortMemberText
-	tx DuelistIntroGRPsychicFortMemberText
+	tx DuelistIntroGRPsychicStrongholdMemberText
 	tx DuelistIntroGRGrassFortLeaderText
 	tx DuelistIntroGRLightningFortLeaderText
 	tx DuelistIntroGRFireFortLeaderText
 	tx DuelistIntroGRWaterFortLeaderText
 	tx DuelistIntroGRFightingFortLeaderText
-	tx DuelistIntroGRPsychicFortLeaderText
+	tx DuelistIntroGRPsychicStrongholdLeaderText
 	tx DuelistIntroColorlessAltarGuardianText
 	tx DuelistIntroGRBigBossText
 	tx DuelistIntroGRKingText
-	tx DuelistIntroUntitledText
+	tx DuelistIntroTapText
 	tx DuelistIntroDungeonMasterText
 	tx DuelistIntroGhostMasterText
 
@@ -3553,7 +5434,7 @@ ShowSpecialRuleDescription:
 	ld h, [hl]
 	ld l, a
 	lb de, 3, 4
-	call Func_35af
+	call InitTextPrinting_ProcessTextFromIDVRAM0
 	pop hl
 
 	; print description
@@ -3566,7 +5447,7 @@ ShowSpecialRuleDescription:
 	ld h, [hl]
 	ld l, a
 	lb de, 1, 8
-	call Func_35af
+	call InitTextPrinting_ProcessTextFromIDVRAM0
 	ret
 
 .TitleAndDescriptionTextIDs:
@@ -3582,9 +5463,6 @@ ShowSpecialRuleDescription:
 	tx SpecialRuleEnergyReturnTitleText,  SpecialRuleEnergyReturnDescriptionText
 	tx SpecialRuleToughEscapeTitleText,   SpecialRuleToughEscapeDescriptionText
 	tx SpecialRuleBlackHoleTitleText,     SpecialRuleBlackHoleDescriptionText
-; 0x1e73a
-
-SECTION "Bank 7@673a", ROMX[$673a], BANK[$7]
 
 Func_1e73a:
 	push af
@@ -3601,98 +5479,1595 @@ Func_1e73a:
 	pop bc
 	pop af
 	ret
-; 0x1e74f
 
-SECTION "Bank 7@6767", ROMX[$6767], BANK[$7]
-
-Func_1e767:
-	xor a
-	ld [wdd07], a
+PauseMenuMinicomScreen:
+	farcall Func_1022a
+	call PushRegistersAndShowMinicomScreen
+	farcall Func_10252
 	ret
-; 0x1e76c
 
-SECTION "Bank 7@6ca5", ROMX[$6ca5], BANK[$7]
+PushRegistersAndShowMinicomScreen:
+	push af
+	push bc
+	push de
+	push hl
+	call ShowMinicomScreen
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
 
-Func_1eca5:
+ClearwMinicomMenuCursorPosition:
+	xor a
+	ld [wMinicomMenuCursorPosition], a
+	ret
+
+ShowMinicomScreen:
+	farcall ClearSpriteAnimsAndSetInitialGraphicsConfiguration
+	call DrawMinicomMainScreen
+	farcall SetFrameFuncAndFadeFromWhite
+.loop
+	call HandleMinicomMenuBox
+	jr c, .end
+	call CallMinicomMenuFunction
+	jr c, .end
+	call DisableLCD
+	farcall ClearSpriteAnimsAndSetInitialGraphicsConfiguration
+	call DrawMinicomMainScreen
+	call EnableLCD
+	jr .loop
+.end
+	farcall FadeToWhiteAndUnsetFrameFunc
+	ret
+
+DrawMinicomMainScreen:
+	ld b, BANK(.menu)
+	ld hl, .menu
+	lb de, 0, 3
+	call LoadMenuBoxParams
+	ld a, [wMinicomMenuCursorPosition]
+	call DrawMenuBox
+	lb de, 0, 0
+	lb bc, 20, 4
+	call DrawRegularTextBoxVRAM0
+	ldtx hl, PauseMenuMinicomText
+	lb de, 7, 2
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	lb de, 0, 12
+	lb bc, 20, 6
+	call DrawRegularTextBoxVRAM0
+	ldtx hl, MinicomDialogText
+	lb de, 1, 14
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	call Func_1f309
+	jr z, .done
+	ld b, BANK(.SpriteAnimGfxParams)
+	ld hl, .SpriteAnimGfxParams
+	ld d, 120
+	ld e, 32
+	ld a, $00
+	ld c, $00
+	call CreateSpriteAnim
+.done
+	ret
+
+.menu:
+	menubox_params TRUE, 20, 10, \
+		SYM_CURSOR_R, SYM_SPACE, SYM_CURSOR_R, SYM_CURSOR_R, \
+		PAD_A, PAD_B, FALSE, 1, NULL, NULL
+	textitem 3, 2, MinicomDeckSaveMachineText
+	textitem 3, 4, MinicomMailboxText
+	textitem 3, 6, MinicomCardAlbumText
+	textitem 3, 8, PCMenuShutdownText
+	textitems_end
+
+.SpriteAnimGfxParams:
+	dw TILESET_SMALL_ENVELOPE
+	dw SPRITE_ANIM_AA
+	dw FRAMESET_173
+	dw PALETTE_180
+
+; return
+;	 a - cursor position, used later in CallMinicomMenuFunction
+HandleMinicomMenuBox:
+	ld a, [wMinicomMenuCursorPosition]
+	call HandleMenuBox
+	ld [wMinicomMenuCursorPosition], a
+	jr c, .cancel
+	push af
+	ld a, SFX_CONFIRM
+	call CallPlaySFX
+	pop af
+	ret
+.cancel
+	push af
+	ld a, SFX_CANCEL
+	call CallPlaySFX
+	pop af
+	ret
+
+; a - function table index
+CallMinicomMenuFunction:
+	ld hl, .minicom_functions
+	call CallMappedFunction
+	ret
+
+.minicom_functions:
+	key_func MINICOMMENU_DECK_SAVE_MACHINE, MinicomDeckSaveMachine
+	key_func MINICOMMENU_MAILBOX,           MinicomMailbox
+	key_func MINICOMMENU_CARD_ALBUM,        MinicomCardAlbum
+	db $ff
+
+MinicomDeckSaveMachine:
+	farcall ClearSpriteAnimsAndSetInitialGraphicsConfiguration
+	farcall Func_baec
+	ret
+
+MinicomCardAlbum:
+	farcall ClearSpriteAnimsAndSetInitialGraphicsConfiguration
+	farcall Func_a786
+	ret
+
+Func_1e849:
+	farcall Func_1022a
+	call MinicomDeckSaveMachine
+	farcall Func_10252
+	ret
+
+Func_1e855:
+	farcall Func_1022a
+	farcall ClearSpriteAnimsAndSetInitialGraphicsConfiguration
+	farcall HandleAutoDeckMenu
+	farcall Func_10252
+	ret
+
+LoadBoosterPackScene:
+	push af
+	push bc
+	push de
+	push hl
+	ld c, a
+	ld b, 0
+	ld hl, .SceneTable
+	add hl, bc
+	ld a, [hl]
+	lb bc, 6, 0
+	call LoadScene
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+.SceneTable:
+	db SCENE_BEGINNING_PACK
+	db SCENE_LEGENDARY_PACK
+	db SCENE_FOSSIL_PACK
+	db SCENE_PSYCHIC_PACK
+	db SCENE_FLYING_PACK
+	db SCENE_ROCKET_PACK
+	db SCENE_AMBITION_PACK
+	db SCENE_PRESENT_PACK
+	db SCENE_INTRO_BASE_SET
+	db SCENE_INTRO_JUNGLE
+	db SCENE_INTRO_FOSSIL
+	db SCENE_INTRO_TEAM_ROCKET
+
+Func_1e889:
+	farcall Func_1022a
+	call GiveBoosterPacks
+	farcall Func_10252
+	ret
+
+; a = BOOSTER_* constant, b = has-another count?
+GiveBoosterPacks:
+	push af
+	push bc
+	push de
+	push hl
+	ld [wCurBoosterPack], a
+	ld a, b
+	ld [wAnotherBoosterPack], a
+	call _GiveBoosterPack
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+_GiveBoosterPack:
+	farcall ClearSpriteAnimsAndSetInitialGraphicsConfiguration
+	call .DrawScreen
+	farcall SetFrameFuncAndFadeFromWhite
+	call Func_3d0d
+	push af
+	ld a, MUSIC_BOOSTER_PACK
+	call Func_3d09
+	pop af
+	ld a, [wCurBoosterPack]
+	add a
+	add a ; table_width 4
+	ld c, a
+	ld b, 0
+	ld hl, .TextTable
+	add hl, bc
+	ld a, [hli]
+	ld [wTxRam2], a
+	ld a, [hli]
+	ld [wTxRam2 + 1], a
+	ld a, [hli]
+	ld [wTxRam2_b], a
+	ld a, [hl]
+	ld [wTxRam2_b + 1], a
+	ldtx hl, ReceivedBoosterPackText
+	ld a, [wAnotherBoosterPack]
+	and a
+	jr z, .loaded_text
+	ldtx hl, ReceivedAnotherBoosterPackText
+
+.loaded_text
+	farcall PrintTextInWideTextBox
+	call WaitForSongToFinish
+	ld a, 60
+	call DoAFrames_WithPreCheck
+	call Func_3d16
+	call WaitForWideTextBoxInput
+	ldtx hl, OpenedBoosterPackText
+	farcall PrintScrollableText_NoTextBoxLabelVRAM0
+	farcall UnsetSpriteAnimationAndFadePalsFrameFunc
+	call .GetPack
+	farcall SetSpriteAnimationAndFadePalsFrameFunc
+	farcall FadeToWhiteAndUnsetFrameFunc
+	ret
+
+; pack number, title
+.TextTable:
+	tx BoosterPack1Text, BoosterPackBeginningPokemonText    ; BOOSTER_BEGINNING_POKEMON
+	tx BoosterPack2Text, BoosterPackLegendaryPowerText      ; BOOSTER_LEGENDARY_POWER
+	tx BoosterPack3Text, BoosterPackIslandOfFossilText      ; BOOSTER_ISLAND_OF_FOSSIL
+	tx BoosterPack4Text, BoosterPackPsychicBattleText       ; BOOSTER_PSYCHIC_BATTLE
+	tx BoosterPack5Text, BoosterPackFlyingPokemonText       ; BOOSTER_SKY_FLYING_POKEMON
+	tx BoosterPack6Text, BoosterPackWeAreTeamRocketText     ; BOOSTER_WE_ARE_TEAM_ROCKET
+	tx BoosterPack7Text, BoosterPackTeamRocketsAmbitionText ; BOOSTER_TEAM_ROCKETS_AMBITION
+	tx SingleSpaceText,  DebugUnregisteredText              ; BOOSTER_DEBUG_10_STAR
+	tx SingleSpaceText,  PresentPackText                    ; BOOSTER_PRESENT_10_ENERGY
+	tx SingleSpaceText,  PresentPackText                    ; BOOSTER_PRESENT_FROM_ALL_SETS
+	tx SingleSpaceText,  PresentPackText                    ; BOOSTER_PRESENT_FROM_NON_ROCKET_SETS
+	tx SingleSpaceText,  PresentPackText                    ; BOOSTER_PRESENT_FROM_LATTER_4_SETS
+	tx SingleSpaceText,  PresentPackText                    ; BOOSTER_PRESENT_FROM_ROCKET_SETS
+	tx SingleSpaceText,  DebugUnregisteredText              ; BOOSTER_DEBUG_2_STAR
+
+.DrawScreen:
+	ld a, [wCurBoosterPack]
+	ld c, a
+	ld b, 0
+	ld hl, .PackTable
+	add hl, bc
+	ld a, [hl]
+	lb de,  6,  0
+	call LoadBoosterPackScene
+	lb de,  0, 12
+	lb bc, 20,  6
+	call DrawRegularTextBoxVRAM0
+	ret
+
+.PackTable:
+	db BEGINNING_POKEMON     ; BOOSTER_BEGINNING_POKEMON
+	db LEGENDARY_POWER       ; BOOSTER_LEGENDARY_POWER
+	db ISLAND_OF_FOSSIL      ; BOOSTER_ISLAND_OF_FOSSIL
+	db PSYCHIC_BATTLE        ; BOOSTER_PSYCHIC_BATTLE
+	db SKY_FLYING_POKEMON    ; BOOSTER_SKY_FLYING_POKEMON
+	db WE_ARE_TEAM_ROCKET    ; BOOSTER_WE_ARE_TEAM_ROCKET
+	db TEAM_ROCKETS_AMBITION ; BOOSTER_TEAM_ROCKETS_AMBITION
+	db BEGINNING_POKEMON     ; BOOSTER_DEBUG_10_STAR
+	db PRESENT_PACK          ; BOOSTER_PRESENT_10_ENERGY
+	db PRESENT_PACK          ; BOOSTER_PRESENT_FROM_ALL_SETS
+	db PRESENT_PACK          ; BOOSTER_PRESENT_FROM_NON_ROCKET_SETS
+	db PRESENT_PACK          ; BOOSTER_PRESENT_FROM_LATTER_4_SETS
+	db PRESENT_PACK          ; BOOSTER_PRESENT_FROM_ROCKET_SETS
+	db BEGINNING_POKEMON     ; BOOSTER_DEBUG_2_STAR
+
+.GetPack:
+	call DoFrame
+	farcall ClearSpriteAnims
+	call DisableLCD
+	call DoFrame
+	ld a, [wCurBoosterPack]
+	farcall GetBoosterPack
+	ret
+
+Func_1e984:
+	farcall Func_1022a
+	call Func_1e990
+	farcall Func_10252
+	ret
+
+Func_1e990:
+	push af
+	push bc
+	push de
+	push hl
+	call Func_1e99c
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+Func_1e99c:
+	farcall ClearSpriteAnimsAndSetInitialGraphicsConfiguration
+	farcall InitOWObjects
+	call Func_1e9ce
+	call Func_1ea1f
+	call Func_1ea6d
+	call Func_1eba4
+	ld bc, PALETTE_161
+	farcall GetPaletteGfxPointer
+	ld c, $00
+	call LoadGfxPalettes
+	farcall SetFrameFuncAndFadeFromWhite
+	ld c, PAD_B
+	farcall WaitForButtonPress
+	call Func_3f61
+	farcall FadeToWhiteAndUnsetFrameFunc
+	ret
+
+Func_1e9ce:
+	ld a, SCENE_TOURNAMENT_TABLE
+	lb bc, 0, 0
+	call LoadScene
+	lb de, 1, 1
+	lb bc, 18, 1
+	farcall FillBoxInBGMapWithZero
+	ldtx hl, GrandMasterCupBracketTitleText
+	lb de, 1, 1
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	ret
+
+Func_1e9ea:
+	push af
+	push bc
+	push de
+	push hl
+	ld d, h
+	ld e, l
+	add a
+	ld c, a
+	ld b, $00
+	ld hl, wdd0a
+	add hl, bc
+	ld [hl], e
+	inc hl
+	ld [hl], d
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+Func_1ea00:
+	push af
+	push hl
+	xor a
+	ldtx hl, TxRam1Text
+.asm_1ea06
+	call Func_1e9ea
+	inc a
+	cp $08
+	jr nz, .asm_1ea06
+	ld hl, wdd1a
+	ld c, $07
+	xor a
+.asm_1ea14
+	ld [hli], a
+	dec c
+	jr nz, .asm_1ea14
+	xor a
+	ld [wdd21], a
+	pop hl
+	pop af
+	ret
+
+Func_1ea1f:
+	push af
+	push bc
+	push de
+	push hl
+	lb de, 1, 2
+	lb bc, 6, 15
+	farcall FillBoxInBGMapWithZero
+	lb de, 1, 2
+	ld hl, wdd0a
+	xor a
+.asm_1ea34
+	push hl
+	push af
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	pop af
+	call PrintTextNoDelay_InitVRAM0
+	pop hl
+	inc hl
+	inc hl
+	inc e
+	inc e
+	inc a
+	cp $08
+	jr nz, .asm_1ea34
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+Func_1ea4c:
+	push af
+	push bc
+	push hl
+	ld b, $00
+	ld hl, wdd1a
+	add hl, bc
+	ld [hl], a
+	dec a
+	and $01
+	inc c
+.asm_1ea5a
+	sla a
+	dec c
+	jr nz, .asm_1ea5a
+	ld b, a
+	srl b
+	ld a, [wdd21]
+	or b
+	ld [wdd21], a
+	pop hl
+	pop bc
+	pop af
+	ret
+
+Func_1ea6d:
+	push af
+	push bc
+	push de
+	push hl
+	ld hl, wdd1a
+	ld bc, $0
+.asm_1ea77
+	ld a, [hli]
+	and a
+	jr z, .asm_1ea89
+	push af
+	push bc
+	push de
+	push hl
+	call Func_1ea94
+	call Func_1eaa5
+	pop hl
+	pop de
+	pop bc
+	pop af
+.asm_1ea89
+	inc c
+	ld a, c
+	cp $07
+	jr nz, .asm_1ea77
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+Func_1ea94:
+	ld hl, $6aba
+	sla c
+	sla c
+	add hl, bc
+	dec a
+	ld c, a
+	sla c
+	add hl, bc
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	ret
+
+Func_1eaa5:
+.asm_1eaa5
+	ld a, [hl]
+	cp $ff
+	ret z
+	ld b, [hl]
+	inc hl
+	ld c, [hl]
+	inc hl
+	ld a, [hl]
+	add $80
+	ld d, a
+	inc hl
+	ld e, [hl]
+	inc hl
+	call Func_383b
+	jr .asm_1eaa5
+	ret
+; 0x1eaba
+
+SECTION "Bank 7@6ba4", ROMX[$6ba4], BANK[$7]
+
+Func_1eba4:
+	push af
+	push bc
+	push de
+	push hl
+	ldtx hl, GrandMasterCupBracketChampionshipText
+	ld a, [wdd20]
+	and a
+	jr z, .asm_1ebd1
+	call Func_1ebe3
+	push af
+	farcall Func_4565d
+	ld [wdd22], a
+	call Func_1ec0f
+	ld hl, Func_3d54
+	call Func_3f6b
+	pop af
+	add a
+	ld c, a
+	ld b, $00
+	ld hl, wdd0a
+	add hl, bc
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+.asm_1ebd1
+	lb de, 13, 9
+	lb bc, 6, 1
+	farcall FillBoxInBGMapWithZero
+	call PrintTextNoDelay_InitVRAM0
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+Func_1ebe3:
+	push bc
+	push de
+	push hl
+	ld hl, $6bff
+	ld d, $00
+.asm_1ebeb
+	ld a, [wdd21]
+	ld b, [hl]
+	inc hl
+	and b
+	ld c, [hl]
+	inc hl
+	inc d
+	cp c
+	jr nz, .asm_1ebeb
+	dec d
+	ld a, d
+	and $07
+	pop hl
+	pop de
+	pop bc
+	ret
+; 0x1ebff
+
+SECTION "Bank 7@6c0f", ROMX[$6c0f], BANK[$7]
+
+Func_1ec0f:
+	push af
+	push bc
+	push de
+	push hl
+	ld a, [wdd22]
+	ld b, $02
+	ld d, $70
+	ld e, $30
+	farcall LoadOWObject
+	farcall ResetOWObjectSpriteAnimating
+	ld b, $01
+	farcall _SetOWObjectFrameIndex
+	xor a
+	ld [wdd24], a
+	ld a, $02
+	ld [wdd23], a
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+; 0x1ec38
+
+SECTION "Bank 7@6c96", ROMX[$6c96], BANK[$7]
+
+MinicomMailbox:
+	push af
+	push bc
+	push de
+	push hl
+	call MinicomMailboxNewMailScreen
+	call MinicomMailboxMainScreen
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+InitializeMailboxWRAM:
 	push af
 	push bc
 	push de
 	push hl
 	xor a
-	ld [wdd36], a
-	ld [wdd50], a
-	ld [wdd5c], a
-	ld [wdd5d], a
-	ld [wdd5e], a
-	ld [wdd5b], a
-	ld [wdd5a], a
-	ld [wdd5f], a
-	ld [wdd60], a
-	ld [wdd73], a
-	ld [wdd74], a
+	ld [wNumMailInQueue], a
+	ld [wMailCount], a
+	ld [wMailboxPage], a
+	ld [wSelectedMailCursorPosition], a
+	ld [wMailOptionSelected], a
+	ld [wTempNumMailInQueue], a
+	ld [wNewMail], a
+	ld [wBlackBoxCardReceived], a
+	ld [wBlackBoxCardReceived + 1], a
+	ld [wBillsPCCardReceived], a
+	ld [wBillsPCCardReceived + 1], a
 	xor a
-	ld hl, wdd37
-	ld bc, $19
+	ld hl, wMailQueue
+	ld bc, MAIL_QUEUE_BUFFER_SIZE
 	call WriteBCBytesToHL
 	xor a
-	ld hl, wdd51
-	ld bc, $9
+	ld hl, wMailList
+	ld bc, MAIL_BUFFER_SIZE
 	call WriteBCBytesToHL
 	pop hl
 	pop de
 	pop bc
 	pop af
 	ret
-; 0x1ece4
 
-SECTION "Bank 7@7293", ROMX[$7293], BANK[$7]
+; the screen after selecting the mailbox which has a large picture of a literal mailbox on it
+MinicomMailboxNewMailScreen:
+	call DisableLCD
+	farcall ClearSpriteAnimsAndSetInitialGraphicsConfiguration
+	call CalculateMailboxStatus
+	call Func_1ed2d
+	call FlushAllPalettes
+	call EnableLCD
+	ld a, [wNewMail]
+	and a
+	jr z, .asm_1ed04
+	push af
+	ld a, SFX_NEW_MAIL
+	call CallPlaySFX
+	pop af
+.asm_1ed04
+	call Func_1ed57
+	call DisableLCD
+	xor a
+	ld [wNewMail], a
+	ld [wMailboxPage], a
+	ld [wSelectedMailCursorPosition], a
+	ld [wTempNumMailInQueue], a
+	ret
 
-Func_1f293:
+CalculateMailboxStatus:
+	ld b, $00
+	ld a, [wTempNumMailInQueue]
+	and a
+	jr nz, .asm_1ed28
+	inc b
+	ld a, [wNewMail]
+	and a
+	jr nz, .asm_1ed28
+	inc b
+.asm_1ed28
+	ld a, b
+	ld [wMailboxStatus], a
+	ret
+
+Func_1ed2d:
+	lb de, 0, 0
+	lb bc, 20, 4
+	call DrawRegularTextBoxVRAM0
+	ldtx hl, MailboxTitleText
+	lb de, 6, 2
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	lb de, 0, 12
+	lb bc, 20, 6
+	call DrawRegularTextBoxVRAM0
+	call Func_1ed5e
+	call LoadMailboxScene
+	ret
+
+LoadMailboxScene:
+	lb bc, 5, 5
+	ld a, [hli]
+	call LoadScene
+	ret
+
+; hl - text
+Func_1ed57:
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	farcall PrintScrollableText_NoTextBoxLabelVRAM0
+;	fallthrough
+
+Func_1ed5e:
+	ld a, [wMailboxStatus]
+	add a
+	ld c, a
+	ld b, $00
+	ld hl, .MailboxScenes
+	add hl, bc
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	ret
+
+.MailboxScenes:
+	dw .SceneFull
+	dw .SceneGotMail
+	dw .SceneNoNewMail
+.SceneFull
+	db SCENE_FULL_MAILBOX
+	tx MailboxFullWarningText
+.SceneGotMail
+	db SCENE_GOT_MAIL
+	tx MailboxNewMailText
+.SceneNoNewMail
+	db SCENE_MAILBOX
+	tx MailboxNoNewMailText
+; 0x1ed7c
+
+SECTION "Bank 7@6da5", ROMX[$6da5], BANK[$7]
+
+MinicomMailboxMainScreen:
+	call DisableLCD
+	farcall ClearSpriteAnimsAndSetInitialGraphicsConfiguration
+	lb de, $40, $ff
+	call SetupText
+	call MinicomMailboxMainScreen_DrawTextBoxes
+	call FlushAllPalettes
+	call EnableLCD
+.loop
+	call MailboxMainScreen
+	call Func_1eef8
+	jr c, .done
+	call MailboxSelectedMail_LoadMenuBoxParams
+	call MailboxSelectedMail_HandleMenuBox
+	jr c, .loop
+	call MailboxSelectedMail_CallMappedFunction
+	jr .loop
+.done
+	ret
+
+MinicomMailboxMainScreen_DrawTextBoxes:
+	lb de, 0, 4
+	lb bc, 20, 14
+	call DrawRegularTextBoxVRAM0
+	lb de, 0, 0
+	lb bc, 20, 5
+	call DrawRegularTextBoxVRAM0
+	ret
+
+MailboxMainScreen:
 	push af
 	push bc
 	push de
 	push hl
-	ld a, [wdd36]
+	lb de, 1, 5
+	ld b, BANK(MailboxMainScreenMenuBoxParams)
+	ld hl, MailboxMainScreenMenuBoxParams
+	call LoadMenuBoxParams
+	ld a, [wSelectedMailCursorPosition]
+	call DrawMenuBox
+	lb de, 0, 0
+	lb bc, 20, 5
+	call DrawRegularTextBoxVRAM0
+	ldtx hl, MailboxChooseMailText
+	ld a, [wMailCount]
 	and a
-	jr z, .asm_1f2eb
-	ld a, $ff
-	ld [wdd5a], a
-	ld a, [wdd50]
-	cp $08
-	jr z, .asm_1f2eb
-	ld de, wdd51
-	ld hl, wdd37
-	ld a, [wdd50]
-	ld b, a
-	ld a, $08
-	sub b
-	ld b, a
-	ld c, $00
-.asm_1f2b9
+	jr nz, .asm_1ee0e
+	ldtx hl, MailboxEmptyText
+.asm_1ee0e
+	lb de, 1, 2
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	ldtx hl, MailboxTitleText
+	lb de, 1, 0
+	call Func_2c4b
+	ld a, [wMailboxPage]
+	add a
+	add a
+	ld c, a
+	ld b, $00
+	ld hl, wMailList
+	add hl, bc
+	lb de, 2, 6
+	ld c, MAIL_MAX_ON_SCREEN
+.print_mail_loop
 	ld a, [hli]
 	and a
-	jr z, .asm_1f2c6
-	res 7, a
-	call .Func_1f2f6
+	jr z, .count_mail_items_on_screen
+	call PrintMailSenderAndSubjectToScreen
+	dec c
+	jr nz, .print_mail_loop
+.count_mail_items_on_screen
+	ld a, MAIL_MAX_ON_SCREEN
+	sub c
+	and a
+	jr nz, .done
+	inc a
+.done
+	call SetMenuBoxNumItems
+	call Func_1ee97
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+; a - mail ID to print
+; de - coordinates passed to InitTextPrinting_ProcessTextFromIDVRAM0
+PrintMailSenderAndSubjectToScreen:
+	push bc
+	push hl
+	ldtx hl, MailboxSenderText
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	inc e
+	ldtx hl, MailboxSubjectText
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	and a
+	jr z, .asm_1ee68
+	bit B_MAIL_READ, a
+	jr nz, .asm_1ee68
+	dec d
+	ldtx hl, MailboxUnreadSymbolText
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	inc d
+.asm_1ee68
+	ld hl, Mail
+	and ~(1 << B_MAIL_READ)
+	ld c, a
+	ld b, $00
+	sla c
+	rl b
+	add hl, bc
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	ld a, d
+	add $05
+	ld d, a
+	dec e
+
+	push hl
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	; sender
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+
+	pop hl
+	inc hl
+	inc hl
+	inc e
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	; subject
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	inc e
+	inc e
+	ld a, d
+	sub $05
+	ld d, a
+	pop hl
+	pop bc
+	ret
+
+Func_1ee97:
+	lb bc, 1, 17
+	ld d, $1d
+	ld e, $01
+	call Func_383b
+	ld a, [wMailboxPage]
+	cp $01
+	jr nz, .asm_1eebd
+	lb bc, 1, 4
+	ld d, $2f
+	ld e, $41
+	call Func_383b
+	lb bc, 1, 17
+	ld d, $1d
+	ld e, $01
+	call Func_383b
+	ret
+.asm_1eebd
+	ld a, [wMailCount]
+	cp $05
+	ret c
+	lb bc, 1, 17
+	ld d, $2f
+	ld e, $01
+	call Func_383b
+	lb bc, 1, 4
+	ld d, $1d
+	ld e, $01
+	call Func_383b
+	ret
+
+; a menu box with blank text items that line up with mail items on screen
+MailboxMainScreenMenuBoxParams:
+	menubox_params FALSE, 18, 12, \
+		SYM_CURSOR_R, SYM_SPACE, SYM_CURSOR_R, SYM_CURSOR_R, \
+		PAD_A, PAD_B, FALSE, 1, UpdateMailboxPage, NULL
+	textitem 1,  1, SingleSpaceText
+	textitem 1,  4, SingleSpaceText
+	textitem 1,  7, SingleSpaceText
+	textitem 1, 10, SingleSpaceText
+	textitems_end
+
+Func_1eef8:
+	ld a, [wSelectedMailCursorPosition]
+	call HandleMenuBox
+	ld [wSelectedMailCursorPosition], a
+	jr c, .asm_1ef22
+	call GetSelectedMailPosition
+	ld c, a
+	ld b, $00
+	ld hl, wMailList
+	add hl, bc
+	ld a, [hl]
+	and a
+	jr nz, .asm_1ef1a
+	push af
+	ld a, SFX_DENIED
+	call CallPlaySFX
+	pop af
+	jr Func_1eef8
+.asm_1ef1a
+	push af
+	ld a, SFX_CONFIRM
+	call CallPlaySFX
+	pop af
+	ret
+.asm_1ef22
+	push af
+	ld a, SFX_CANCEL
+	call CallPlaySFX
+	pop af
+	ret
+
+_UpdateMailboxPage::
+	push af
+	push bc
+	push de
+	push hl
+	call GetMenuBoxFocusedItem
+	and $03 ; bottom-most mail item on the screen
+	cp 3
+	call z, ScrollMailboxPageOnPadDown
+	call GetMenuBoxFocusedItem
+	and $03
+	and a ; top mail item on the screen
+	call z, ScrollMailboxPageOnPadUp
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+ScrollMailboxPageOnPadDown:
+	ldh a, [hDPadHeld]
+	and PAD_DOWN
+	ret z
+
+	ld a, [wMailboxPage]
+	cp 1
+	ret z
+
+	ld a, [wMailCount]
+	cp 5
+	ret c
+
+	push af
+	ld a, SFX_CURSOR
+	call CallPlaySFX
+	pop af
+	ld a, [wMailboxPage]
+	inc a
+	ld [wMailboxPage], a
+	xor a
+	ld [wSelectedMailCursorPosition], a
+	call MailboxMainScreen
+	call SetMenuBoxFocusedItem
+	call SetwDA37
+	ret
+
+ScrollMailboxPageOnPadUp:
+	ldh a, [hDPadHeld]
+	and PAD_UP
+	ret z
+
+	ld a, [wMailboxPage]
+	and a
+	ret z
+
+	push af
+	ld a, SFX_CURSOR
+	call CallPlaySFX
+	pop af
+	ld a, [wMailboxPage]
+	dec a
+	ld [wMailboxPage], a
+	ld a, 3
+	ld [wSelectedMailCursorPosition], a
+	call MailboxMainScreen
+	call SetMenuBoxFocusedItem
+	call SetwDA37
+	ret
+; 0x1ef9a
+
+SECTION "Bank 7@6fa4", ROMX[$6fa4], BANK[$7]
+
+MailboxSelectedMail_LoadMenuBoxParams:
+	lb de, 0, 0
+	ld b, BANK(.menu_box_params)
+	ld hl, .menu_box_params
+	call LoadMenuBoxParams
+	xor a
+	call DrawMenuBox
+	ldtx hl, MailboxActionPromptText
+	lb de, 1, 1
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	ret
+
+.menu_box_params
+	menubox_params TRUE, 20, 5, \
+		SYM_CURSOR_R, SYM_SPACE, SYM_CURSOR_R, SYM_CURSOR_R, \
+		PAD_A, PAD_B, TRUE, 0, NULL, NULL
+	textitem  2, 3, MailboxActionReadText
+	textitem  9, 3, MailboxActionDeleteText
+	textitem 16, 3, GiftCenterQuitText
+	textitems_end
+
+MailboxSelectedMail_HandleMenuBox:
+	xor a
+	call HandleMenuBox
+	ld [wMailOptionSelected], a
+	ret
+
+MailboxSelectedMail_CallMappedFunction:
+	ld a, [wMailOptionSelected]
+	ld hl, .function_map
+	call CallMappedFunction
+	ret
+
+.function_map:
+	key_func MAILBOXMENU_READ,   ReadMail
+	key_func MAILBOXMENU_DELETE, DeleteMail
+	db $ff
+
+ReadMail:
+	call DrawReadMailScreenHeader
+	call _ReadMail
+	ret
+
+; draws the box at the top that says the sender and subject
+; does not actually fill in the sender and subject names though
+DrawReadMailScreenHeader:
+	lb de, $40, $7f
+	call SetupText
+	lb de, 0, 0
+	lb bc, 20, 5
+	call DrawRegularTextBoxVRAM0
+	ldtx hl, MailboxTitleText
+	lb de, 1, 0
+	call Func_2c4b
+	ld hl, .text_items
+	call PlaceTextItemsVRAM0
+	ret
+
+.text_items:
+	textitem 1, 2, MailboxSenderText
+	textitem 1, 3, MailboxSubjectText
+	textitems_end
+
+_ReadMail:
+	lb bc, 1, 17
+	ld d, $1d
+	ld e, $01
+	call Func_383b
+	call GetSelectedMailPosition
+	ld c, a
+	ld b, $00
+	ld hl, wMailList
+	add hl, bc
+	ld a, [hl]
+	ld [wMailId], a
+	set B_MAIL_READ, a ; mark mail as read
+	ld [hl], a
+	add a
+	ld c, a
+	ld b, $00
+	ld hl, Mail
+	add hl, bc
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	ld a, [hli]
+	ld [wMailSenderText], a
+	ld a, [hli]
+	ld [wMailSenderText + 1], a
+	call PrintMailSender
+	ld a, [hli]
+	ld [wMailSubjectText], a
+	ld a, [hli]
+	ld [wMailSubjectText + 1], a
+	call PrintMailSubject
+.read_mail_loop
+	; mail is terminated with MAIL_TERMINATOR ($ffff)
+	ld a, [hl]
+	cp $ff
+	jr nz, .print_body
+	inc hl
+	ld a, [hld]
+	cp $ff
+	jr z, .done
+.print_body
+	call PrintMailBodyPage
+	jr z, .asm_1f074
+	push hl
+	call WaitForWideTextBoxInput
+	pop hl
+.asm_1f074
+	call GiveCardsAttachedToMailPage
+	jr .read_mail_loop
+.done
+	ret
+
+PrintMailSender:
+	push hl
+	ld a, [wMailSenderText]
+	ld l, a
+	ld a, [wMailSenderText + 1]
+	ld h, a
+	lb de, 6, 2
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	pop hl
+	ret
+
+PrintMailSubject:
+	push hl
+	ld a, [wMailSubjectText]
+	ld l, a
+	ld a, [wMailSubjectText + 1]
+	ld h, a
+	lb de, 6, 3
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	pop hl
+	ret
+
+ClearMailBodyPage:
+	lb de, 1, 5
+	lb bc, 18, 12
+	farcall FillBoxInBGMapWithZero
+	ret
+
+; hl - mail body text
+; fills the lower portion of the ReadMail screen with the mail body text at hl
+; and then increments hl by 2 (advancing it to the next body page's text).
+; prints nothing if value at hl is $0000
+; return
+;	- hl: input incremented by 2
+PrintMailBodyPage:
+	push hl
+	lb de, $80, $ff
+	call SetupText
+	pop hl
+	push hl
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	or h
+	jr z, .skip
+	call ClearMailBodyPage
+	lb de, 1, 6
+	call PrintTextNoDelay_InitVRAM0
+.skip
+	pop hl
+	inc hl
+	inc hl
+	ret
+
+; give the card(s) attached to the current page of mail, if present
+GiveCardsAttachedToMailPage:
+	push hl
+	ld a, [wMailId]
+	bit B_MAIL_READ, a
+	; don't give out a card again if this mail has already been read
+	jr nz, .done
+
+	ld a, [hli]
+	ld b, [hl]
+	ld c, a
+	or b
+	jr z, .done
+	bit B_MAIL_BOOSTER_PACK, b
+	jr nz, .give_booster
+	bit B_MAIL_GENERIC_CARD, b
+	jr nz, .give_generic_card
+	bit B_MAIL_BLACK_BOX, b
+	jr nz, .give_blackbox_cards
+	bit B_MAIL_BILLS_PC, b
+	jr nz, .give_billspc_card
+
+.done
+	pop hl
+	inc hl
+	inc hl
+	ret
+
+; gives the booster pack specified in the first byte of the command
+.give_booster
+	call StartFadeToWhite
+	call WaitPalFading_Bank07
+	ld a, c
+	ld b, $00
+	call GiveBoosterPacks
+	call .redraw_mail_screen
+	jr .done
+
+; gives a card specified in the first byte of the command.
+; this would effectively be a "hard-coded" card delivered with the mail.
+; appears to be unused in the real game mail data
+.give_generic_card
+	ld a, b
+	and %00111111
+	ld d, a
+	ld e, c
+	call .give_card
+	call .redraw_mail_screen
+	jr .done
+
+; gives the cards attached to black box mail, found at [wBlackBoxCardReceived]
+; clears out the cards by setting to $0000 as it gives them
+.give_blackbox_cards
+	push hl
+	ld hl, wBlackBoxCardReceived
+.blackbox_card_loop
+	xor a
+	ld e, [hl]
+	ld [hli], a
+	ld d, [hl]
+	ld [hli], a
+	ld a, d
+	or e
+	jr z, .loop_done
+	call .give_card
+	jr .blackbox_card_loop
+.loop_done
+	pop hl
+	call .redraw_mail_screen
+	jr .done
+
+; gives the cards attached to bill's PC mail, found at [wBillsPCCardReceived]
+.give_billspc_card
+	push hl
+	ld hl, wBillsPCCardReceived
+	xor a
+	ld e, [hl]
+	ld [hli], a
+	ld d, [hl]
+	ld [hli], a
+	call .give_card
+	pop hl
+	call .redraw_mail_screen
+	jr .done
+
+.give_card
+	call StartFadeToWhite
+	call WaitPalFading_Bank07
+	push hl
+	farcall GetReceivedCardText
+	call AddCardToCollection
+	call Func_1d53a
+	pop hl
+	ret
+
+.redraw_mail_screen
+	inc hl
+	ld a, [hli]
+	ld b, a
+	ld a, [hl]
+	or b
+	jr z, .done
+	farcall ClearSpriteAnimsAndSetInitialGraphicsConfiguration
+	call DisableLCD
+	call MinicomMailboxMainScreen_DrawTextBoxes
+	call DrawReadMailScreenHeader
+	call PrintMailSender
+	call PrintMailSubject
+	call FlushAllPalettes
+	call EnableLCD
+	ret
+
+DeleteMail:
+	push af
+	push bc
+	push de
+	push hl
+	call GetSelectedMailPosition
+	ld c, a
+	ld b, $00
+	ld hl, wMailList
+	add hl, bc
+	ld a, [hl]
+	ld [wMailId], a
+	call MailboxYesNoPrompt_DeleteConfirm
+	jr c, .asm_1f1ad
+	dec a
+	jr z, .asm_1f1ad
+	bit 7, [hl]
+	jr nz, .asm_1f187
+	call MailboxYesNoPrompt_DeleteUnreadConfirm
+	jr c, .asm_1f1ad
+	dec a
+	jr z, .asm_1f1ad
+.asm_1f187
+	xor a
+	ld [hl], a
+	ld d, h
+	ld e, l
+	inc hl
+	ld a, $08
+	sub c
+	and a
+	jr z, .asm_1f19d
+	ld c, a
+.asm_1f193
+	push af
+	ld a, [hli]
+	ld [de], a
+	inc de
+	pop af
+	dec a
+	jr nz, .asm_1f193
+	xor a
+	ld [hl], a
+.asm_1f19d
+	ld a, [wMailCount]
+	dec a
+	ld [wMailCount], a
+	call DeleteGameCenterMailedCard
+	call DrawMailDeletedTextBox
+	call Func_1f210
+.asm_1f1ad
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+DrawMailDeletedTextBox:
+	lb de, 0, 0
+	lb bc, 20, 5
+	call DrawRegularTextBoxVRAM0
+	ldtx hl, MailboxDeletedText
+	lb de, 1, 2
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	ld a, 60
+	call DoAFrames_WithPreCheck
+	ret
+
+MailboxYesNoPrompt_DeleteConfirm:
+	push hl
+	ldtx hl, MailboxActionDeleteConfirmText
+	call MailboxYesNoPrompt
+	pop hl
+	ret
+
+MailboxYesNoPrompt_DeleteUnreadConfirm:
+	push hl
+	ldtx hl, MailboxActionDeleteUnreadConfirmText
+	call MailboxYesNoPrompt
+	pop hl
+	ret
+
+; hl - text
+MailboxYesNoPrompt:
+	push hl
+	ld b, BANK(.menu_box_params)
+	ld hl, .menu_box_params
+	lb de, 0, 0
+	call LoadMenuBoxParams
+	pop hl
+	ld a, 1
+	call DrawMenuBox
+	lb de, 1, 1
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	call HandleMenuBox
+	ret
+
+.menu_box_params
+	menubox_params TRUE, 20, 5, \
+		SYM_CURSOR_R, SYM_SPACE, SYM_CURSOR_R, SYM_CURSOR_R, \
+		PAD_A, PAD_B, TRUE, 0, NULL, NULL
+	textitem  7, 3, PlayerDiaryPromptYesText
+	textitem 11, 3, PlayerDiaryPromptNoText
+	textitems_end
+
+Func_1f210:
+	ld a, [wSelectedMailCursorPosition]
+	and a
+	jr nz, .asm_1f225
+	ld a, [wMailboxPage]
+	and a
+	ret z
+	xor a
+	ld [wMailboxPage], a
+	ld a, $03
+	ld [wSelectedMailCursorPosition], a
+	ret
+.asm_1f225
+	ld a, [wMailCount]
+	ld c, a
+	call GetSelectedMailPosition
+	cp c
+	ret c
+	ld a, [wSelectedMailCursorPosition]
+	dec a
+	ld [wSelectedMailCursorPosition], a
+	ret
+
+; if the current mail being read/acted on is from the game center,
+; delete the card that is waiting to be collected.
+DeleteGameCenterMailedCard:
+	ld a, [wMailId]
+	cp $01 ; black box mail id
+	jr nz, .asm_1f244
+	ld de, $0
+	call SetBlackBoxCard
+	ret
+.asm_1f244
+	cp $02 ; bill's PC mail id
+	ret nz
+	ld de, $0
+	call SetBillsPCCard
+	ret
+
+; input: a - new mail to add to queue
+; set carry and quit if mail queue is full, i.e. [wNumMailInQueue] = MAIL_QUEUE_BUFFER_SIZE - 1
+; else:
+; - if bit 7 (B_MAIL_PRIORITY_DELIVERY) of a is 0, add to the END of the mail queue
+; - if bit 7 (B_MAIL_PRIORITY_DELIVERY) of a is 1,
+;     add to the FRONT of the mail queue and shift the rest
+;	  this new mail will be inserted BETWEEN any current priority mail in the queue, and the non-priority
+; finally, increment [wNumMailInQueue] by 1
+AddMailToQueue:
+	push bc
+	push de
+	push hl
+	ld e, a
+	ld a, [wNumMailInQueue]
+	cp MAIL_QUEUE_BUFFER_SIZE - 1
+	jr z, .mail_queue_full
+
+	bit B_MAIL_PRIORITY_DELIVERY, e
+	call z, .not_priority
+	call nz, .has_priority
+
+	ld hl, wNumMailInQueue
+	inc [hl]
+; clear carry
+	scf
+	ccf
+	jr .done
+.mail_queue_full
+	scf
+; fallthrough
+.done
+	pop hl
+	pop de
+	pop bc
+	ret
+
+; if not priority mail, add it to the END of the mail queue
+.not_priority:
+	push af
+	ld a, [wNumMailInQueue]
+	ld c, a
+	ld b, 0
+	ld hl, wMailQueue
+	add hl, bc
+	ld [hl], e
+	pop af
+	ret
+
+; if mail is high priority, add it to the FRONT of the mail queue
+; black box and bill's PC mail, for example, are sent as high priority
+.has_priority:
+	push af
+	ld hl, wMailQueue
+	ld c, MAIL_QUEUE_BUFFER_SIZE - 1
+	; skip past other high priority mail
+.check_byte_loop
+	bit B_MAIL_PRIORITY_DELIVERY, [hl]
+	jr z, .shift_loop
+	inc hl
+	dec c
+	jr nz, .check_byte_loop
+.shift_loop
+	ld b, [hl]
+	ld [hl], e ; at top of function, e was copied from input a (our new mail)
+	ld e, b
+	inc hl
+	dec c
+	jr nz, .shift_loop
+	pop af
+	ret
+
+DeliverMailFromQueue:
+	push af
+	push bc
+	push de
+	push hl
+	ld a, [wNumMailInQueue]
+	and a
+	jr z, .done
+
+	ld a, NEW_MAIL
+	ld [wNewMail], a
+	ld a, [wMailCount]
+	cp MAIL_MAX_NUM
+	; if the mailbox already has MAIL_MAX_NUM, can't deliver more mail
+	jr z, .done
+
+	ld de, wMailList
+	ld hl, wMailQueue
+	ld a, [wMailCount]
+	ld b, a
+	ld a, MAIL_MAX_NUM
+	sub b
+	ld b, a ; number of mail to insert
+	ld c, $00 ; counts how many times we insert mail in the loop
+
+.insert_new_mail_loop
+	ld a, [hli]
+	and a
+	; break the loop if the next mail in the queue is $00, i.e. we have drained the whole queue
+	jr z, .done_inserting_mail
+	; reset bit 7, because when mail is in the mailbox it means it has been read (B_MAIL_READ)
+	res B_MAIL_PRIORITY_DELIVERY, a
+	call InsertNewMail
 	inc c
 	dec b
-	jr nz, .asm_1f2b9
-.asm_1f2c6
-	ld a, [wdd50]
+	jr nz, .insert_new_mail_loop
+	; fallthrough if b = 0; i.e. when we have filled up the mailbox again
+
+.done_inserting_mail
+	; update the mail counts based on how many we inserted
+	ld a, [wMailCount]
 	add c
-	ld [wdd50], a
-	ld a, [wdd36]
+	ld [wMailCount], a
+	ld a, [wNumMailInQueue]
 	sub c
-	ld [wdd36], a
-	ld hl, wdd37
+	ld [wNumMailInQueue], a
+
+	ld hl, wMailQueue
 	ld b, $00
 	add hl, bc
-	ld de, wdd37
-	ld a, $18
+	ld de, wMailQueue
+	ld a, MAIL_QUEUE_BUFFER_SIZE - 1
 	sub c
 	ld c, a
 	ld a, [hli]
-.asm_1f2e2
+
+.loop2
 	ld [de], a
 	inc de
 	ld b, [hl]
@@ -3700,22 +7075,25 @@ Func_1f293:
 	ld [hli], a
 	ld a, b
 	dec c
-	jr nz, .asm_1f2e2
-.asm_1f2eb
-	ld a, [wdd36]
-	ld [wdd5b], a
+	jr nz, .loop2
+
+.done
+	ld a, [wNumMailInQueue]
+	ld [wTempNumMailInQueue], a
 	pop hl
 	pop de
 	pop bc
 	pop af
 	ret
 
-; shift data in de 1 byte right
-.Func_1f2f6:
+; a - new mail to add
+; de - wMailList
+; Shifts the mail list one byte to the right, and inserts (a) at the front
+InsertNewMail:
 	push bc
 	push de
 	push hl
-	ld c, $08
+	ld c, MAIL_MAX_NUM
 .loop
 	ld l, a
 	ld a, [de]
@@ -3730,9 +7108,74 @@ Func_1f293:
 	pop de
 	pop bc
 	ret
-; 0x1f309
 
-SECTION "Bank 7@757b", ROMX[$757b], BANK[$7]
+Func_1f309:
+	ld a, [wNewMail]
+	and a
+	ret
+
+; de - card offset
+SetBlackBoxCard:
+	push af
+	ld a, e
+	ld [wBlackBoxCardReceived], a
+	ld a, d
+	ld [wBlackBoxCardReceived + 1], a
+	pop af
+	ret
+
+; de - card offset
+SetBillsPCCard:
+	push af
+	ld a, e
+	ld [wBillsPCCardReceived], a
+	ld a, d
+	ld [wBillsPCCardReceived + 1], a
+	pop af
+	ret
+
+; set carry if there is a black box card
+CheckForBlackBoxCardInMail:
+	push bc
+	ld a, [wBlackBoxCardReceived]
+	ld b, a
+	ld a, [wBlackBoxCardReceived + 1]
+	or b
+	scf
+	jr nz, .asm_1f331
+	ccf
+.asm_1f331
+	pop bc
+	ret
+
+; set carry if there is a bill's pc card
+CheckForBillsPCCardInMail:
+	push bc
+	ld a, [wBillsPCCardReceived]
+	ld b, a
+	ld a, [wBillsPCCardReceived + 1]
+	or b
+	scf
+	jr nz, .asm_1f340
+	ccf
+.asm_1f340
+	pop bc
+	ret
+
+; return
+;	a - position in the mail list of the currently selected mail item
+GetSelectedMailPosition:
+	push bc
+	ld a, [wMailboxPage]
+	add a
+	add a
+	ld b, a
+	ld a, [wSelectedMailCursorPosition]
+	add b
+	pop bc
+	ret
+
+INCLUDE "data/mail.asm"
 
 Func_1f57b::
 	push af
@@ -3843,9 +7286,327 @@ Func_1f57b::
 	db  2, -2
 	db -2,  2
 	db $80 ; end
-; 0x1f60c
 
-SECTION "Bank 7@782b", ROMX[$782b], BANK[$7]
+; input: a, c
+; set [wdd75] = a, [wdd76] = 0, [wdd77] = c
+Set3FromwDD75:
+	push af
+	ld [wdd75], a
+	ld a, c
+	ld [wdd77], a
+	xor a
+	ld [wdd76], a
+	pop af
+	ret
+
+; set [wdd75] = [wdd76] = 0, [wdd77] = c
+Func_1f61a:
+	push af
+	ld a, 0
+	call Set3FromwDD75
+	push af
+	ret
+
+GetwDD75:
+	ld a, [wdd75]
+	and a
+	ret
+
+Func_1f627:
+	farcall Func_102a4
+	call Func_1f633
+	farcall Func_102c4
+	ret
+
+Func_1f633:
+	push af
+	push de
+	push hl
+	xor a
+	ld [wdd78], a
+	call Func_1f644
+	call Func_1f7ad
+	pop hl
+	pop de
+	pop af
+	ret
+
+Func_1f644:
+	farcall InitOWObjects
+	farcall SetInitialGraphicsConfiguration
+	farcall Func_10672
+	call Func_1f666
+	call Func_1f682
+	call StartFadeFromWhite
+	call WaitPalFading_Bank07
+	call Func_1f6cd
+	call StartFadeToWhite
+	call WaitPalFading_Bank07
+	ret
+
+Func_1f666:
+	lb de, 0, 0
+	lb bc, 20, 3
+	call DrawRegularTextBoxVRAM0
+	lb de, 0, 12
+	lb bc, 20, 6
+	call DrawRegularTextBoxVRAM0
+	ldtx hl, GrandMasterCupPrizesTitleText
+	lb de, 4, 1
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	ret
+
+Func_1f682:
+	ld b, $07
+	ld hl, $76ad
+	ld de, $3
+	call LoadMenuBoxParams
+	ld a, [wdd78]
+	call DrawMenuBox
+	ld de, $404
+	ld hl, wdd7a
+	ld c, $04
+.asm_1f69b
+	push hl
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	pop hl
+	inc hl
+	inc hl
+	inc hl
+	inc hl
+	inc e
+	inc e
+	dec c
+	jr nz, .asm_1f69b
+	ret
+; 0x1f6ad
+
+SECTION "Bank 7@76cd", ROMX[$76cd], BANK[$7]
+
+Func_1f6cd:
+.asm_1f6cd
+	call Func_1f748
+	xor a
+	ld [wdd79], a
+.asm_1f6d4
+	ldtx hl, GrandMasterCupPrizesDialogText
+	lb de, 1, 14
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+.asm_1f6dd
+	ld a, [wdd78]
+	call HandleMenuBox
+	ld [wdd78], a
+	ldh a, [hKeysPressed]
+	and PAD_START
+	jr z, .asm_1f6f1
+	call Func_1f71c
+	jr .asm_1f6d4
+.asm_1f6f1
+	ldh a, [hKeysPressed]
+	and PAD_A
+	jr z, .asm_1f6fd
+	ld a, [wdd78]
+	call Func_1f752
+.asm_1f6fd
+	ldh a, [hKeysPressed]
+	and PAD_B
+	jr z, .asm_1f709
+	ld a, [wdd78]
+	call Func_1f762
+.asm_1f709
+	ld a, [wdd79]
+	cp $02
+	jr nz, .asm_1f6dd
+	ldtx hl, GrandMasterCupPrizesConfirmPromptText
+	ld a, $01
+	farcall DrawWideTextBox_PrintTextWithYesOrNoMenu
+	jr c, .asm_1f6cd
+	ret
+
+Func_1f71c:
+	call Func_1f7b6
+	call EmptyScreen
+	farcall InitOWObjects
+	farcall SetInitialGraphicsConfiguration
+	farcall Func_10672
+	call Func_1f666
+	call Func_1f682
+	ld a, [wdd79]
+	and a
+	jr z, .asm_1f744
+	ld a, [wdd8e]
+	ld d, $17
+	ld e, $00
+	call Func_1f76f
+.asm_1f744
+	call EnableLCD
+	ret
+
+Func_1f748:
+	xor a
+.asm_1f749
+	call Func_1f762
+	inc a
+	cp $04
+	jr nz, .asm_1f749
+	ret
+
+Func_1f752:
+	push af
+	ld d, $17
+	ld e, $00
+	call Func_1f76f
+	call Func_1f79e
+	call Func_1f77b
+	pop af
+	ret
+
+Func_1f762:
+	push af
+	ld d, $00
+	ld e, $00
+	call Func_1f76f
+	call Func_1f78d
+	pop af
+	ret
+
+Func_1f76f:
+	push af
+	add a
+	add $04
+	ld c, a
+	ld b, $03
+	call Func_383b
+	pop af
+	ret
+
+Func_1f77b:
+	ld c, a
+	ld b, $00
+	ld hl, wdd8a
+	add hl, bc
+	ld a, [hl]
+	and a
+	ret nz
+	ld a, $ff
+	ld [hl], a
+	ld hl, wdd79
+	inc [hl]
+	ret
+
+Func_1f78d:
+	ld c, a
+	ld b, $00
+	ld hl, wdd8a
+	add hl, bc
+	ld a, [hl]
+	and a
+	ret z
+	xor a
+	ld [hl], a
+	ld hl, wdd79
+	dec [hl]
+	ret
+
+Func_1f79e:
+	ld a, [wdd79]
+	ld c, a
+	ld b, $00
+	ld hl, wdd8e
+	add hl, bc
+	ld a, [wdd78]
+	ld [hl], a
+	ret
+
+Func_1f7ad:
+	ld a, [wdd8e]
+	ld b, a
+	ld a, [wdd8e + 1]
+	ld c, a
+	ret
+
+Func_1f7b6:
+	ld a, [wdd78]
+	add a
+	add a
+	ld c, a
+	ld b, $00
+	ld hl, wdd7a
+	add hl, bc
+	inc hl
+	inc hl
+	ld e, [hl]
+	inc hl
+	ld d, [hl]
+	farcall 1, LoadCardDataToBuffer1_FromCardID ; need to specify bank to match baserom
+	farcall SetupDuel
+	farcall OpenCardPage_FromHand
+	ret
+
+Func_1f7d4:
+	push af
+	push bc
+	push de
+	push hl
+	ld d, h
+	ld e, l
+	push bc
+	add a
+	add a
+	ld c, a
+	ld b, $00
+	ld hl, wdd7a
+	add hl, bc
+	pop bc
+	ld [hl], e
+	inc hl
+	ld [hl], d
+	inc hl
+	ld [hl], c
+	inc hl
+	ld [hl], b
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+Func_1f7f1:
+	farcall Func_102a4
+	call HandleIngameCardPop
+	farcall Func_102c4
+	ret
+
+HandleIngameCardPop:
+	push af
+	push bc
+	push de
+	push hl
+	ld hl, .FunctionMap
+	call CallMappedFunction
+	call StartFadeToWhite
+	call WaitPalFading_Bank07
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+.FunctionMap:
+	key_func SCRIPTED_CARD_POP_RONALD,       IngameCardPop.Ronald
+	key_func SCRIPTED_CARD_POP_IMAKUNI,      IngameCardPop.Imakuni_first
+	key_func SCRIPTED_RARE_CARD_POP_IMAKUNI, IngameCardPop.Imakuni_rare
+	db $ff
+
+; dupe of Func_1f7f1
+Func_1f81f:
+	farcall Func_102a4
+	call HandleIngameCardPop
+	farcall Func_102c4
+	ret
 
 CardPopMenu:
 	push af
@@ -3864,9 +7625,60 @@ CardPopMenu:
 	pop bc
 	pop af
 	ret
-; 0x1f84c
 
-SECTION "Bank 7@78bd", ROMX[$78bd], BANK[$7]
+Func_1f84c:
+	farcall Func_102a4
+	call Func_1f858
+	farcall Func_102c4
+	ret
+
+Func_1f858:
+	push af
+	push bc
+	push de
+	push hl
+	ld [wdd93], a
+	call Func_1f867
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
+
+Func_1f867:
+	farcall ZeroObjectPositionsAndEnableOBPFading
+	farcall SetInitialGraphicsConfiguration
+	call Func_1f88f
+	call StartFadeFromWhite
+	call WaitPalFading_Bank07
+	ldtx hl, GameCenterCardDungeonUnableNotEnoughChipsText
+	ld a, [wdd93]
+	and a
+	jr z, .asm_1f884
+	ldtx hl, GameCenterCardDungeonDialogText
+.asm_1f884
+	farcall PrintScrollableText_NoTextBoxLabelVRAM0
+	call StartFadeToWhite
+	call WaitPalFading_Bank07
+	ret
+
+Func_1f88f:
+	lb de, 0, 0
+	lb bc, 20, 19
+	call DrawRegularTextBoxVRAM0
+	ldtx hl, GameCenterCardDungeonDescriptionText
+	lb de, 1, 2
+	call InitTextPrinting_ProcessTextFromIDVRAM0
+	ldtx hl, GameCenterCardDungeonTitleText
+	lb de, 1, 0
+	call Func_2c4b
+	ldtx hl, GameCenter10ChipsPerPlayText
+	lb de, 13, 0
+	call Func_2c4b
+	lb de, 0, 12
+	lb bc, 20, 6
+	call DrawRegularTextBoxVRAM0
+	ret
 
 PlayerGenderAndNameSelection::
 	push af
@@ -3879,7 +7691,7 @@ PlayerGenderAndNameSelection::
 	call WaitPalFading_Bank07
 	farcall UnsetFadePalsFrameFunc
 	push af
-	ld a, MUSIC_PCMAINMENU
+	ld a, MUSIC_PC_MAIN_MENU
 	call SetMusic
 	pop af
 	farcall PlayerGenderSelection
@@ -3892,9 +7704,33 @@ PlayerGenderAndNameSelection::
 	pop bc
 	pop af
 	ret
-; 0x1f8eb
 
-SECTION "Bank 7@791d", ROMX[$791d], BANK[$7]
+Func_1f8eb:
+	farcall Func_1022a
+	call Func_1f8f7
+	farcall Func_10252
+	ret
+
+Func_1f8f7:
+	push af
+	push bc
+	push de
+	push hl
+	farcall SetFrameFuncAndFadeFromWhite
+	farcall Func_2612a
+	jr c, .asm_1f914
+	ldtx hl, GameCenterToBeMailedText_2
+	farcall PrintScrollableText_NoTextBoxLabelVRAM0
+	call SetBillsPCCard
+	ld a, $82 ; priority bill's PC mail
+	call AddMailToQueue
+.asm_1f914
+	farcall FadeToWhiteAndUnsetFrameFunc
+	pop hl
+	pop de
+	pop bc
+	pop af
+	ret
 
 MACRO animation
 	dw \1 ; tileset ID
@@ -3908,174 +7744,174 @@ ENDM
 
 Animations:
 ; DUEL_ANIM_NONE
-	animation TILESET_HIT, SPRITE_ANIM_00, FRAMESET_000, PALETTE_0D8, SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_2E, $00
+	animation TILESET_GLOW, SPRITE_ANIM_00, FRAMESET_000, PALETTE_0D8, SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_SONIC_BOOM, $00
 ; DUEL_ANIM_GLOW
-	animation TILESET_HIT, SPRITE_ANIM_00, FRAMESET_000, PALETTE_0D8, SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_11, $00
+	animation TILESET_GLOW, SPRITE_ANIM_00, FRAMESET_000, PALETTE_0D8, SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_GLOW, $00
 ; DUEL_ANIM_PARALYSIS
-	animation TILESET_PARALYSIS, SPRITE_ANIM_01, FRAMESET_001, PALETTE_0D9, SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_12, $00
+	animation TILESET_PARALYSIS, SPRITE_ANIM_01, FRAMESET_001, PALETTE_0D9, SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_PARALYSIS, $00
 ; DUEL_ANIM_SLEEP
-	animation TILESET_SLEEP, SPRITE_ANIM_02, FRAMESET_002, PALETTE_0DA, SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_13, $00
+	animation TILESET_SLEEP, SPRITE_ANIM_02, FRAMESET_002, PALETTE_0DA, SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_SLEEP, $00
 ; DUEL_ANIM_CONFUSION
-	animation TILESET_CONFUSION_STAR, SPRITE_ANIM_03, FRAMESET_003, PALETTE_0DB, SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_14, $00
+	animation TILESET_CONFUSION_STAR, SPRITE_ANIM_03, FRAMESET_003, PALETTE_0DB, SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_CONFUSION, $00
 ; DUEL_ANIM_POISON
-	animation TILESET_POISON, SPRITE_ANIM_04, FRAMESET_004, PALETTE_0DC, SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_15, $00
+	animation TILESET_POISON, SPRITE_ANIM_04, FRAMESET_004, PALETTE_0DC, SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_POISON, $00
 ; DUEL_ANIM_SINGLE_HIT
-	animation TILESET_GLOW, SPRITE_ANIM_05, FRAMESET_005, PALETTE_0DD, SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_16, $00
+	animation TILESET_HIT, SPRITE_ANIM_05, FRAMESET_005, PALETTE_0DD, SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_SMALL_HIT, $00
 ; DUEL_ANIM_HIT
-	animation TILESET_GLOW, SPRITE_ANIM_05, FRAMESET_006, PALETTE_0DD, SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_17, $00
+	animation TILESET_HIT, SPRITE_ANIM_05, FRAMESET_006, PALETTE_0DD, SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_HIT, $00
 ; DUEL_ANIM_BIG_HIT
-	animation TILESET_GLOW, SPRITE_ANIM_05, FRAMESET_007, PALETTE_0DD, SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_17, $00
+	animation TILESET_HIT, SPRITE_ANIM_05, FRAMESET_007, PALETTE_0DD, SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_HIT, $00
 ; DUEL_ANIM_SHOW_DAMAGE
 	animation TILESET_DAMAGE, SPRITE_ANIM_06, FRAMESET_008, PALETTE_0DE, SPRITE_ANIM_FLAG_UNSKIPPABLE, NONE, $00
 ; DUEL_ANIM_THUNDER_SHOCK
-	animation TILESET_THUNDER, SPRITE_ANIM_07, FRAMESET_015, PALETTE_0DF, NONE, SFX_18, $00
+	animation TILESET_THUNDER, SPRITE_ANIM_07, FRAMESET_015, PALETTE_0DF, NONE, SFX_THUNDER_SHOCK, $00
 ; DUEL_ANIM_LIGHTNING
-	animation TILESET_LIGHTING, SPRITE_ANIM_08, FRAMESET_016, PALETTE_0E0, NONE, SFX_19, $00
+	animation TILESET_LIGHTNING, SPRITE_ANIM_08, FRAMESET_016, PALETTE_0E0, NONE, SFX_LIGHTNING, $00
 ; DUEL_ANIM_BORDER_SPARK
-	animation TILESET_SPARK, SPRITE_ANIM_09, FRAMESET_017, PALETTE_0E1, NONE, SFX_1A, $00
+	animation TILESET_SPARK, SPRITE_ANIM_09, FRAMESET_017, PALETTE_0E1, NONE, SFX_BORDER_SPARK, $00
 ; DUEL_ANIM_BIG_LIGHTNING
-	animation TILESET_BIG_LIGHTING, SPRITE_ANIM_0A, FRAMESET_018, PALETTE_0E2, SPRITE_ANIM_FLAG_CENTERED, SFX_1B, $00
+	animation TILESET_BIG_LIGHTNING, SPRITE_ANIM_0A, FRAMESET_018, PALETTE_0E2, SPRITE_ANIM_FLAG_CENTERED, SFX_BIG_LIGHTNING, $00
 ; DUEL_ANIM_SMALL_FLAME
-	animation TILESET_EMBER, SPRITE_ANIM_0B, FRAMESET_019, PALETTE_0E3, NONE, SFX_1C, $00
+	animation TILESET_EMBER, SPRITE_ANIM_0B, FRAMESET_019, PALETTE_0E3, NONE, SFX_SMALL_FLAME, $00
 ; DUEL_ANIM_BIG_FLAME
-	animation TILESET_EMBER, SPRITE_ANIM_0B, FRAMESET_01A, PALETTE_0E3, NONE, SFX_1D, $00
+	animation TILESET_EMBER, SPRITE_ANIM_0B, FRAMESET_01A, PALETTE_0E3, NONE, SFX_BIG_FLAME, $00
 ; DUEL_ANIM_FIRE_SPIN
-	animation TILESET_FIRE_SPIN, SPRITE_ANIM_0C, FRAMESET_01B, PALETTE_0E4, SPRITE_ANIM_FLAG_CENTERED, SFX_1E, $00
+	animation TILESET_FIRE_SPIN, SPRITE_ANIM_0C, FRAMESET_01B, PALETTE_0E4, SPRITE_ANIM_FLAG_CENTERED, SFX_FIRE_SPIN, $00
 ; DUEL_ANIM_DIVE_BOMB
-	animation TILESET_FIRE_BIRD, SPRITE_ANIM_0D, FRAMESET_01C, PALETTE_0E5, NONE, SFX_1F, $00
+	animation TILESET_FIRE_BIRD, SPRITE_ANIM_0D, FRAMESET_01C, PALETTE_0E5, NONE, SFX_DIVE_BOMB, $00
 ; DUEL_ANIM_WATER_JETS
-	animation TILESET_WATER_DROP, SPRITE_ANIM_0E, FRAMESET_021, PALETTE_0E6, SPRITE_ANIM_FLAG_CENTERED, SFX_20, $00
+	animation TILESET_WATER_DROP, SPRITE_ANIM_0E, FRAMESET_021, PALETTE_0E6, SPRITE_ANIM_FLAG_CENTERED, SFX_WATER_JETS, $00
 ; DUEL_ANIM_WATER_GUN
-	animation TILESET_WATER_GUN, SPRITE_ANIM_0F, FRAMESET_022, PALETTE_0E7, NONE, SFX_21, $00
+	animation TILESET_WATER_GUN, SPRITE_ANIM_0F, FRAMESET_022, PALETTE_0E7, NONE, SFX_WATER_GUN, $00
 ; DUEL_ANIM_WHIRLPOOL
-	animation TILESET_WHIRLPOOL, SPRITE_ANIM_10, FRAMESET_023, PALETTE_0E8, SPRITE_ANIM_FLAG_CENTERED, SFX_22, $00
+	animation TILESET_WHIRLPOOL, SPRITE_ANIM_10, FRAMESET_023, PALETTE_0E8, SPRITE_ANIM_FLAG_CENTERED, SFX_WHIRLPOOL, $00
 ; DUEL_ANIM_HYDRO_PUMP
-	animation TILESET_HYDRO_PUMP, SPRITE_ANIM_11, FRAMESET_024, PALETTE_0E9, NONE, SFX_23, $00
+	animation TILESET_HYDRO_PUMP, SPRITE_ANIM_11, FRAMESET_024, PALETTE_0E9, NONE, SFX_HYDRO_PUMP, $00
 ; DUEL_ANIM_BLIZZARD
-	animation TILESET_SNOW, SPRITE_ANIM_12, FRAMESET_025, PALETTE_0EA, SPRITE_ANIM_FLAG_CENTERED, SFX_24, $00
+	animation TILESET_SNOW, SPRITE_ANIM_12, FRAMESET_025, PALETTE_0EA, SPRITE_ANIM_FLAG_CENTERED, SFX_BLIZZARD, $00
 ; DUEL_ANIM_PSYCHIC
-	animation TILESET_PSYCHIC, SPRITE_ANIM_13, FRAMESET_026, PALETTE_0EB, NONE, SFX_25, $00
+	animation TILESET_PSYCHIC, SPRITE_ANIM_13, FRAMESET_026, PALETTE_0EB, NONE, SFX_PSYCHIC, $00
 ; DUEL_ANIM_LEER
-	animation TILESET_EVIL_EYES, SPRITE_ANIM_14, FRAMESET_027, PALETTE_0EC, NONE, SFX_26, $00
+	animation TILESET_EVIL_EYES, SPRITE_ANIM_14, FRAMESET_027, PALETTE_0EC, NONE, SFX_LEER, $00
 ; DUEL_ANIM_BEAM
-	animation TILESET_BEAM, SPRITE_ANIM_15, FRAMESET_028, PALETTE_0ED, SPRITE_ANIM_FLAG_Y_INVERTED | SPRITE_ANIM_FLAG_Y_FLIP, SFX_27, $00
+	animation TILESET_BEAM, SPRITE_ANIM_15, FRAMESET_028, PALETTE_0ED, SPRITE_ANIM_FLAG_Y_INVERTED | SPRITE_ANIM_FLAG_Y_FLIP, SFX_BEAM, $00
 ; DUEL_ANIM_HYPER_BEAM
-	animation TILESET_HYPER_BEAM, SPRITE_ANIM_16, FRAMESET_029, PALETTE_0EE, SPRITE_ANIM_FLAG_Y_INVERTED | SPRITE_ANIM_FLAG_Y_FLIP, SFX_28, $00
-; DUEL_ANIM_ROCK_THROW
-	animation TILESET_ROCK, SPRITE_ANIM_17, FRAMESET_02A, PALETTE_0EF, NONE, SFX_29, $00
+	animation TILESET_HYPER_BEAM, SPRITE_ANIM_16, FRAMESET_029, PALETTE_0EE, SPRITE_ANIM_FLAG_Y_INVERTED | SPRITE_ANIM_FLAG_Y_FLIP, SFX_HYPER_BEAM, $00
+; DUEL_ANIM_AVALANCHE
+	animation TILESET_ROCK, SPRITE_ANIM_17, FRAMESET_02A, PALETTE_0EF, NONE, SFX_AVALANCHE, $00
 ; DUEL_ANIM_STONE_BARRAGE
-	animation TILESET_ROCK, SPRITE_ANIM_17, FRAMESET_02B, PALETTE_0EF, NONE, SFX_2A, $00
+	animation TILESET_ROCK, SPRITE_ANIM_17, FRAMESET_02B, PALETTE_0EF, NONE, SFX_STONE_BARRAGE, $00
 ; DUEL_ANIM_PUNCH
-	animation TILESET_PUNCH, SPRITE_ANIM_18, FRAMESET_02C, PALETTE_0F0, NONE, SFX_2B, $00
-; DUEL_ANIM_THUNDERPUNCH
-	animation TILESET_PUNCH, SPRITE_ANIM_18, FRAMESET_02D, PALETTE_0F0, NONE, SFX_52, $00
+	animation TILESET_PUNCH, SPRITE_ANIM_18, FRAMESET_02C, PALETTE_0F0, NONE, SFX_PUNCH, $00
+; DUEL_ANIM_THUNDER_PUNCH
+	animation TILESET_PUNCH, SPRITE_ANIM_18, FRAMESET_02D, PALETTE_0F0, NONE, SFX_THUNDER_PUNCH, $00
 ; DUEL_ANIM_FIRE_PUNCH
-	animation TILESET_PUNCH, SPRITE_ANIM_18, FRAMESET_02E, PALETTE_0F0, NONE, SFX_53, $00
+	animation TILESET_PUNCH, SPRITE_ANIM_18, FRAMESET_02E, PALETTE_0F0, NONE, SFX_FIRE_PUNCH, $00
 ; DUEL_ANIM_STRETCH_KICK
-	animation TILESET_STRETCH_KICK, SPRITE_ANIM_19, FRAMESET_02F, PALETTE_0F1, SPRITE_ANIM_FLAG_X_INVERTED | SPRITE_ANIM_FLAG_X_FLIP, SFX_2C, $00
+	animation TILESET_STRETCH_KICK, SPRITE_ANIM_19, FRAMESET_02F, PALETTE_0F1, SPRITE_ANIM_FLAG_X_INVERTED | SPRITE_ANIM_FLAG_X_FLIP, SFX_STRETCH_KICK, $00
 ; DUEL_ANIM_SLASH
-	animation TILESET_SLASH, SPRITE_ANIM_1A, FRAMESET_030, PALETTE_0F2, NONE, SFX_2D, $00
+	animation TILESET_SLASH, SPRITE_ANIM_1A, FRAMESET_030, PALETTE_0F2, NONE, SFX_SLASH, $00
 ; DUEL_ANIM_WHIP
-	animation TILESET_VINE_WHIP, SPRITE_ANIM_1B, FRAMESET_032, PALETTE_0F3, NONE, SFX_2D, $00
-; DUEL_ANIM_SONICBOOM
-	animation TILESET_SONIC_BOOM, SPRITE_ANIM_1C, FRAMESET_033, PALETTE_0F4, NONE, SFX_2E, $00
+	animation TILESET_VINE_WHIP, SPRITE_ANIM_1B, FRAMESET_032, PALETTE_0F3, NONE, SFX_SLASH, $00
+; DUEL_ANIM_SONIC_BOOM
+	animation TILESET_SONIC_BOOM, SPRITE_ANIM_1C, FRAMESET_033, PALETTE_0F4, NONE, SFX_SONIC_BOOM, $00
 ; DUEL_ANIM_FURY_SWIPES
-	animation TILESET_SLASH, SPRITE_ANIM_1A, FRAMESET_031, PALETTE_0F2, NONE, SFX_2F, $00
+	animation TILESET_SLASH, SPRITE_ANIM_1A, FRAMESET_031, PALETTE_0F2, NONE, SFX_FURY_SWIPES, $00
 ; DUEL_ANIM_DRILL
-	animation TILESET_HORN_DRILL, SPRITE_ANIM_1D, FRAMESET_034, PALETTE_0F5, SPRITE_ANIM_FLAG_X_INVERTED | SPRITE_ANIM_FLAG_X_FLIP, SFX_30, $00
+	animation TILESET_HORN_DRILL, SPRITE_ANIM_1D, FRAMESET_034, PALETTE_0F5, SPRITE_ANIM_FLAG_X_INVERTED | SPRITE_ANIM_FLAG_X_FLIP, SFX_DRILL, $00
 ; DUEL_ANIM_POT_SMASH
-	animation TILESET_POT_SMASH, SPRITE_ANIM_1E, FRAMESET_035, PALETTE_0F6, NONE, SFX_31, $00
+	animation TILESET_POT_SMASH, SPRITE_ANIM_1E, FRAMESET_035, PALETTE_0F6, NONE, SFX_POT_SMASH, $00
 ; DUEL_ANIM_BONEMERANG
-	animation TILESET_BONE, SPRITE_ANIM_1F, FRAMESET_036, PALETTE_0F7, NONE, SFX_32, $00
+	animation TILESET_BONE, SPRITE_ANIM_1F, FRAMESET_036, PALETTE_0F7, NONE, SFX_BONEMERANG, $00
 ; DUEL_ANIM_SEISMIC_TOSS
-	animation TILESET_SEISMIC_TOSS, SPRITE_ANIM_20, FRAMESET_037, PALETTE_0F8, NONE, SFX_33, $00
+	animation TILESET_SEISMIC_TOSS, SPRITE_ANIM_20, FRAMESET_037, PALETTE_0F8, NONE, SFX_SEISMIC_TOSS, $00
 ; DUEL_ANIM_NEEDLES
-	animation TILESET_NEEDLES, SPRITE_ANIM_21, FRAMESET_038, PALETTE_0F9, NONE, SFX_34, $00
+	animation TILESET_NEEDLES, SPRITE_ANIM_21, FRAMESET_038, PALETTE_0F9, NONE, SFX_NEEDLES, $00
 ; DUEL_ANIM_WHITE_GAS
-	animation TILESET_GAS, SPRITE_ANIM_22, FRAMESET_039, PALETTE_0FA, NONE, SFX_35, $00
+	animation TILESET_GAS, SPRITE_ANIM_22, FRAMESET_039, PALETTE_0FA, NONE, SFX_WHITE_GAS, $00
 ; DUEL_ANIM_POWDER
-	animation TILESET_POWDER, SPRITE_ANIM_23, FRAMESET_03A, PALETTE_0FB, NONE, SFX_36, $00
+	animation TILESET_POWDER, SPRITE_ANIM_23, FRAMESET_03A, PALETTE_0FB, NONE, SFX_POWDER, $00
 ; DUEL_ANIM_GOO
-	animation TILESET_GOO, SPRITE_ANIM_24, FRAMESET_03B, PALETTE_0FC, NONE, SFX_37, $00
+	animation TILESET_GOO, SPRITE_ANIM_24, FRAMESET_03B, PALETTE_0FC, NONE, SFX_GOO, $00
 ; DUEL_ANIM_BUBBLES
-	animation TILESET_BUBBLE, SPRITE_ANIM_25, FRAMESET_03C, PALETTE_0FD, NONE, SFX_38, $00
+	animation TILESET_BUBBLE, SPRITE_ANIM_25, FRAMESET_03C, PALETTE_0FD, NONE, SFX_BUBBLES, $00
 ; DUEL_ANIM_STRING_SHOT
-	animation TILESET_STRING_SHOT, SPRITE_ANIM_26, FRAMESET_03D, PALETTE_0FE, NONE, SFX_39, $00
+	animation TILESET_STRING_SHOT, SPRITE_ANIM_26, FRAMESET_03D, PALETTE_0FE, NONE, SFX_STRING_SHOT, $00
 ; DUEL_ANIM_BOYFRIENDS
-	animation TILESET_HEART, SPRITE_ANIM_27, FRAMESET_03E, PALETTE_0FF, NONE, SFX_3A, $00
+	animation TILESET_HEART, SPRITE_ANIM_27, FRAMESET_03E, PALETTE_0FF, NONE, SFX_BOYFRIENDS, $00
 ; DUEL_ANIM_LURE
-	animation TILESET_LURE, SPRITE_ANIM_28, FRAMESET_03F, PALETTE_100, SPRITE_ANIM_FLAG_X_INVERTED | SPRITE_ANIM_FLAG_X_FLIP, SFX_3B, $00
+	animation TILESET_LURE, SPRITE_ANIM_28, FRAMESET_03F, PALETTE_100, SPRITE_ANIM_FLAG_X_INVERTED | SPRITE_ANIM_FLAG_X_FLIP, SFX_LURE, $00
 ; DUEL_ANIM_TOXIC
-	animation TILESET_SKULL, SPRITE_ANIM_29, FRAMESET_040, PALETTE_101, NONE, SFX_3C, $00
+	animation TILESET_SKULL, SPRITE_ANIM_29, FRAMESET_040, PALETTE_101, NONE, SFX_TOXIC, $00
 ; DUEL_ANIM_CONFUSE_RAY
-	animation TILESET_CONFUSE_RAY, SPRITE_ANIM_2A, FRAMESET_041, PALETTE_102, NONE, SFX_3D, $00
+	animation TILESET_CONFUSE_RAY, SPRITE_ANIM_2A, FRAMESET_041, PALETTE_102, NONE, SFX_CONFUSE_RAY, $00
 ; DUEL_ANIM_SING
-	animation TILESET_NOTES, SPRITE_ANIM_2B, FRAMESET_042, PALETTE_103, NONE, SFX_3E, $00
+	animation TILESET_NOTES, SPRITE_ANIM_2B, FRAMESET_042, PALETTE_103, NONE, SFX_SING, $00
 ; DUEL_ANIM_SUPERSONIC
-	animation TILESET_SOUND, SPRITE_ANIM_2C, FRAMESET_043, PALETTE_104, NONE, SFX_3F, $00
+	animation TILESET_SOUND, SPRITE_ANIM_2C, FRAMESET_043, PALETTE_104, NONE, SFX_SUPERSONIC, $00
 ; DUEL_ANIM_PETAL_DANCE
-	animation TILESET_PETAL, SPRITE_ANIM_2D, FRAMESET_044, PALETTE_105, SPRITE_ANIM_FLAG_CENTERED, SFX_40, $00
+	animation TILESET_PETAL, SPRITE_ANIM_2D, FRAMESET_044, PALETTE_105, SPRITE_ANIM_FLAG_CENTERED, SFX_PETAL_DANCE, $00
 ; DUEL_ANIM_PROTECT
-	animation TILESET_PROTECT, SPRITE_ANIM_2E, FRAMESET_045, PALETTE_106, NONE, SFX_41, $00
+	animation TILESET_PROTECT, SPRITE_ANIM_2E, FRAMESET_045, PALETTE_106, NONE, SFX_PROTECT, $00
 ; DUEL_ANIM_BARRIER
-	animation TILESET_BARRIER, SPRITE_ANIM_2F, FRAMESET_046, PALETTE_107, NONE, SFX_42, $00
+	animation TILESET_BARRIER, SPRITE_ANIM_2F, FRAMESET_046, PALETTE_107, NONE, SFX_BARRIER, $00
 ; DUEL_ANIM_SPEED
-	animation TILESET_SPEED, SPRITE_ANIM_30, FRAMESET_047, PALETTE_108, SPRITE_ANIM_FLAG_CENTERED, SFX_43, $00
+	animation TILESET_SPEED, SPRITE_ANIM_30, FRAMESET_047, PALETTE_108, SPRITE_ANIM_FLAG_CENTERED, SFX_SPEED, $00
 ; DUEL_ANIM_WHIRLWIND
-	animation TILESET_WHIRLWIND, SPRITE_ANIM_31, FRAMESET_048, PALETTE_109, NONE, SFX_44, $00
+	animation TILESET_WHIRLWIND, SPRITE_ANIM_31, FRAMESET_048, PALETTE_109, NONE, SFX_WHIRLWIND, $00
 ; DUEL_ANIM_CRY
-	animation TILESET_SNIVEL, SPRITE_ANIM_32, FRAMESET_04A, PALETTE_10A, NONE, SFX_45, $00
+	animation TILESET_SNIVEL, SPRITE_ANIM_32, FRAMESET_04A, PALETTE_10A, NONE, SFX_CRY, $00
 ; DUEL_ANIM_QUESTION_MARK
-	animation TILESET_QUESTION_MARK, SPRITE_ANIM_33, FRAMESET_04B, PALETTE_10B, NONE, SFX_46, $00
+	animation TILESET_QUESTION_MARK, SPRITE_ANIM_33, FRAMESET_04B, PALETTE_10B, NONE, SFX_QUESTION_MARK, $00
 ; DUEL_ANIM_SELFDESTRUCT
-	animation TILESET_EXPLOSION, SPRITE_ANIM_34, FRAMESET_04C, PALETTE_10C, NONE, SFX_47, $00
+	animation TILESET_EXPLOSION, SPRITE_ANIM_34, FRAMESET_04C, PALETTE_10C, NONE, SFX_SELFDESTRUCT, $00
 ; DUEL_ANIM_BIG_SELFDESTRUCT_1
-	animation TILESET_EXPLOSION, SPRITE_ANIM_34, FRAMESET_04D, PALETTE_10C, NONE, SFX_48, $00
+	animation TILESET_EXPLOSION, SPRITE_ANIM_34, FRAMESET_04D, PALETTE_10C, NONE, SFX_BIG_SELFDESTRUCT, $00
 ; DUEL_ANIM_HEAL
-	animation TILESET_HEAL, SPRITE_ANIM_35, FRAMESET_04F, PALETTE_10D, NONE, SFX_49, $00
+	animation TILESET_HEAL, SPRITE_ANIM_35, FRAMESET_04F, PALETTE_10D, NONE, SFX_HEAL, $00
 ; DUEL_ANIM_DRAIN
-	animation TILESET_DRAIN, SPRITE_ANIM_36, FRAMESET_051, PALETTE_10E, NONE, SFX_4A, $00
+	animation TILESET_DRAIN, SPRITE_ANIM_36, FRAMESET_051, PALETTE_10E, NONE, SFX_DRAIN, $00
 ; DUEL_ANIM_DARK_GAS
-	animation TILESET_GAS, SPRITE_ANIM_22, FRAMESET_039, PALETTE_10F, NONE, SFX_4B, $00
+	animation TILESET_GAS, SPRITE_ANIM_22, FRAMESET_039, PALETTE_10F, NONE, SFX_DARK_GAS, $00
 ; DUEL_ANIM_BIG_SELFDESTRUCT_2
-	animation TILESET_EXPLOSION, SPRITE_ANIM_34, FRAMESET_04E, PALETTE_10C, NONE, SFX_47, $00
-; DUEL_ANIM_UNUSED_42
-	animation TILESET_GLOW, SPRITE_ANIM_05, FRAMESET_006, PALETTE_0DD, SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_16, $00
-; DUEL_ANIM_UNUSED_43
-	animation TILESET_GLOW, SPRITE_ANIM_05, FRAMESET_007, PALETTE_0DD, SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_17, $00
-; DUEL_ANIM_BENCH_THUNDER
-	animation TILESET_THUNDER, SPRITE_ANIM_07, FRAMESET_015, PALETTE_0DF, NONE, SFX_18, $00
+	animation TILESET_EXPLOSION, SPRITE_ANIM_34, FRAMESET_04E, PALETTE_10C, NONE, SFX_SELFDESTRUCT, $00
+; DUEL_ANIM_UNUSED_HIT
+	animation TILESET_HIT, SPRITE_ANIM_05, FRAMESET_006, PALETTE_0DD, SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_SMALL_HIT, $00
+; DUEL_ANIM_UNUSED_BIG_HIT
+	animation TILESET_HIT, SPRITE_ANIM_05, FRAMESET_007, PALETTE_0DD, SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_HIT, $00
+; DUEL_ANIM_THUNDER_BENCH
+	animation TILESET_THUNDER, SPRITE_ANIM_07, FRAMESET_015, PALETTE_0DF, NONE, SFX_THUNDER_SHOCK, $00
 ; DUEL_ANIM_QUICKFREEZE
-	animation TILESET_SNOW, SPRITE_ANIM_12, FRAMESET_025, PALETTE_0EA, SPRITE_ANIM_FLAG_CENTERED, SFX_24, $00
-; DUEL_ANIM_BENCH_GLOW
-	animation TILESET_SMALL_GLOW, SPRITE_ANIM_37, FRAMESET_052, PALETTE_110, SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_11, $00
+	animation TILESET_SNOW, SPRITE_ANIM_12, FRAMESET_025, PALETTE_0EA, SPRITE_ANIM_FLAG_CENTERED, SFX_BLIZZARD, $00
+; DUEL_ANIM_GLOW_BENCH
+	animation TILESET_SMALL_GLOW, SPRITE_ANIM_37, FRAMESET_052, PALETTE_110, SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_GLOW, $00
 ; DUEL_ANIM_FIREGIVER_START
-	animation TILESET_FIRE_BIRD, SPRITE_ANIM_0D, FRAMESET_01D, PALETTE_0E5, SPRITE_ANIM_FLAG_CENTERED, SFX_5C, $00
-; DUEL_ANIM_UNUSED_48
+	animation TILESET_FIRE_BIRD, SPRITE_ANIM_0D, FRAMESET_01D, PALETTE_0E5, SPRITE_ANIM_FLAG_CENTERED, SFX_FIREGIVER_START, $00
+; DUEL_ANIM_UNUSED_FIREGIVER_INIT
 	animation TILESET_FIRE_BIRD, SPRITE_ANIM_0D, FRAMESET_01E, PALETTE_0E5, SPRITE_ANIM_FLAG_CENTERED, NONE, $00
 ; DUEL_ANIM_HEALING_WIND
-	animation TILESET_HEAL, SPRITE_ANIM_35, FRAMESET_050, PALETTE_10D, SPRITE_ANIM_FLAG_CENTERED, SFX_4C, $00
-; DUEL_ANIM_BENCH_WHIRLWIND
-	animation TILESET_WHIRLWIND, SPRITE_ANIM_31, FRAMESET_049, PALETTE_109, SPRITE_ANIM_FLAG_CENTERED, SFX_4D, $00
+	animation TILESET_HEAL, SPRITE_ANIM_35, FRAMESET_050, PALETTE_10D, SPRITE_ANIM_FLAG_CENTERED, SFX_HEALING_WIND, $00
+; DUEL_ANIM_WHIRLWIND_BENCH
+	animation TILESET_WHIRLWIND, SPRITE_ANIM_31, FRAMESET_049, PALETTE_109, SPRITE_ANIM_FLAG_CENTERED, SFX_WHIRLWIND_BENCH, $00
 ; DUEL_ANIM_EXPAND
-	animation TILESET_EXPAND, SPRITE_ANIM_38, FRAMESET_053, PALETTE_111, NONE, SFX_4E, $00
+	animation TILESET_EXPAND, SPRITE_ANIM_38, FRAMESET_053, PALETTE_111, NONE, SFX_EXPAND, $00
 ; DUEL_ANIM_CAT_PUNCH
-	animation TILESET_CAT_PUNCH, SPRITE_ANIM_39, FRAMESET_054, PALETTE_112, NONE, SFX_4F, $00
+	animation TILESET_CAT_PUNCH, SPRITE_ANIM_39, FRAMESET_054, PALETTE_112, NONE, SFX_CAT_PUNCH, $00
 ; DUEL_ANIM_THUNDER_WAVE
-	animation TILESET_ELECTRIC_WAVE, SPRITE_ANIM_3A, FRAMESET_055, PALETTE_113, NONE, SFX_50, $00
+	animation TILESET_ELECTRIC_WAVE, SPRITE_ANIM_3A, FRAMESET_055, PALETTE_113, NONE, SFX_THUNDER_WAVE, $00
 ; DUEL_ANIM_FIREGIVER_PLAYER
-	animation TILESET_FIRE_BIRD, SPRITE_ANIM_0D, FRAMESET_01F, PALETTE_0E5, SPRITE_ANIM_FLAG_CENTERED, SFX_51, $00
+	animation TILESET_FIRE_BIRD, SPRITE_ANIM_0D, FRAMESET_01F, PALETTE_0E5, SPRITE_ANIM_FLAG_CENTERED, SFX_FIREGIVER, $00
 ; DUEL_ANIM_FIREGIVER_OPP
-	animation TILESET_FIRE_BIRD, SPRITE_ANIM_0D, FRAMESET_020, PALETTE_0E5, SPRITE_ANIM_FLAG_CENTERED, SFX_51, $00
-; DUEL_ANIM_UNUSED_50
+	animation TILESET_FIRE_BIRD, SPRITE_ANIM_0D, FRAMESET_020, PALETTE_0E5, SPRITE_ANIM_FLAG_CENTERED, SFX_FIREGIVER, $00
+; DUEL_ANIM_UNUSED_DECK_SWAP
 	animation TILESET_CARD, SPRITE_ANIM_5C, FRAMESET_079, PALETTE_135, SPRITE_ANIM_FLAG_CENTERED | SPRITE_ANIM_FLAG_UNSKIPPABLE, NONE, $00
 ; DUEL_ANIM_PLAYER_SHUFFLE
-	animation TILESET_CARD, SPRITE_ANIM_5C, FRAMESET_07A, PALETTE_135, SPRITE_ANIM_FLAG_CENTERED | SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_07, $00
+	animation TILESET_CARD, SPRITE_ANIM_5C, FRAMESET_07A, PALETTE_135, SPRITE_ANIM_FLAG_CENTERED | SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_CARD_SHUFFLE, $00
 ; DUEL_ANIM_OPP_SHUFFLE
-	animation TILESET_CARD, SPRITE_ANIM_5C, FRAMESET_07B, PALETTE_135, SPRITE_ANIM_FLAG_CENTERED | SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_07, $00
+	animation TILESET_CARD, SPRITE_ANIM_5C, FRAMESET_07B, PALETTE_135, SPRITE_ANIM_FLAG_CENTERED | SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_CARD_SHUFFLE, $00
 ; DUEL_ANIM_BOTH_SHUFFLE
-	animation TILESET_CARD, SPRITE_ANIM_5C, FRAMESET_07C, PALETTE_135, SPRITE_ANIM_FLAG_CENTERED | SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_07, $00
-; DUEL_ANIM_UNUSED_54
+	animation TILESET_CARD, SPRITE_ANIM_5C, FRAMESET_07C, PALETTE_135, SPRITE_ANIM_FLAG_CENTERED | SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_CARD_SHUFFLE, $00
+; DUEL_ANIM_UNUSED_DECK_SHIFT
 	animation TILESET_CARD, SPRITE_ANIM_5C, FRAMESET_07D, PALETTE_135, SPRITE_ANIM_FLAG_CENTERED | SPRITE_ANIM_FLAG_UNSKIPPABLE, NONE, $00
 ; DUEL_ANIM_BOTH_DRAW
 	animation TILESET_CARD, SPRITE_ANIM_5C, FRAMESET_07E, PALETTE_135, SPRITE_ANIM_FLAG_CENTERED | SPRITE_ANIM_FLAG_UNSKIPPABLE, NONE, $00
@@ -4085,10 +7921,10 @@ Animations:
 	animation TILESET_CARD, SPRITE_ANIM_5C, FRAMESET_080, PALETTE_135, SPRITE_ANIM_FLAG_CENTERED | SPRITE_ANIM_FLAG_UNSKIPPABLE, NONE, $00
 ; DUEL_ANIM_COIN_SPIN
 	animation TILESET_TCG1_PIKACHU_COIN, SPRITE_ANIM_5D, FRAMESET_082, PALETTE_136, SPRITE_ANIM_FLAG_CENTERED | SPRITE_ANIM_FLAG_UNSKIPPABLE, NONE, $00
-; DUEL_ANIM_COIN_TOSS1
-	animation TILESET_TCG1_PIKACHU_COIN, SPRITE_ANIM_5D, FRAMESET_083, PALETTE_136, SPRITE_ANIM_FLAG_CENTERED | SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_0B, $00
-; DUEL_ANIM_COIN_TOSS2
-	animation TILESET_TCG1_PIKACHU_COIN, SPRITE_ANIM_5D, FRAMESET_084, PALETTE_136, SPRITE_ANIM_FLAG_CENTERED | SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_0B, $00
+; DUEL_ANIM_COIN_TOSS_GOING_HEADS
+	animation TILESET_TCG1_PIKACHU_COIN, SPRITE_ANIM_5D, FRAMESET_083, PALETTE_136, SPRITE_ANIM_FLAG_CENTERED | SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_COIN_TOSS, $00
+; DUEL_ANIM_COIN_TOSS_GOING_TAILS
+	animation TILESET_TCG1_PIKACHU_COIN, SPRITE_ANIM_5D, FRAMESET_084, PALETTE_136, SPRITE_ANIM_FLAG_CENTERED | SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_COIN_TOSS, $00
 ; DUEL_ANIM_COIN_TAILS
 	animation TILESET_TCG1_PIKACHU_COIN, SPRITE_ANIM_5D, FRAMESET_085, PALETTE_136, SPRITE_ANIM_FLAG_CENTERED | SPRITE_ANIM_FLAG_UNSKIPPABLE, NONE, $00
 ; DUEL_ANIM_COIN_HEADS
@@ -4099,81 +7935,81 @@ Animations:
 	animation TILESET_DUEL_RESULT, SPRITE_ANIM_5E, FRAMESET_088, PALETTE_137, SPRITE_ANIM_FLAG_CENTERED | SPRITE_ANIM_FLAG_UNSKIPPABLE, NONE, $00
 ; DUEL_ANIM_DUEL_DRAW
 	animation TILESET_DUEL_RESULT, SPRITE_ANIM_5E, FRAMESET_089, PALETTE_137, SPRITE_ANIM_FLAG_CENTERED | SPRITE_ANIM_FLAG_UNSKIPPABLE, NONE, $00
-; DUEL_ANIM_UNUSED_60
+; DUEL_ANIM_UNUSED_DECK_PAUSE
 	animation TILESET_CARD, SPRITE_ANIM_5C, FRAMESET_081, PALETTE_135, SPRITE_ANIM_FLAG_CENTERED | SPRITE_ANIM_FLAG_UNSKIPPABLE, NONE, $00
-; DUEL_ANIM_61
-	animation TILESET_HIT, SPRITE_ANIM_00, FRAMESET_000, PALETTE_0D8, SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_2E, $00
-; DUEL_ANIM_62
-	animation TILESET_HIT, SPRITE_ANIM_00, FRAMESET_000, PALETTE_0D8, SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_2E, $00
-; DUEL_ANIM_63
-	animation TILESET_HIT, SPRITE_ANIM_00, FRAMESET_000, PALETTE_0D8, SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_2E, $00
-; DUEL_ANIM_64
-	animation TILESET_FIREBALLS, SPRITE_ANIM_3B, FRAMESET_056, PALETTE_114, SPRITE_ANIM_FLAG_X_INVERTED | SPRITE_ANIM_FLAG_Y_INVERTED | SPRITE_ANIM_FLAG_X_FLIP | SPRITE_ANIM_FLAG_Y_FLIP, SFX_64, $00
-; DUEL_ANIM_65
-	animation TILESET_FIREBALLS, SPRITE_ANIM_3B, FRAMESET_057, PALETTE_114, SPRITE_ANIM_FLAG_X_INVERTED | SPRITE_ANIM_FLAG_Y_INVERTED | SPRITE_ANIM_FLAG_X_FLIP | SPRITE_ANIM_FLAG_Y_FLIP, SFX_65, $00
-; DUEL_ANIM_66
-	animation TILESET_BENCH_MANIP, SPRITE_ANIM_3C, FRAMESET_058, PALETTE_115, SPRITE_ANIM_FLAG_Y_INVERTED | SPRITE_ANIM_FLAG_CENTERED | SPRITE_ANIM_FLAG_Y_FLIP, SFX_66, $00
-; DUEL_ANIM_67
-	animation TILESET_PSYCHIC_BEAM, SPRITE_ANIM_3D, FRAMESET_059, PALETTE_116, SPRITE_ANIM_FLAG_Y_INVERTED | SPRITE_ANIM_FLAG_Y_FLIP, SFX_67, $00
-; DUEL_ANIM_68
-	animation TILESET_BENCH_PSYCHIC_BEAM, SPRITE_ANIM_3E, FRAMESET_05A, PALETTE_117, SPRITE_ANIM_FLAG_Y_INVERTED | SPRITE_ANIM_FLAG_3 | SPRITE_ANIM_FLAG_Y_FLIP, SFX_68, $00
-; DUEL_ANIM_69
-	animation TILESET_ROCK_THROW, SPRITE_ANIM_3F, FRAMESET_05B, PALETTE_118, NONE, SFX_69, $00
-; DUEL_ANIM_6A
-	animation TILESET_MEGA_PUNCH, SPRITE_ANIM_40, FRAMESET_05C, PALETTE_119, NONE, SFX_6A, $00
-; DUEL_ANIM_6B
-	animation TILESET_PSYPUNCH, SPRITE_ANIM_41, FRAMESET_05D, PALETTE_11A, NONE, SFX_6B, $00
-; DUEL_ANIM_6C
-	animation TILESET_SLUDGE_PUNCH, SPRITE_ANIM_42, FRAMESET_05E, PALETTE_11B, NONE, SFX_6C, $00
-; DUEL_ANIM_6D
-	animation TILESET_ICE_PUNCH, SPRITE_ANIM_43, FRAMESET_05F, PALETTE_11C, NONE, SFX_6D, $00
-; DUEL_ANIM_6E
-	animation TILESET_KICK, SPRITE_ANIM_44, FRAMESET_060, PALETTE_11D, NONE, SFX_6E, $00
-; DUEL_ANIM_6F
-	animation TILESET_TAIL_SLAP, SPRITE_ANIM_45, FRAMESET_061, PALETTE_11E, NONE, SFX_6F, $00
-; DUEL_ANIM_70
-	animation TILESET_TAIL_WHIP, SPRITE_ANIM_46, FRAMESET_062, PALETTE_11F, SPRITE_ANIM_FLAG_X_INVERTED | SPRITE_ANIM_FLAG_X_FLIP, SFX_70, $00
-; DUEL_ANIM_71
-	animation TILESET_SLAP, SPRITE_ANIM_47, FRAMESET_063, PALETTE_120, NONE, SFX_71, $00
-; DUEL_ANIM_72
-	animation TILESET_QUESTION_MARK_SMALL, SPRITE_ANIM_48, FRAMESET_064, PALETTE_121, NONE, SFX_72, $00
-; DUEL_ANIM_73
-	animation TILESET_SKULL_BASH, SPRITE_ANIM_49, FRAMESET_065, PALETTE_122, SPRITE_ANIM_FLAG_X_INVERTED | SPRITE_ANIM_FLAG_X_FLIP, SFX_73, $00
-; DUEL_ANIM_74
-	animation TILESET_COIN_HURL, SPRITE_ANIM_4A, FRAMESET_066, PALETTE_123, NONE, SFX_74, $00
-; DUEL_ANIM_75
-	animation TILESET_193, SPRITE_ANIM_4B, FRAMESET_068, PALETTE_124, SPRITE_ANIM_FLAG_8x16, SFX_75, $00
-; DUEL_ANIM_76
-	animation TILESET_FOLLOW_ME, SPRITE_ANIM_4C, FRAMESET_069, PALETTE_125, NONE, SFX_76, $00
-; DUEL_ANIM_77
-	animation TILESET_SWIFT, SPRITE_ANIM_4D, FRAMESET_06A, PALETTE_126, SPRITE_ANIM_FLAG_X_INVERTED | SPRITE_ANIM_FLAG_X_FLIP, SFX_77, $00
-; DUEL_ANIM_78
-	animation TILESET_3D_ATTACK, SPRITE_ANIM_4E, FRAMESET_06B, PALETTE_127, NONE, SFX_78, $00
-; DUEL_ANIM_79
-	animation TILESET_WATER_DROP, SPRITE_ANIM_0E, FRAMESET_021, PALETTE_0E6, SPRITE_ANIM_FLAG_CENTERED, SFX_79, $00
-; DUEL_ANIM_7A
-	animation TILESET_FOCUS_BLAST, SPRITE_ANIM_50, FRAMESET_06D, PALETTE_129, SPRITE_ANIM_FLAG_Y_INVERTED | SPRITE_ANIM_FLAG_Y_FLIP, SFX_7A, $00
-; DUEL_ANIM_7B
-	animation TILESET_FOCUS_BLAST_BENCH, SPRITE_ANIM_51, FRAMESET_06E, PALETTE_12A, SPRITE_ANIM_FLAG_Y_INVERTED | SPRITE_ANIM_FLAG_3 | SPRITE_ANIM_FLAG_Y_FLIP, SFX_7B, $00
-; DUEL_ANIM_7C
-	animation TILESET_BONE2, SPRITE_ANIM_52, FRAMESET_06F, PALETTE_12B, NONE, SFX_8C, $00
-; DUEL_ANIM_7D
-	animation TILESET_COIN_HURL, SPRITE_ANIM_4A, FRAMESET_067, PALETTE_123, NONE, SFX_8D, $00
-; DUEL_ANIM_7E
-	animation TILESET_BIG_SNORE, SPRITE_ANIM_53, FRAMESET_070, PALETTE_12C, NONE, SFX_8E, $00
-; DUEL_ANIM_7F
-	animation TILESET_RAZOR_LEAF, SPRITE_ANIM_54, FRAMESET_071, PALETTE_12D, SPRITE_ANIM_FLAG_X_INVERTED | SPRITE_ANIM_FLAG_X_FLIP, SFX_92, $00
-; DUEL_ANIM_80
-	animation TILESET_GUILLOTINE, SPRITE_ANIM_55, FRAMESET_072, PALETTE_12E, NONE, SFX_93, $00
-; DUEL_ANIM_81
-	animation TILESET_VINE_PULL, SPRITE_ANIM_56, FRAMESET_073, PALETTE_12F, SPRITE_ANIM_FLAG_X_INVERTED | SPRITE_ANIM_FLAG_Y_INVERTED | SPRITE_ANIM_FLAG_X_FLIP | SPRITE_ANIM_FLAG_Y_FLIP, SFX_94, $00
-; DUEL_ANIM_82
-	animation TILESET_PERPLEX, SPRITE_ANIM_57, FRAMESET_074, PALETTE_130, NONE, SFX_95, $00
-; DUEL_ANIM_83
-	animation TILESET_NINE_TAILS, SPRITE_ANIM_58, FRAMESET_075, PALETTE_131, NONE, SFX_96, $00
-; DUEL_ANIM_84
-	animation TILESET_BONE_HEADBUTT, SPRITE_ANIM_59, FRAMESET_076, PALETTE_132, SPRITE_ANIM_FLAG_X_INVERTED | SPRITE_ANIM_FLAG_X_FLIP, SFX_97, $00
-; DUEL_ANIM_85
-	animation TILESET_DRILL_DIVE, SPRITE_ANIM_5A, FRAMESET_077, PALETTE_133, SPRITE_ANIM_FLAG_X_INVERTED | SPRITE_ANIM_FLAG_X_FLIP, SFX_98, $00
-; DUEL_ANIM_86
-	animation TILESET_DARK_SONG, SPRITE_ANIM_5B, FRAMESET_078, PALETTE_134, SPRITE_ANIM_FLAG_X_INVERTED | SPRITE_ANIM_FLAG_X_FLIP, SFX_99, $00
+; DUEL_ANIM_PLACEHOLDER_61
+	animation TILESET_GLOW, SPRITE_ANIM_00, FRAMESET_000, PALETTE_0D8, SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_SONIC_BOOM, $00
+; DUEL_ANIM_PLACEHOLDER_62
+	animation TILESET_GLOW, SPRITE_ANIM_00, FRAMESET_000, PALETTE_0D8, SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_SONIC_BOOM, $00
+; DUEL_ANIM_PLACEHOLDER_63
+	animation TILESET_GLOW, SPRITE_ANIM_00, FRAMESET_000, PALETTE_0D8, SPRITE_ANIM_FLAG_UNSKIPPABLE, SFX_SONIC_BOOM, $00
+; DUEL_ANIM_FIREBALL
+	animation TILESET_FIREBALLS, SPRITE_ANIM_3B, FRAMESET_056, PALETTE_114, SPRITE_ANIM_FLAG_X_INVERTED | SPRITE_ANIM_FLAG_Y_INVERTED | SPRITE_ANIM_FLAG_X_FLIP | SPRITE_ANIM_FLAG_Y_FLIP, SFX_FIREBALL, $00
+; DUEL_ANIM_CONTINUOUS_FIREBALL
+	animation TILESET_FIREBALLS, SPRITE_ANIM_3B, FRAMESET_057, PALETTE_114, SPRITE_ANIM_FLAG_X_INVERTED | SPRITE_ANIM_FLAG_Y_INVERTED | SPRITE_ANIM_FLAG_X_FLIP | SPRITE_ANIM_FLAG_Y_FLIP, SFX_CONTINUOUS_FIREBALL, $00
+; DUEL_ANIM_BENCH_MANIPULATION
+	animation TILESET_BENCH_MANIPULATION, SPRITE_ANIM_3C, FRAMESET_058, PALETTE_115, SPRITE_ANIM_FLAG_Y_INVERTED | SPRITE_ANIM_FLAG_CENTERED | SPRITE_ANIM_FLAG_Y_FLIP, SFX_BENCH_MANIPULATION, $00
+; DUEL_ANIM_PSYCHIC_BEAM
+	animation TILESET_PSYCHIC_BEAM, SPRITE_ANIM_3D, FRAMESET_059, PALETTE_116, SPRITE_ANIM_FLAG_Y_INVERTED | SPRITE_ANIM_FLAG_Y_FLIP, SFX_PSYCHIC_BEAM, $00
+; DUEL_ANIM_PSYCHIC_BEAM_BENCH
+	animation TILESET_PSYCHIC_BEAM_BENCH, SPRITE_ANIM_3E, FRAMESET_05A, PALETTE_117, SPRITE_ANIM_FLAG_Y_INVERTED | SPRITE_ANIM_FLAG_3 | SPRITE_ANIM_FLAG_Y_FLIP, SFX_PSYCHIC_BEAM_BENCH, $00
+; DUEL_ANIM_BOULDER_SMASH
+	animation TILESET_ROCK_THROW, SPRITE_ANIM_3F, FRAMESET_05B, PALETTE_118, NONE, SFX_BOULDER_SMASH, $00
+; DUEL_ANIM_MEGA_PUNCH
+	animation TILESET_MEGA_PUNCH, SPRITE_ANIM_40, FRAMESET_05C, PALETTE_119, NONE, SFX_MEGA_PUNCH, $00
+; DUEL_ANIM_PSYPUNCH
+	animation TILESET_PSYPUNCH, SPRITE_ANIM_41, FRAMESET_05D, PALETTE_11A, NONE, SFX_PSYPUNCH, $00
+; DUEL_ANIM_SLUDGE_PUNCH
+	animation TILESET_SLUDGE_PUNCH, SPRITE_ANIM_42, FRAMESET_05E, PALETTE_11B, NONE, SFX_SLUDGE_PUNCH, $00
+; DUEL_ANIM_ICE_PUNCH
+	animation TILESET_ICE_PUNCH, SPRITE_ANIM_43, FRAMESET_05F, PALETTE_11C, NONE, SFX_ICE_PUNCH, $00
+; DUEL_ANIM_KICK
+	animation TILESET_KICK, SPRITE_ANIM_44, FRAMESET_060, PALETTE_11D, NONE, SFX_KICK, $00
+; DUEL_ANIM_TAIL_SLAP
+	animation TILESET_TAIL_SLAP, SPRITE_ANIM_45, FRAMESET_061, PALETTE_11E, NONE, SFX_TAIL_SLAP, $00
+; DUEL_ANIM_TAIL_WHIP
+	animation TILESET_TAIL_WHIP, SPRITE_ANIM_46, FRAMESET_062, PALETTE_11F, SPRITE_ANIM_FLAG_X_INVERTED | SPRITE_ANIM_FLAG_X_FLIP, SFX_TAIL_WHIP, $00
+; DUEL_ANIM_SLAP
+	animation TILESET_SLAP, SPRITE_ANIM_47, FRAMESET_063, PALETTE_120, NONE, SFX_SLAP, $00
+; DUEL_ANIM_QUESTION_MARK_BENCH
+	animation TILESET_QUESTION_MARK_SMALL, SPRITE_ANIM_48, FRAMESET_064, PALETTE_121, NONE, SFX_QUESTION_MARK_BENCH, $00
+; DUEL_ANIM_SKULL_BASH
+	animation TILESET_SKULL_BASH, SPRITE_ANIM_49, FRAMESET_065, PALETTE_122, SPRITE_ANIM_FLAG_X_INVERTED | SPRITE_ANIM_FLAG_X_FLIP, SFX_SKULL_BASH, $00
+; DUEL_ANIM_COIN_HURL
+	animation TILESET_COIN_HURL, SPRITE_ANIM_4A, FRAMESET_066, PALETTE_123, NONE, SFX_COIN_HURL, $00
+; DUEL_ANIM_TELEPORT
+	animation TILESET_TELEPORT, SPRITE_ANIM_4B, FRAMESET_068, PALETTE_124, SPRITE_ANIM_FLAG_8x16, SFX_TELEPORT, $00
+; DUEL_ANIM_FOLLOW_ME
+	animation TILESET_FOLLOW_ME, SPRITE_ANIM_4C, FRAMESET_069, PALETTE_125, NONE, SFX_FOLLOW_ME, $00
+; DUEL_ANIM_SWIFT
+	animation TILESET_SWIFT, SPRITE_ANIM_4D, FRAMESET_06A, PALETTE_126, SPRITE_ANIM_FLAG_X_INVERTED | SPRITE_ANIM_FLAG_X_FLIP, SFX_SWIFT, $00
+; DUEL_ANIM_3D_ATTACK
+	animation TILESET_3D_ATTACK, SPRITE_ANIM_4E, FRAMESET_06B, PALETTE_127, NONE, SFX_3D_ATTACK, $00
+; DUEL_ANIM_DRY_UP
+	animation TILESET_WATER_DROP, SPRITE_ANIM_0E, FRAMESET_021, PALETTE_0E6, SPRITE_ANIM_FLAG_CENTERED, SFX_DRY_UP, $00
+; DUEL_ANIM_FOCUS_BLAST
+	animation TILESET_FOCUS_BLAST, SPRITE_ANIM_50, FRAMESET_06D, PALETTE_129, SPRITE_ANIM_FLAG_Y_INVERTED | SPRITE_ANIM_FLAG_Y_FLIP, SFX_FOCUS_BLAST, $00
+; DUEL_ANIM_FOCUS_BLAST_BENCH
+	animation TILESET_FOCUS_BLAST_BENCH, SPRITE_ANIM_51, FRAMESET_06E, PALETTE_12A, SPRITE_ANIM_FLAG_Y_INVERTED | SPRITE_ANIM_FLAG_3 | SPRITE_ANIM_FLAG_Y_FLIP, SFX_FOCUS_BLAST_BENCH, $00
+; DUEL_ANIM_BONE_TOSS_BENCH
+	animation TILESET_BONE2, SPRITE_ANIM_52, FRAMESET_06F, PALETTE_12B, NONE, SFX_BONE_TOSS_BENCH, $00
+; DUEL_ANIM_COIN_HURL_BENCH
+	animation TILESET_COIN_HURL, SPRITE_ANIM_4A, FRAMESET_067, PALETTE_123, NONE, SFX_COIN_HURL_BENCH, $00
+; DUEL_ANIM_BIG_SNORE
+	animation TILESET_BIG_SNORE, SPRITE_ANIM_53, FRAMESET_070, PALETTE_12C, NONE, SFX_BIG_SNORE, $00
+; DUEL_ANIM_RAZOR_LEAF
+	animation TILESET_RAZOR_LEAF, SPRITE_ANIM_54, FRAMESET_071, PALETTE_12D, SPRITE_ANIM_FLAG_X_INVERTED | SPRITE_ANIM_FLAG_X_FLIP, SFX_RAZOR_LEAF, $00
+; DUEL_ANIM_GUILLOTINE
+	animation TILESET_GUILLOTINE, SPRITE_ANIM_55, FRAMESET_072, PALETTE_12E, NONE, SFX_GUILLOTINE, $00
+; DUEL_ANIM_VINE_PULL
+	animation TILESET_VINE_PULL, SPRITE_ANIM_56, FRAMESET_073, PALETTE_12F, SPRITE_ANIM_FLAG_X_INVERTED | SPRITE_ANIM_FLAG_Y_INVERTED | SPRITE_ANIM_FLAG_X_FLIP | SPRITE_ANIM_FLAG_Y_FLIP, SFX_VINE_PULL, $00
+; DUEL_ANIM_PERPLEX
+	animation TILESET_PERPLEX, SPRITE_ANIM_57, FRAMESET_074, PALETTE_130, NONE, SFX_PERPLEX, $00
+; DUEL_ANIM_NINE_TAILS
+	animation TILESET_NINE_TAILS, SPRITE_ANIM_58, FRAMESET_075, PALETTE_131, NONE, SFX_NINE_TAILS, $00
+; DUEL_ANIM_BONE_HEADBUTT
+	animation TILESET_BONE_HEADBUTT, SPRITE_ANIM_59, FRAMESET_076, PALETTE_132, SPRITE_ANIM_FLAG_X_INVERTED | SPRITE_ANIM_FLAG_X_FLIP, SFX_BONE_HEADBUTT, $00
+; DUEL_ANIM_DRILL_DIVE
+	animation TILESET_DRILL_DIVE, SPRITE_ANIM_5A, FRAMESET_077, PALETTE_133, SPRITE_ANIM_FLAG_X_INVERTED | SPRITE_ANIM_FLAG_X_FLIP, SFX_DRILL_DIVE, $00
+; DUEL_ANIM_DARK_SONG
+	animation TILESET_DARK_SONG, SPRITE_ANIM_5B, FRAMESET_078, PALETTE_134, SPRITE_ANIM_FLAG_X_INVERTED | SPRITE_ANIM_FLAG_X_FLIP, SFX_DARK_SONG, $00

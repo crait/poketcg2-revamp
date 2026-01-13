@@ -238,7 +238,7 @@ CreditsCmd_PrintHeader:
 	ld l, a
 	ld a, [wCreditsCmdArg5]
 	ld h, a
-	call Func_35af
+	call InitTextPrinting_ProcessTextFromIDVRAM0
 	ld b, d
 	ld c, e
 	call BCCoordToBGMap0Address
@@ -260,7 +260,7 @@ CreditsCmd_PrintHeader:
 	dec b
 	jr nz, .loop_tiles
 	pop hl
-	ld de, BG_MAP_WIDTH
+	ld de, TILEMAP_WIDTH
 	add hl, de
 	pop bc
 	dec c
@@ -279,7 +279,7 @@ CreditsCmd_PrintBlack:
 	ld l, a
 	ld a, [wCreditsCmdArg5]
 	ld h, a
-	call Func_35af
+	call InitTextPrinting_ProcessTextFromIDVRAM0
 	bank1call SetFontAndTextBoxFrameColor
 	ret
 
@@ -344,7 +344,7 @@ Func_13ac1::
 CreditsCmd_WaitInput:
 	ld a, [wCreditsCmdArg1]
 	ld c, a
-	call Func_10221
+	call WaitForButtonPress
 	ret
 
 CreditsCmd_MusicFadeOut:
@@ -354,7 +354,7 @@ CreditsCmd_MusicFadeOut:
 	dec a
 	push af
 	ld a, a
-	call Func_3d3a
+	call CallSetVolume
 	pop af
 	ld b, 20
 .loop_wait
@@ -369,7 +369,7 @@ CreditsCmd_SetVolume:
 	ld a, [wCreditsCmdArg1]
 	push af
 	ld a, a
-	call Func_3d3a
+	call CallSetVolume
 	pop af
 	ret
 

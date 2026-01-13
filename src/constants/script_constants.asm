@@ -16,8 +16,8 @@
 	const EVENT_GOT_GR_COIN_PIECE_TOP_RIGHT               ; $0d
 	const EVENT_GOT_GR_COIN_PIECE_BOTTOM_LEFT             ; $0e
 	const EVENT_GOT_GR_COIN_PIECE_BOTTOM_RIGHT            ; $0f
-	const EVENT_GOT_MAGNEMITE_COIN                        ; $10
-	const EVENT_GOT_GOLBAT_COIN                           ; $11
+	const EVENT_GOT_GOLBAT_COIN                           ; $10
+	const EVENT_GOT_MAGNEMITE_COIN                        ; $11
 	const EVENT_GOT_MAGMAR_COIN                           ; $12
 	const EVENT_GOT_PSYDUCK_COIN                          ; $13
 	const EVENT_GOT_MACHAMP_COIN                          ; $14
@@ -143,7 +143,7 @@
 	const EVENT_TALKED_TO_ISHII_2                         ; $7d
 	const EVENT_TALKED_TO_SAMEJIMA_2                      ; $7e
 ; GR Castle flags
-	const EVENT_TALKED_TO_KANZAJI                         ; $7f
+	const EVENT_TALKED_TO_KANZAKI                         ; $7f
 	const EVENT_TALKED_TO_RUI                             ; $80
 	const EVENT_BEAT_KANZAKI                              ; $81
 	const EVENT_BEAT_RUI                                  ; $82
@@ -278,6 +278,30 @@
 	const EVENT_F5                                        ; $f5
 DEF NUM_EVENT_FLAGS EQU const_value
 
+	const_def 1
+	const GC_PIECES_1 ; 1
+	const GC_PIECES_2 ; 2
+	const GC_PIECES_3 ; 3
+	const GC_PIECES_4 ; 4
+
+; Ronald events
+; - card pops after you leave Mason's Lab for the first time
+; - challenges you at Fig/Grass/Sci/Fire/Psy Club after 2 GR Coin pieces, giving you Super Energy Retrieval only if you win
+; - gives you 1 LEGENDARY_POWER at Water Club after you win GR3 there for the first time
+; - gives you 2 ISLAND_OF_FOSSIL at Fig/Grass/Sci/Fire Club after 4 pieces, boasting he's got back stolen cards
+; DEF RONALD_FIRST_CARD_POP  EQU $0
+DEF RONALD_DUEL_GC_PIECES_2  EQU $1
+DEF RONALD_GIFT_WON_GR3_ONCE EQU $1
+DEF RONALD_GIFT_GC_PIECES_4  EQU $2
+
+; Imakuni? event win-count thresholds, both Black and Red
+DEF IMAKUNI_THRESHOLD_1 EQU $3
+DEF IMAKUNI_THRESHOLD_2 EQU $6
+DEF IMAKUNI_THRESHOLD_3 EQU $9
+
+DEF EVENT_VAR_BYTES   EQU $34
+DEF GENERAL_VAR_BYTES EQU $34
+
 DEF PLAYER_MALE   EQU $0
 DEF PLAYER_FEMALE EQU $1
 
@@ -285,3 +309,82 @@ DEF NORTH    EQU $00
 DEF EAST     EQU $01
 DEF SOUTH    EQU $02
 DEF WEST     EQU $03
+
+DEF MOVE_BACKWARDS  EQU %10000000 ; for when an NPC walks backwards
+DEF MOVE_SPEED_WALK EQU 1
+DEF MOVE_SPEED_RUN  EQU 2
+
+; the true max is probably much lower. this is just the biggest 6-bit number.
+DEF MAX_MOVEMENT EQU $3f
+
+; generate MOVE_x constants for use in NPCMovement data.
+; see also: script_extractor.py
+; The raw data value = (number of steps to move << 2) + speed
+; e.g. MOVE_2 = 0x09; RUN_2 = 0x0a
+FOR N, MAX_MOVEMENT
+	DEF MOVE_{d:N} EQU (N << 2) + MOVE_SPEED_WALK
+	DEF RUN_{d:N} EQU (N << 2) + MOVE_SPEED_RUN
+ENDR
+
+; TODO: Identify WRAM to give them proper names
+DEF wD606_STRUCT_SIZE  EQU $8
+DEF SCRIPT_BUFFER_SIZE EQU $20
+DEF SCRIPT_STACK_SIZE  EQU $10
+
+DEF NUM_UNIQUE_MAILS_IN_GAME    EQU 29
+DEF MAIL_MAX_NUM                EQU 8
+DEF MAIL_MAX_ON_SCREEN          EQU 4
+DEF MAIL_BUFFER_SIZE            EQU MAIL_MAX_NUM + 1
+DEF MAIL_QUEUE_BUFFER_SIZE      EQU 25
+DEF NEW_MAIL EQU $ff
+
+DEF B_MAIL_READ EQU 7
+DEF B_MAIL_PRIORITY_DELIVERY EQU 7
+
+; mail attachments
+	const_def 4
+	const B_MAIL_BILLS_PC     ; 4
+	const B_MAIL_BLACK_BOX    ; 5
+	const B_MAIL_GENERIC_CARD ; 6
+	const B_MAIL_BOOSTER_PACK ; 7
+
+DEF MAIL_COMMAND_GIVE_BILLS_PC     EQU 1 << B_MAIL_BILLS_PC
+DEF MAIL_COMMAND_GIVE_BLACK_BOX    EQU 1 << B_MAIL_BLACK_BOX
+DEF MAIL_COMMAND_GIVE_GENERIC_CARD EQU 1 << B_MAIL_GENERIC_CARD
+DEF MAIL_COMMAND_GIVE_BOOSTER      EQU 1 << B_MAIL_BOOSTER_PACK
+DEF MAIL_TERMINATOR EQU $ffff
+
+; TODO: Figure out why 2 is added in IngameCardPop
+	const_def
+	const SCRIPTED_CARD_POP_RONALD       ; $0
+	const SCRIPTED_CARD_POP_IMAKUNI      ; $1
+	const SCRIPTED_RARE_CARD_POP_IMAKUNI ; $2
+
+; duel requirement IDs
+; for DuelRequirementFunctionMap and duel_requirement_check script calls
+	const_def
+	const DUEL_REQUIREMENT_MIYUKI           ; $00
+	const DUEL_REQUIREMENT_RENNA            ; $01
+	const DUEL_REQUIREMENT_ICHIKAWA         ; $02
+	const DUEL_REQUIREMENT_YUKI             ; $03
+	const DUEL_REQUIREMENT_SHOKO            ; $04
+	const DUEL_REQUIREMENT_MIYAJIMA         ; $05
+	const DUEL_REQUIREMENT_SENTA            ; $06
+	const DUEL_REQUIREMENT_GODA             ; $07
+	const DUEL_REQUIREMENT_GRACE            ; $08
+	const DUEL_REQUIREMENT_MIWA             ; $09
+	const DUEL_REQUIREMENT_YOSUKE           ; $0a
+	const DUEL_REQUIREMENT_RYOKO            ; $0b
+	const DUEL_REQUIREMENT_NISHIJIMA_REROLL ; $0c
+	const DUEL_REQUIREMENT_NISHIJIMA_USE    ; $0d
+	const DUEL_REQUIREMENT_ISHII_REROLL     ; $0e
+	const DUEL_REQUIREMENT_ISHII_USE        ; $0f
+	const DUEL_REQUIREMENT_SAMEJIMA_REROLL  ; $10
+	const DUEL_REQUIREMENT_SAMEJIMA_USE     ; $11
+	const DUEL_REQUIREMENT_KANZAKI          ; $12
+
+; booster pack list types, used by give_booster_packs
+	const_def
+	const BOOSTERS_GIVE_ALL    ; 0
+	const BOOSTERS_GIVE_N      ; 1
+	const BOOSTERS_GIVE_RANDOM ; 2

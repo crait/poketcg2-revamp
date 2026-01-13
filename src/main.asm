@@ -16,9 +16,6 @@ INCLUDE "engine/bank03.asm"
 SECTION "Bank 4", ROMX
 INCLUDE "engine/bank04.asm"
 
-SECTION "Scenes", ROMX[$6eb9], BANK[$4]
-INCLUDE "engine/scenes.asm"
-
 SECTION "Bank 5", ROMX
 INCLUDE "engine/bank05.asm"
 
@@ -34,9 +31,6 @@ INCLUDE "engine/bank08.asm"
 SECTION "Bank 9", ROMX
 INCLUDE "engine/bank09.asm"
 
-SECTION "GBC Only Disclaimer", ROMX[$64fd], BANK[$9]
-INCLUDE "engine/gbc_only_disclaimer.asm"
-
 SECTION "Bank a", ROMX
 INCLUDE "engine/bank0a.asm"
 
@@ -45,6 +39,9 @@ INCLUDE "engine/bank0b.asm"
 
 SECTION "Bank c", ROMX
 INCLUDE "engine/bank0c.asm"
+
+SECTION "Bank d", ROMX
+INCLUDE "engine/bank0d.asm"
 
 SECTION "Bank e", ROMX
 INCLUDE "engine/bank0e.asm"
@@ -64,8 +61,11 @@ INCLUDE "engine/bank12.asm"
 SECTION "Bank 13", ROMX
 INCLUDE "engine/bank13.asm"
 
-SECTION "Bank 16", ROMX
-INCLUDE "engine/bank16.asm"
+SECTION "Effect Commands", ROMX
+INCLUDE "engine/duel/effect_commands.asm"
+
+SECTION "Decks", ROMX
+INCLUDE "data/decks.asm"
 
 SECTION "Bank 17", ROMX
 INCLUDE "data/card_pointers.asm"
@@ -74,25 +74,8 @@ INCLUDE "data/cards1.asm"
 SECTION "Bank 18", ROMX
 INCLUDE "data/cards2.asm"
 
-SECTION "Decks", ROMX[$54ac], BANK[$16]
-INCLUDE "data/decks.asm"
+SECTION "Effect Functions 2", ROMX
+INCLUDE "engine/duel/effect_functions2.asm"
 
-SECTION "Bank 1a", ROMX
-INCLUDE "engine/bank1a.asm"
-
-INCLUDE "engine/bank4b.asm"
-
-SECTION "Gfx Pointers", ROMX[$4545], BANK[$4b]
-INCLUDE "data/gfx_pointers/tilemaps.asm"
-INCLUDE "data/gfx_pointers/tilesets.asm"
-INCLUDE "data/gfx_pointers/palettes.asm"
-INCLUDE "data/gfx_pointers/sprite_animations.asm"
-INCLUDE "data/gfx_pointers/framesets.asm"
-INCLUDE "data/gfx_pointers/ow_tile_frames.asm"
-INCLUDE "data/gfx_pointers/ow_animations.asm"
-
-SECTION "Map Gfx", ROMX[$6c59], BANK[$4b]
-INCLUDE "data/map_gfx.asm"
-
-SECTION "Bank 4c", ROMX
-INCLUDE "engine/bank4c.asm"
+SECTION "Effect Functions 1", ROMX
+INCLUDE "engine/duel/effect_functions1.asm"

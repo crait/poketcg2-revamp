@@ -19,10 +19,10 @@ Credits:
 	credits_wait 20
 
 	credits_draw_box  0,  0, 20, 18
-	credits_show_portrait NPC_ISHIHARA, 2, 6, EMOTION_NORMAL
+	credits_show_portrait ISHIHARA_PIC, 2, 6, EMOTION_NORMAL
 	credits_fade_in CREDITS_FADE_BACKGROUND, $0a
 	credits_wait 60
-	credits_show_portrait NPC_ISHIHARA, 2, 6, EMOTION_HAPPY
+	credits_show_portrait ISHIHARA_PIC, 2, 6, EMOTION_HAPPY
 	credits_print_header  7, 2, 2, CreditsProducersText
 	credits_print_text 10,  6, CreditsProducersListText
 	credits_fade_in CREDITS_FADE_HEADER_TEXT, $05
@@ -33,10 +33,10 @@ Credits:
 	credits_wait 20
 
 	credits_draw_box  0,  0, 20, 18
-	credits_show_portrait NPC_AARON, 2, 6, EMOTION_NORMAL
+	credits_show_portrait AARON_PIC, 2, 6, EMOTION_NORMAL
 	credits_fade_in CREDITS_FADE_BACKGROUND, $0a
 	credits_wait 60
-	credits_show_portrait NPC_AARON, 2, 6, EMOTION_HAPPY
+	credits_show_portrait AARON_PIC, 2, 6, EMOTION_HAPPY
 	credits_print_header  7, 2, 2, CreditsDirectorText
 	credits_print_text 10,  8, CreditsDirectorListText
 	credits_fade_in CREDITS_FADE_HEADER_TEXT, $05
@@ -47,10 +47,10 @@ Credits:
 	credits_wait 20
 
 	credits_draw_box  0,  0, 20, 18
-	credits_show_portrait NPC_KAMIYA, 2, 6, EMOTION_NORMAL
+	credits_show_portrait KAMIYA_PIC, 2, 6, EMOTION_NORMAL
 	credits_fade_in CREDITS_FADE_BACKGROUND, $0a
 	credits_wait 60
-	credits_show_portrait NPC_KAMIYA, 2, 6, EMOTION_HAPPY
+	credits_show_portrait KAMIYA_PIC, 2, 6, EMOTION_HAPPY
 	credits_print_header  4, 2, 2, CreditsStoryText
 	credits_print_text 10,  8, CreditsStoryListText
 	credits_fade_in CREDITS_FADE_HEADER_TEXT, $05
@@ -61,10 +61,10 @@ Credits:
 	credits_wait 20
 
 	credits_draw_box  0,  0, 20, 18
-	credits_show_portrait NPC_TAP, 2, 6, EMOTION_HAPPY
+	credits_show_portrait TAP_PIC, 2, 6, EMOTION_HAPPY
 	credits_fade_in CREDITS_FADE_BACKGROUND, $0a
 	credits_wait 60
-	credits_show_portrait NPC_TAP, 2, 6, EMOTION_HAPPY
+	credits_show_portrait TAP_PIC, 2, 6, EMOTION_HAPPY
 	credits_print_header  5, 2, 2, CreditsPlannerText
 	credits_print_text 10,  8, CreditsPlannerListText
 	credits_fade_in CREDITS_FADE_HEADER_TEXT, $05
@@ -75,7 +75,7 @@ Credits:
 	credits_wait 20
 
 	credits_draw_box  0,  0, 20, 18
-	credits_show_portrait NPC_TOBICHAN, 2, 6, EMOTION_NORMAL
+	credits_show_portrait TOBICHAN_PIC, 2, 6, EMOTION_NORMAL
 	credits_fade_in CREDITS_FADE_BACKGROUND, $0a
 	credits_wait 60
 	credits_print_header  5, 2, 2, CreditsProgrammersText
@@ -215,7 +215,7 @@ Credits:
 	credits_wait 20
 
 	credits_draw_box  0,  0, 20, 18
-	credits_show_portrait NPC_KEN, 2, 6, EMOTION_NORMAL
+	credits_show_portrait KEN_PIC, 2, 6, EMOTION_NORMAL
 	credits_fade_in CREDITS_FADE_BACKGROUND, $0a
 	credits_wait 60
 	credits_print_header 10, 2, 2, CreditsCardGameProductionText
@@ -229,7 +229,7 @@ Credits:
 
 	credits_draw_box  2,  6,  6,  6
 	credits_draw_box 10,  6, 10,  6
-	credits_show_portrait NPC_DR_MASON, 2, 6, EMOTION_HAPPY
+	credits_show_portrait DR_MASON_PIC, 2, 6, EMOTION_HAPPY
 	credits_fade_in CREDITS_FADE_BACKGROUND, $0a
 	credits_wait 60
 	credits_print_text 10,  8, CreditsCardGameProductionList2Text
@@ -242,7 +242,7 @@ Credits:
 
 	credits_draw_box  2,  6,  6,  6
 	credits_draw_box 10,  6, 10,  6
-	credits_show_portrait NPC_MURRAY, 2, 6, EMOTION_NORMAL
+	credits_show_portrait MURRAY_PIC, 2, 6, EMOTION_NORMAL
 	credits_fade_in CREDITS_FADE_BACKGROUND, $0a
 	credits_wait 60
 	credits_print_text 10,  8, CreditsCardGameProductionList3Text
@@ -332,7 +332,7 @@ Credits:
 	credits_wait 20
 
 	credits_draw_box  0,  0, 20, 18
-	credits_show_portrait NPC_IMAKUNI_RED, 2, 6, EMOTION_SAD
+	credits_show_portrait IMAKUNI_RED_PIC, 2, 6, EMOTION_SAD
 	credits_fade_in CREDITS_FADE_BACKGROUND, $0a
 	credits_wait 60
 	credits_print_header 12, 2, 2, CreditsGuestAppearancesText
@@ -567,9 +567,9 @@ Credits:
 
 	credits_draw_box  0,  0, 20, 18
 	credits_init_ow
-	credits_load_map OVERWORLD_MAP_TCG
+	credits_load_map OVERWORLD_MAP_GFX_TCG
 	credits_load_tilemap TILEMAP_100, 0, 0
-	credits_load_ow_obj OW_MARK, SOUTH, $34, $30
+	credits_load_npc NPC_MARK, SOUTH, $34, $30
 	credits_fade_in CREDITS_FADE_ALL, $0a
 	credits_wait 60
 	credits_draw_box 19,  0,  1, 18
@@ -596,7 +596,7 @@ Credits:
 	credits_show_tile $03, $10, $0f, $00
 	credits_print_text  4, 16, CreditsToBeContinuedText
 	credits_wait 120
-	credits_wait_input A_BUTTON | START
+	credits_wait_input PAD_A | PAD_START
 	credits_stop_music
 	credits_fade_out CREDITS_FADE_ALL, $0f
 	credits_wait 30

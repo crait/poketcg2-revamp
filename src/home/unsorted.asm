@@ -16,8 +16,8 @@ AssertSFXFinished::
 	farcall _AssertSFXFinished
 	ret
 
-Func_3071::
-	ld a, SFX_04
+PlaySFX_InvalidChoice::
+	ld a, SFX_DENIED
 PlaySFX::
 	farcall _PlaySFX
 	ret
@@ -109,11 +109,11 @@ NewGameAndPrologue::
 	farcall GetEventValue
 	jr nz, .female
 ; male
-	ld a, OW_MARK
+	ld a, NPC_MARK
 	ld [wPlayerOWObject], a
 	jr .got_info
 .female
-	ld a, OW_MINT
+	ld a, NPC_MINT
 	ld [wPlayerOWObject], a
 
 .got_info
@@ -126,7 +126,7 @@ NewGameAndPrologue::
 	ld a, $0e
 	ld [wCurOWLocation], a
 	farcall Func_ea30
-	ld a, SFX_56
+	ld a, SFX_SAVE_GAME
 	call PlaySFX
 	farcall WaitForSFXToFinish
 
@@ -202,7 +202,7 @@ Func_3154::
 
 Func_3195::
 	ld a, [wPlayerOWObject]
-	farcall Func_10dcb
+	farcall GetOWObjectAnimStruct1Flag0And1
 	ld a, b
 	xor $02
 	ld b, a
@@ -220,7 +220,7 @@ Func_31a8::
 	bit SPRITEANIMSTRUCT_MOVE_F, a
 	jr z, .not_moving
 	ldh a, [hKeysHeld]
-	bit B_BUTTON_F, a
+	bit B_PAD_B, a
 	jr nz, .b_btn_pressed
 	ld a, [wPlayerOWObject]
 	farcall GetOWObjectSpeedAndMoveDuration
@@ -319,8 +319,9 @@ Func_323f::
 
 Func_324d::
 	ld a, [wPlayerOWObject]
-	farcall Func_10da7
-.asm_3254
+	farcall GetOWObjectTilePosition
+;	fallthrough
+Func_3254::
 	ld a, [hli]
 	cp $ff
 	jr nz, .asm_325b
@@ -363,12 +364,8 @@ Func_324d::
 	inc hl
 .asm_3283
 	ld a, $07
-	add l
-	ld l, a
-	jr nc, .asm_328a
-	inc h
-.asm_328a
-	jr .asm_3254
+	add_hl_a
+	jr Func_3254
 
 Func_328c::
 	push hl
@@ -379,7 +376,7 @@ Func_328c::
 	push af
 	call Func_3195
 	pop af
-	farcall Func_10dcf
+	farcall SetOWObjectDirection
 	pop hl
 	call Func_344c
 	ret
@@ -404,13 +401,13 @@ Func_32aa::
 
 Func_32bf::
 	ld a, [wPlayerOWObject]
-	farcall Func_10dcb
+	farcall GetOWObjectAnimStruct1Flag0And1
 	ld a, $00
 	cp b
 	jr nz, .asm_32d6
 	ld a, [wPlayerOWObject]
-	farcall Func_10da7
-	call Func_324d.asm_3254
+	farcall GetOWObjectTilePosition
+	call Func_3254
 	ret
 .asm_32d6
 	scf
@@ -420,9 +417,9 @@ Func_32d8::
 	call Func_32f6
 	jr nc, .done
 	ldh a, [hKeysPressed]
-	bit 0, a
+	bit B_PAD_A, a
 	jr nz, .asm_32e9
-	bit 3, a
+	bit B_PAD_START, a
 	jr nz, .asm_32f0
 	jr .done
 .asm_32e9
@@ -437,23 +434,23 @@ Func_32d8::
 
 Func_32f6::
 	ldh a, [hKeysHeld]
-	and D_PAD
+	and PAD_CTRL_PAD
 	jr z, .set_carry
 	ld b, NORTH
-	bit D_UP_F, a
+	bit B_PAD_UP, a
 	jr nz, .got_direction
 	inc b ; EAST
-	bit D_RIGHT_F, a
+	bit B_PAD_RIGHT, a
 	jr nz, .got_direction
 	inc b ; SOUTH
-	bit D_DOWN_F, a
+	bit B_PAD_DOWN, a
 	jr nz, .got_direction
-	; D_LEFT_F set
+	; B_PAD_LEFT set
 	inc b ; WEST
 .got_direction
 	ld c, 1
 	ldh a, [hKeysHeld]
-	bit B_BUTTON_F, a
+	bit B_PAD_B, a
 	jr z, .got_speed
 	inc c
 .got_speed
@@ -464,7 +461,7 @@ Func_32f6::
 	ld a, $05
 	ld [wd582], a
 	ld a, [wPlayerOWObject]
-	farcall Func_10dd3
+	farcall StartOWObjectAnimation
 	scf
 	ccf
 	jr .exit
@@ -501,9 +498,10 @@ Func_3340::
 .asm_3361
 	ld a, [wPlayerOWObject]
 	farcall StopOWObjectAnimation
-	farcall Func_10eff
+	farcall SetOWObjectFlag5_WithID
 	ret
 
+; a = NPC_* ID
 Func_336d::
 	push af
 .loop_wait
@@ -518,6 +516,7 @@ Func_336d::
 	pop af
 	ret
 
+; a = NPC_* ID
 WaitForOWObjectAnimation::
 	push af
 .loop
@@ -557,7 +556,7 @@ Func_33b7::
 	add c ; *3
 	ld c, a
 	rl b
-	ld hl, Data_c651
+	ld hl, MapHeaderPtrs
 	add hl, bc
 	ld a, [hli]
 	ld c, a
@@ -579,39 +578,40 @@ Func_33b7::
 	ld [wd58c + 1], a
 	ret
 
-Func_33f2::
-	ld hl, wd618
+StartScript::
+	ld hl, wScriptFlags
 	or a
-	jr nz, .asm_3405
+	jr nz, .skip_reset
+; reset script vars and stack
 	xor a
-	ld [wd616], a
-	ld [wd617], a
+	ld [wScriptLoadedVar], a
+	ld [wScriptLoadedVar + 1], a
 	ld [hl], a
-	ld a, $10
-	ld [wd61d], a
-.asm_3405
+	ld a, SCRIPT_STACK_SIZE
+	ld [wScriptStackOffset], a
+.skip_reset
 	res 6, [hl]
 	ldh a, [hBankROM]
-	ld [wd619], a
+	ld [wScriptBank], a
 	; pop return address from stack
 	pop hl
 	ld a, l
-	ld [wd61b + 0], a
+	ld [wScriptPointer + 0], a
 	ld a, h
-	ld [wd61b + 1], a
-	farcall Func_dbdb
-.asm_3419
-	farcall Func_dbf2
-	ld a, [wd618]
+	ld [wScriptPointer + 1], a
+	farcall ReloadScriptBuffer
+.script_loop
+	farcall RunOverworldScript
+	ld a, [wScriptFlags]
 	bit 7, a
-	jr nz, .asm_342a
+	jr nz, .script_ended
 	bit 6, a
-	jr nz, .asm_342a
-	jr .asm_3419
-.asm_342a
-	ld a, [wd619]
+	jr nz, .script_ended
+	jr .script_loop
+.script_ended
+	ld a, [wScriptBank]
 	call BankswitchROM
-	ld hl, wd61b
+	ld hl, wScriptPointer
 	ld a, [hli]
 	ld c, a
 	ld b, [hl]
@@ -630,6 +630,7 @@ CopyFarHLToDE::
 	call BankswitchROM
 	ret
 
+; a = NPC_* ID
 Func_344c::
 	ld c, a
 .asm_344d
@@ -725,14 +726,14 @@ CoreGameLoop::
 	farcall _CoreGameLoop
 	ret
 
-Func_34be::
-	farcall $4, $4000
+CallStartupDebugMenu::
+	farcall StartUpDebugMenu
 	ret
 
 WaitForLCDOff::
 .loop_wait
 	ldh a, [rSTAT]
-	and STAT_LCDC_STATUS
+	and STAT_MODE
 	jr nz, .loop_wait
 	ret
 
@@ -752,7 +753,7 @@ MultiplyBCByDE::
 	push af
 	push bc
 	push de
-	call .Multiply
+	call Multiply
 	pop de
 	pop bc
 	pop af
@@ -762,7 +763,7 @@ MultiplyBCByDE::
 ; output:
 ;  carry if bc < de
 ;  z if bc == de
-.CompareBCAndDE:
+CompareBCAndDE::
 	ld a, b
 	cp d
 	ret c
@@ -771,8 +772,8 @@ MultiplyBCByDE::
 	cp e
 	ret
 
-.Multiply:
-	call .CompareBCAndDE
+Multiply:
+	call CompareBCAndDE
 	jr c, .ok
 	; bc > de
 	; swap bc and de
@@ -833,21 +834,23 @@ CopyBCBytesFromHLToDE::
 
 SwitchWRAMBank::
 	ld [wWRAMBank], a
-	ldh [rSVBK], a
+	ldh [rWBK], a
 	ret
 
-Func_3529::
+DoAFrames_WithPreCheck::
 	push af
 	and a
-	jr z, .asm_3533
-.asm_352d
+	jr z, .done
+.loop
 	call DoFrame
 	dec a
-	jr nz, .asm_352d
-.asm_3533
+	jr nz, .loop
+.done
 	pop af
 	ret
 
+; a - table index
+; hl - pointer to data table, $ff terminated
 CallMappedFunction::
 	ld c, a
 .loop_entries
@@ -953,7 +956,7 @@ Func_35a0::
 	push bc
 	push de
 	push hl
-	ld de, $407f
+	lb de, $40, $7f
 	call SetupText
 	pop hl
 	pop de
@@ -963,12 +966,12 @@ Func_35a0::
 
 ; hl = text ID
 ; de = coordinates
-Func_35af::
+InitTextPrinting_ProcessTextFromIDVRAM0::
 	push af
 	push bc
 	push de
 	push hl
-	xor a
+	xor a ; BANK("VRAM0")
 	call BankswitchVRAM
 	call InitTextPrinting_ProcessTextFromID
 	pop hl
@@ -977,12 +980,14 @@ Func_35af::
 	pop af
 	ret
 
-Func_35bf::
+; hl = text ID
+; de = coordinates
+PrintTextNoDelay_InitVRAM0::
 	push af
 	push bc
 	push de
 	push hl
-	xor a
+	xor a ; BANK("VRAM0")
 	call BankswitchVRAM
 	call PrintTextNoDelay_Init
 	pop hl
@@ -991,12 +996,17 @@ Func_35bf::
 	pop af
 	ret
 
-Func_35cf::
+; hl - list of text items
+;
+; writes n items of text each given in the following format in hl:
+; x coord, y coord, text id
+; $ff-terminated
+PlaceTextItemsVRAM0::
 	push af
 	push bc
 	push de
 	push hl
-	xor a
+	xor a ; BANK("VRAM0")
 	call BankswitchVRAM
 	call PlaceTextItems
 	pop hl
@@ -1008,7 +1018,7 @@ Func_35cf::
 ; hl = text ID
 ; de = coordinates
 Func_35df::
-	call Func_35af
+	call InitTextPrinting_ProcessTextFromIDVRAM0
 	push bc
 	push de
 	ld bc, $c0 tiles
@@ -1338,9 +1348,9 @@ LoadOWAnimatedTiles::
 	pop af
 	ret
 
-Func_378c::
-	ld c, $02
-	call Func_3861
+CopyCGBBGPalsFromSource_BeginWithPal2::
+	ld c, 2
+	call CopyCGBBGPalsFromSource_WithPalOffset
 	ret
 
 Func_3792::
@@ -1391,9 +1401,9 @@ Func_37ce::
 	push bc
 	push de
 	push hl
-	ld a, [$d896]
+	ld a, [wd896]
 	ld c, a
-	ld a, [$d897]
+	ld a, [wd896 + 1]
 	ld b, a
 	or c
 	jr z, .asm_3823
@@ -1402,12 +1412,12 @@ Func_37ce::
 	farcall $7, $4941
 	cp $02
 	jr z, .asm_3823
-	ld a, [$d899]
+	ld a, [wd899]
 	dec a
-	ld [$d899], a
+	ld [wd899], a
 	jr nz, .asm_3823
-	ld a, [$d898]
-	ld [$d899], a
+	ld a, [wd898]
+	ld [wd899], a
 	farcall GetPaletteGfxPointer
 	ldh a, [hBankROM]
 	push af
@@ -1415,14 +1425,14 @@ Func_37ce::
 	call BankswitchROM
 	ld a, [hli]
 	ld b, a
-	ld a, [$d89a]
+	ld a, [wd89a]
 	ld c, a
 	inc a
 	cp b
 	jr nz, .asm_3810
 	xor a
 .asm_3810
-	ld [$d89a], a
+	ld [wd89a], a
 	sla c
 	sla c
 	sla c
@@ -1450,16 +1460,20 @@ Func_3828::
 	call FlushAllPalettes
 	ret
 
+; set current dest VRAM bank to a
 BankswitchVRAM::
 	call _BankswitchVRAM
 	ret
 
+; bc - coordinates
+; d - ?
+; e - ?
 Func_383b::
 	push af
 	push de
 	ld d, b
 	ld e, c
-	farcall Func_10673
+	farcall AdjustDECoordByhSC
 	ld b, d
 	ld c, e
 	pop de
@@ -1483,7 +1497,7 @@ Func_383b::
 ; b = source bank
 ; hl = pointer to palette
 ; c = starting CGB BG pal number
-Func_3861::
+CopyCGBBGPalsFromSource_WithPalOffset::
 	ldh a, [hBankROM]
 	push af
 	ld a, b
@@ -1503,7 +1517,7 @@ Func_3861::
 	ld b, $00
 	sla c
 	sla c
-	sla c ; *CGB_PAL_SIZE
+	sla c ; *PAL_SIZE
 	ld hl, wBackgroundPalettesCGB
 	add hl, bc
 	ld d, h
@@ -1512,7 +1526,7 @@ Func_3861::
 	ld a, [hli]
 	ld c, a
 .loop_pals
-	ld b, CGB_PAL_SIZE
+	ld b, PAL_SIZE
 .loop_copy
 	ld a, [hli]
 	ld [de], a
@@ -1528,12 +1542,14 @@ Func_3861::
 	ldh [rBGP], a
 	ret
 
+; bc - x,y dimensions of text box
+; de - coordinates
 DrawRegularTextBoxVRAM0::
 	push af
 	push bc
 	push de
 	push hl
-	xor a
+	xor a ; BANK("VRAM0")
 	call BankswitchVRAM
 	call DrawRegularTextBox
 	pop hl
@@ -1542,12 +1558,12 @@ DrawRegularTextBoxVRAM0::
 	pop af
 	ret
 
-Func_38ad::
+DrawLabeledTextBoxVRAM0::
 	push af
 	push bc
 	push de
 	push hl
-	xor a
+	xor a ; BANK("VRAM0")
 	call BankswitchVRAM
 	call DrawLabeledTextBox
 	pop hl
@@ -1565,7 +1581,7 @@ LoadGfxPalettes::
 	ld b, $00
 	sla c
 	sla c
-	sla c ; *CGB_PAL_SIZE
+	sla c ; *PAL_SIZE
 	ld hl, wObjectPalettesCGB
 	add hl, bc
 	ld d, h
@@ -1575,7 +1591,7 @@ LoadGfxPalettes::
 	ld c, a
 	push bc
 .loop_pals
-	ld b, CGB_PAL_SIZE
+	ld b, PAL_SIZE
 .loop_copy
 	ld a, [hli]
 	ld [de], a
@@ -1707,7 +1723,7 @@ Func_3924::
 	ld a, c
 	bit 7, a
 	jr z, .set_attr
-	set OAM_TILE_BANK, b
+	set B_OAM_BANK1, b
 	res 7, c
 .set_attr
 	call SetOneObjectAttributes
@@ -1861,7 +1877,7 @@ Func_3a39::
 	push de
 	push hl
 	farcall UpdateOWScroll
-	farcall Func_108cd
+	farcall GetwD8A1
 	and a
 	jr nz, .asm_3a50
 	ld e, $01
@@ -1904,9 +1920,9 @@ Func_3a81::
 	farcall Func_1e088
 	ld a, [wActiveScreenAnim]
 	cp $ff
-	jr nz, .skip_update_sprites
+	jr nz, .done
 	farcall UpdateSpriteAnims
-.skip_update_sprites
+.done
 	pop hl
 	pop de
 	pop bc
@@ -1919,7 +1935,7 @@ DrawPlayerPortrait::
 	push bc
 	push de
 	push hl
-	farcall Func_1c0ec
+	farcall GetPlayerPortrait
 	add $00
 	ld d, b
 	ld e, c
@@ -1932,7 +1948,7 @@ DrawPlayerPortrait::
 	pop af
 	ret
 
-; a = NPC_* constant
+; a = *_PIC constant
 ; bc = coordinates
 ; e = EMOTION_* constant
 DrawNPCPortrait::
@@ -1940,7 +1956,7 @@ DrawNPCPortrait::
 	push bc
 	push de
 	push hl
-	cp NPC_MINT_LINK + 1
+	cp MINT_LINK_PIC + 1
 	jr nc, .ok
 	; Mark and Mint don't have portrait variants
 	ld e, EMOTION_NORMAL
@@ -2009,7 +2025,7 @@ LoadPortraitPalettes::
 	add $03
 .asm_3b0c
 	ld c, a
-	call Func_3861
+	call CopyCGBBGPalsFromSource_WithPalOffset
 	pop de
 	pop bc
 	pop af
@@ -2046,7 +2062,7 @@ LoadMenuBoxParams::
 	push af
 	ld a, b
 	call BankswitchROM
-	farcall Func_10673
+	farcall AdjustDECoordByhSC
 	ld a, d
 	ld [wMenuBoxX], a
 	ld a, e
@@ -2223,8 +2239,8 @@ Func_3c2e::
 	push bc
 	push de
 	push hl
-	ld c, $02
-	call Func_3861
+	ld c, 2
+	call CopyCGBBGPalsFromSource_WithPalOffset
 	pop hl
 	pop de
 	pop bc
@@ -2236,7 +2252,7 @@ StubbedPlayDefaultSong::
 	ret
 
 Func_3c3d::
-	farcall $7, $5ef1
+	farcall Func_1def1
 	ret
 
 ResetAnimationQueue::
@@ -2271,10 +2287,10 @@ FinishQueuedAnimations::
 ; - a = animation index
 PlayDuelAnimation::
 	ld [wCurAnimation], a ; hold an animation temporarily
-	call .LoadDuelAnimationToBuffer
+	call LoadDuelAnimationToBuffer
 	ret
 
-.LoadDuelAnimationToBuffer:
+LoadDuelAnimationToBuffer::
 	ldh a, [hBankROM]
 	push af
 	ld [wDuelAnimReturnBank], a
@@ -2377,6 +2393,7 @@ Func_3d02::
 	pop af
 	ret
 
+; a = MUSIC_* constant
 Func_3d09::
 	call PlaySong
 	ret
@@ -2413,7 +2430,7 @@ Func_3d32::
 	ld [wdd04], a
 	ret
 
-Func_3d3a::
+CallSetVolume::
 	call SetVolume
 	ret
 
@@ -2529,7 +2546,7 @@ LoadBGPalette::
 	ld a, b ; source bank
 	call BankswitchROM
 	ld c, e
-	call Func_3861
+	call CopyCGBBGPalsFromSource_WithPalOffset
 	pop af
 	call BankswitchROM
 	pop hl
@@ -2643,8 +2660,8 @@ LoadScene::
 	farcall _LoadScene
 	ret
 
-Func_3e75::
-	farcall $7, $6f2a
+UpdateMailboxPage::
+	farcall _UpdateMailboxPage
 	ret
 
 Func_3e7a::
@@ -2665,14 +2682,14 @@ ApplyBackgroundScroll::
 	push af
 	push hl
 
-	ldh a, [rSVBK]
+	ldh a, [rWBK]
 	push af
 	ld a, BANK("WRAM1")
-	ldh [rSVBK], a
+	ldh [rWBK], a
 
 	call DisableInt_LYCoincidence
 	ld hl, rSTAT
-	res STAT_LYCFLAG, [hl] ; reset coincidence flag
+	res B_STAT_LYCF, [hl] ; reset coincidence flag
 	ei
 	ld hl, wApplyBGScroll
 	ld a, [hl]
@@ -2695,7 +2712,7 @@ ApplyBackgroundScroll::
 	call GetNextBackgroundScroll
 	ld hl, rSTAT
 .wait_hblank_or_vblank
-	bit STAT_BUSY, [hl]
+	bit B_STAT_BUSY, [hl]
 	jr nz, .wait_hblank_or_vblank
 	ldh [rSCX], a
 	ldh a, [rLY]
@@ -2716,7 +2733,7 @@ ApplyBackgroundScroll::
 	call EnableInt_LYCoincidence
 .done
 	pop af
-	ldh [rSVBK], a
+	ldh [rWBK], a
 	pop hl
 	pop af
 	ret
@@ -2759,10 +2776,10 @@ GetNextBackgroundScroll::
 EnableInt_LYCoincidence::
 	push hl
 	ld hl, rSTAT
-	set STAT_LYC, [hl]
+	set B_STAT_LYC, [hl]
 	xor a
 	ld hl, rIE
-	set INT_LCD_STAT, [hl]
+	set B_IE_STAT, [hl]
 	pop hl
 	ret
 
@@ -2770,10 +2787,10 @@ EnableInt_LYCoincidence::
 DisableInt_LYCoincidence::
 	push hl
 	ld hl, rSTAT
-	res STAT_LYC, [hl]
+	res B_STAT_LYC, [hl]
 	xor a
 	ld hl, rIE
-	res INT_LCD_STAT, [hl]
+	res B_IE_STAT, [hl]
 	pop hl
 	ret
 

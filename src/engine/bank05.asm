@@ -2557,7 +2557,7 @@ AIActionTable_CompleteCombustionDeck:
 	dw GROWLITHE_LV12
 	dw PONYTA_LV15
 	dw MAGMAR_LV27
-	dw NULL; end
+	dw NULL ; end
 
 .list_bench
 	dw MAGMAR_LV27
@@ -2565,7 +2565,7 @@ AIActionTable_CompleteCombustionDeck:
 	dw GROWLITHE_LV12
 	dw MEOWTH_LV14
 	dw KANGASKHAN_LV40
-	dw NULL; end
+	dw NULL ; end
 
 .StoreListPointers:
 	ld hl, wAICardListArenaPriority
@@ -6102,7 +6102,7 @@ AIDecideBenchPokemonToSwitchTo:
 ; calculate damage of the move and raise AI score
 ; AI score += floor(Damage / 20)
 .check_energy_card
-	farcall Func_2a331
+	farcall LookForEnergyNeededInHand
 	jr nc, .check_attached_energy
 	ld a, [wSelectedAttack]
 	call EstimateDamage_VersusDefendingCard
@@ -6964,7 +6964,7 @@ Func_16af1:
 	ld a, [wAlreadyPlayedEnergy]
 	or a
 	jr nz, .check_evolution_ko
-	farcall $a, $6331 ; LookForEnergyNeededInHand
+	farcall LookForEnergyNeededInHand
 	jr nc, .check_evolution_ko
 	ld a, 7
 	call AIEncourage
@@ -8452,11 +8452,11 @@ AIProcessAndTryToUseAttack:
 ; AI will use it if wAIExecuteProcessedAttack is 0.
 ; in either case, return carry if an attack is chosen to be used.
 AIProcessAttacks:
-; if AI used Pluspower, load its attack index
+; if AI used PlusPower, load its attack index
 	ld a, [wPreviousAIFlags]
 	and AI_FLAG_USED_PLUSPOWER
 	jr z, .no_pluspower
-	ld a, [wAIPluspowerAttack]
+	ld a, [wAIPlusPowerAttack]
 	cp $02
 	jr nc, .no_pluspower
 	ld [wSelectedAttack], a
@@ -8592,7 +8592,7 @@ GetAIScoreOfAttack:
 	ld a, e
 	ld [wTempTurnDuelistCardID], a
 	ld a, d
-	ld [$ccd5], a
+	ld [wTempTurnDuelistCardID + 1], a
 	call SwapTurn
 	ld a, DUELVARS_ARENA_CARD
 	get_turn_duelist_var
@@ -8600,7 +8600,7 @@ GetAIScoreOfAttack:
 	ld a, e
 	ld [wTempNonTurnDuelistCardID], a
 	ld a, d
-	ld [$ccd7], a
+	ld [wTempNonTurnDuelistCardID + 1], a
 	bank1call HandleNoDamageOrEffectSubstatus
 	call SwapTurn
 	jr nc, .asm_17581
@@ -8693,7 +8693,7 @@ GetAIScoreOfAttack:
 	ld a, $01
 	ld [wd072], a
 	call AIDiscourage
-	ld a, [$cccc]
+	ld a, [wAIMaxDamage]
 	farcall $13, $4b6e
 	or a
 	jr z, .asm_17629
@@ -9484,7 +9484,7 @@ AIPickPrizeCards:
 	add DUELVARS_PRIZE_CARDS
 	get_turn_duelist_var
 	call AddCardToHand
-	bank1call TurnDuelistTakePrizes.Func_551d
+	bank1call TurnDuelistTakePrizes.OpenCardPageIfFaceUp
 	ret
 
 .prize_flags
@@ -9955,7 +9955,7 @@ CalculateDamage_VersusDefendingPokemon:
 	ld hl, wDamage
 .Calculate:
 	ld e, [hl]
-	ld a, [$ccca]
+	ld a, [wDamage + 1]
 	ld d, a
 	push hl
 
@@ -10029,7 +10029,7 @@ CalculateDamage_VersusDefendingPokemon:
 	ldh a, [hTempPlayAreaLocation_ff9d]
 	add CARD_LOCATION_ARENA
 	ld b, a
-	call ApplyAttachedPluspower
+	call ApplyAttachedPlusPower
 	call SwapTurn
 	ld b, CARD_LOCATION_ARENA
 	call ApplyAttachedDefender
@@ -10265,7 +10265,7 @@ CalculateDamage_FromDefendingPokemon:
 
 .apply_pluspower_and_defender
 	ld b, CARD_LOCATION_ARENA
-	call ApplyAttachedPluspower
+	call ApplyAttachedPlusPower
 	call SwapTurn
 	ldh a, [hTempPlayAreaLocation_ff9d]
 	add CARD_LOCATION_ARENA

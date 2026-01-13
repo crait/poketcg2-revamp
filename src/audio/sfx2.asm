@@ -22,35 +22,35 @@ SFX2_Play:
 	rrca
 	ld [wdd8c], a
 	jr nc, .asm_1f802e
-	ld a, $8
-	ldh [rNR10], a
-	ldh [rNR12], a
-	swap a
-	ldh [rNR14], a
+	ld a, AUD1SWEEP_DOWN
+	ldh [rAUD1SWEEP], a
+	ldh [rAUD1ENV], a
+	swap a ; AUD1HIGH_RESTART
+	ldh [rAUD1HIGH], a
 .asm_1f802e
 	ld a, [wdd8c]
 	rrca
 	ld [wdd8c], a
 	jr nc, .asm_1f803f
-	ld a, $8
-	ldh [rNR22], a
-	swap a
-	ldh [rNR24], a
+	ld a, AUD2ENV_UP
+	ldh [rAUD2ENV], a
+	swap a ; AUD2HIGH_RESTART
+	ldh [rAUD2HIGH], a
 .asm_1f803f
 	ld a, [wdd8c]
 	rrca
 	ld [wdd8c], a
 	jr nc, .asm_1f804c
 	ld a, $0
-	ldh [rNR32], a
+	ldh [rAUD3LEVEL], a
 .asm_1f804c
 	ld a, [wdd8c]
 	rrca
 	jr nc, .asm_1f805a
-	ld a, $8
-	ldh [rNR42], a
-	swap a
-	ldh [rNR44], a
+	ld a, AUD4ENV_UP
+	ldh [rAUD4ENV], a
+	swap a ; AUD4GO_RESTART
+	ldh [rAUD4GO], a
 .asm_1f805a
 	ld a, $1
 	ld [wde53], a
@@ -82,8 +82,8 @@ SFX2_Play:
 	ld a, c
 	cp $0
 	jr nz, .asm_1f8091
-	ld a, $8
-	ldh [rNR10], a
+	ld a, AUD1SWEEP_DOWN
+	ldh [rAUD1SWEEP], a
 .asm_1f8091
 	ld hl, wde2f
 	add hl, bc
@@ -107,7 +107,7 @@ SFX2_Play:
 SFX2_Update:
 	ld a, [wCurSfxBank]
 	ldh [hBankROM], a
-	ld [MBC3RomBank], a
+	ld [rROMB], a
 	ld a, [wdd8c]
 	or a
 	jr nz, .asm_fc063
@@ -218,7 +218,7 @@ SFX2_0:
 	ld [hl], $0
 	or d
 	ld d, a
-	ld hl, rNR11
+	ld hl, rAUD1LEN
 	ld a, c
 	add a
 	add a
@@ -251,7 +251,7 @@ SFX2_1:
 	ld a, [hli]
 	ld e, a
 	push hl
-	ld hl, rNR12
+	ld hl, rAUD1ENV
 	ld a, c
 	add a
 	add a
@@ -265,7 +265,7 @@ SFX2_1:
 SFX2_2:
 	swap a
 	ld e, a
-	ld hl, rNR11
+	ld hl, rAUD1LEN
 	ld a, c
 	add a
 	add a
@@ -379,7 +379,7 @@ Func_fc18d_2:
 	ld [hl], $0
 	or d
 	ld d, a
-	ld hl, rNR11
+	ld hl, rAUD1LEN
 	ld a, c
 	add a
 	add a
@@ -428,7 +428,7 @@ Func_fc1cd_2:
 	ld [hl], $0
 	or e
 	ld e, a
-	ld hl, rNR41
+	ld hl, rAUD4LEN
 	xor a
 	ld [hli], a
 	inc hl
@@ -448,7 +448,7 @@ SFX2_7:
 	ld h, [hl]
 	ld l, a
 	ld a, $0
-	ldh [rNR30], a
+	ldh [rAUD3ENA], a
 	ld b, d
 	ld de, $ff30
 .asm_fc215
@@ -462,7 +462,7 @@ SFX2_7:
 	ld a, $1
 	ld [wMusicWaveChange], a
 	ld a, $80
-	ldh [rNR30], a
+	ldh [rAUD3ENA], a
 	ld b, $0
 	pop hl
 	jp Func_fc094_2
@@ -494,7 +494,7 @@ SFX2_8:
 SFX2_9:
 	pop hl
 	ld a, [hli]
-	ldh [rNR10], a
+	ldh [rAUD1SWEEP], a
 	jp Func_fc094_2
 
 SFX2_end:
@@ -515,7 +515,7 @@ SFX2_end:
 	add c
 	ld e, a
 	ld d, b
-	ld hl, rNR12
+	ld hl, rAUD1ENV
 	add hl, de
 	ld a, $8
 	ld [hli], a
@@ -539,64 +539,64 @@ INCLUDE "audio/wave_instruments.asm"
 
 INCLUDE "audio/sfx/sfx_unused.asm"
 
-INCLUDE "audio/sfx/sfx_64.asm"
-INCLUDE "audio/sfx/sfx_65.asm"
-INCLUDE "audio/sfx/sfx_66.asm"
-INCLUDE "audio/sfx/sfx_67.asm"
-INCLUDE "audio/sfx/sfx_68.asm"
-INCLUDE "audio/sfx/sfx_69.asm"
-INCLUDE "audio/sfx/sfx_6a.asm"
-INCLUDE "audio/sfx/sfx_6b.asm"
-INCLUDE "audio/sfx/sfx_6c.asm"
-INCLUDE "audio/sfx/sfx_6d.asm"
-INCLUDE "audio/sfx/sfx_6e.asm"
-INCLUDE "audio/sfx/sfx_6f.asm"
-INCLUDE "audio/sfx/sfx_70.asm"
-INCLUDE "audio/sfx/sfx_71.asm"
-INCLUDE "audio/sfx/sfx_72.asm"
-INCLUDE "audio/sfx/sfx_73.asm"
-INCLUDE "audio/sfx/sfx_74.asm"
-INCLUDE "audio/sfx/sfx_75.asm"
-INCLUDE "audio/sfx/sfx_76.asm"
-INCLUDE "audio/sfx/sfx_77.asm"
-INCLUDE "audio/sfx/sfx_78.asm"
-INCLUDE "audio/sfx/sfx_79.asm"
-INCLUDE "audio/sfx/sfx_7a.asm"
-INCLUDE "audio/sfx/sfx_7b.asm"
-INCLUDE "audio/sfx/sfx_7c.asm"
-INCLUDE "audio/sfx/sfx_7d.asm"
-INCLUDE "audio/sfx/sfx_7e.asm"
-INCLUDE "audio/sfx/sfx_7f.asm"
-INCLUDE "audio/sfx/sfx_80.asm"
-INCLUDE "audio/sfx/sfx_81.asm"
-INCLUDE "audio/sfx/sfx_82.asm"
-INCLUDE "audio/sfx/sfx_83.asm"
-INCLUDE "audio/sfx/sfx_84.asm"
-INCLUDE "audio/sfx/sfx_85.asm"
-INCLUDE "audio/sfx/sfx_86.asm"
-INCLUDE "audio/sfx/sfx_87.asm"
-INCLUDE "audio/sfx/sfx_88.asm"
-INCLUDE "audio/sfx/sfx_89.asm"
-INCLUDE "audio/sfx/sfx_8a.asm"
-INCLUDE "audio/sfx/sfx_8b.asm"
-INCLUDE "audio/sfx/sfx_8c.asm"
-INCLUDE "audio/sfx/sfx_8d.asm"
-INCLUDE "audio/sfx/sfx_8e.asm"
-INCLUDE "audio/sfx/sfx_8f.asm"
-INCLUDE "audio/sfx/sfx_90.asm"
-INCLUDE "audio/sfx/sfx_91.asm"
-INCLUDE "audio/sfx/sfx_92.asm"
-INCLUDE "audio/sfx/sfx_93.asm"
-INCLUDE "audio/sfx/sfx_94.asm"
-INCLUDE "audio/sfx/sfx_95.asm"
-INCLUDE "audio/sfx/sfx_96.asm"
-INCLUDE "audio/sfx/sfx_97.asm"
-INCLUDE "audio/sfx/sfx_98.asm"
-INCLUDE "audio/sfx/sfx_99.asm"
-INCLUDE "audio/sfx/sfx_9a.asm"
-INCLUDE "audio/sfx/sfx_9b.asm"
-INCLUDE "audio/sfx/sfx_9c.asm"
-INCLUDE "audio/sfx/sfx_9d.asm"
-INCLUDE "audio/sfx/sfx_9e.asm"
-INCLUDE "audio/sfx/sfx_9f.asm"
-INCLUDE "audio/sfx/sfx_a0.asm"
+INCLUDE "audio/sfx/sfx_fireball.asm"
+INCLUDE "audio/sfx/sfx_continuous_fireball.asm"
+INCLUDE "audio/sfx/sfx_bench_manipulation.asm"
+INCLUDE "audio/sfx/sfx_psychic_beam.asm"
+INCLUDE "audio/sfx/sfx_psychic_beam_bench.asm"
+INCLUDE "audio/sfx/sfx_boulder_smash.asm"
+INCLUDE "audio/sfx/sfx_mega_punch.asm"
+INCLUDE "audio/sfx/sfx_psypunch.asm"
+INCLUDE "audio/sfx/sfx_sludge_punch.asm"
+INCLUDE "audio/sfx/sfx_ice_punch.asm"
+INCLUDE "audio/sfx/sfx_kick.asm"
+INCLUDE "audio/sfx/sfx_tail_slap.asm"
+INCLUDE "audio/sfx/sfx_tail_whip.asm"
+INCLUDE "audio/sfx/sfx_slap.asm"
+INCLUDE "audio/sfx/sfx_question_mark_bench.asm"
+INCLUDE "audio/sfx/sfx_skull_bash.asm"
+INCLUDE "audio/sfx/sfx_coin_hurl.asm"
+INCLUDE "audio/sfx/sfx_teleport.asm"
+INCLUDE "audio/sfx/sfx_follow_me.asm"
+INCLUDE "audio/sfx/sfx_swift.asm"
+INCLUDE "audio/sfx/sfx_3d_attack.asm"
+INCLUDE "audio/sfx/sfx_dry_up.asm"
+INCLUDE "audio/sfx/sfx_focus_blast.asm"
+INCLUDE "audio/sfx/sfx_focus_blast_bench.asm"
+INCLUDE "audio/sfx/sfx_chips_counting.asm"
+INCLUDE "audio/sfx/sfx_slot_start.asm"
+INCLUDE "audio/sfx/sfx_slot_reel.asm"
+INCLUDE "audio/sfx/sfx_black_box_insert.asm"
+INCLUDE "audio/sfx/sfx_black_box_inserted.asm"
+INCLUDE "audio/sfx/sfx_black_box_transmitted.asm"
+INCLUDE "audio/sfx/sfx_new_mail.asm"
+INCLUDE "audio/sfx/sfx_pod_doors.asm"
+INCLUDE "audio/sfx/sfx_pitfall.asm"
+INCLUDE "audio/sfx/sfx_open_chest.asm"
+INCLUDE "audio/sfx/sfx_npc_warp_transform.asm"
+INCLUDE "audio/sfx/sfx_stronghold_platform_up.asm"
+INCLUDE "audio/sfx/sfx_stronghold_platform_down.asm"
+INCLUDE "audio/sfx/sfx_gr_blimp_hatch_close.asm"
+INCLUDE "audio/sfx/sfx_gr_blimp_hatch_open.asm"
+INCLUDE "audio/sfx/sfx_gr_blimp_tractor_beam.asm"
+INCLUDE "audio/sfx/sfx_bone_toss_bench.asm"
+INCLUDE "audio/sfx/sfx_coin_hurl_bench.asm"
+INCLUDE "audio/sfx/sfx_big_snore.asm"
+INCLUDE "audio/sfx/sfx_slot_big_hit.asm"
+INCLUDE "audio/sfx/sfx_slot_bonus_hit.asm"
+INCLUDE "audio/sfx/sfx_slot_small_hit.asm"
+INCLUDE "audio/sfx/sfx_razor_leaf.asm"
+INCLUDE "audio/sfx/sfx_guillotine.asm"
+INCLUDE "audio/sfx/sfx_vine_pull.asm"
+INCLUDE "audio/sfx/sfx_perplex.asm"
+INCLUDE "audio/sfx/sfx_nine_tails.asm"
+INCLUDE "audio/sfx/sfx_bone_headbutt.asm"
+INCLUDE "audio/sfx/sfx_drill_dive.asm"
+INCLUDE "audio/sfx/sfx_dark_song.asm"
+INCLUDE "audio/sfx/sfx_tcg2_intro_orbs.asm"
+INCLUDE "audio/sfx/sfx_tcg2_intro_title.asm"
+INCLUDE "audio/sfx/sfx_tcg2_intro_subtitle.asm"
+INCLUDE "audio/sfx/sfx_electronic_input.asm"
+INCLUDE "audio/sfx/sfx_electronic_response.asm"
+INCLUDE "audio/sfx/sfx_ghost_master_appear.asm"
+INCLUDE "audio/sfx/sfx_ghost_master_disappear.asm"
