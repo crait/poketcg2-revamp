@@ -26,6 +26,7 @@
 *disasm_output.asm
 
 # revamp tools
+*.bak
 rgbds/
 bgb/
 catalog/node_modules/

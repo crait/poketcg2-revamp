@@ -261,7 +261,7 @@ IvysaurLv26Card:
 DarkIvysaurCard:
 	db TYPE_PKMN_GRASS ; type
 	dw $c5d7 ; gfx
-	tx DarkIvysaurName ; name
+	tx IvysaurName ; name
 	db DIAMOND ; rarity
 	db GB ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
@@ -469,14 +469,14 @@ VenusaurAltLv67Card:
 DarkVenusaurCard:
 	db TYPE_PKMN_GRASS ; type
 	dw $c6bb ; gfx
-	tx DarkVenusaurName ; name
+	tx VenusaurName ; name
 	db STAR ; rarity
 	db GB ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
 	dw DARK_VENUSAUR
 	db 70 ; hp
 	db STAGE2 ; stage
-	tx DarkIvysaurName ; pre-evo name
+	tx IvysaurName ; pre-evo name
 
 	; attack 1
 	energy GRASS, 3 ; energies
@@ -1197,7 +1197,7 @@ ArbokLv30Card:
 DarkArbokCard:
 	db TYPE_PKMN_GRASS ; type
 	dw $6075 ; gfx
-	tx DarkArbokName ; name
+	tx ArbokName ; name
 	db STAR ; rarity
 	db TEAM_ROCKET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
@@ -2029,7 +2029,7 @@ GolbatLv29Card:
 DarkGolbatCard:
 	db TYPE_PKMN_GRASS ; type
 	dw $614b ; gfx
-	tx DarkGolbatName ; name
+	tx GolbatName ; name
 	db STAR ; rarity
 	db TEAM_ROCKET ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
@@ -2237,7 +2237,7 @@ GloomCard:
 DarkGloomCard:
 	db TYPE_PKMN_GRASS ; type
 	dw $6225 ; gfx
-	tx DarkGloomName ; name
+	tx GloomName ; name
 	db DIAMOND ; rarity
 	db TEAM_ROCKET ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
@@ -2341,14 +2341,14 @@ VileplumeCard:
 DarkVileplumeCard:
 	db TYPE_PKMN_GRASS ; type
 	dw $628e ; gfx
-	tx DarkVileplumeName ; name
+	tx VileplumeName ; name
 	db STAR ; rarity
 	db TEAM_ROCKET ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
 	dw DARK_VILEPLUME
 	db 60 ; hp
 	db STAGE2 ; stage
-	tx DarkGloomName ; pre-evo name
+	tx GloomName ; pre-evo name
 
 	; attack 1
 	energy 0 ; energies
@@ -3225,7 +3225,7 @@ MukCard:
 DarkMukCard:
 	db TYPE_PKMN_GRASS ; type
 	dw $6360 ; gfx
-	tx DarkMukName ; name
+	tx MukName ; name
 	db DIAMOND ; rarity
 	db TEAM_ROCKET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
@@ -3641,7 +3641,7 @@ WeezingLv27Card:
 DarkWeezingCard:
 	db TYPE_PKMN_GRASS ; type
 	dw $6432 ; gfx
-	tx DarkWeezingName ; name
+	tx WeezingName ; name
 	db STAR ; rarity
 	db TEAM_ROCKET ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
@@ -4213,7 +4213,7 @@ CharmeleonCard:
 DarkCharmeleonCard:
 	db TYPE_PKMN_FIRE ; type
 	dw $5a13 ; gfx
-	tx DarkCharmeleonName ; name
+	tx CharmeleonName ; name
 	db DIAMOND ; rarity
 	db TEAM_ROCKET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
@@ -4369,14 +4369,14 @@ CharizardAltLv76Card:
 DarkCharizardCard:
 	db TYPE_PKMN_FIRE ; type
 	dw $5a7c ; gfx
-	tx DarkCharizardName ; name
+	tx CharizardName ; name
 	db STAR ; rarity
 	db TEAM_ROCKET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
 	dw DARK_CHARIZARD
 	db 80 ; hp
 	db STAGE2 ; stage
-	tx DarkCharmeleonName ; pre-evo name
+	tx CharmeleonName ; pre-evo name
 
 	; attack 1
 	energy COLORLESS, 1 ; energies
@@ -4629,7 +4629,7 @@ NinetalesLv35Card:
 DarkNinetalesCard:
 	db TYPE_PKMN_FIRE ; type
 	dw $c8d2 ; gfx
-	tx DarkNinetalesName ; name
+	tx NinetalesName ; name
 	db STAR ; rarity
 	db GB ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
@@ -5253,7 +5253,7 @@ RapidashLv33Card:
 DarkRapidashCard:
 	db TYPE_PKMN_FIRE ; type
 	dw $5b4e ; gfx
-	tx DarkRapidashName ; name
+	tx RapidashName ; name
 	db CIRCLE ; rarity
 	db TEAM_ROCKET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
@@ -5617,7 +5617,7 @@ FlareonLv28Card:
 DarkFlareonCard:
 	db TYPE_PKMN_FIRE ; type
 	dw $5bb7 ; gfx
-	tx DarkFlareonName ; name
+	tx FlareonName ; name
 	db DIAMOND ; rarity
 	db TEAM_ROCKET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
@@ -6137,7 +6137,7 @@ WartortleLv24Card:
 DarkWartortleCard:
 	db TYPE_PKMN_WATER ; type
 	dw $5c97 ; gfx
-	tx DarkWartortleName ; name
+	tx WartortleName ; name
 	db DIAMOND ; rarity
 	db TEAM_ROCKET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
@@ -6293,14 +6293,14 @@ BlastoiseAltLv52Card:
 DarkBlastoiseCard:
 	db TYPE_PKMN_WATER ; type
 	dw $5d3c ; gfx
-	tx DarkBlastoiseName ; name
+	tx BlastoiseName ; name
 	db STAR ; rarity
 	db TEAM_ROCKET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
 	dw DARK_BLASTOISE
 	db 70 ; hp
 	db STAGE2 ; stage
-	tx DarkWartortleName ; pre-evo name
+	tx WartortleName ; pre-evo name
 
 	; attack 1
 	energy WATER, 2 ; energies
@@ -6553,7 +6553,7 @@ GolduckLv28Card:
 DarkGolduckCard:
 	db TYPE_PKMN_WATER ; type
 	dw $5e0e ; gfx
-	tx DarkGolduckName ; name
+	tx GolduckName ; name
 	db DIAMOND ; rarity
 	db TEAM_ROCKET ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
@@ -8061,7 +8061,7 @@ StarmieCard:
 DarkStarmieCard:
 	db TYPE_PKMN_WATER ; type
 	dw $c869 ; gfx
-	tx DarkStarmieName ; name
+	tx StarmieName ; name
 	db DIAMOND ; rarity
 	db GB ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
@@ -8321,7 +8321,7 @@ GyaradosCard:
 DarkGyaradosCard:
 	db TYPE_PKMN_WATER ; type
 	dw $5ee0 ; gfx
-	tx DarkGyaradosName ; name
+	tx GyaradosName ; name
 	db STAR ; rarity
 	db TEAM_ROCKET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
@@ -8581,7 +8581,7 @@ VaporeonLv42Card:
 DarkVaporeonCard:
 	db TYPE_PKMN_WATER ; type
 	dw $5f49 ; gfx
-	tx DarkVaporeonName ; name
+	tx VaporeonName ; name
 	db DIAMOND ; rarity
 	db TEAM_ROCKET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
@@ -9413,7 +9413,7 @@ PikachuAltLv16Card:
 FlyingPikachuLv12Card:
 	db TYPE_PKMN_LIGHTNING ; type
 	dw $2f18 ; gfx
-	tx FlyingPikachuName ; name
+	tx PikachuName ; name
 	db PROMOSTAR ; rarity
 	db PRO ; real set
 	db PROMOTIONAL ; in-game set
@@ -9465,7 +9465,7 @@ FlyingPikachuLv12Card:
 FlyingPikachuAltLv12Card:
 	db TYPE_PKMN_LIGHTNING ; type
 	dw $a53a ; gfx
-	tx FlyingPikachuName ; name
+	tx PikachuName ; name
 	db PROMOSTAR ; rarity
 	db PRO ; real set
 	db PROMOTIONAL ; in-game set
@@ -9517,7 +9517,7 @@ FlyingPikachuAltLv12Card:
 SurfingPikachuLv13Card:
 	db TYPE_PKMN_LIGHTNING ; type
 	dw $3000 ; gfx
-	tx SurfingPikachuName ; name
+	tx PikachuName ; name
 	db PROMOSTAR ; rarity
 	db PRO ; real set
 	db PROMOTIONAL ; in-game set
@@ -9569,7 +9569,7 @@ SurfingPikachuLv13Card:
 SurfingPikachuAltLv13Card:
 	db TYPE_PKMN_LIGHTNING ; type
 	dw $30ab ; gfx
-	tx SurfingPikachuName ; name
+	tx PikachuName ; name
 	db PROMOSTAR ; rarity
 	db PRO ; real set
 	db PROMOTIONAL ; in-game set
@@ -9829,7 +9829,7 @@ RaichuLv45Card:
 DarkRaichuCard:
 	db TYPE_PKMN_LIGHTNING ; type
 	dw $c78d ; gfx
-	tx DarkRaichuName ; name
+	tx RaichuName ; name
 	db STAR ; rarity
 	db GB ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
@@ -10245,7 +10245,7 @@ MagnetonLv35Card:
 DarkMagnetonCard:
 	db TYPE_PKMN_LIGHTNING ; type
 	dw $6f6d ; gfx
-	tx DarkMagnetonName ; name
+	tx MagnetonName ; name
 	db STAR ; rarity
 	db TEAM_ROCKET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
@@ -10557,7 +10557,7 @@ ElectrodeLv42Card:
 DarkElectrodeCard:
 	db TYPE_PKMN_LIGHTNING ; type
 	dw $7069 ; gfx
-	tx DarkElectrodeName ; name
+	tx ElectrodeName ; name
 	db DIAMOND ; rarity
 	db TEAM_ROCKET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
@@ -10869,7 +10869,7 @@ JolteonLv29Card:
 DarkJolteonCard:
 	db TYPE_PKMN_LIGHTNING ; type
 	dw $70d2 ; gfx
-	tx DarkJolteonName ; name
+	tx JolteonName ; name
 	db DIAMOND ; rarity
 	db TEAM_ROCKET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
@@ -11597,7 +11597,7 @@ DugtrioLv40Card:
 DarkDugtrioCard:
 	db TYPE_PKMN_FIGHTING ; type
 	dw $686d ; gfx
-	tx DarkDugtrioName ; name
+	tx DugtrioName ; name
 	db STAR ; rarity
 	db TEAM_ROCKET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
@@ -11857,7 +11857,7 @@ PrimeapeCard:
 DarkPrimeapeCard:
 	db TYPE_PKMN_FIGHTING ; type
 	dw $6963 ; gfx
-	tx DarkPrimeapeName ; name
+	tx PrimeapeName ; name
 	db DIAMOND ; rarity
 	db TEAM_ROCKET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
