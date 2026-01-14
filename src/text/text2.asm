@@ -1127,8 +1127,7 @@ ChooseADarkEvolutionCardText:
 	textfw "「わるいポケモン」への 進化カードを"
 	linefw "えらんでください"
 	done
-	
-EXPORT EffectTargetDarkPokemonText
+
 EffectTargetDarkPokemonText:
 	textfw "わるいポケモン"
 	done

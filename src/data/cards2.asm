@@ -157,7 +157,7 @@ MachokeLv40Card:
 DarkMachokeCard:
 	db TYPE_PKMN_FIGHTING ; type
 	dw $6a4f ; gfx
-	tx MachokeName ; name
+	tx DarkMachokeName ; name
 	db DIAMOND ; rarity
 	db TEAM_ROCKET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
@@ -313,14 +313,14 @@ MachampLv67Card:
 DarkMachampCard:
 	db TYPE_PKMN_FIGHTING ; type
 	dw $6ac6 ; gfx
-	tx MachampName ; name
+	tx DarkMachampName ; name
 	db STAR ; rarity
 	db TEAM_ROCKET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
 	dw DARK_MACHAMP
 	db 70 ; hp
 	db STAGE2 ; stage
-	tx MachokeName ; pre-evo name
+	tx DarkMachokeName ; pre-evo name
 
 	; attack 1
 	energy FIGHTING, 2 ; energies
@@ -1041,7 +1041,7 @@ MarowakLv32Card:
 DarkMarowakCard:
 	db TYPE_PKMN_FIGHTING ; type
 	dw $c800 ; gfx
-	tx MarowakName ; name
+	tx DarkMarowakName ; name
 	db DIAMOND ; rarity
 	db GB ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
@@ -1977,7 +1977,7 @@ KadabraLv39Card:
 DarkKadabraCard:
 	db TYPE_PKMN_PSYCHIC ; type
 	dw $6504 ; gfx
-	tx KadabraName ; name
+	tx DarkKadabraName ; name
 	db DIAMOND ; rarity
 	db TEAM_ROCKET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
@@ -2133,14 +2133,14 @@ AlakazamLv45Card:
 DarkAlakazamCard:
 	db TYPE_PKMN_PSYCHIC ; type
 	dw $656d ; gfx
-	tx AlakazamName ; name
+	tx DarkAlakazamName ; name
 	db STAR ; rarity
 	db TEAM_ROCKET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
 	dw DARK_ALAKAZAM
 	db 60 ; hp
 	db STAGE2 ; stage
-	tx KadabraName ; pre-evo name
+	tx DarkKadabraName ; pre-evo name
 
 	; attack 1
 	energy PSYCHIC, 2, COLORLESS, 1 ; energies
@@ -2445,7 +2445,7 @@ SlowbroLv35Card:
 DarkSlowbroCard:
 	db TYPE_PKMN_PSYCHIC ; type
 	dw $6661 ; gfx
-	tx SlowbroName ; name
+	tx DarkSlowbroName ; name
 	db STAR ; rarity
 	db TEAM_ROCKET ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
@@ -2861,7 +2861,7 @@ HaunterLv26Card:
 DarkHaunterCard:
 	db TYPE_PKMN_PSYCHIC ; type
 	dw $c640 ; gfx
-	tx HaunterName ; name
+	tx DarkHaunterName ; name
 	db DIAMOND ; rarity
 	db GB ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
@@ -3017,14 +3017,14 @@ GengarLv40Card:
 DarkGengarCard:
 	db TYPE_PKMN_PSYCHIC ; type
 	dw $ca31 ; gfx
-	tx GengarName ; name
+	tx DarkGengarName ; name
 	db STAR ; rarity
 	db GB ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
 	dw DARK_GENGAR
 	db 70 ; hp
 	db STAGE2 ; stage
-	tx HaunterName ; pre-evo name
+	tx DarkHaunterName ; pre-evo name
 
 	; attack 1
 	energy 0 ; energies
@@ -3277,7 +3277,7 @@ HypnoLv36Card:
 DarkHypnoCard:
 	db TYPE_PKMN_PSYCHIC ; type
 	dw $675b ; gfx
-	tx HypnoName ; name
+	tx DarkHypnoName ; name
 	db STAR ; rarity
 	db TEAM_ROCKET ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
@@ -3901,7 +3901,7 @@ MewtwoLv67Card:
 GRsMewtwoCard:
 	db TYPE_PKMN_PSYCHIC ; type
 	dw $c56e ; gfx
-	tx MewtwoName ; name
+	tx GRsMewtwoName ; name
 	db STAR ; rarity
 	db GB ; real set
 	db PROMOTIONAL ; in-game set
@@ -4629,7 +4629,7 @@ RaticateCard:
 DarkRaticateCard:
 	db TYPE_PKMN_COLORLESS ; type
 	dw $6b98 ; gfx
-	tx RaticateName ; name
+	tx DarkRaticateName ; name
 	db CIRCLE ; rarity
 	db TEAM_ROCKET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
@@ -4941,7 +4941,7 @@ FearowLv27Card:
 DarkFearowCard:
 	db TYPE_PKMN_COLORLESS ; type
 	dw $c93b ; gfx
-	tx FearowName ; name
+	tx DarkFearowName ; name
 	db DIAMOND ; rarity
 	db GB ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
@@ -5149,7 +5149,7 @@ ClefableCard:
 DarkClefableCard:
 	db TYPE_PKMN_COLORLESS ; type
 	dw $c724 ; gfx
-	tx ClefableName ; name
+	tx DarkClefableName ; name
 	db STAR ; rarity
 	db GB ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
@@ -5773,7 +5773,7 @@ PersianCard:
 DarkPersianLv28Card:
 	db TYPE_PKMN_COLORLESS ; type
 	dw $6c7a ; gfx
-	tx PersianName ; name
+	tx DarkPersianName ; name
 	db CIRCLE ; rarity
 	db TEAM_ROCKET ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
@@ -5825,7 +5825,7 @@ DarkPersianLv28Card:
 DarkPersianAltLv28Card:
 	db TYPE_PKMN_COLORLESS ; type
 	dw $9e90 ; gfx
-	tx PersianName ; name
+	tx DarkPersianName ; name
 	db CIRCLE ; rarity
 	db PRO ; real set
 	db PROMOTIONAL ; in-game set
@@ -7021,7 +7021,7 @@ PorygonLv20Card:
 CoolPorygonCard:
 	db TYPE_PKMN_COLORLESS ; type
 	dw $9f62 ; gfx
-	tx PorygonName ; name
+	tx CoolPorygonName ; name
 	db PROMOSTAR ; rarity
 	db PRO ; real set
 	db PROMOTIONAL ; in-game set
@@ -7177,7 +7177,7 @@ SnorlaxLv35Card:
 HungrySnorlaxCard:
 	db TYPE_PKMN_COLORLESS ; type
 	dw $a000 ; gfx
-	tx SnorlaxName ; name
+	tx HungrySnorlaxName ; name
 	db PROMOSTAR ; rarity
 	db PRO ; real set
 	db PROMOTIONAL ; in-game set
@@ -7385,7 +7385,7 @@ DragonairCard:
 DarkDragonairCard:
 	db TYPE_PKMN_COLORLESS ; type
 	dw $6e32 ; gfx
-	tx DragonairName ; name
+	tx DarkDragonairName ; name
 	db DIAMOND ; rarity
 	db TEAM_ROCKET ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
@@ -7593,14 +7593,14 @@ DragoniteLv45Card:
 DarkDragoniteCard:
 	db TYPE_PKMN_COLORLESS ; type
 	dw $6e9b ; gfx
-	tx DragoniteName ; name
+	tx DarkDragoniteName ; name
 	db STAR ; rarity
 	db TEAM_ROCKET ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
 	dw DARK_DRAGONITE
 	db 70 ; hp
 	db STAGE2 ; stage
-	tx DragonairName ; pre-evo name
+	tx DarkDragonairName ; pre-evo name
 
 	; attack 1
 	energy 0 ; energies

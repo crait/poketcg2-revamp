@@ -3,11 +3,11 @@ INCLUDE "macros/credits_commands.asm"
 Credits:
 	credits_music_fade_out
 	credits_stop_music
-	credits_wait 30
+	credits_wait 120
 	credits_set_volume 7
 	credits_set_music MUSIC_CREDITS
 	credits_fade_out CREDITS_FADE_ALL, $05
-	credits_wait 30
+	credits_wait 60
 
 	credits_draw_box  0,  0, 20, 18
 	credits_show_title
@@ -599,6 +599,6 @@ Credits:
 	credits_wait_input PAD_A | PAD_START
 	credits_stop_music
 	credits_fade_out CREDITS_FADE_ALL, $0f
-	credits_wait 30
+	credits_wait 120
 	credits_deinit_ow
 	credits_end

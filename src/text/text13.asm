@@ -464,7 +464,7 @@ Text122b:
 
 Text122c:
 	textfw "アタシは 4が スキなの"
-	linefw "だから サイドカードは 6枚よ!"
+	linefw "だから サイドカードは 4枚よ!"
 	done
 
 Text122d:
@@ -490,7 +490,7 @@ Text122f:
 	done
 
 Text1230:
-	textfw "サイドカードは 6枚よ"
+	textfw "サイドカードは 4枚よ"
 	linefw "それでしか 対戦しないわ!"
 	done
 

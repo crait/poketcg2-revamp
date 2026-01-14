@@ -863,7 +863,7 @@ Text1150:
 	done
 
 Text1151:
-	textfw "サイドカードは 6枚よ!"
+	textfw "サイドカードは 4枚よ!"
 	linefw " "
 	linefw "こんどこそ ぜぇーったいに"
 	linefw "まけないんだからねぇー!!"

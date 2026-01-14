@@ -3479,7 +3479,8 @@ DisplayCardPage_PokemonOverview:
 	; print surrounding box, card name at 5,1, type, set 2, and rarity
 	call PrintPokemonCardPageGenericInformation
 	; print fixed text and draw the card symbol associated to its TYPE_*
-	farcall CardPageRetWeakResistDarkText
+	ld hl, CardPageRetreatWRTextData
+	call PlaceTextItems
 	ld hl, CardPageLvHPNoTextTileData
 	call WriteDataBlocksToBGMap0
 	lb de, 3, 2
@@ -3505,7 +3506,8 @@ DisplayCardPage_PokemonOverview:
 	; draw the surrounding box, and print fixed text
 	call DrawCardPageBoxAndCardGfx
 	call LoadDuelCheckPokemonScreenTiles
-	farcall CardPageRetWeakResistDarkText
+	ld hl, CardPageRetreatWRTextData
+	call PlaceTextItems
 	ld hl, CardPageNoTextTileData
 	call WriteDataBlocksToBGMap0
 	ld a, 1
