@@ -29,7 +29,7 @@ BulbasaurLv12Card:
 	tx RazorLeafName ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
-	db 30 ; damage
+	db 20 ; damage
 	db DAMAGE_NORMAL ; category
 	dw NONE ; effect commands
 	db NONE ; flags 1
@@ -63,11 +63,11 @@ BulbasaurLv13Card:
 	dw NONE ; pre-evo name
 
 	; attack 1
-	energy GRASS, 2 ; energies
+	energy GRASS, 1 ; energies
 	tx LeechSeedName ; name
 	tx LeechSeedDescription ; description
 	dw NONE ; description (cont)
-	db 20 ; damage
+	db 10 ; damage
 	db DAMAGE_NORMAL ; category
 	dw BulbasaurLeechSeedEffectCommands ; effect commands
 	db NONE ; flags 1
@@ -115,20 +115,6 @@ BulbasaurLv15Card:
 	dw NONE ; pre-evo name
 
 	; attack 1
-	energy COLORLESS, 1 ; energies
-	tx FirstAidName ; name
-	tx FirstAidDescription ; description
-	dw NONE ; description (cont)
-	db 0 ; damage
-	db RESIDUAL ; category
-	dw BulbasaurFirstAidEffectCommands ; effect commands
-	db NONE ; flags 1
-	db HEAL_USER ; flags 2
-	db FLAG_3_BIT_2 ; flags 3
-	db 1 ; ?
-	db ATK_ANIM_RECOVER ; animation
-
-	; attack 2
 	energy GRASS, 1 ; energies
 	tx PoisonSeedName ; name
 	tx InflictPoisonDescription ; description
@@ -141,6 +127,20 @@ BulbasaurLv15Card:
 	db NONE ; flags 3
 	db 0 ; ?
 	db ATK_ANIM_POISON_SEED ; animation
+
+	; attack 2
+	energy 0 ; energies
+	dw NONE ; name
+	dw NONE ; description
+	dw NONE ; description (cont)
+	db 0 ; damage
+	db DAMAGE_NORMAL ; category
+	dw NONE ; effect commands
+	db NONE ; flags 1
+	db NONE ; flags 2
+	db NONE ; flags 3
+	db 0 ; ?
+	db ATK_ANIM_NONE ; animation
 
 	db 1 ; retreat cost
 	db WR_FIRE ; weakness
@@ -162,16 +162,16 @@ IvysaurLv20Card:
 	db BASE_SET ; real set
 	db PSYCHIC_BATTLE ; in-game set
 	dw IVYSAUR_LV20
-	db 60 ; hp
+	db 70 ; hp
 	db STAGE1 ; stage
 	tx BulbasaurName ; pre-evo name
 
 	; attack 1
-	energy GRASS, 1, COLORLESS, 2 ; energies
+	energy GRASS, 1 ; energies
 	tx VineWhipName ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
-	db 30 ; damage
+	db 20 ; damage
 	db DAMAGE_NORMAL ; category
 	dw NONE ; effect commands
 	db NONE ; flags 1
@@ -194,7 +194,7 @@ IvysaurLv20Card:
 	db 0 ; ?
 	db ATK_ANIM_POWDER_HIT_POISON ; animation
 
-	db 1 ; retreat cost
+	db 2 ; retreat cost
 	db WR_FIRE ; weakness
 	db NONE ; resistance
 	tx SeedName ; category
@@ -214,7 +214,7 @@ IvysaurLv26Card:
 	db BULBASAUR_DECK ; real set
 	db BEGINNING_POKEMON ; in-game set
 	dw IVYSAUR_LV26
-	db 70 ; hp
+	db 80 ; hp
 	db STAGE1 ; stage
 	tx BulbasaurName ; pre-evo name
 
@@ -233,18 +233,18 @@ IvysaurLv26Card:
 	db ATK_ANIM_DRAIN ; animation
 
 	; attack 2
-	energy GRASS, 2, COLORLESS, 1 ; energies
-	tx VineWhipAltName ; name
+	energy 0 ; energies
+	dw NONE ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
-	db 40 ; damage
+	db 0 ; damage
 	db DAMAGE_NORMAL ; category
 	dw NONE ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
 	db 0 ; ?
-	db ATK_ANIM_WHIP ; animation
+	db ATK_ANIM_NONE ; animation
 
 	db 2 ; retreat cost
 	db WR_FIRE ; weakness
@@ -266,7 +266,7 @@ DarkIvysaurCard:
 	db GB ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
 	dw DARK_IVYSAUR
-	db 50 ; hp
+	db 60 ; hp
 	db STAGE1 ; stage
 	tx BulbasaurName ; pre-evo name
 
@@ -318,7 +318,7 @@ VenusaurLv64Card:
 	db GB ; real set
 	db PROMOTIONAL ; in-game set
 	dw VENUSAUR_LV64
-	db 100 ; hp
+	db 110 ; hp
 	db STAGE2 ; stage
 	tx IvysaurName ; pre-evo name
 
@@ -337,11 +337,11 @@ VenusaurLv64Card:
 	db ATK_ANIM_SOLAR_POWER ; animation
 
 	; attack 2
-	energy GRASS, 4 ; energies
+	energy GRASS, 3 ; energies
 	tx MegaDrainName ; name
 	tx MegaDrainDescription ; description
 	dw NONE ; description (cont)
-	db 40 ; damage
+	db 50 ; damage
 	db DAMAGE_NORMAL ; category
 	dw VenusaurMegaDrainEffectCommands ; effect commands
 	db NONE ; flags 1
@@ -389,7 +389,7 @@ VenusaurLv67Card:
 	db ATK_ANIM_PKMN_POWER_1 ; animation
 
 	; attack 2
-	energy GRASS, 4 ; energies
+	energy GRASS, 3 ; energies
 	tx SolarbeamName ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
@@ -441,7 +441,7 @@ VenusaurAltLv67Card:
 	db ATK_ANIM_PKMN_POWER_1 ; animation
 
 	; attack 2
-	energy GRASS, 4 ; energies
+	energy GRASS, 3 ; energies
 	tx SolarbeamName ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
@@ -474,7 +474,7 @@ DarkVenusaurCard:
 	db GB ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
 	dw DARK_VENUSAUR
-	db 70 ; hp
+	db 120 ; hp
 	db STAGE2 ; stage
 	tx IvysaurName ; pre-evo name
 
@@ -483,7 +483,7 @@ DarkVenusaurCard:
 	tx HorridPollenName ; name
 	tx HorridPollenDescription ; description
 	dw NONE ; description (cont)
-	db 30 ; damage
+	db 40 ; damage
 	db DAMAGE_NORMAL ; category
 	dw DarkVenusaurHorridPollenEffectCommands ; effect commands
 	db NONE ; flags 1
@@ -533,15 +533,15 @@ CaterpieCard:
 	; attack 1
 	energy GRASS, 1 ; energies
 	tx StringShotName ; name
-	tx MayInflictParalysisDescription ; description
+	tx MayPreventRetreatingDescription ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_NORMAL ; category
 	dw CaterpieStringShotEffectCommands ; effect commands
-	db INFLICT_PARALYSIS ; flags 1
-	db NONE ; flags 2
+	db NONE ; flags 1
+	db FLAG_2_BIT_6 ; flags 2
 	db NONE ; flags 3
-	db 0 ; ?
+	db 1 ; ?
 	db ATK_ANIM_STRING_SHOT ; animation
 
 	; attack 2
@@ -734,18 +734,18 @@ WeedleLv12Card:
 	db BASE_SET ; real set
 	db BEGINNING_POKEMON ; in-game set
 	dw WEEDLE_LV12
-	db 40 ; hp
+	db 30 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
 	; attack 1
 	energy GRASS, 1 ; energies
 	tx PoisonStingName ; name
-	tx MayInflictPoisonDescription ; description
+	tx InflictPoisonDescription ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_NORMAL ; category
-	dw WeedlePoisonStingEffectCommands ; effect commands
+	dw WeedlePoisonHornEffectCommands ; effect commands
 	db INFLICT_POISON ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
@@ -786,25 +786,11 @@ WeedleLv15Card:
 	db EXPANSION_SHEET ; real set
 	db PSYCHIC_BATTLE ; in-game set
 	dw WEEDLE_LV15
-	db 50 ; hp
+	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
 	; attack 1
-	energy COLORLESS, 1 ; energies
-	tx PeckName ; name
-	dw NONE ; description
-	dw NONE ; description (cont)
-	db 10 ; damage
-	db DAMAGE_NORMAL ; category
-	dw NONE ; effect commands
-	db NONE ; flags 1
-	db NONE ; flags 2
-	db NONE ; flags 3
-	db 0 ; ?
-	db ATK_ANIM_HIT ; animation
-
-	; attack 2
 	energy GRASS, 1 ; energies
 	tx PoisonHornName ; name
 	tx InflictPoisonDescription ; description
@@ -817,6 +803,20 @@ WeedleLv15Card:
 	db NONE ; flags 3
 	db 0 ; ?
 	db ATK_ANIM_POISON_SEED ; animation
+
+	; attack 2
+	energy 0 ; energies
+	dw NONE ; name
+	dw NONE ; description
+	dw NONE ; description (cont)
+	db 0 ; damage
+	db DAMAGE_NORMAL ; category
+	dw NONE ; effect commands
+	db NONE ; flags 1
+	db NONE ; flags 2
+	db NONE ; flags 3
+	db 0 ; ?
+	db ATK_ANIM_NONE ; animation
 
 	db 1 ; retreat cost
 	db WR_FIRE ; weakness
@@ -909,18 +909,18 @@ KakunaLv23Card:
 	db ATK_ANIM_NONE ; animation
 
 	; attack 2
-	energy GRASS, 2 ; energies
-	tx PoisonPowderName ; name
-	tx MayInflictPoisonDescription ; description
+	energy 0 ; energies
+	dw NONE ; name
+	dw NONE ; description
 	dw NONE ; description (cont)
-	db 20 ; damage
+	db 0 ; damage
 	db DAMAGE_NORMAL ; category
-	dw KakunaPoisonPowderEffectCommands ; effect commands
-	db INFLICT_POISON ; flags 1
+	dw NONE ; effect commands
+	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
 	db 0 ; ?
-	db ATK_ANIM_POWDER_EFFECT_CHANCE ; animation
+	db ATK_ANIM_NONE ; animation
 
 	db 2 ; retreat cost
 	db WR_FIRE ; weakness
@@ -942,12 +942,12 @@ BeedrillCard:
 	db BASE_SET ; real set
 	db BEGINNING_POKEMON ; in-game set
 	dw BEEDRILL
-	db 80 ; hp
+	db 100 ; hp
 	db STAGE2 ; stage
 	tx KakunaName ; pre-evo name
 
 	; attack 1
-	energy COLORLESS, 3 ; energies
+	energy COLORLESS, 2 ; energies
 	tx TwineedleName ; name
 	tx Do30DamageNumberOfHeadsDescription ; description
 	dw NONE ; description (cont)
@@ -963,9 +963,9 @@ BeedrillCard:
 	; attack 2
 	energy GRASS, 3 ; energies
 	tx PoisonStingName ; name
-	tx MayInflictPoisonDescription ; description
+	tx InflictPoisonDescription ; description
 	dw NONE ; description (cont)
-	db 40 ; damage
+	db 60 ; damage
 	db DAMAGE_NORMAL ; category
 	dw BeedrillPoisonStingEffectCommands ; effect commands
 	db INFLICT_POISON ; flags 1
@@ -3043,7 +3043,7 @@ VictreebelCard:
 	; attack 2
 	energy GRASS, 2 ; energies
 	tx AcidName ; name
-	tx AcidDescription ; description
+	tx MayPreventRetreatingDescription ; description
 	dw NONE ; description (cont)
 	db 20 ; damage
 	db DAMAGE_NORMAL ; category
@@ -4033,7 +4033,7 @@ CharmanderLv9Card:
 	tx FireTailName ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
-	db 20 ; damage
+	db 10 ; damage
 	db DAMAGE_NORMAL ; category
 	dw NONE ; effect commands
 	db NONE ; flags 1
@@ -4062,7 +4062,7 @@ CharmanderLv10Card:
 	db BASE_SET ; real set
 	db BEGINNING_POKEMON ; in-game set
 	dw CHARMANDER_LV10
-	db 50 ; hp
+	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
@@ -4081,7 +4081,7 @@ CharmanderLv10Card:
 	db ATK_ANIM_SLASH ; animation
 
 	; attack 2
-	energy FIRE, 1, COLORLESS, 1 ; energies
+	energy FIRE, 2 ; energies
 	tx EmberName ; name
 	tx DiscardOneFireEnergyDescription ; description
 	dw NONE ; description (cont)
@@ -4137,7 +4137,7 @@ CharmanderLv12Card:
 	tx FireTailName ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
-	db 30 ; damage
+	db 20 ; damage
 	db DAMAGE_NORMAL ; category
 	dw NONE ; effect commands
 	db NONE ; flags 1
@@ -4185,7 +4185,7 @@ CharmeleonCard:
 	db ATK_ANIM_SLASH ; animation
 
 	; attack 2
-	energy FIRE, 2, COLORLESS, 1 ; energies
+	energy FIRE, 3 ; energies
 	tx FlamethrowerName ; name
 	tx DiscardOneFireEnergyDescription ; description
 	dw NONE ; description (cont)
@@ -4218,16 +4218,16 @@ DarkCharmeleonCard:
 	db TEAM_ROCKET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
 	dw DARK_CHARMELEON
-	db 50 ; hp
+	db 70 ; hp
 	db STAGE1 ; stage
 	tx CharmanderName ; pre-evo name
 
 	; attack 1
-	energy COLORLESS, 2 ; energies
+	energy COLORLESS, 1 ; energies
 	tx TailSlapName ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
-	db 20 ; damage
+	db 10 ; damage
 	db DAMAGE_NORMAL ; category
 	dw NONE ; effect commands
 	db NONE ; flags 1
@@ -4237,11 +4237,11 @@ DarkCharmeleonCard:
 	db ATK_ANIM_TAIL_SLAP ; animation
 
 	; attack 2
-	energy FIRE, 3 ; energies
+	energy FIRE, 1 ; energies
 	tx FireballName ; name
 	tx FireballDescription ; description
 	dw NONE ; description (cont)
-	db 70 ; damage
+	db 40 ; damage
 	db DAMAGE_NORMAL ; category
 	dw DarkCharmeleonFireballEffectCommands ; effect commands
 	db NONE ; flags 1
@@ -4250,7 +4250,7 @@ DarkCharmeleonCard:
 	db 3 ; ?
 	db ATK_ANIM_FIREBALL ; animation
 
-	db 2 ; retreat cost
+	db 1 ; retreat cost
 	db WR_WATER ; weakness
 	db NONE ; resistance
 	tx FlameName ; category
@@ -4302,7 +4302,7 @@ CharizardLv76Card:
 	db 6 ; ?
 	db ATK_ANIM_FIRE_SPIN ; animation
 
-	db 3 ; retreat cost
+	db 1 ; retreat cost
 	db WR_WATER ; weakness
 	db WR_FIGHTING ; resistance
 	tx FlameName ; category
@@ -4374,7 +4374,7 @@ DarkCharizardCard:
 	db TEAM_ROCKET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
 	dw DARK_CHARIZARD
-	db 80 ; hp
+	db 120 ; hp
 	db STAGE2 ; stage
 	tx CharmeleonName ; pre-evo name
 
@@ -4393,7 +4393,7 @@ DarkCharizardCard:
 	db ATK_ANIM_HIT ; animation
 
 	; attack 2
-	energy FIRE, 2 ; energies
+	energy FIRE, 1 ; energies
 	tx ContinuousFireballName ; name
 	tx ContinuousFireballDescription ; description
 	dw NONE ; description (cont)
@@ -4406,7 +4406,7 @@ DarkCharizardCard:
 	db 0 ; ?
 	db ATK_ANIM_CONTINUOUS_FIREBALL ; animation
 
-	db 3 ; retreat cost
+	db 2 ; retreat cost
 	db WR_WATER ; weakness
 	db WR_FIGHTING ; resistance
 	tx FlameName ; category
@@ -5863,7 +5863,7 @@ SquirtleLv8Card:
 	db ATK_ANIM_NONE ; animation
 
 	db 1 ; retreat cost
-	db WR_LIGHTNING ; weakness
+	db WR_GRASS ; weakness
 	db NONE ; resistance
 	tx TinyTurtleName ; category
 	db DEX_SQUIRTLE ; Pokedex number
@@ -5887,7 +5887,7 @@ SquirtleLv14Card:
 	dw NONE ; pre-evo name
 
 	; attack 1
-	energy WATER, 1 ; energies
+	energy COLORLESS, 1 ; energies
 	tx BiteName ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
@@ -5901,7 +5901,7 @@ SquirtleLv14Card:
 	db ATK_ANIM_HIT ; animation
 
 	; attack 2
-	energy WATER, 1, COLORLESS, 1 ; energies
+	energy COLORLESS, 3 ; energies
 	tx SkullBashName ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
@@ -5915,7 +5915,7 @@ SquirtleLv14Card:
 	db ATK_ANIM_SKULL_BASH ; animation
 
 	db 1 ; retreat cost
-	db WR_LIGHTNING ; weakness
+	db WR_GRASS ; weakness
 	db NONE ; resistance
 	tx TinyTurtleName ; category
 	db DEX_SQUIRTLE ; Pokedex number
@@ -5967,7 +5967,7 @@ SquirtleLv15Card:
 	db ATK_ANIM_HIT ; animation
 
 	db 1 ; retreat cost
-	db WR_LIGHTNING ; weakness
+	db WR_GRASS ; weakness
 	db NONE ; resistance
 	tx TinyTurtleName ; category
 	db DEX_SQUIRTLE ; Pokedex number
@@ -5991,7 +5991,7 @@ SquirtleLv16Card:
 	dw NONE ; pre-evo name
 
 	; attack 1
-	energy COLORLESS, 2 ; energies
+	energy WATER, 2 ; energies
 	tx ShellAttackName ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
@@ -6019,7 +6019,7 @@ SquirtleLv16Card:
 	db ATK_ANIM_NONE ; animation
 
 	db 1 ; retreat cost
-	db WR_LIGHTNING ; weakness
+	db WR_GRASS ; weakness
 	db NONE ; resistance
 	tx TinyTurtleName ; category
 	db DEX_SQUIRTLE ; Pokedex number
@@ -6070,8 +6070,8 @@ WartortleLv22Card:
 	db 0 ; ?
 	db ATK_ANIM_HIT ; animation
 
-	db 1 ; retreat cost
-	db WR_LIGHTNING ; weakness
+	db 2 ; retreat cost
+	db WR_GRASS ; weakness
 	db NONE ; resistance
 	tx TurtleName ; category
 	db DEX_WARTORTLE ; Pokedex number
@@ -6109,7 +6109,7 @@ WartortleLv24Card:
 	db ATK_ANIM_BUBBLES_COPY ; animation
 
 	; attack 2
-	energy WATER, 2 ; energies
+	energy COLORLESS, 3 ; energies
 	tx SurfName ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
@@ -6123,7 +6123,7 @@ WartortleLv24Card:
 	db ATK_ANIM_WATER_JETS ; animation
 
 	db 2 ; retreat cost
-	db WR_LIGHTNING ; weakness
+	db WR_GRASS ; weakness
 	db NONE ; resistance
 	tx TurtleName ; category
 	db DEX_WARTORTLE ; Pokedex number
@@ -6142,7 +6142,7 @@ DarkWartortleCard:
 	db TEAM_ROCKET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
 	dw DARK_WARTORTLE
-	db 60 ; hp
+	db 70 ; hp
 	db STAGE1 ; stage
 	tx SquirtleName ; pre-evo name
 
@@ -6175,7 +6175,7 @@ DarkWartortleCard:
 	db ATK_ANIM_GLOW_EFFECT ; animation
 
 	db 1 ; retreat cost
-	db WR_LIGHTNING ; weakness
+	db WR_GRASS ; weakness
 	db NONE ; resistance
 	tx TurtleName ; category
 	db DEX_WARTORTLE ; Pokedex number
@@ -6227,7 +6227,7 @@ BlastoiseLv52Card:
 	db ATK_ANIM_HYDRO_PUMP ; animation
 
 	db 3 ; retreat cost
-	db WR_LIGHTNING ; weakness
+	db WR_GRASS ; weakness
 	db NONE ; resistance
 	tx ShellfishName ; category
 	db DEX_BLASTOISE ; Pokedex number
@@ -6279,7 +6279,7 @@ BlastoiseAltLv52Card:
 	db ATK_ANIM_HYDRO_PUMP ; animation
 
 	db 3 ; retreat cost
-	db WR_LIGHTNING ; weakness
+	db WR_GRASS ; weakness
 	db NONE ; resistance
 	tx ShellfishName ; category
 	db DEX_BLASTOISE ; Pokedex number
@@ -6298,7 +6298,7 @@ DarkBlastoiseCard:
 	db TEAM_ROCKET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
 	dw DARK_BLASTOISE
-	db 70 ; hp
+	db 120 ; hp
 	db STAGE2 ; stage
 	tx WartortleName ; pre-evo name
 
@@ -6317,7 +6317,7 @@ DarkBlastoiseCard:
 	db ATK_ANIM_HYDRO_PUMP ; animation
 
 	; attack 2
-	energy WATER, 1, COLORLESS, 2 ; energies
+	energy WATER, 1, COLORLESS, 3 ; energies
 	tx RocketTackleName ; name
 	tx RocketTackleDescription ; description
 	dw NONE ; description (cont)
@@ -6330,8 +6330,8 @@ DarkBlastoiseCard:
 	db 10 ; ?
 	db ATK_ANIM_ROCKET_TACKLE ; animation
 
-	db 2 ; retreat cost
-	db WR_LIGHTNING ; weakness
+	db 3 ; retreat cost
+	db WR_GRASS ; weakness
 	db NONE ; resistance
 	tx ShellfishName ; category
 	db DEX_BLASTOISE ; Pokedex number

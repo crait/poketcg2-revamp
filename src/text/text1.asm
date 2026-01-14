@@ -1326,9 +1326,9 @@ DamageCheckPlusXDamageForEachHeadsText:
 	linefw "「おもて」×<RAMNUM>ダメージ追加!!"
 	done
 
-AcidCheckText:
-	textfw "「ようかいえき」判定"
-	linefw "「おもて」ならつぎの番ににげられない"
+MayPreventRetreatingCheckText:
+	textfw "「おもて」ならつぎの番ににげられない"
+	linefw "          "
 	done
 
 TransparencyCheckText:

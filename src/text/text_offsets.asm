@@ -280,7 +280,7 @@ TextOffsets::
 	textpointer DamageCheckIfHeadsPlusDamageText                      ; 0x0112
 	textpointer DamageCheckXDamageTimesHeadsText                      ; 0x0113
 	textpointer DamageCheckPlusXDamageForEachHeadsText                ; 0x0114
-	textpointer AcidCheckText                                         ; 0x0115
+	textpointer MayPreventRetreatingCheckText                         ; 0x0115
 	textpointer TransparencyCheckText                                 ; 0x0116
 	textpointer ConfusionCheckDamageText                              ; 0x0117
 	textpointer ConfusionCheckRetreatText                             ; 0x0118
@@ -333,7 +333,7 @@ TextOffsets::
 	textpointer MagnetCheckText                                       ; 0x0147
 	textpointer FossilGuidanceCheckText                               ; 0x0148
 	textpointer AttackUnsuccessfulText                                ; 0x0149
-	textpointer UnableToRetreatDueToAcidText                          ; 0x014a
+	textpointer UnableToRetreatDueToAttackText                        ; 0x014a
 	textpointer UnableToRetreatDueToRockSealText                      ; 0x014b
 	textpointer UnableToRetreatDueToDrillDiveText                     ; 0x014c
 	textpointer UnableToRetreatDueToGuardText                         ; 0x014d
@@ -5128,7 +5128,7 @@ SECTION "Text Offsets 2", ROMX
 	textpointer LureName                                              ; 0x13fc
 	textpointer LureDescription                                       ; 0x13fd
 	textpointer AcidName                                              ; 0x13fe
-	textpointer AcidDescription                                       ; 0x13ff
+	textpointer MayPreventRetreatingDescription                       ; 0x13ff
 	textpointer VictreebelDescription                                 ; 0x1400
 	textpointer GrimerName                                            ; 0x1401
 	textpointer PoisonGasName                                         ; 0x1402

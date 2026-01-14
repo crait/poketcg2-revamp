@@ -8940,10 +8940,10 @@ CheckUnableToRetreatDueToEffect:
 	get_turn_duelist_var
 	or a
 	jr z, .can_retreat
-	ldtx hl, UnableToRetreatDueToAcidText
+	ldtx hl, UnableToRetreatDueToAttackText
 	cp SUBSTATUS2_ACID
 	jr z, .set_carry
-	ldtx hl, UnableToRetreatDueToRockSealText
+	ldtx hl, UnableToRetreatDueToAttackText
 	cp SUBSTATUS2_ROCK_SEAL
 	jr z, .set_carry
 .can_retreat

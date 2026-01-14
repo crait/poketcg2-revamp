@@ -57,8 +57,8 @@ AttackUnsuccessfulText:
 	textfw "ワザを しっぱいした"
 	done
 
-UnableToRetreatDueToAcidText:
-	textfw "「ようかいえき」の効果で"
+UnableToRetreatDueToAttackText:
+	textfw "相手のワザの効果で   "
 	linefw "にげられない"
 	done
 

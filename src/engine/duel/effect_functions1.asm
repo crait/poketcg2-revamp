@@ -1663,8 +1663,8 @@ VictreebelLure_SwitchDefendingPokemon:
 	ret
 
 ; If heads, defending Pokemon can't retreat next turn
-AcidEffect:
-	ldtx de, AcidCheckText
+MayPreventRetreatingEffect:
+	ldtx de, MayPreventRetreatingCheckText
 	call TossCoin_Bank1a
 	ret nc
 	ld a, SUBSTATUS2_ACID

@@ -79,7 +79,7 @@ VictreebelLureEffectCommands:
 
 VictreebelAcidEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, AcidEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, MayPreventRetreatingEffect
 	db $00
 
 PinsirIronGripEffectCommands:
@@ -89,7 +89,7 @@ PinsirIronGripEffectCommands:
 
 CaterpieStringShotEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, StringShotEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, MayPreventRetreatingEffect
 	db $00
 
 GloomPoisonPowderEffectCommands:
@@ -152,7 +152,7 @@ BeedrillTwineedleEffectCommands:
 
 BeedrillPoisonStingEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, BeedrillPoisonSting_Poison50PercentEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, PoisonEffect
 	dbw EFFECTCMDTYPE_AI, BeedrillPoisonSting_AIEffect
 	db $00
 
@@ -2346,7 +2346,7 @@ MetapodMysteriousPowerEffectCommands:
 
 WeedlePoisonHornEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, PoisonHorn_PoisonEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, PoisonEffect
 	dbw EFFECTCMDTYPE_AI, PoisonHorn_AIEffect
 	db $00
 
