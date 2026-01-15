@@ -4119,7 +4119,7 @@ PidgeyLv8Card:
 	dw NONE ; pre-evo name
 
 	; attack 1
-	energy COLORLESS, 2 ; energies
+	energy COLORLESS, 1 ; energies
 	tx WhirlwindName ; name
 	tx WhirlwindDescription ; description
 	dw NONE ; description (cont)
@@ -4166,7 +4166,7 @@ PidgeyLv10Card:
 	db EXPANSION_SHEET ; real set
 	db SKY_FLYING_POKEMON ; in-game set
 	dw PIDGEY_LV10
-	db 50 ; hp
+	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
@@ -4185,7 +4185,7 @@ PidgeyLv10Card:
 	db ATK_ANIM_WHIRLWIND ; animation
 
 	; attack 2
-	energy COLORLESS, 2 ; energies
+	energy COLORLESS, 3 ; energies
 	tx QuickAttackName ; name
 	tx QuickAttackAltDescription1 ; description
 	dw NONE ; description (cont)
@@ -4218,16 +4218,16 @@ PidgeottoLv36Card:
 	db BASE_SET ; real set
 	db SKY_FLYING_POKEMON ; in-game set
 	dw PIDGEOTTO_LV36
-	db 60 ; hp
+	db 70 ; hp
 	db STAGE1 ; stage
 	tx PidgeyName ; pre-evo name
 
 	; attack 1
-	energy COLORLESS, 2 ; energies
+	energy COLORLESS, 1 ; energies
 	tx WhirlwindName ; name
 	tx WhirlwindDescription ; description
 	dw NONE ; description (cont)
-	db 20 ; damage
+	db 10 ; damage
 	db DAMAGE_NORMAL ; category
 	dw PidgeottoWhirlwindEffectCommands ; effect commands
 	db NONE ; flags 1
@@ -4237,7 +4237,7 @@ PidgeottoLv36Card:
 	db ATK_ANIM_WHIRLWIND ; animation
 
 	; attack 2
-	energy COLORLESS, 3 ; energies
+	energy COLORLESS, 2 ; energies
 	tx MirrorMoveName ; name
 	tx MirrorMoveDescription ; description
 	dw NONE ; description (cont)
@@ -4250,7 +4250,7 @@ PidgeottoLv36Card:
 	db 0 ; ?
 	db ATK_ANIM_MIRROR_MOVE ; animation
 
-	db 1 ; retreat cost
+	db 0 ; retreat cost
 	db WR_LIGHTNING ; weakness
 	db WR_FIGHTING ; resistance
 	tx BirdName ; category
@@ -4270,11 +4270,25 @@ PidgeottoLv38Card:
 	db EXPANSION_SHEET ; real set
 	db PSYCHIC_BATTLE ; in-game set
 	dw PIDGEOTTO_LV38
-	db 60 ; hp
+	db 70 ; hp
 	db STAGE1 ; stage
 	tx PidgeyName ; pre-evo name
 
 	; attack 1
+	energy COLORLESS, 1 ; energies
+	tx FlyName ; name
+	tx FlyAltDescription ; description
+	dw NONE ; description (cont)
+	db 10 ; damage
+	db DAMAGE_NORMAL ; category
+	dw PidgeottoFlyEffectCommands ; effect commands
+	db NONE ; flags 1
+	db NULLIFY_OR_WEAKEN_ATTACK ; flags 2
+	db FLAG_3_BIT_2 ; flags 3
+	db 0 ; ?
+	db ATK_ANIM_AGILITY_PROTECT ; animation
+
+	; attack 2
 	energy COLORLESS, 2 ; energies
 	tx TwisterName ; name
 	tx TwisterDescription ; description
@@ -4287,20 +4301,6 @@ PidgeottoLv38Card:
 	db SPECIAL_AI_HANDLING ; flags 3
 	db 0 ; ?
 	db ATK_ANIM_WHIRLWIND ; animation
-
-	; attack 2
-	energy COLORLESS, 3 ; energies
-	tx FlyName ; name
-	tx FlyAltDescription ; description
-	dw NONE ; description (cont)
-	db 30 ; damage
-	db DAMAGE_NORMAL ; category
-	dw PidgeottoFlyEffectCommands ; effect commands
-	db NONE ; flags 1
-	db NULLIFY_OR_WEAKEN_ATTACK ; flags 2
-	db FLAG_3_BIT_2 ; flags 3
-	db 0 ; ?
-	db ATK_ANIM_AGILITY_PROTECT ; animation
 
 	db 0 ; retreat cost
 	db WR_LIGHTNING ; weakness
@@ -4322,12 +4322,26 @@ PidgeotLv38Card:
 	db GB ; real set
 	db PSYCHIC_BATTLE ; in-game set
 	dw PIDGEOT_LV38
-	db 80 ; hp
+	db 120 ; hp
 	db STAGE2 ; stage
 	tx PidgeottoName ; pre-evo name
 
 	; attack 1
-	energy COLORLESS, 3 ; energies
+	energy COLORLESS, 1 ; energies
+	tx GaleName ; name
+	tx GaleDescription ; description
+	dw NONE ; description (cont)
+	db 10 ; damage
+	db DAMAGE_NORMAL ; category
+	dw PidgeotGaleEffectCommands ; effect commands
+	db NONE ; flags 1
+	db SWITCH_OPPONENT_POKEMON ; flags 2
+	db NONE ; flags 3
+	db 0 ; ?
+	db ATK_ANIM_GLOW_EFFECT ; animation
+
+	; attack 2
+	energy COLORLESS, 2 ; energies
 	tx SlicingWingName ; name
 	tx SlicingWingDescription ; description
 	dw NONE ; description (cont)
@@ -4340,21 +4354,7 @@ PidgeotLv38Card:
 	db 2 ; ?
 	db ATK_ANIM_WHIRLWIND_ZIGZAG ; animation
 
-	; attack 2
-	energy COLORLESS, 4 ; energies
-	tx GaleName ; name
-	tx GaleDescription ; description
-	dw NONE ; description (cont)
-	db 20 ; damage
-	db DAMAGE_NORMAL ; category
-	dw PidgeotGaleEffectCommands ; effect commands
-	db NONE ; flags 1
-	db SWITCH_OPPONENT_POKEMON ; flags 2
-	db NONE ; flags 3
-	db 0 ; ?
-	db ATK_ANIM_GLOW_EFFECT ; animation
-
-	db 1 ; retreat cost
+	db 0 ; retreat cost
 	db WR_LIGHTNING ; weakness
 	db WR_FIGHTING ; resistance
 	tx BirdName ; category
@@ -4374,7 +4374,7 @@ PidgeotLv40Card:
 	db JUNGLE ; real set
 	db SKY_FLYING_POKEMON ; in-game set
 	dw PIDGEOT_LV40
-	db 80 ; hp
+	db 110 ; hp
 	db STAGE2 ; stage
 	tx PidgeottoName ; pre-evo name
 

@@ -597,7 +597,7 @@ MetapodLv20Card:
 	db ATK_ANIM_NONE ; animation
 
 	; attack 2
-	energy GRASS, 2 ; energies
+	energy COLORLESS, 2 ; energies
 	tx MysteriousPowerName ; name
 	tx MayInflictConfusionDescription ; description
 	dw NONE ; description (cont)
@@ -649,18 +649,18 @@ MetapodLv21Card:
 	db ATK_ANIM_NONE ; animation
 
 	; attack 2
-	energy GRASS, 2 ; energies
-	tx StunSporeName ; name
-	tx MayInflictParalysisDescription ; description
+	energy 0 ; energies
+	dw NONE ; name
+	dw NONE ; description
 	dw NONE ; description (cont)
-	db 20 ; damage
+	db 0 ; damage
 	db DAMAGE_NORMAL ; category
-	dw MetapodStunSporeEffectCommands ; effect commands
-	db INFLICT_PARALYSIS ; flags 1
+	dw NONE ; effect commands
+	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
 	db 0 ; ?
-	db ATK_ANIM_POWDER_EFFECT_CHANCE ; animation
+	db ATK_ANIM_NONE ; animation
 
 	db 2 ; retreat cost
 	db WR_FIRE ; weakness
