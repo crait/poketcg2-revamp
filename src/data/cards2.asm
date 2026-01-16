@@ -815,7 +815,7 @@ OnixLv25Card:
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
-	db 3 ; ?
+	db 0 ; ?
 	db ATK_ANIM_ROCK_THROW ; animation
 
 	db 3 ; retreat cost
@@ -1439,7 +1439,7 @@ RhydonLv48Card:
 	db LOW_RECOIL ; flags 1
 	db SWITCH_OPPONENT_POKEMON ; flags 2
 	db NONE ; flags 3
-	db 20 ; ?
+	db 0 ; ?
 	db ATK_ANIM_HIT_RECOIL ; animation
 
 	db 3 ; retreat cost
