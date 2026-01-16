@@ -802,7 +802,7 @@ OnixLv25Card:
 	db NONE ; flags 2
 	db NONE ; flags 3
 	db 0 ; ?
-	db ATK_ANIM_HIT ; animation
+	db ATK_ANIM_NONE ; animation
 
 	; attack 2
 	energy FIGHTING, 3 ; energies
@@ -815,7 +815,7 @@ OnixLv25Card:
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
-	db 0 ; ?
+	db 3 ; ?
 	db ATK_ANIM_ROCK_THROW ; animation
 
 	db 3 ; retreat cost
