@@ -1762,7 +1762,7 @@ Do30DamageTimes2Flips_AIEffect:
 	ret
 
 ; Flip 2 coins; deal 30x number of heads
-Do30DamageTimes2Flips_MultiplierEffect:
+Do30DamageTimes2FlipsEffect:
 	ld hl, 30
 	call LoadTxRam3
 	ldtx de, DamageCheckXDamageTimesHeadsText
@@ -1826,7 +1826,7 @@ MetapodStunSporeEffect:
 	call Paralysis50PercentEffect
 	ret
 
-OddishStunSporeEffect:
+MayInflictParalysisEffect:
 	call Paralysis50PercentEffect
 	ret
 
@@ -2033,7 +2033,7 @@ Do10DamageTimes3Flips_AIEffect:
 	call SetExpectedAIDamage
 	ret
 
-Do10DamageTimes3Flips_MultiplierEffect:
+Do10DamageTimes3FlipsEffect:
 	ld hl, 10
 	call LoadTxRam3
 	ldtx de, DamageCheckXDamageTimesHeadsText
@@ -2191,13 +2191,13 @@ ParasectSporeEffect:
 	call SleepEffect
 	ret
 
-WeedlePoisonSting_AIEffect:
+MayInflictPoison_AIEffect:
 	ld a, 10 / 2
 	lb de, 0, 10
 	call UpdateExpectedAIDamage_AccountForPoison
 	ret
 
-WeedlePoisonSting_Poison50PercentEffect:
+MayInflictPoisonEffect:
 	call Poison50PercentEffect
 	ret
 
@@ -2685,13 +2685,13 @@ Heal_RemoveDamageEffect:
 	call ExchangeRNG
 	ret
 
-PetalDance_AIEffect:
+Do40DamageTimes3Flips_AIEffect:
 	ld a, 120 / 2
 	lb de, 0, 120
 	call SetExpectedAIDamage
 	ret
 
-PetalDance_MultiplierEffect:
+Do40DamageTimes3FlipsEffect:
 	ld hl, 40
 	call LoadTxRam3
 	ldtx de, DamageCheckXDamageTimesHeadsText
@@ -6466,7 +6466,7 @@ Do20DamageTimes4Flips_AIEffect:
 	call SetExpectedAIDamage
 	ret
 
-Do20DamageTimes4Flips_MultiplierEffect:
+Do20DamageTimes4FlipsEffect:
 	ld hl, 20
 	call LoadTxRam3
 	ldtx de, DamageCheckXDamageTimesHeadsText
@@ -10871,7 +10871,7 @@ MysteriousPowerEffect:
 	call Confusion50PercentEffect
 	ret
 
-PoisonHorn_AIEffect:
+Poison_AIEffect:
 	ld a, 10
 	lb de, 10, 10
 	call UpdateExpectedAIDamage_AccountForPoison

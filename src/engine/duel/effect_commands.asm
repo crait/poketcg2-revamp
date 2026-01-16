@@ -146,7 +146,7 @@ ZubatLeechLifeEffectCommands:
 
 Do30DamageTimes2FlipsEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Do30DamageTimes2Flips_MultiplierEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Do30DamageTimes2FlipsEffect
 	dbw EFFECTCMDTYPE_AI, Do30DamageTimes2Flips_AIEffect
 	db $00
 
@@ -182,9 +182,9 @@ MetapodStunSporeEffectCommands:
 	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, MetapodStunSporeEffect
 	db $00
 
-OddishStunSporeEffectCommands:
+MayInflictParalysisEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, OddishStunSporeEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, MayInflictParalysisEffect
 	db $00
 
 OddishSproutEffectCommands:
@@ -229,7 +229,7 @@ NidoqueenBoyfriendsEffectCommands:
 
 Do10DamageTimes3FlipsEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Do10DamageTimes3Flips_MultiplierEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Do10DamageTimes3FlipsEffect
 	dbw EFFECTCMDTYPE_AI, Do10DamageTimes3Flips_AIEffect
 	db $00
 
@@ -286,10 +286,10 @@ ParasectSporeEffectCommands:
 	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, ParasectSporeEffect
 	db $00
 
-WeedlePoisonStingEffectCommands:
+MayInflictPoisonEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, WeedlePoisonSting_Poison50PercentEffect
-	dbw EFFECTCMDTYPE_AI, WeedlePoisonSting_AIEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, MayInflictPoison_AIEffect
+	dbw EFFECTCMDTYPE_AI, MayInflictPoisonEffect
 	db $00
 
 IvysaurPoisonPowderEffectCommands:
@@ -389,7 +389,7 @@ VileplumeHealEffectCommands:
 	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Heal_RemoveDamageEffect
 	db $00
 
-VileplumePetalDanceEffectCommands:
+Do40DamageTimes3FlipsEffectCommands:
 	db BANK("Effect Functions 1")
 	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, PetalDance_MultiplierEffect
 	dbw EFFECTCMDTYPE_AI, PetalDance_AIEffect
@@ -1294,7 +1294,7 @@ JolteonQuickAttackEffectCommands:
 
 Do20DamageTimes4FlipsEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Do20DamageTimes4Flips_MultiplierEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Do20DamageTimes4FlipsEffect
 	dbw EFFECTCMDTYPE_AI, Do20DamageTimes4Flips_AIEffect
 	db $00
 
@@ -2344,10 +2344,10 @@ MetapodMysteriousPowerEffectCommands:
 	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, MysteriousPowerEffect
 	db $00
 
-WeedlePoisonHornEffectCommands:
+InflictPoisonEffectCommands:
 	db BANK("Effect Functions 1")
 	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, PoisonEffect
-	dbw EFFECTCMDTYPE_AI, PoisonHorn_AIEffect
+	dbw EFFECTCMDTYPE_AI, Poison_AIEffect
 	db $00
 
 KakunaPoisonFluidEffectCommands:
@@ -2955,7 +2955,7 @@ NidorinaStrengthInNumbersEffectCommands:
 
 Do30DamageTimes3FlipsEffectCommands:
 	db BANK("Effect Functions 2")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Do30DamageTimes3Flips_MultiplierEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Do30DamageTimes3FlipsEffect
 	dbw EFFECTCMDTYPE_AI, Do30DamageTimes3Flips_AIEffect
 	db $00
 
@@ -3444,7 +3444,7 @@ DragoniteSupersonicFlightEffectCommands:
 
 Do10DamageTimes2FlipsEffectCommands:
 	db BANK("Effect Functions 2")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Do10DamageTimes2Flips_MultiplierEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Do10DamageTimes2FlipsEffect
 	dbw EFFECTCMDTYPE_AI, Do10DamageTimes2Flips_AIEffect
 	db $00
 

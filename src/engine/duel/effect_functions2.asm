@@ -3298,7 +3298,7 @@ Do30DamageTimes3Flips_AIEffect:
 	farcall SetExpectedAIDamage
 	ret
 
-Do30DamageTimes3Flips_MultiplierEffect:
+Do30DamageTimes3FlipsEffect:
 	ld hl, 30
 	call LoadTxRam3
 	ldtx de, DamageCheckXDamageTimesHeadsText
@@ -6201,7 +6201,7 @@ Do10DamageTimes2Flips_AIEffect:
 	farcall SetExpectedAIDamage
 	ret
 
-Do10DamageTimes2Flips_MultiplierEffect:
+Do10DamageTimes2FlipsEffect:
 	ld hl, 10
 	call LoadTxRam3
 	ldtx de, DamageCheckXDamageTimesHeadsText

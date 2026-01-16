@@ -5799,7 +5799,7 @@ DarkPersianLv28Card:
 	; attack 2
 	energy COLORLESS, 2 ; energies
 	tx PoisonClawsName ; name
-	tx MayInflictPoisonAltDescription ; description
+	tx MayInflictPoisonDescription ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_NORMAL ; category
@@ -5851,7 +5851,7 @@ DarkPersianAltLv28Card:
 	; attack 2
 	energy COLORLESS, 2 ; energies
 	tx PoisonClawsName ; name
-	tx MayInflictPoisonAltDescription ; description
+	tx MayInflictPoisonDescription ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_NORMAL ; category

@@ -947,9 +947,9 @@ PoisonStingName:
 	textfw "どくばり"
 	done
 
-MayInflictPoisonDescription:
-	textfw "コインを投げて「おもて」なら、[相手]"
-	linefw "を「どく」状態にする。"
+MayInflictPoisonAltDescription:
+	textfw "コインを投げて「おもて」なら、"
+	linefw "[相手]を「どく」状態にする。"
 	done
 
 HairyBugName:
@@ -1058,7 +1058,7 @@ BiteName:
 	textfw "かみつく"
 	done
 
-MayInflictPoisonAltDescription:
+MayInflictPoisonDescription:
 	textfw "コインを投げて「おもて」なら、"
 	linefw "[相手]を「どく」状態にする。"
 	done

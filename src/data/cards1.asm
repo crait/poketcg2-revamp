@@ -745,7 +745,7 @@ WeedleLv12Card:
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_NORMAL ; category
-	dw WeedlePoisonHornEffectCommands ; effect commands
+	dw InflictPoisonEffectCommands ; effect commands
 	db INFLICT_POISON ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
@@ -797,7 +797,7 @@ WeedleLv15Card:
 	dw NONE ; description (cont)
 	db 0 ; damage
 	db DAMAGE_NORMAL ; category
-	dw WeedlePoisonHornEffectCommands ; effect commands
+	dw InflictPoisonEffectCommands ; effect commands
 	db INFLICT_POISON ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
@@ -1067,7 +1067,7 @@ EkansLv15Card:
 	; attack 2
 	energy GRASS, 2 ; energies
 	tx PoisonStingName ; name
-	tx MayInflictPoisonAltDescription ; description
+	tx MayInflictPoisonDescription ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_NORMAL ; category
@@ -1275,7 +1275,7 @@ NidoranFLv12Card:
 	; attack 2
 	energy GRASS, 2 ; energies
 	tx PoisonStingName ; name
-	tx MayInflictPoisonAltDescription ; description
+	tx MayInflictPoisonDescription ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_NORMAL ; category
@@ -1884,31 +1884,31 @@ ZubatLv12Card:
 
 	; attack 1
 	energy COLORLESS, 1 ; energies
-	tx BiteName ; name
+	tx FlitterName ; name
+	tx DigUnderDescription ; description
+	dw NONE ; description (cont)
+	db 0 ; damage
+	db RESIDUAL ; category
+	dw DiglettDigUnderEffectCommands ; effect commands
+	db DAMAGE_TO_OPPONENT_BENCH ; flags 1
+	db FLAG_2_BIT_6 ; flags 2
+	db FLAG_3_BIT_2 ; flags 3
+	db 0 ; ?
+	db ATK_ANIM_HIT ; animation
+
+	; attack 2
+	energy 0 ; energies
+	dw NONE ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
-	db 10 ; damage
+	db 0 ; damage
 	db DAMAGE_NORMAL ; category
 	dw NONE ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
 	db 0 ; ?
-	db ATK_ANIM_HIT ; animation
-
-	; attack 2
-	energy GRASS, 1, COLORLESS, 1 ; energies
-	tx SuspiciousSoundwaveName ; name
-	tx MayInflictConfusionDescription ; description
-	dw NONE ; description (cont)
-	db 10 ; damage
-	db DAMAGE_NORMAL ; category
-	dw ZubatSuspiciousSoundwaveEffectCommands ; effect commands
-	db NONE ; flags 1
-	db NONE ; flags 2
-	db NONE ; flags 3
-	db 0 ; ?
-	db ATK_ANIM_SUSPICIOUS_SOUNDWAVE ; animation
+	db ATK_ANIM_NONE ; animation
 
 	db 0 ; retreat cost
 	db WR_PSYCHIC ; weakness
@@ -2034,7 +2034,7 @@ DarkGolbatCard:
 	db TEAM_ROCKET ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
 	dw DARK_GOLBAT
-	db 50 ; hp
+	db 70 ; hp
 	db STAGE1 ; stage
 	tx ZubatName ; pre-evo name
 
@@ -2086,7 +2086,7 @@ OddishLv8Card:
 	db JUNGLE ; real set
 	db ISLAND_OF_FOSSIL ; in-game set
 	dw ODDISH_LV8
-	db 50 ; hp
+	db 30 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
@@ -2095,9 +2095,9 @@ OddishLv8Card:
 	tx StunSporeName ; name
 	tx MayInflictParalysisDescription ; description
 	dw NONE ; description (cont)
-	db 10 ; damage
+	db 0 ; damage
 	db DAMAGE_NORMAL ; category
-	dw OddishStunSporeEffectCommands ; effect commands
+	dw MayInflictParalysisEffectCommands ; effect commands
 	db INFLICT_PARALYSIS ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
@@ -2105,7 +2105,7 @@ OddishLv8Card:
 	db ATK_ANIM_POWDER_EFFECT_CHANCE ; animation
 
 	; attack 2
-	energy GRASS, 2 ; energies
+	energy GRASS, 1 ; energies
 	tx SproutName ; name
 	tx SproutDescription ; description
 	dw NONE ; description (cont)
@@ -2138,37 +2138,37 @@ OddishLv21Card:
 	db TEAM_ROCKET ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
 	dw ODDISH_LV21
-	db 50 ; hp
+	db 30 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
 	; attack 1
 	energy GRASS, 1 ; energies
-	tx SleepPowderName ; name
-	tx InflictSleepDescription ; description
-	dw NONE ; description (cont)
-	db 0 ; damage
-	db DAMAGE_NORMAL ; category
-	dw OddishSleepPowderEffectCommands ; effect commands
-	db INFLICT_SLEEP ; flags 1
-	db NONE ; flags 2
-	db NONE ; flags 3
-	db 0 ; ?
-	db ATK_ANIM_SPORE ; animation
-
-	; attack 2
-	energy GRASS, 1 ; energies
 	tx PoisonPowderName ; name
-	tx InflictPoisonDescription ; description
+	tx MayInflictPoisonDescription ; description
 	dw NONE ; description (cont)
 	db 0 ; damage
 	db DAMAGE_NORMAL ; category
-	dw OddishPoisonPowderEffectCommands ; effect commands
+	dw MayInflictPoisonEffectCommands ; effect commands
 	db INFLICT_POISON ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
 	db 0 ; ?
 	db ATK_ANIM_POISON_POWDER ; animation
+
+	; attack 2
+	energy 0 ; energies
+	dw NONE ; name
+	dw NONE ; description
+	dw NONE ; description (cont)
+	db 0 ; damage
+	db DAMAGE_NORMAL ; category
+	dw NONE ; effect commands
+	db NONE ; flags 1
+	db NONE ; flags 2
+	db NONE ; flags 3
+	db 0 ; ?
+	db ATK_ANIM_NONE ; animation
 
 	db 1 ; retreat cost
 	db WR_FIRE ; weakness
@@ -2190,7 +2190,7 @@ GloomCard:
 	db JUNGLE ; real set
 	db ISLAND_OF_FOSSIL ; in-game set
 	dw GLOOM
-	db 60 ; hp
+	db 40 ; hp
 	db STAGE1 ; stage
 	tx OddishName ; pre-evo name
 
@@ -2209,20 +2209,20 @@ GloomCard:
 	db ATK_ANIM_POISON_POWDER ; animation
 
 	; attack 2
-	energy GRASS, 2 ; energies
-	tx FoulOdorName ; name
-	tx FoulOdorDescription ; description
+	energy 0 ; energies
+	dw NONE ; name
+	dw NONE ; description
 	dw NONE ; description (cont)
-	db 20 ; damage
+	db 0 ; damage
 	db DAMAGE_NORMAL ; category
-	dw GloomFoulOdorEffectCommands ; effect commands
-	db INFLICT_CONFUSION ; flags 1
-	db FLAG_2_BIT_7 ; flags 2
+	dw NONE ; effect commands
+	db NONE ; flags 1
+	db NONE ; flags 2
 	db NONE ; flags 3
-	db 1 ; ?
-	db ATK_ANIM_FOUL_ODOR ; animation
+	db 0 ; ?
+	db ATK_ANIM_NONE ; animation
 
-	db 1 ; retreat cost
+	db 2 ; retreat cost
 	db WR_FIRE ; weakness
 	db NONE ; resistance
 	tx WeedName ; category
@@ -2242,7 +2242,7 @@ DarkGloomCard:
 	db TEAM_ROCKET ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
 	dw DARK_GLOOM
-	db 50 ; hp
+	db 40 ; hp
 	db STAGE1 ; stage
 	tx OddishName ; pre-evo name
 
@@ -2262,17 +2262,17 @@ DarkGloomCard:
 
 	; attack 2
 	energy GRASS, 2 ; energies
-	tx PoisonPowderName ; name
-	tx InflictPoisonDescription ; description
+	tx FoulOdorName ; name
+	tx FoulOdorDescription ; description
 	dw NONE ; description (cont)
-	db 10 ; damage
+	db 0 ; damage
 	db DAMAGE_NORMAL ; category
-	dw DarkGloomPoisonPowderEffectCommands ; effect commands
-	db INFLICT_POISON ; flags 1
-	db NONE ; flags 2
+	dw GloomFoulOdorEffectCommands ; effect commands
+	db INFLICT_CONFUSION ; flags 1
+	db FLAG_2_BIT_7 ; flags 2
 	db NONE ; flags 3
-	db 0 ; ?
-	db ATK_ANIM_POISONPOWDER ; animation
+	db 1 ; ?
+	db ATK_ANIM_FOUL_ODOR ; animation
 
 	db 2 ; retreat cost
 	db WR_FIRE ; weakness
@@ -2294,7 +2294,7 @@ VileplumeCard:
 	db JUNGLE ; real set
 	db ISLAND_OF_FOSSIL ; in-game set
 	dw VILEPLUME
-	db 80 ; hp
+	db 70 ; hp
 	db STAGE2 ; stage
 	tx GloomName ; pre-evo name
 
@@ -2317,9 +2317,9 @@ VileplumeCard:
 	tx PetalDanceName ; name
 	tx PetalDanceDescription ; description
 	dw NONE ; description (cont)
-	db 40 ; damage
+	db 30 ; damage
 	db DAMAGE_X ; category
-	dw VileplumePetalDanceEffectCommands ; effect commands
+	dw Do30DamageTimes3FlipsEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
@@ -2346,7 +2346,7 @@ DarkVileplumeCard:
 	db TEAM_ROCKET ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
 	dw DARK_VILEPLUME
-	db 60 ; hp
+	db 50 ; hp
 	db STAGE2 ; stage
 	tx GloomName ; pre-evo name
 
@@ -2365,18 +2365,18 @@ DarkVileplumeCard:
 	db ATK_ANIM_NONE ; animation
 
 	; attack 2
-	energy GRASS, 3 ; energies
-	tx PetalWhirlwindName ; name
-	tx PetalWhirlwindDescription ; description
+	energy GRASS, 1 ; energies
+	tx SproutName ; name
+	tx SproutDescription ; description
 	dw NONE ; description (cont)
-	db 30 ; damage
-	db DAMAGE_X ; category
-	dw DarkVileplumePetalWhirlwindEffectCommands ; effect commands
+	db 0 ; damage
+	db RESIDUAL ; category
+	dw OddishSproutEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
-	db NONE ; flags 3
+	db SPECIAL_AI_HANDLING | FLAG_3_BIT_2 ; flags 3
 	db 0 ; ?
-	db ATK_ANIM_PETAL_DANCE ; animation
+	db ATK_ANIM_GLOW_EFFECT ; animation
 
 	db 2 ; retreat cost
 	db WR_FIRE ; weakness
@@ -3407,7 +3407,7 @@ KoffingLv12Card:
 	; attack 2
 	energy GRASS, 1, COLORLESS, 1 ; energies
 	tx PoisonGasName ; name
-	tx MayInflictPoisonAltDescription ; description
+	tx MayInflictPoisonDescription ; description
 	dw NONE ; description (cont)
 	db 20 ; damage
 	db DAMAGE_NORMAL ; category
@@ -3497,7 +3497,7 @@ KoffingLv14Card:
 	; attack 1
 	energy GRASS, 1 ; energies
 	tx PoisonGasName ; name
-	tx MayInflictPoisonAltDescription ; description
+	tx MayInflictPoisonDescription ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_NORMAL ; category
@@ -5331,7 +5331,7 @@ MagmarLv18Card:
 	; attack 2
 	energy FIRE, 2 ; energies
 	tx SmogName ; name
-	tx MayInflictPoisonAltDescription ; description
+	tx MayInflictPoisonDescription ; description
 	dw NONE ; description (cont)
 	db 20 ; damage
 	db DAMAGE_NORMAL ; category
@@ -11207,7 +11207,7 @@ SandshrewLv15Card:
 	; attack 2
 	energy FIGHTING, 1 ; energies
 	tx PoisonStingName ; name
-	tx MayInflictPoisonAltDescription ; description
+	tx MayInflictPoisonDescription ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_NORMAL ; category
