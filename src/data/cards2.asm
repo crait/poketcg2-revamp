@@ -734,26 +734,12 @@ OnixLv12Card:
 	db BASE_SET ; real set
 	db BEGINNING_POKEMON ; in-game set
 	dw ONIX_LV12
-	db 90 ; hp
+	db 70 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
 	; attack 1
 	energy FIGHTING, 1 ; energies
-	tx RockThrowName ; name
-	dw NONE ; description
-	dw NONE ; description (cont)
-	db 10 ; damage
-	db DAMAGE_NORMAL ; category
-	dw NONE ; effect commands
-	db NONE ; flags 1
-	db NONE ; flags 2
-	db NONE ; flags 3
-	db 0 ; ?
-	db ATK_ANIM_ROCK_THROW ; animation
-
-	; attack 2
-	energy FIGHTING, 2 ; energies
 	tx HardenName ; name
 	tx Harden30DamageAltDescription ; description
 	dw NONE ; description (cont)
@@ -765,6 +751,20 @@ OnixLv12Card:
 	db FLAG_3_BIT_2 ; flags 3
 	db 0 ; ?
 	db ATK_ANIM_PROTECT ; animation
+
+	; attack 2
+	energy FIGHTING, 3 ; energies
+	tx RockThrowName ; name
+	dw NONE ; description
+	dw NONE ; description (cont)
+	db 20 ; damage
+	db DAMAGE_NORMAL ; category
+	dw NONE ; effect commands
+	db NONE ; flags 1
+	db NONE ; flags 2
+	db NONE ; flags 3
+	db 0 ; ?
+	db ATK_ANIM_ROCK_THROW ; animation
 
 	db 3 ; retreat cost
 	db WR_GRASS ; weakness
@@ -795,17 +795,17 @@ OnixLv25Card:
 	tx BindName ; name
 	tx MayInflictParalysisAltDescription ; description
 	dw NONE ; description (cont)
-	db 10 ; damage
+	db 0 ; damage
 	db DAMAGE_NORMAL ; category
 	dw OnixBindEffectCommands ; effect commands
 	db INFLICT_PARALYSIS ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
 	db 0 ; ?
-	db ATK_ANIM_HIT_EFFECT ; animation
+	db ATK_ANIM_HIT ; animation
 
 	; attack 2
-	energy FIGHTING, 2 ; energies
+	energy FIGHTING, 3 ; energies
 	tx RockSealName ; name
 	tx RockSealDescription ; description
 	dw NONE ; description (cont)
@@ -818,7 +818,7 @@ OnixLv25Card:
 	db 0 ; ?
 	db ATK_ANIM_ROCK_THROW ; animation
 
-	db 2 ; retreat cost
+	db 3 ; retreat cost
 	db WR_GRASS ; weakness
 	db NONE ; resistance
 	tx RockSnakeName ; category
@@ -838,7 +838,7 @@ CuboneLv13Card:
 	db JUNGLE ; real set
 	db SKY_FLYING_POKEMON ; in-game set
 	dw CUBONE_LV13
-	db 40 ; hp
+	db 30 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
@@ -994,12 +994,12 @@ MarowakLv32Card:
 	db GB ; real set
 	db LEGENDARY_POWER ; in-game set
 	dw MAROWAK_LV32
-	db 70 ; hp
+	db 90 ; hp
 	db STAGE1 ; stage
 	tx CuboneName ; pre-evo name
 
 	; attack 1
-	energy FIGHTING, 1, COLORLESS, 1 ; energies
+	energy FIGHTING, 1 ; energies
 	tx BoneAttackName ; name
 	tx BoneAttackDescription ; description
 	dw NONE ; description (cont)
@@ -1013,7 +1013,7 @@ MarowakLv32Card:
 	db ATK_ANIM_BONEMERANG ; animation
 
 	; attack 2
-	energy FIGHTING, 3 ; energies
+	energy FIGHTING, 1 ; energies
 	tx WailName ; name
 	tx WailDescription ; description
 	dw NONE ; description (cont)
@@ -1046,7 +1046,7 @@ DarkMarowakCard:
 	db GB ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
 	dw DARK_MAROWAK
-	db 60 ; hp
+	db 90 ; hp
 	db STAGE1 ; stage
 	tx CuboneName ; pre-evo name
 
@@ -1055,7 +1055,7 @@ DarkMarowakCard:
 	tx BoneHeadbuttName ; name
 	tx BoneHeadbuttDescription ; description
 	dw NONE ; description (cont)
-	db 20 ; damage
+	db 30 ; damage
 	db DAMAGE_NORMAL ; category
 	dw DarkMarowakBoneHeadbuttEffectCommands ; effect commands
 	db NONE ; flags 1
@@ -1098,7 +1098,7 @@ HitmonleeLv23Card:
 	db EXPANSION_SHEET ; real set
 	db LEGENDARY_POWER ; in-game set
 	dw HITMONLEE_LV23
-	db 50 ; hp
+	db 60 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
@@ -1117,7 +1117,7 @@ HitmonleeLv23Card:
 	db ATK_ANIM_LEG_SWEEP ; animation
 
 	; attack 2
-	energy FIGHTING, 2, COLORLESS, 1 ; energies
+	energy FIGHTING, 3 ; energies
 	tx RollingKickName ; name
 	tx MayInflictParalysisAltDescription ; description
 	dw NONE ; description (cont)
@@ -1202,39 +1202,39 @@ HitmonchanLv23Card:
 	db EXPANSION_SHEET ; real set
 	db SKY_FLYING_POKEMON ; in-game set
 	dw HITMONCHAN_LV23
-	db 50 ; hp
+	db 60 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
 	; attack 1
 	energy FIGHTING, 1 ; energies
 	tx MatchPunchName ; name
-	tx MatchPunchDescription ; description
-	dw NONE ; description (cont)
-	db 20 ; damage
-	db DAMAGE_NORMAL ; category
-	dw HitmonchanMatchPunchEffectCommands ; effect commands
-	db DAMAGE_TO_OPPONENT_BENCH ; flags 1
-	db NONE ; flags 2
-	db FLAG_3_BIT_2 ; flags 3
-	db 0 ; ?
-	db ATK_ANIM_PUNCH ; animation
-
-	; attack 2
-	energy 0 ; energies
-	dw NONE ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
-	db 0 ; damage
+	db 20 ; damage
 	db DAMAGE_NORMAL ; category
 	dw NONE ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
 	db 0 ; ?
-	db ATK_ANIM_NONE ; animation
+	db ATK_ANIM_PUNCH ; animation
 
-	db 2 ; retreat cost
+	; attack 2
+	energy WATER, 1 ; energies
+	tx IcePunchName ; name
+	dw NONE ; description
+	dw NONE ; description (cont)
+	db 20 ; damage
+	db DAMAGE_NORMAL ; category
+	dw NONE ; effect commands
+	db NONE ; flags 1
+	db NONE ; flags 2
+	db NONE ; flags 3
+	db 0 ; ?
+	db ATK_ANIM_ICE_PUNCH ; animation
+
+	db 1 ; retreat cost
 	db WR_PSYCHIC ; weakness
 	db NONE ; resistance
 	tx PunchName ; category
@@ -1254,7 +1254,7 @@ HitmonchanLv33Card:
 	db BASE_SET ; real set
 	db BEGINNING_POKEMON ; in-game set
 	dw HITMONCHAN_LV33
-	db 70 ; hp
+	db 60 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
@@ -1263,7 +1263,7 @@ HitmonchanLv33Card:
 	tx JabName ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
-	db 20 ; damage
+	db 10 ; damage
 	db DAMAGE_NORMAL ; category
 	dw NONE ; effect commands
 	db NONE ; flags 1
@@ -1273,7 +1273,7 @@ HitmonchanLv33Card:
 	db ATK_ANIM_PUNCH ; animation
 
 	; attack 2
-	energy FIGHTING, 2, COLORLESS, 1 ; energies
+	energy FIGHTING, 3 ; energies
 	tx SpecialPunchName ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
@@ -5274,7 +5274,7 @@ JigglypuffLv13Card:
 	db NONE ; flags 2
 	db SPECIAL_AI_HANDLING | FLAG_3_BIT_2 ; flags 3
 	db 0 ; ?
-	db ATK_ANIM_NONE ; animation
+	db ATK_ANIM_LULLABY ; animation
 
 	; attack 2
 	energy 0 ; energies
@@ -6038,7 +6038,7 @@ DoduoLv10Card:
 	db BASE_SET ; real set
 	db PSYCHIC_BATTLE ; in-game set
 	dw DODUO_LV10
-	db 50 ; hp
+	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
@@ -6090,37 +6090,37 @@ DodrioLv25Card:
 	db EXPANSION_SHEET ; real set
 	db SKY_FLYING_POKEMON ; in-game set
 	dw DODRIO_LV25
-	db 60 ; hp
+	db 80 ; hp
 	db STAGE1 ; stage
 	tx DoduoName ; pre-evo name
 
 	; attack 1
-	energy COLORLESS, 1 ; energies
-	tx SmashKickName ; name
+	energy COLORLESS, 2 ; energies
+	tx RageName ; name
+	tx RageDescription ; description
+	dw NONE ; description (cont)
+	db 10 ; damage
+	db DAMAGE_PLUS ; category
+	dw DodrioRageEffectCommands ; effect commands
+	db NONE ; flags 1
+	db NONE ; flags 2
+	db BOOST_IF_TAKEN_DAMAGE ; flags 3
+	db 0 ; ?
+	db ATK_ANIM_BIG_HIT ; animation
+
+	; attack 2
+	energy 0 ; energies
+	dw NONE ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
-	db 20 ; damage
+	db 0 ; damage
 	db DAMAGE_NORMAL ; category
 	dw NONE ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
 	db 0 ; ?
-	db ATK_ANIM_HIT ; animation
-
-	; attack 2
-	energy COLORLESS, 3 ; energies
-	tx TriAttackName ; name
-	tx Do20DamageTimes3FlipsDescription ; description
-	dw NONE ; description (cont)
-	db 20 ; damage
-	db DAMAGE_X ; category
-	dw DodrioTriAttackEffectCommands ; effect commands
-	db NONE ; flags 1
-	db NONE ; flags 2
-	db NONE ; flags 3
-	db 0 ; ?
-	db ATK_ANIM_MULTIPLE_SLASH ; animation
+	db ATK_ANIM_NONE ; animation
 
 	db 0 ; retreat cost
 	db WR_LIGHTNING ; weakness
@@ -6162,17 +6162,17 @@ DodrioLv28Card:
 
 	; attack 2
 	energy COLORLESS, 3 ; energies
-	tx RageName ; name
-	tx RageDescription ; description
+	tx TriAttackName ; name
+	tx Do20DamageTimes3FlipsDescription ; description
 	dw NONE ; description (cont)
-	db 10 ; damage
-	db DAMAGE_PLUS ; category
-	dw DodrioRageEffectCommands ; effect commands
+	db 20 ; damage
+	db DAMAGE_X ; category
+	dw DodrioTriAttackEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
-	db BOOST_IF_TAKEN_DAMAGE ; flags 3
+	db NONE ; flags 3
 	db 0 ; ?
-	db ATK_ANIM_BIG_HIT ; animation
+	db ATK_ANIM_MULTIPLE_SLASH ; animation
 
 	db 0 ; retreat cost
 	db WR_LIGHTNING ; weakness
@@ -6226,7 +6226,7 @@ LickitungLv20Card:
 	db 0 ; ?
 	db ATK_ANIM_HIT ; animation
 
-	db 2 ; retreat cost
+	db 4 ; retreat cost
 	db WR_FIGHTING ; weakness
 	db WR_PSYCHIC ; resistance
 	tx LickingName ; category
@@ -6252,20 +6252,6 @@ LickitungLv26Card:
 
 	; attack 1
 	energy COLORLESS, 1 ; energies
-	tx TongueWrapName ; name
-	tx MayInflictParalysisDescription ; description
-	dw NONE ; description (cont)
-	db 10 ; damage
-	db DAMAGE_NORMAL ; category
-	dw LickitungTongueWrapEffectCommands ; effect commands
-	db INFLICT_PARALYSIS ; flags 1
-	db NONE ; flags 2
-	db NONE ; flags 3
-	db 0 ; ?
-	db ATK_ANIM_GOO ; animation
-
-	; attack 2
-	energy COLORLESS, 2 ; energies
 	tx SupersonicName ; name
 	tx MayInflictConfusionAltDescription ; description
 	dw NONE ; description (cont)
@@ -6277,6 +6263,20 @@ LickitungLv26Card:
 	db NONE ; flags 3
 	db 0 ; ?
 	db ATK_ANIM_SUPERSONIC ; animation
+
+	; attack 2
+	energy COLORLESS, 1 ; energies
+	tx TongueWrapName ; name
+	dw NONE ; description
+	dw NONE ; description (cont)
+	db 10 ; damage
+	db DAMAGE_NORMAL ; category
+	dw NONE ; effect commands
+	db NONE ; flags 1
+	db NONE ; flags 2
+	db NONE ; flags 3
+	db 0 ; ?
+	db ATK_ANIM_LICK ; animation
 
 	db 3 ; retreat cost
 	db WR_FIGHTING ; weakness
