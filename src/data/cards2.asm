@@ -4460,7 +4460,7 @@ RattataLv9Card:
 
 	db 0 ; retreat cost
 	db WR_FIGHTING ; weakness
-	db WR_PSYCHIC ; resistance
+	db NONE ; resistance
 	tx MouseName ; category
 	db DEX_RATTATA ; Pokedex number
 	db FALSE ; is Dark
@@ -4478,7 +4478,7 @@ RattataLv12Card:
 	db TEAM_ROCKET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
 	dw RATTATA_LV12
-	db 40 ; hp
+	db 30 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
@@ -4498,21 +4498,21 @@ RattataLv12Card:
 
 	; attack 2
 	energy COLORLESS, 1 ; energies
-	tx QuickAttackName ; name
-	tx IfHeadsDo10DamageDescription ; description
+	tx ScratchName ; name
+	dw NONE ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
-	db DAMAGE_PLUS ; category
-	dw RattataQuickAttackEffectCommands ; effect commands
+	db DAMAGE_NORMAL ; category
+	dw NONE ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
 	db 0 ; ?
-	db ATK_ANIM_QUICK_ATTACK ; animation
+	db ATK_ANIM_HIT ; animation
 
 	db 0 ; retreat cost
 	db WR_FIGHTING ; weakness
-	db WR_PSYCHIC ; resistance
+	db NONE ; resistance
 	tx MouseName ; category
 	db DEX_RATTATA ; Pokedex number
 	db FALSE ; is Dark
@@ -4530,23 +4530,23 @@ RattataLv15Card:
 	db EXPANSION_SHEET ; real set
 	db SKY_FLYING_POKEMON ; in-game set
 	dw RATTATA_LV15
-	db 50 ; hp
+	db 30 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
 	; attack 1
 	energy COLORLESS, 1 ; energies
-	tx ScratchName ; name
-	dw NONE ; description
+	tx QuickAttackName ; name
+	tx IfHeadsDo10DamageDescription ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
-	db DAMAGE_NORMAL ; category
-	dw NONE ; effect commands
+	db DAMAGE_PLUS ; category
+	dw RattataQuickAttackEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
 	db 0 ; ?
-	db ATK_ANIM_HIT ; animation
+	db ATK_ANIM_QUICK_ATTACK ; animation
 
 	; attack 2
 	energy COLORLESS, 1 ; energies
@@ -4562,9 +4562,9 @@ RattataLv15Card:
 	db 0 ; ?
 	db ATK_ANIM_TAIL_WHIP ; animation
 
-	db 1 ; retreat cost
+	db 0 ; retreat cost
 	db WR_FIGHTING ; weakness
-	db WR_PSYCHIC ; resistance
+	db NONE ; resistance
 	tx MouseName ; category
 	db DEX_RATTATA ; Pokedex number
 	db FALSE ; is Dark
@@ -4582,12 +4582,12 @@ RaticateCard:
 	db BASE_SET ; real set
 	db BEGINNING_POKEMON ; in-game set
 	dw RATICATE
-	db 60 ; hp
+	db 70 ; hp
 	db STAGE1 ; stage
 	tx RattataName ; pre-evo name
 
 	; attack 1
-	energy COLORLESS, 1 ; energies
+	energy COLORLESS, 2 ; energies
 	tx BiteName ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
@@ -4601,7 +4601,7 @@ RaticateCard:
 	db ATK_ANIM_HIT ; animation
 
 	; attack 2
-	energy COLORLESS, 3 ; energies
+	energy COLORLESS, 2 ; energies
 	tx SuperFangName ; name
 	tx SuperFangDescription ; description
 	dw NONE ; description (cont)
@@ -4616,7 +4616,7 @@ RaticateCard:
 
 	db 1 ; retreat cost
 	db WR_FIGHTING ; weakness
-	db WR_PSYCHIC ; resistance
+	db NONE ; resistance
 	tx MouseName ; category
 	db DEX_RATICATE ; Pokedex number
 	db FALSE ; is Dark
@@ -4634,16 +4634,16 @@ DarkRaticateCard:
 	db TEAM_ROCKET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
 	dw DARK_RATICATE
-	db 50 ; hp
+	db 60 ; hp
 	db STAGE1 ; stage
 	tx RattataName ; pre-evo name
 
 	; attack 1
-	energy COLORLESS, 2 ; energies
+	energy COLORLESS, 1 ; energies
 	tx GnawName ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
-	db 20 ; damage
+	db 10 ; damage
 	db DAMAGE_NORMAL ; category
 	dw NONE ; effect commands
 	db NONE ; flags 1
@@ -4657,7 +4657,7 @@ DarkRaticateCard:
 	tx HyperFangName ; name
 	tx IfTailsDoNothingAltDescription ; description
 	dw NONE ; description (cont)
-	db 50 ; damage
+	db 70 ; damage
 	db DAMAGE_NORMAL ; category
 	dw DarkRaticateHyperFangEffectCommands ; effect commands
 	db NONE ; flags 1
@@ -4668,7 +4668,7 @@ DarkRaticateCard:
 
 	db 1 ; retreat cost
 	db WR_FIGHTING ; weakness
-	db WR_PSYCHIC ; resistance
+	db NONE ; resistance
 	tx MouseName ; category
 	db DEX_RATICATE ; Pokedex number
 	db TRUE ; is Dark
@@ -4738,7 +4738,7 @@ SpearowLv12Card:
 	db EXPANSION_SHEET ; real set
 	db PSYCHIC_BATTLE ; in-game set
 	dw SPEAROW_LV12
-	db 40 ; hp
+	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
@@ -4790,26 +4790,12 @@ SpearowLv13Card:
 	db JUNGLE ; real set
 	db SKY_FLYING_POKEMON ; in-game set
 	dw SPEAROW_LV13
-	db 50 ; hp
+	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
 	; attack 1
 	energy COLORLESS, 1 ; energies
-	tx PeckName ; name
-	dw NONE ; description
-	dw NONE ; description (cont)
-	db 10 ; damage
-	db DAMAGE_NORMAL ; category
-	dw NONE ; effect commands
-	db NONE ; flags 1
-	db NONE ; flags 2
-	db NONE ; flags 3
-	db 0 ; ?
-	db ATK_ANIM_HIT ; animation
-
-	; attack 2
-	energy COLORLESS, 3 ; energies
 	tx MirrorMoveName ; name
 	tx MirrorMoveDescription ; description
 	dw NONE ; description (cont)
@@ -4821,6 +4807,20 @@ SpearowLv13Card:
 	db NONE ; flags 3
 	db 0 ; ?
 	db ATK_ANIM_MIRROR_MOVE ; animation
+
+	; attack 2
+	energy 0 ; energies
+	dw NONE ; name
+	dw NONE ; description
+	dw NONE ; description (cont)
+	db 0 ; damage
+	db DAMAGE_NORMAL ; category
+	dw NONE ; effect commands
+	db NONE ; flags 1
+	db NONE ; flags 2
+	db NONE ; flags 3
+	db 0 ; ?
+	db ATK_ANIM_NONE ; animation
 
 	db 0 ; retreat cost
 	db WR_LIGHTNING ; weakness
@@ -4842,12 +4842,12 @@ FearowLv24Card:
 	db EXPANSION_SHEET ; real set
 	db SKY_FLYING_POKEMON ; in-game set
 	dw FEAROW_LV24
-	db 60 ; hp
+	db 80 ; hp
 	db STAGE1 ; stage
 	tx SpearowName ; pre-evo name
 
 	; attack 1
-	energy COLORLESS, 2 ; energies
+	energy COLORLESS, 1 ; energies
 	tx QuickAttackName ; name
 	tx QuickAttackAltDescription1 ; description
 	dw NONE ; description (cont)
@@ -4865,7 +4865,7 @@ FearowLv24Card:
 	tx DrillDescentName ; name
 	tx IfTailsDoNothingAltDescription ; description
 	dw NONE ; description (cont)
-	db 50 ; damage
+	db 70 ; damage
 	db DAMAGE_NORMAL ; category
 	dw FearowDrillDescentEffectCommands ; effect commands
 	db NONE ; flags 1
@@ -4894,12 +4894,12 @@ FearowLv27Card:
 	db JUNGLE ; real set
 	db PSYCHIC_BATTLE ; in-game set
 	dw FEAROW_LV27
-	db 70 ; hp
+	db 90 ; hp
 	db STAGE1 ; stage
 	tx SpearowName ; pre-evo name
 
 	; attack 1
-	energy COLORLESS, 3 ; energies
+	energy COLORLESS, 2 ; energies
 	tx AgilityName ; name
 	tx AgilityDescription ; description
 	dw NONE ; description (cont)
@@ -4913,7 +4913,7 @@ FearowLv27Card:
 	db ATK_ANIM_QUICK_ATTACK ; animation
 
 	; attack 2
-	energy COLORLESS, 4 ; energies
+	energy COLORLESS, 3 ; energies
 	tx DrillPeckName ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
@@ -4946,7 +4946,7 @@ DarkFearowCard:
 	db GB ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
 	dw DARK_FEAROW
-	db 60 ; hp
+	db 90 ; hp
 	db STAGE1 ; stage
 	tx SpearowName ; pre-evo name
 
@@ -4969,7 +4969,7 @@ DarkFearowCard:
 	tx DrillDiveName ; name
 	tx DrillDiveDescription ; description
 	dw NONE ; description (cont)
-	db 40 ; damage
+	db 30 ; damage
 	db DAMAGE_NORMAL ; category
 	dw DarkFearowDrillDiveEffectCommands ; effect commands
 	db NONE ; flags 1
