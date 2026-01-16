@@ -2546,10 +2546,10 @@ MrMimeDampeningShieldEffectCommands:
 	dbw EFFECTCMDTYPE_INITIAL_EFFECT_1, DampeningShieldEffect
 	db $00
 
-MrMimeJugglingEffectCommands:
+Do10DamageTimes4FlipsEffectCommands:
 	db BANK("Effect Functions 2")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Juggling_MultiplierEffect
-	dbw EFFECTCMDTYPE_AI, Juggling_AIEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Do10DamageTimes4FlipsEffect
+	dbw EFFECTCMDTYPE_AI, Do10DamageTimes4Flips_AIEffect
 	db $00
 
 PinsirSlicingThrowEffectCommands:

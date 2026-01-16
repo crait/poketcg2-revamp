@@ -1306,7 +1306,7 @@ RhyhornCard:
 	db JUNGLE ; real set
 	db LEGENDARY_POWER ; in-game set
 	dw RHYHORN
-	db 70 ; hp
+	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
@@ -1358,7 +1358,7 @@ RhydonLv37Card:
 	db EXPANSION_SHEET ; real set
 	db PSYCHIC_BATTLE ; in-game set
 	dw RHYDON_LV37
-	db 80 ; hp
+	db 90 ; hp
 	db STAGE1 ; stage
 	tx RhyhornName ; pre-evo name
 
@@ -1377,7 +1377,7 @@ RhydonLv37Card:
 	db ATK_ANIM_HIT ; animation
 
 	; attack 2
-	energy FIGHTING, 3 ; energies
+	energy FIGHTING, 2 ; energies
 	tx OneTwoStrikeName ; name
 	tx QuickAttackAltDescription1 ; description
 	dw NONE ; description (cont)
@@ -1410,7 +1410,7 @@ RhydonLv48Card:
 	db JUNGLE ; real set
 	db LEGENDARY_POWER ; in-game set
 	dw RHYDON_LV48
-	db 100 ; hp
+	db 90 ; hp
 	db STAGE1 ; stage
 	tx RhyhornName ; pre-evo name
 
@@ -1419,7 +1419,7 @@ RhydonLv48Card:
 	tx HornAttackName ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
-	db 30 ; damage
+	db 40 ; damage
 	db DAMAGE_NORMAL ; category
 	dw NONE ; effect commands
 	db NONE ; flags 1
@@ -1433,7 +1433,7 @@ RhydonLv48Card:
 	tx RamAltName ; name
 	tx RamDescription ; description
 	dw NONE ; description (cont)
-	db 50 ; damage
+	db 70 ; damage
 	db DAMAGE_NORMAL ; category
 	dw RhydonRamEffectCommands ; effect commands
 	db LOW_RECOIL ; flags 1
@@ -3355,11 +3355,11 @@ MrMimeLv20Card:
 	; attack 2
 	energy PSYCHIC, 1, COLORLESS, 1 ; energies
 	tx JugglingName ; name
-	tx JugglingDescription ; description
+	tx Do10DamageTimes4FlipsDescription ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_X ; category
-	dw MrMimeJugglingEffectCommands ; effect commands
+	dw Do10DamageTimes4FlipsEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
@@ -6298,12 +6298,12 @@ ChanseyLv40Card:
 	db EXPANSION_SHEET ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
 	dw CHANSEY_LV40
-	db 100 ; hp
+	db 80 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
 	; attack 1
-	energy COLORLESS, 1 ; energies
+	energy COLORLESS, 2 ; energies
 	tx SingName ; name
 	tx MayInflictSleepDescription ; description
 	dw NONE ; description (cont)
@@ -6317,22 +6317,22 @@ ChanseyLv40Card:
 	db ATK_ANIM_LULLABY ; animation
 
 	; attack 2
-	energy COLORLESS, 3 ; energies
+	energy COLORLESS, 2 ; energies
 	tx DoubleSlapAltName ; name
-	tx Do20DamageTimes2FlipsDescription ; description
+	tx Do10DamageTimes2FlipsDescription ; description
 	dw NONE ; description (cont)
-	db 20 ; damage
+	db 10 ; damage
 	db DAMAGE_X ; category
-	dw Do20DamageTimes2FlipsEffectCommands ; effect commands
+	dw Do10DamageTimes2FlipsEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
 	db 0 ; ?
 	db ATK_ANIM_SLAP ; animation
 
-	db 1 ; retreat cost
+	db 3 ; retreat cost
 	db WR_FIGHTING ; weakness
-	db WR_PSYCHIC ; resistance
+	db NONE ; resistance
 	tx EggName ; category
 	db DEX_CHANSEY ; Pokedex number
 	db FALSE ; is Dark
@@ -6350,7 +6350,7 @@ ChanseyLv55Card:
 	db BASE_SET ; real set
 	db BEGINNING_POKEMON ; in-game set
 	dw CHANSEY_LV55
-	db 120 ; hp
+	db 80 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
@@ -6369,22 +6369,22 @@ ChanseyLv55Card:
 	db ATK_ANIM_NONE ; animation
 
 	; attack 2
-	energy COLORLESS, 4 ; energies
-	tx DoubleEdgeName ; name
-	tx Do80DamageToSelfDescription ; description
+	energy COLORLESS, 2 ; energies
+	tx SubmissionName ; name
+	tx Do20DamageToSelfDescription ; description
 	dw NONE ; description (cont)
-	db 80 ; damage
+	db 20 ; damage
 	db DAMAGE_NORMAL ; category
-	dw ChanseyDoubleEdgeEffectCommands ; effect commands
-	db HIGH_RECOIL ; flags 1
+	dw MachokeSubmissionEffectCommands ; effect commands
+	db LOW_RECOIL ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
-	db 80 ; ?
+	db 20 ; ?
 	db ATK_ANIM_HIT_RECOIL ; animation
 
-	db 1 ; retreat cost
+	db 3 ; retreat cost
 	db WR_FIGHTING ; weakness
-	db WR_PSYCHIC ; resistance
+	db NONE ; resistance
 	tx EggName ; category
 	db DEX_CHANSEY ; Pokedex number
 	db FALSE ; is Dark
@@ -6402,7 +6402,7 @@ KangaskhanLv36Card:
 	db EXPANSION_SHEET ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
 	dw KANGASKHAN_LV36
-	db 80 ; hp
+	db 70 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
@@ -6411,7 +6411,7 @@ KangaskhanLv36Card:
 	tx BiteName ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
-	db 20 ; damage
+	db 10 ; damage
 	db DAMAGE_NORMAL ; category
 	dw NONE ; effect commands
 	db NONE ; flags 1
@@ -6425,7 +6425,7 @@ KangaskhanLv36Card:
 	tx TailDropName ; name
 	tx IfEitherTailsDoNothingDescription ; description
 	dw NONE ; description (cont)
-	db 80 ; damage
+	db 60 ; damage
 	db DAMAGE_NORMAL ; category
 	dw KangaskhanTailDropEffectCommands ; effect commands
 	db NONE ; flags 1
@@ -6436,7 +6436,7 @@ KangaskhanLv36Card:
 
 	db 3 ; retreat cost
 	db WR_FIGHTING ; weakness
-	db WR_PSYCHIC ; resistance
+	db NONE ; resistance
 	tx ParentName ; category
 	db DEX_KANGASKHAN ; Pokedex number
 	db FALSE ; is Dark
@@ -6454,12 +6454,12 @@ KangaskhanLv38Card:
 	db PRO ; real set
 	db PROMOTIONAL ; in-game set
 	dw KANGASKHAN_LV38
-	db 80 ; hp
+	db 70 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
 	; attack 1
-	energy COLORLESS, 1 ; energies
+	energy COLORLESS, 2 ; energies
 	tx DizzyPunchName ; name
 	tx Do10DamageTimes2FlipsDescription ; description
 	dw NONE ; description (cont)
@@ -6473,7 +6473,7 @@ KangaskhanLv38Card:
 	db ATK_ANIM_PUNCH ; animation
 
 	; attack 2
-	energy COLORLESS, 3 ; energies
+	energy COLORLESS, 4 ; energies
 	tx MegaPunchName ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
@@ -6488,7 +6488,7 @@ KangaskhanLv38Card:
 
 	db 3 ; retreat cost
 	db WR_FIGHTING ; weakness
-	db WR_PSYCHIC ; resistance
+	db NONE ; resistance
 	tx ParentName ; category
 	db DEX_KANGASKHAN ; Pokedex number
 	db FALSE ; is Dark
@@ -6506,7 +6506,7 @@ KangaskhanLv40Card:
 	db JUNGLE ; real set
 	db LEGENDARY_POWER ; in-game set
 	dw KANGASKHAN_LV40
-	db 90 ; hp
+	db 70 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
@@ -6527,11 +6527,11 @@ KangaskhanLv40Card:
 	; attack 2
 	energy COLORLESS, 4 ; energies
 	tx CometPunchName ; name
-	tx Do20DamageTimes4FlipsDescription ; description
+	tx Do10DamageTimes4FlipsDescription ; description
 	dw NONE ; description (cont)
 	db 20 ; damage
 	db DAMAGE_X ; category
-	dw Do20DamageTimes4FlipsEffectCommands ; effect commands
+	dw Do10DamageTimes4FlipsEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
@@ -6540,7 +6540,7 @@ KangaskhanLv40Card:
 
 	db 3 ; retreat cost
 	db WR_FIGHTING ; weakness
-	db WR_PSYCHIC ; resistance
+	db NONE ; resistance
 	tx ParentName ; category
 	db DEX_KANGASKHAN ; Pokedex number
 	db FALSE ; is Dark

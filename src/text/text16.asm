@@ -1634,7 +1634,7 @@ JugglingName:
 	textfw "ジャグリング"
 	done
 
-JugglingDescription:
+Do10DamageTimes4FlipsDescription:
 	textfw "コインを4枚投げ、「おもて」の数"
 	linefw "×10のダメージ。"
 	done

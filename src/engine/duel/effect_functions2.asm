@@ -1180,13 +1180,13 @@ DampeningShieldEffect:
 	scf
 	ret
 
-Juggling_AIEffect:
+Do10DamageTimes4Flips_AIEffect:
 	ld a, (10 * 4) / 2
 	lb de, 0, 40
 	farcall SetExpectedAIDamage
 	ret
 
-Juggling_MultiplierEffect:
+Do10DamageTimes4FlipsEffect:
 	ld hl, 10
 	call LoadTxRam3
 	ldtx de, DamageCheckXDamageTimesHeadsText

@@ -3698,18 +3698,18 @@ TangelaLv8Card:
 	db BASE_SET ; real set
 	db BEGINNING_POKEMON ; in-game set
 	dw TANGELA_LV8
-	db 50 ; hp
+	db 60 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
 	; attack 1
-	energy GRASS, 1, COLORLESS, 1 ; energies
+	energy GRASS, 1 ; energies
 	tx BindName ; name
 	tx MayInflictParalysisDescription ; description
 	dw NONE ; description (cont)
-	db 20 ; damage
+	db 0 ; damage
 	db DAMAGE_NORMAL ; category
-	dw TangelaBindEffectCommands ; effect commands
+	dw MayInflictParalysisEffectCommands ; effect commands
 	db INFLICT_PARALYSIS ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
@@ -3750,37 +3750,37 @@ TangelaLv12Card:
 	db GB ; real set
 	db PSYCHIC_BATTLE ; in-game set
 	dw TANGELA_LV12
-	db 50 ; hp
+	db 60 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
 	; attack 1
 	energy GRASS, 1 ; energies
-	tx StunSporeName ; name
-	tx MayInflictParalysisDescription ; description
-	dw NONE ; description (cont)
-	db 10 ; damage
-	db DAMAGE_NORMAL ; category
-	dw TangelaStunSporeEffectCommands ; effect commands
-	db INFLICT_PARALYSIS ; flags 1
-	db NONE ; flags 2
-	db NONE ; flags 3
-	db 0 ; ?
-	db ATK_ANIM_POWDER_EFFECT_CHANCE ; animation
-
-	; attack 2
-	energy GRASS, 2, COLORLESS, 1 ; energies
 	tx PoisonWhipName ; name
 	tx InflictPoisonDescription ; description
 	dw NONE ; description (cont)
-	db 10 ; damage
+	db 20 ; damage
 	db DAMAGE_NORMAL ; category
-	dw TangelaPoisonWhipEffectCommands ; effect commands
+	dw InflictPoisonEffectCommands ; effect commands
 	db INFLICT_POISON ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
 	db 0 ; ?
 	db ATK_ANIM_POISON_WHIP ; animation
+
+	; attack 2
+	energy GRASS, 2 ; energies
+	tx LeechSeedName ; name
+	tx LeechSeedDescription ; description
+	dw NONE ; description (cont)
+	db 20 ; damage
+	db DAMAGE_NORMAL ; category
+	dw BulbasaurLeechSeedEffectCommands ; effect commands
+	db NONE ; flags 1
+	db HEAL_USER ; flags 2
+	db NONE ; flags 3
+	db 1 ; ?
+	db ATK_ANIM_DRAIN ; animation
 
 	db 2 ; retreat cost
 	db WR_FIRE ; weakness
@@ -3802,7 +3802,7 @@ ScytherLv23Card:
 	db EXPANSION_SHEET ; real set
 	db LEGENDARY_POWER ; in-game set
 	dw SCYTHER_LV23
-	db 60 ; hp
+	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
@@ -3811,7 +3811,7 @@ ScytherLv23Card:
 	tx SlashingStrikeName ; name
 	tx SlashingStrikeDescription ; description
 	dw NONE ; description (cont)
-	db 40 ; damage
+	db 30 ; damage
 	db DAMAGE_NORMAL ; category
 	dw ScytherSlashingStrikeEffectCommands ; effect commands
 	db NONE ; flags 1
@@ -3854,7 +3854,7 @@ ScytherLv25Card:
 	db JUNGLE ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
 	dw SCYTHER_LV25
-	db 70 ; hp
+	db 60 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
@@ -3873,7 +3873,7 @@ ScytherLv25Card:
 	db ATK_ANIM_GLOW_EFFECT ; animation
 
 	; attack 2
-	energy COLORLESS, 3 ; energies
+	energy GRASS, 3 ; energies
 	tx SlashName ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
@@ -7682,7 +7682,7 @@ HorseaLv20Card:
 	db 2 ; ?
 	db ATK_ANIM_WATER_GUN ; animation
 
-	db 0 ; retreat cost
+	db 1 ; retreat cost
 	db WR_LIGHTNING ; weakness
 	db NONE ; resistance
 	tx DragonName ; category
@@ -7754,12 +7754,12 @@ SeadraLv26Card:
 	db EXPANSION_SHEET ; real set
 	db SKY_FLYING_POKEMON ; in-game set
 	dw SEADRA_LV26
-	db 70 ; hp
+	db 80 ; hp
 	db STAGE1 ; stage
 	tx HorseaName ; pre-evo name
 
 	; attack 1
-	energy WATER, 2 ; energies
+	energy WATER, 1 ; energies
 	tx WaterBombName ; name
 	tx WaterBombDescription ; description
 	tx WaterBombDescriptionCont ; description (cont)
@@ -7786,7 +7786,7 @@ SeadraLv26Card:
 	db 0 ; ?
 	db ATK_ANIM_NONE ; animation
 
-	db 1 ; retreat cost
+	db 0 ; retreat cost
 	db WR_LIGHTNING ; weakness
 	db NONE ; resistance
 	tx DragonName ; category
@@ -7811,7 +7811,7 @@ GoldeenCard:
 	dw NONE ; pre-evo name
 
 	; attack 1
-	energy WATER, 1 ; energies
+	energy COLORLESS, 1 ; energies
 	tx HornAttackName ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
@@ -7962,7 +7962,7 @@ StaryuLv17Card:
 	db EXPANSION_SHEET ; real set
 	db PSYCHIC_BATTLE ; in-game set
 	dw STARYU_LV17
-	db 50 ; hp
+	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
@@ -7981,7 +7981,7 @@ StaryuLv17Card:
 	db ATK_ANIM_PSYBEAM ; animation
 
 	; attack 2
-	energy WATER, 1, COLORLESS, 1 ; energies
+	energy WATER, 2 ; energies
 	tx SpinningAttackName ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
@@ -8014,7 +8014,7 @@ StarmieCard:
 	db BASE_SET ; real set
 	db BEGINNING_POKEMON ; in-game set
 	dw STARMIE
-	db 60 ; hp
+	db 80 ; hp
 	db STAGE1 ; stage
 	tx StaryuName ; pre-evo name
 
@@ -8033,11 +8033,11 @@ StarmieCard:
 	db ATK_ANIM_RECOVER ; animation
 
 	; attack 2
-	energy WATER, 1, COLORLESS, 2 ; energies
+	energy WATER, 2 ; energies
 	tx StarFreezeName ; name
 	tx MayInflictParalysisDescription ; description
 	dw NONE ; description (cont)
-	db 20 ; damage
+	db 30 ; damage
 	db DAMAGE_NORMAL ; category
 	dw StarmieStarFreezeEffectCommands ; effect commands
 	db INFLICT_PARALYSIS ; flags 1
@@ -8085,7 +8085,7 @@ DarkStarmieCard:
 	db ATK_ANIM_GLOW_EFFECT ; animation
 
 	; attack 2
-	energy WATER, 2 ; energies
+	energy WATER, 1 ; energies
 	tx SpinningShowerName ; name
 	tx SpinningShowerDescription ; description
 	dw NONE ; description (cont)

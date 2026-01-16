@@ -6045,7 +6045,7 @@ SECTION "Text Offsets 2", ROMX
 	textpointer DampeningShieldName                                   ; 0x1791
 	textpointer DampeningShieldDescription                            ; 0x1792
 	textpointer JugglingName                                          ; 0x1793
-	textpointer JugglingDescription                                   ; 0x1794
+	textpointer Do10DamageTimes4FlipsDescription                      ; 0x1794
 	textpointer BarrierName                                           ; 0x1795
 	textpointer MrMimeLv20Description                                 ; 0x1796
 	textpointer InvisibleWallName                                     ; 0x1797
