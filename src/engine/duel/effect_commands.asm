@@ -391,8 +391,8 @@ VileplumeHealEffectCommands:
 
 Do40DamageTimes3FlipsEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, PetalDance_MultiplierEffect
-	dbw EFFECTCMDTYPE_AI, PetalDance_AIEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Do40DamageTimes3FlipsEffect
+	dbw EFFECTCMDTYPE_AI, Do40DamageTimes3Flips_AIEffect
 	db $00
 
 TangelaStunSporeEffectCommands:
@@ -1171,7 +1171,7 @@ MachokeSubmissionEffectCommands:
 
 Selfdestruct200DamageEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_AFTER_DAMAGE, Selfdestruct200Damage
+	dbw EFFECTCMDTYPE_AFTER_DAMAGE, Selfdestruct200DamageEffect
 	db $00
 
 GravelerHardenEffectCommands:

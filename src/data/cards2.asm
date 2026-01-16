@@ -116,7 +116,7 @@ MachokeLv40Card:
 
 	; attack 1
 	energy FIGHTING, 2 ; energies
-	tx SkullBaseName ; name
+	tx SkullBashName ; name
 	tx PsycrushDescription ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
@@ -5889,11 +5889,11 @@ FarfetchdLv20Card:
 	; attack 1
 	energy COLORLESS, 1 ; energies
 	tx LeekSlapName ; name
-	tx LeekSlapDescription ; description
+	tx IfTailsDoNothingDescription ; description
 	dw NONE ; description (cont)
 	db 30 ; damage
 	db DAMAGE_NORMAL ; category
-	dw FarfetchdLeekSlapEffectCommands ; effect commands
+	dw NidoranMHornHazardEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
@@ -5914,7 +5914,7 @@ FarfetchdLv20Card:
 	db 0 ; ?
 	db ATK_ANIM_POT_SMASH ; animation
 
-	db 1 ; retreat cost
+	db 2 ; retreat cost
 	db WR_LIGHTNING ; weakness
 	db WR_FIGHTING ; resistance
 	tx WildDuckName ; category
@@ -5941,11 +5941,11 @@ FarfetchdAltLv20Card:
 	; attack 1
 	energy COLORLESS, 1 ; energies
 	tx LeekSlapName ; name
-	tx LeekSlapAltDescription ; description
+	tx IfTailsDoNothingDescription ; description
 	dw NONE ; description (cont)
 	db 30 ; damage
 	db DAMAGE_NORMAL ; category
-	dw FarfetchdAltLeekSlapEffectCommands ; effect commands
+	dw NidoranMHornHazardEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
@@ -5966,7 +5966,7 @@ FarfetchdAltLv20Card:
 	db 0 ; ?
 	db ATK_ANIM_POT_SMASH ; animation
 
-	db 1 ; retreat cost
+	db 2 ; retreat cost
 	db WR_LIGHTNING ; weakness
 	db WR_FIGHTING ; resistance
 	tx WildDuckName ; category

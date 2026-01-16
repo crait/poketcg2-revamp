@@ -5629,7 +5629,7 @@ SECTION "Text Offsets 2", ROMX
 	textpointer MagnetCategoryName                                    ; 0x15f1
 	textpointer MagnemiteLv12Description                              ; 0x15f2
 	textpointer ThunderWaveName                                       ; 0x15f3
-	textpointer Selfdestruct60DamageDescription                       ; 0x15f4
+	textpointer Selfdestruct40DamageDescription                       ; 0x15f4
 	textpointer MagnemiteLv13Description                              ; 0x15f5
 	textpointer MagneticStormName                                     ; 0x15f6
 	textpointer MagneticStormDescription                              ; 0x15f7

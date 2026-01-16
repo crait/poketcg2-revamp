@@ -11817,7 +11817,7 @@ PrimeapeCard:
 	; attack 1
 	energy FIGHTING ; energies
 	tx FurySwipesName ; name
-	tx Do20DamageTimes2Flips ; description
+	tx Do20DamageTimes2FlipsDescription ; description
 	dw NONE ; description (cont)
 	db 20 ; damage
 	db DAMAGE_X ; category

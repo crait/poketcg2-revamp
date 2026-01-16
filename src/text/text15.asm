@@ -2069,7 +2069,7 @@ ThunderWaveName:
 	textfw "でんじは"
 	done
 
-Selfdestruct60DamageDescription:
+Selfdestruct40DamageDescription:
 	textfw "[自分]にも60ダメージ。"
 	linefw "おたがいの控えポケモン全員にも、"
 	linefw "「弱点・抵抗力」に関係なく、それぞれ"
