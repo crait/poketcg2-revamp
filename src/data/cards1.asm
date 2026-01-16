@@ -1306,7 +1306,7 @@ NidoranFLv13Card:
 	db JUNGLE ; real set
 	db LEGENDARY_POWER ; in-game set
 	dw NIDORANF_LV13
-	db 60 ; hp
+	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 	
@@ -1462,7 +1462,7 @@ NidoqueenCard:
 	db JUNGLE ; real set
 	db ISLAND_OF_FOSSIL ; in-game set
 	dw NIDOQUEEN
-	db 90 ; hp
+	db 120 ; hp
 	db STAGE2 ; stage
 	tx NidorinaName ; pre-evo name
 	
