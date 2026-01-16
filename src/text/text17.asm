@@ -1310,7 +1310,7 @@ TheRocketsTrapName:
 
 TheRocketsTrapDescription:
 	textfw "コインを投げて「おもて」なら、相手の"
-	linefw "手札から3枚のカードを、おもてを見な"
+	linefw "手札から2枚のカードを、おもてを見な"
 	linefw "いで選び、相手の山札にもどす。その後"
 	linefw "その山札をよく切る。"
 	done

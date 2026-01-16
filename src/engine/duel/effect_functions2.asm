@@ -1320,7 +1320,7 @@ TheRocketsTrap_ReturnToDeck50PercentEffect:
 
 	; place terminating byte on end of list
 	ld a, $ff
-	ld [wDuelTempList + 3], a
+	ld [wDuelTempList + 2], a
 
 	; go through shuffled hand cards and add to wDuelTempList
 	ld c, a ; -1
