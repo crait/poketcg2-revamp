@@ -1133,9 +1133,9 @@ KabutopsAbsorbEffectCommands:
 	dbw EFFECTCMDTYPE_AFTER_DAMAGE, AbsorbEffect
 	db $00
 
-CuboneSnivelEffectCommands:
+ReduceDamageBy20EffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, CuboneSnivelEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, ReduceDamageBy20Effect
 	db $00
 
 CuboneRageEffectCommands:
@@ -1150,12 +1150,12 @@ MarowakBonemerangEffectCommands:
 	dbw EFFECTCMDTYPE_AI, Bonemerang_AIEffect
 	db $00
 
-MarowakCallforFriendEffectCommands:
+CallforFriendEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_INITIAL_EFFECT_1, MarowakCallForFamily_CheckDeckAndPlayArea
-	dbw EFFECTCMDTYPE_AFTER_DAMAGE, MarowakCallForFamily_PutInPlayAreaEffect
-	dbw EFFECTCMDTYPE_REQUIRE_SELECTION, MarowakCallForFamily_PlayerSelectEffect
-	dbw EFFECTCMDTYPE_AI_SELECTION, MarowakCallForFamily_AISelectEffect
+	dbw EFFECTCMDTYPE_INITIAL_EFFECT_1, CallForFriend_CheckDeckAndPlayArea
+	dbw EFFECTCMDTYPE_AFTER_DAMAGE, CallForFriend_PutInPlayAreaEffect
+	dbw EFFECTCMDTYPE_REQUIRE_SELECTION, CallForFriend_PlayerSelectEffect
+	dbw EFFECTCMDTYPE_AI_SELECTION, CallForFriend_AISelectEffect
 	db $00
 
 MachokeKarateChopEffectCommands:
@@ -2761,9 +2761,9 @@ MagnetonMicrowaveEffectCommands:
 	dbw EFFECTCMDTYPE_AI, Microwave_AIEffect
 	db $00
 
-SeelGrowlEffectCommands:
+ReduceDamageBy10EffectCommands:
 	db BANK("Effect Functions 2")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, SeelGrowlEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, ReduceDamageBy10Effect
 	db $00
 
 SeelIceBeamEffectCommands:

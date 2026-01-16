@@ -583,7 +583,7 @@ SnivelName:
 	textfw "なきつく"
 	done
 
-SnivelDescription:
+ReduceDamageBy20Description:
 	textfw "次の相手の番、このワザを受けた[相手]"
 	linefw "がこのカードに与えるダメージは"
 	linefw "「-20」される。"
@@ -628,7 +628,7 @@ CallForFriendName:
 	done
 
 CallForFriendDescription:
-	textfw "自分の山札から「闘」タイプの"
+	textfw "自分の山札から       "
 	linefw "「たねポケモン」を1枚選び出し、"
 	linefw "自分のベンチに出す。その後、"
 	linefw "その山札をよく切る。(ベンチに空きが"

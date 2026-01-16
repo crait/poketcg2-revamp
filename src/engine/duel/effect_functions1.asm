@@ -5890,7 +5890,7 @@ AbsorbEffect:
 	call ApplyAndAnimateHPRecovery
 	ret
 
-CuboneSnivelEffect:
+ReduceDamageBy20Effect:
 	ld a, SUBSTATUS2_REDUCE_BY_20
 	call ApplySubstatus2ToDefendingCard
 	ret
@@ -5926,28 +5926,29 @@ Bonemerang_MultiplierEffect:
 	ret
 
 ; returns carry if can't add Pokemon from deck
-MarowakCallForFamily_CheckDeckAndPlayArea:
+CallForFriend_CheckDeckAndPlayArea:
 	farcall CheckIfDeckIsEmpty
 	ret c ; return if no cards in deck
 	farcall CheckIfHasSpaceInBench
 	ret
 
-MarowakCallForFamily_PlayerSelectEffect:
+; modified to search for all Pokemon from just fighting
+CallForFriend_PlayerSelectEffect:
 	call CreateDeckCardList
-	ldtx hl, ChooseBasicFightingPokemonFromDeckText
-	ldtx bc, EffectTargetFightingPokemonText
-	ld a, CARDSEARCH_BASIC_FIGHTING_POKEMON
+	ldtx hl, ChooseBasicPokemonText ; Originally ChooseBasicFightingPokemonFromDeckText, so maybe 'from deck' should be considered
+	ldtx bc, EffectTargetBasicPokemonText
+	ld a, CARDSEARCH_BASIC_POKEMON
 	farcall LookForCardsInDeck
 	jr c, .got_selection
-	ldtx hl, ChooseBasicFightingPokemonText
+	ldtx hl, ChooseBasicPokemonText
 	ldtx de, DuelistDeckText
 	farcall SelectCardSearchTarget
 .got_selection
 	ldh [hTemp_ffa0], a
 	ret
 
-MarowakCallForFamily_AISelectEffect:
-	ld a, CARDSEARCH_BASIC_FIGHTING_POKEMON
+CallForFriend_AISelectEffect:
+	ld a, CARDSEARCH_BASIC_POKEMON
 	farcall SetCardSearchFuncParams
 	call CreateDeckCardList
 	ld hl, wDuelTempList
@@ -5960,7 +5961,7 @@ MarowakCallForFamily_AISelectEffect:
 	jr nc, .loop
 	ret
 
-MarowakCallForFamily_PutInPlayAreaEffect:
+CallForFriend_PutInPlayAreaEffect:
 	ldh a, [hTemp_ffa0]
 	cp $ff
 	jr z, .shuffle
@@ -6564,7 +6565,7 @@ Spark_BenchDamageEffect:
 	ret
 
 PikachuLv16GrowlEffect:
-	ld a, SUBSTATUS2_GROWL
+	ld a, SUBSTATUS2_REDUCE_BY_10
 	call ApplySubstatus2ToDefendingCard
 	ret
 
@@ -6573,7 +6574,7 @@ PikachuLv16ThundershockEffect:
 	ret
 
 PikachuAltLv16GrowlEffect:
-	ld a, SUBSTATUS2_GROWL
+	ld a, SUBSTATUS2_REDUCE_BY_10
 	call ApplySubstatus2ToDefendingCard
 	ret
 

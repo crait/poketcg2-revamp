@@ -845,11 +845,11 @@ CuboneLv13Card:
 	; attack 1
 	energy COLORLESS, 1 ; energies
 	tx SnivelName ; name
-	tx SnivelDescription ; description
+	tx ReduceDamageBy20Description ; description
 	dw NONE ; description (cont)
 	db 0 ; damage
 	db DAMAGE_NORMAL ; category
-	dw CuboneSnivelEffectCommands ; effect commands
+	dw ReduceDamageBy20EffectCommands ; effect commands
 	db NONE ; flags 1
 	db NULLIFY_OR_WEAKEN_ATTACK ; flags 2
 	db NONE ; flags 3
@@ -942,12 +942,26 @@ MarowakLv26Card:
 	db JUNGLE ; real set
 	db SKY_FLYING_POKEMON ; in-game set
 	dw MAROWAK_LV26
-	db 60 ; hp
+	db 90 ; hp
 	db STAGE1 ; stage
 	tx CuboneName ; pre-evo name
 
 	; attack 1
-	energy FIGHTING, 2 ; energies
+	energy FIGHTING, 1 ; energies
+	tx CallForFriendName ; name
+	tx CallForFriendDescription ; description
+	dw NONE ; description (cont)
+	db 0 ; damage
+	db RESIDUAL ; category
+	dw CallforFriendEffectCommands ; effect commands
+	db NONE ; flags 1
+	db NONE ; flags 2
+	db SPECIAL_AI_HANDLING | FLAG_3_BIT_2 ; flags 3
+	db 0 ; ?
+	db ATK_ANIM_GLOW_EFFECT ; animation
+
+	; attack 2
+	energy FIGHTING, 1 ; energies
 	tx BonemerangName ; name
 	tx Do30DamageTimes2FlipsDescription ; description
 	dw NONE ; description (cont)
@@ -959,20 +973,6 @@ MarowakLv26Card:
 	db NONE ; flags 3
 	db 0 ; ?
 	db ATK_ANIM_BONEMERANG ; animation
-
-	; attack 2
-	energy FIGHTING, 2, COLORLESS, 1 ; energies
-	tx CallForFriendName ; name
-	tx CallForFriendDescription ; description
-	dw NONE ; description (cont)
-	db 0 ; damage
-	db RESIDUAL ; category
-	dw MarowakCallforFriendEffectCommands ; effect commands
-	db NONE ; flags 1
-	db NONE ; flags 2
-	db SPECIAL_AI_HANDLING | FLAG_3_BIT_2 ; flags 3
-	db 0 ; ?
-	db ATK_ANIM_GLOW_EFFECT ; animation
 
 	db 1 ; retreat cost
 	db WR_GRASS ; weakness
@@ -5102,25 +5102,11 @@ ClefableCard:
 	db JUNGLE ; real set
 	db ISLAND_OF_FOSSIL ; in-game set
 	dw CLEFABLE
-	db 70 ; hp
+	db 80 ; hp
 	db STAGE1 ; stage
 	tx ClefairyName ; pre-evo name
 
 	; attack 1
-	energy COLORLESS, 1 ; energies
-	tx MetronomeName ; name
-	tx MetronomeDescription ; description
-	dw NONE ; description (cont)
-	db 0 ; damage
-	db RESIDUAL ; category
-	dw ClefableMetronomeEffectCommands ; effect commands
-	db NONE ; flags 1
-	db FLAG_2_BIT_5 ; flags 2
-	db NONE ; flags 3
-	db 0 ; ?
-	db ATK_ANIM_NONE ; animation
-
-	; attack 2
 	energy COLORLESS, 2 ; energies
 	tx MinimizeName ; name
 	tx MinimizeAltDescription ; description
@@ -5133,6 +5119,20 @@ ClefableCard:
 	db FLAG_3_BIT_2 ; flags 3
 	db 20 ; ?
 	db ATK_ANIM_PROTECT ; animation
+
+	; attack 2
+	energy COLORLESS, 3 ; energies
+	tx MetronomeName ; name
+	tx MetronomeDescription ; description
+	dw NONE ; description (cont)
+	db 0 ; damage
+	db RESIDUAL ; category
+	dw ClefableMetronomeEffectCommands ; effect commands
+	db NONE ; flags 1
+	db FLAG_2_BIT_5 ; flags 2
+	db NONE ; flags 3
+	db 0 ; ?
+	db ATK_ANIM_NONE ; animation
 
 	db 2 ; retreat cost
 	db WR_FIGHTING ; weakness
@@ -5154,7 +5154,7 @@ DarkClefableCard:
 	db GB ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
 	dw DARK_CLEFABLE
-	db 70 ; hp
+	db 80 ; hp
 	db STAGE1 ; stage
 	tx ClefairyName ; pre-evo name
 
@@ -5206,7 +5206,7 @@ JigglypuffLv12Card:
 	db PRO ; real set
 	db PROMOTIONAL ; in-game set
 	dw JIGGLYPUFF_LV12
-	db 50 ; hp
+	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
@@ -5229,7 +5229,7 @@ JigglypuffLv12Card:
 	tx DoubleEdgeName ; name
 	tx Do20DamageToSelfDescription ; description
 	dw NONE ; description (cont)
-	db 40 ; damage
+	db 30 ; damage
 	db DAMAGE_NORMAL ; category
 	dw JigglypuffDoubleEdgeEffectCommands ; effect commands
 	db LOW_RECOIL ; flags 1
@@ -5265,11 +5265,11 @@ JigglypuffLv13Card:
 	; attack 1
 	energy COLORLESS, 1 ; energies
 	tx FriendshipSongName ; name
-	tx FriendshipSongDescription ; description
+	tx CallForFriendDescription ; description
 	dw NONE ; description (cont)
 	db 0 ; damage
 	db RESIDUAL ; category
-	dw JigglypuffFriendshipSongEffectCommands ; effect commands
+	dw CallforFriendEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db SPECIAL_AI_HANDLING | FLAG_3_BIT_2 ; flags 3
@@ -5277,18 +5277,18 @@ JigglypuffLv13Card:
 	db ATK_ANIM_NONE ; animation
 
 	; attack 2
-	energy COLORLESS, 2 ; energies
-	tx ExpandName ; name
-	tx ExpandDescription ; description
+	energy 0 ; energies
+	dw NONE ; name
+	dw NONE ; description
 	dw NONE ; description (cont)
-	db 10 ; damage
+	db 0 ; damage
 	db DAMAGE_NORMAL ; category
-	dw JigglypuffExpandEffectCommands ; effect commands
+	dw NONE ; effect commands
 	db NONE ; flags 1
-	db NULLIFY_OR_WEAKEN_ATTACK ; flags 2
-	db FLAG_3_BIT_2 ; flags 3
-	db 10 ; ?
-	db ATK_ANIM_EXPAND ; animation
+	db NONE ; flags 2
+	db NONE ; flags 3
+	db 0 ; ?
+	db ATK_ANIM_NONE ; animation
 
 	db 1 ; retreat cost
 	db WR_FIGHTING ; weakness
@@ -5310,7 +5310,7 @@ JigglypuffLv14Card:
 	db JUNGLE ; real set
 	db LEGENDARY_POWER ; in-game set
 	dw JIGGLYPUFF_LV14
-	db 60 ; hp
+	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
@@ -5333,7 +5333,7 @@ JigglypuffLv14Card:
 	tx PoundName ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
-	db 20 ; damage
+	db 10 ; damage
 	db DAMAGE_NORMAL ; category
 	dw NONE ; effect commands
 	db NONE ; flags 1
@@ -5362,7 +5362,7 @@ WigglytuffLv36Card:
 	db JUNGLE ; real set
 	db LEGENDARY_POWER ; in-game set
 	dw WIGGLYTUFF_LV36
-	db 80 ; hp
+	db 90 ; hp
 	db STAGE1 ; stage
 	tx JigglypuffName ; pre-evo name
 
@@ -5433,20 +5433,20 @@ WigglytuffLv40Card:
 	db ATK_ANIM_HELPING_HAND ; animation
 
 	; attack 2
-	energy COLORLESS, 4 ; energies
+	energy COLORLESS, 2 ; energies
 	tx ExpandName ; name
-	tx ExpandAltDescription ; description
+	tx ReduceDamageBy20Description ; description
 	dw NONE ; description (cont)
 	db 20 ; damage
 	db DAMAGE_NORMAL ; category
-	dw WigglytuffExpandEffectCommands ; effect commands
+	dw ReduceDamageBy20EffectCommands ; effect commands
 	db NONE ; flags 1
 	db NULLIFY_OR_WEAKEN_ATTACK ; flags 2
-	db FLAG_3_BIT_2 ; flags 3
+	db FLAG_3_BIT_2 ; maybe should be NONE??
 	db 10 ; ?
 	db ATK_ANIM_EXPAND ; animation
 
-	db 3 ; retreat cost
+	db 2 ; retreat cost
 	db WR_FIGHTING ; weakness
 	db WR_PSYCHIC ; resistance
 	tx BalloonName ; category

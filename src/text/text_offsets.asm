@@ -5429,7 +5429,7 @@ SECTION "Text Offsets 2", ROMX
 	textpointer JellyfishStingName                                    ; 0x1529
 	textpointer TentacruelDescription                                 ; 0x152a
 	textpointer SeelName                                              ; 0x152b
-	textpointer GrowlAltDescription1                                  ; 0x152c
+	textpointer ReduceDamageBy10Description                           ; 0x152c
 	textpointer IceBeamName                                           ; 0x152d
 	textpointer SeaLionName                                           ; 0x152e
 	textpointer SeelLv10Description                                   ; 0x152f
@@ -5845,7 +5845,7 @@ SECTION "Text Offsets 2", ROMX
 	textpointer OnixLv25Description                                   ; 0x16c9
 	textpointer CuboneName                                            ; 0x16ca
 	textpointer SnivelName                                            ; 0x16cb
-	textpointer SnivelDescription                                     ; 0x16cc
+	textpointer ReduceDamageBy20Description                           ; 0x16cc
 	textpointer LonelyName                                            ; 0x16cd
 	textpointer CuboneLv13Description                                 ; 0x16ce
 	textpointer BoneTossName                                          ; 0x16cf

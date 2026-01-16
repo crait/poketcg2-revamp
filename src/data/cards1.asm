@@ -1930,12 +1930,12 @@ GolbatLv25Card:
 	db EXPANSION_SHEET ; real set
 	db ISLAND_OF_FOSSIL ; in-game set
 	dw GOLBAT_LV25
-	db 50 ; hp
+	db 70 ; hp
 	db STAGE1 ; stage
 	tx ZubatName ; pre-evo name
 
 	; attack 1
-	energy GRASS, 2, COLORLESS, 1 ; energies
+	energy GRASS, 2 ; energies
 	tx LeechLifeName ; name
 	tx LeechLifeAltDescription ; description
 	dw NONE ; description (cont)
@@ -1949,7 +1949,7 @@ GolbatLv25Card:
 	db ATK_ANIM_DRAIN ; animation
 
 	; attack 2
-	energy GRASS, 1, COLORLESS, 3 ; energies
+	energy COLORLESS, 3 ; energies
 	tx NosediveName ; name
 	tx NosediveDescription ; description
 	dw NONE ; description (cont)
@@ -1962,7 +1962,7 @@ GolbatLv25Card:
 	db 0 ; ?
 	db ATK_ANIM_BIG_HIT ; animation
 
-	db 1 ; retreat cost
+	db 0 ; retreat cost
 	db WR_PSYCHIC ; weakness
 	db WR_FIGHTING ; resistance
 	tx BatName ; category
@@ -1982,12 +1982,12 @@ GolbatLv29Card:
 	db FOSSIL ; real set
 	db SKY_FLYING_POKEMON ; in-game set
 	dw GOLBAT_LV29
-	db 60 ; hp
+	db 70 ; hp
 	db STAGE1 ; stage
 	tx ZubatName ; pre-evo name
 
 	; attack 1
-	energy COLORLESS, 3 ; energies
+	energy COLORLESS, 2 ; energies
 	tx WingAttackName ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
@@ -2001,7 +2001,7 @@ GolbatLv29Card:
 	db ATK_ANIM_HIT ; animation
 
 	; attack 2
-	energy GRASS, 2, COLORLESS, 1 ; energies
+	energy GRASS, 2 ; energies
 	tx LeechLifeName ; name
 	tx LeechLifeDescription ; description
 	dw NONE ; description (cont)
@@ -4121,15 +4121,15 @@ CharmanderLv12Card:
 	; attack 1
 	energy COLORLESS, 1 ; energies
 	tx GrowlName ; name
-	tx GrowlDescription ; description
+	tx ReduceDamageBy10Description ; description
 	dw NONE ; description (cont)
 	db 0 ; damage
 	db DAMAGE_NORMAL ; category
-	dw CharmanderGrowlEffectCommands ; effect commands
+	dw ReduceDamageBy10EffectCommands ; effect commands
 	db NONE ; flags 1
 	db NULLIFY_OR_WEAKEN_ATTACK ; flags 2
 	db NONE ; flags 3
-	db 0 ; ?
+	db 10 ; ?
 	db ATK_ANIM_SUPERSONIC ; animation
 
 	; attack 2
@@ -4535,7 +4535,7 @@ NinetalesLv32Card:
 	tx VulpixName ; pre-evo name
 
 	; attack 1
-	energy COLORLESS, 2 ; energies
+	energy COLORLESS, 1 ; energies
 	tx LureAltName ; name
 	tx LureDescription ; description
 	dw NONE ; description (cont)
@@ -4582,12 +4582,12 @@ NinetalesLv35Card:
 	db GB ; real set
 	db PSYCHIC_BATTLE ; in-game set
 	dw NINETALES_LV35
-	db 80 ; hp
+	db 90 ; hp
 	db STAGE1 ; stage
 	tx VulpixName ; pre-evo name
 
 	; attack 1
-	energy FIRE, 2 ; energies
+	energy FIRE, 1 ; energies
 	tx MixUpName ; name
 	tx MixUpDescription ; description
 	dw NONE ; description (cont)
@@ -4601,7 +4601,7 @@ NinetalesLv35Card:
 	db ATK_ANIM_GLOW_EFFECT ; animation
 
 	; attack 2
-	energy FIRE, 3 ; energies
+	energy FIRE, 2 ; energies
 	tx DancingEmbersName ; name
 	tx DancingEmbersDescription ; description
 	dw NONE ; description (cont)
@@ -4614,7 +4614,7 @@ NinetalesLv35Card:
 	db 0 ; ?
 	db ATK_ANIM_FIRE_SPIN ; animation
 
-	db 1 ; retreat cost
+	db 0 ; retreat cost
 	db WR_WATER ; weakness
 	db NONE ; resistance
 	tx FoxName ; category
@@ -4634,7 +4634,7 @@ DarkNinetalesCard:
 	db GB ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
 	dw DARK_NINETALES
-	db 60 ; hp
+	db 80 ; hp
 	db STAGE1 ; stage
 	tx VulpixName ; pre-evo name
 
@@ -4653,7 +4653,7 @@ DarkNinetalesCard:
 	db ATK_ANIM_PERPLEX ; animation
 
 	; attack 2
-	energy FIRE, 2, COLORLESS, 1 ; energies
+	energy FIRE, 2 ; energies
 	tx NineTailsName ; name
 	tx NineTailsDescription ; description
 	dw NONE ; description (cont)
@@ -4666,7 +4666,7 @@ DarkNinetalesCard:
 	db 0 ; ?
 	db ATK_ANIM_NINE_TAILS ; animation
 
-	db 0 ; retreat cost
+	db 1 ; retreat cost
 	db WR_WATER ; weakness
 	db NONE ; resistance
 	tx FoxName ; category
@@ -7033,11 +7033,11 @@ SeelLv10Card:
 	; attack 1
 	energy COLORLESS, 1 ; energies
 	tx GrowlName ; name
-	tx GrowlAltDescription1 ; description
+	tx ReduceDamageBy10Description ; description
 	dw NONE ; description (cont)
 	db 0 ; damage
 	db DAMAGE_NORMAL ; category
-	dw SeelGrowlEffectCommands ; effect commands
+	dw ReduceDamageBy10EffectCommands ; effect commands
 	db NONE ; flags 1
 	db NULLIFY_OR_WEAKEN_ATTACK ; flags 2
 	db NONE ; flags 3
@@ -9321,7 +9321,7 @@ PikachuLv16Card:
 	; attack 1
 	energy COLORLESS, 1 ; energies
 	tx GrowlName ; name
-	tx GrowlAltDescription1 ; description
+	tx ReduceDamageBy10Description ; description
 	dw NONE ; description (cont)
 	db 0 ; damage
 	db DAMAGE_NORMAL ; category
@@ -9373,7 +9373,7 @@ PikachuAltLv16Card:
 	; attack 1
 	energy COLORLESS, 1 ; energies
 	tx GrowlName ; name
-	tx GrowlAltDescription1 ; description
+	tx ReduceDamageBy10Description ; description
 	dw NONE ; description (cont)
 	db 0 ; damage
 	db DAMAGE_NORMAL ; category

@@ -1066,7 +1066,7 @@ SeelName:
 	textfw "パウワウ"
 	done
 
-GrowlAltDescription1:
+ReduceDamageBy10Description:
 	textfw "次の相手の番、このワザを受けた"
 	linefw "[相手]がこのカードに与えるダメージは"
 	linefw "「-10」される。"

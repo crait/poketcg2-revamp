@@ -619,7 +619,7 @@ BulbasaurFirstAid_HealEffect:
 	ret
 
 CharmanderGrowlEffect:
-	ld a, SUBSTATUS2_GROWL
+	ld a, SUBSTATUS2_REDUCE_BY_10
 	farcall ApplySubstatus2ToDefendingCard
 	ret
 
@@ -1127,7 +1127,7 @@ KickAway_SwitchEffect:
 	ret
 
 DoduoGrowlEffect:
-	ld a, SUBSTATUS2_GROWL
+	ld a, SUBSTATUS2_REDUCE_BY_10
 	farcall ApplySubstatus2ToDefendingCard
 	ret
 
@@ -2455,8 +2455,8 @@ Microwave_BenchDamageAndDiscardEffect:
 	ld [hl], LAST_TURN_EFFECT_DISCARD_ENERGY
 	ret
 
-SeelGrowlEffect:
-	ld a, SUBSTATUS2_GROWL
+ReduceDamageBy10Effect:
+	ld a, SUBSTATUS2_REDUCE_BY_10
 	farcall ApplySubstatus2ToDefendingCard
 	ret
 
