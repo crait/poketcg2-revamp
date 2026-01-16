@@ -1169,9 +1169,9 @@ MachokeSubmissionEffectCommands:
 	dbw EFFECTCMDTYPE_AFTER_DAMAGE, SubmissionEffect
 	db $00
 
-GolemSelfdestructEffectCommands:
+Selfdestruct200DamageEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_AFTER_DAMAGE, GolemSelfdestructEffect
+	dbw EFFECTCMDTYPE_AFTER_DAMAGE, Selfdestruct200Damage
 	db $00
 
 GravelerHardenEffectCommands:
@@ -1265,9 +1265,9 @@ MagnemiteThunderWaveEffectCommands:
 	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, MagnemiteThunderWaveEffect
 	db $00
 
-MagnemiteSelfdestructEffectCommands:
+Selfdestruct60DamageEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_AFTER_DAMAGE, MagnemiteSelfdestructEffect
+	dbw EFFECTCMDTYPE_AFTER_DAMAGE, Selfdestruct60DamageEffect
 	db $00
 
 ZapdosThunderEffectCommands:
@@ -2535,10 +2535,10 @@ ChanseySingEffectCommands:
 	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, ChanseySingEffect
 	db $00
 
-ChanseyDoubleSlapEffectCommands:
+Do20DamageTimes2FlipsEffectCommands:
 	db BANK("Effect Functions 2")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, ChanseyDoubleSlap_MultiplierEffect
-	dbw EFFECTCMDTYPE_AI, ChanseyDoubleSlap_AIEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Do20DamageTimes2FlipsEffect
+	dbw EFFECTCMDTYPE_AI, Do20DamageTimes2Flips_AIEffect
 	db $00
 
 MrMimeDampeningShieldEffectCommands:

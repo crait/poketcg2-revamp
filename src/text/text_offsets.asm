@@ -5629,7 +5629,7 @@ SECTION "Text Offsets 2", ROMX
 	textpointer MagnetCategoryName                                    ; 0x15f1
 	textpointer MagnemiteLv12Description                              ; 0x15f2
 	textpointer ThunderWaveName                                       ; 0x15f3
-	textpointer Selfdestruct40DamageDescription                       ; 0x15f4
+	textpointer Selfdestruct60DamageDescription                       ; 0x15f4
 	textpointer MagnemiteLv13Description                              ; 0x15f5
 	textpointer MagneticStormName                                     ; 0x15f6
 	textpointer MagneticStormDescription                              ; 0x15f7
@@ -5647,7 +5647,7 @@ SECTION "Text Offsets 2", ROMX
 	textpointer MagnetonLv30Description                               ; 0x1603
 	textpointer SonicboomName                                         ; 0x1604
 	textpointer SonicboomDescription                                  ; 0x1605
-	textpointer Selfdestruct100DamageDescription                      ; 0x1606
+	textpointer Selfdestruct200DamageDescription                      ; 0x1606
 	textpointer DarkMagnetonName                                      ; 0x1607
 	textpointer SonicboomAltDescription                               ; 0x1608
 	textpointer MagneticLinesName                                     ; 0x1609
@@ -5681,7 +5681,7 @@ SECTION "Text Offsets 2", ROMX
 	textpointer ThunderpunchDescription                               ; 0x1625
 	textpointer ElectabuzzLv35Description                             ; 0x1626
 	textpointer JolteonName                                           ; 0x1627
-	textpointer Do20DamageNumberOfHeadsDescription                    ; 0x1628
+	textpointer Do20DamageTimes2FlipsDescription                    ; 0x1628
 	textpointer StunNeedleName                                        ; 0x1629
 	textpointer JolteonLv24Description                                ; 0x162a
 	textpointer QuickAttackAltDescription2                            ; 0x162b

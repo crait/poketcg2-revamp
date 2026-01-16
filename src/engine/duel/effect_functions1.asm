@@ -6006,8 +6006,8 @@ SubmissionEffect:
 	call DealRecoilDamageToSelf
 	ret
 
-GolemSelfdestructEffect:
-	ld a, 100
+Selfdestruct200DamageEffect:
+	ld a, 200
 	call DealRecoilDamageToSelf
 	call SetIsDamageToSelf
 	ld a, 20
@@ -6302,8 +6302,8 @@ MagnemiteThunderWaveEffect:
 	call Paralysis50PercentEffect
 	ret
 
-MagnemiteSelfdestructEffect:
-	ld a, 40
+Selfdestruct60DamageEffect:
+	ld a, 60
 	call DealRecoilDamageToSelf
 
 	call SetIsDamageToSelf

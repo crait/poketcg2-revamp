@@ -2069,8 +2069,8 @@ ThunderWaveName:
 	textfw "でんじは"
 	done
 
-Selfdestruct40DamageDescription:
-	textfw "[自分]にも40ダメージ。"
+Selfdestruct60DamageDescription:
+	textfw "[自分]にも60ダメージ。"
 	linefw "おたがいの控えポケモン全員にも、"
 	linefw "「弱点・抵抗力」に関係なく、それぞれ"
 	linefw "10ダメージ。"
@@ -2175,8 +2175,8 @@ SonicboomDescription:
 	linefw "・抵抗力」の影響を受けない。"
 	done
 
-Selfdestruct100DamageDescription:
-	textfw "[自分]にも100ダメージ。"
+Selfdestruct200DamageDescription:
+	textfw "[自分]にも200ダメージ。"
 	linefw "おたがいの控えポケモン全員にも、"
 	linefw "「弱点・抵抗力」に関係なく、それぞれ"
 	linefw "20ダメージ。"
@@ -2352,7 +2352,7 @@ JolteonName:
 	textfw "サンダース"
 	done
 
-Do20DamageNumberOfHeadsDescription:
+Do20DamageTimes2FlipsDescription:
 	textfw "コインを2枚投げ、「おもて」の数"
 	linefw "×20のダメージ。"
 	done

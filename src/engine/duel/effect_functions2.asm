@@ -1159,13 +1159,13 @@ LickitungStomp_DamageBoostEffect:
 	farcall AddDamageIfHeads
 	ret
 
-ChanseyDoubleSlap_AIEffect:
+Do20DamageTimes2Flips_AIEffect:
 	ld a, (20 * 2) / 2
 	lb de, 0, 40
 	farcall SetExpectedAIDamage
 	ret
 
-ChanseyDoubleSlap_MultiplierEffect:
+Do20DamageTimes2FlipsEffect:
 	ld hl, 20
 	call LoadTxRam3
 	ldtx de, DamageCheckXDamageTimesHeadsText
