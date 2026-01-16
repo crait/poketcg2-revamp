@@ -4955,7 +4955,7 @@ SECTION "Text Offsets 2", ROMX
 	textpointer KakunaLv23Description                                 ; 0x134f
 	textpointer BeedrillName                                          ; 0x1350
 	textpointer TwineedleName                                         ; 0x1351
-	textpointer Do30DamageNumberOfHeadsDescription                    ; 0x1352
+	textpointer Do30DamageTimes2FlipsDescription                    ; 0x1352
 	textpointer PoisonBeeName                                         ; 0x1353
 	textpointer BeedrillDescription                                   ; 0x1354
 	textpointer EkansName                                             ; 0x1355
@@ -4987,14 +4987,14 @@ SECTION "Text Offsets 2", ROMX
 	textpointer TailWhipDescription                                   ; 0x136f
 	textpointer NidoranFLv12Description                               ; 0x1370
 	textpointer FurySwipesName                                        ; 0x1371
-	textpointer FurySwipes10DamageDescription                         ; 0x1372
+	textpointer Do10DamageTimes3FlipsDescription                         ; 0x1372
 	textpointer CallForFamilyName                                     ; 0x1373
 	textpointer CallForFamilyNidoranDescription                       ; 0x1374
 	textpointer NidoranFLv13Description                               ; 0x1375
 	textpointer NidorinaName                                          ; 0x1376
 	textpointer StrengthInNumbersName                                 ; 0x1377
 	textpointer StrengthInNumbersDescription                          ; 0x1378
-	textpointer FurySwipes30DamageDescription                         ; 0x1379
+	textpointer Do30DamageTimes3FlipsDescription                         ; 0x1379
 	textpointer NidorinaLv22Description                               ; 0x137a
 	textpointer SupersonicName                                        ; 0x137b
 	textpointer MayInflictConfusionAltDescription                     ; 0x137c
@@ -5520,7 +5520,7 @@ SECTION "Text Offsets 2", ROMX
 	textpointer MagikarpLv6Description                                ; 0x1584
 	textpointer MagikarpLv8Description                                ; 0x1585
 	textpointer TrickleName                                           ; 0x1586
-	textpointer Plus10DamagePerHeadsDescription                       ; 0x1587
+	textpointer Do10DamageTimes2FlipsDescription                       ; 0x1587
 	textpointer DragonRageName                                        ; 0x1588
 	textpointer IfEitherTailsDoNothingDescription                     ; 0x1589
 	textpointer MagikarpLv10Description                               ; 0x158a
@@ -5686,7 +5686,7 @@ SECTION "Text Offsets 2", ROMX
 	textpointer JolteonLv24Description                                ; 0x162a
 	textpointer QuickAttackAltDescription2                            ; 0x162b
 	textpointer PinMissileName                                        ; 0x162c
-	textpointer PinMissileDescription                                 ; 0x162d
+	textpointer Do20DamageTimes4FlipsDescription                                 ; 0x162d
 	textpointer JolteonLv29Description                                ; 0x162e
 	textpointer DarkJolteonName                                       ; 0x162f
 	textpointer LightningFlashName                                    ; 0x1630
@@ -5717,7 +5717,7 @@ SECTION "Text Offsets 2", ROMX
 	textpointer SwiftDescription                                      ; 0x1649
 	textpointer SandshrewLv15Description                              ; 0x164a
 	textpointer SandslashName                                         ; 0x164b
-	textpointer FurySwipes20DamageDescription                         ; 0x164c
+	textpointer Do20DamageTimes3FlipsDescription                         ; 0x164c
 	textpointer SandslashLv33Description                              ; 0x164d
 	textpointer SandVeilName                                          ; 0x164e
 	textpointer RollingNeedleName                                     ; 0x164f
@@ -5912,7 +5912,7 @@ SECTION "Text Offsets 2", ROMX
 	textpointer FossilName                                            ; 0x170c
 	textpointer AerodactylLv28Description                             ; 0x170d
 	textpointer TailspinAttackName                                    ; 0x170e
-	textpointer TailspinAttackDescription                             ; 0x170f
+	textpointer Do10DamageToSelfDescription                             ; 0x170f
 	textpointer AerodactylLv30Description                             ; 0x1710
 	textpointer AbraName                                              ; 0x1711
 	textpointer PsychicBeamName                                       ; 0x1712

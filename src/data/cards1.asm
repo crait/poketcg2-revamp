@@ -949,11 +949,11 @@ BeedrillCard:
 	; attack 1
 	energy COLORLESS, 2 ; energies
 	tx TwineedleName ; name
-	tx Do30DamageNumberOfHeadsDescription ; description
+	tx Do30DamageTimes2FlipsDescription ; description
 	dw NONE ; description (cont)
 	db 30 ; damage
 	db DAMAGE_X ; category
-	dw BeedrillTwineedleEffectCommands ; effect commands
+	dw Do30DamageTimes2FlipsEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
@@ -1013,11 +1013,11 @@ EkansLv10Card:
 	db ATK_ANIM_SPIT_POISON ; animation
 
 	; attack 2
-	energy GRASS, 1, COLORLESS, 1 ; energies
+	energy GRASS, 2 ; energies
 	tx WrapName ; name
 	tx MayInflictParalysisDescription ; description
 	dw NONE ; description (cont)
-	db 20 ; damage
+	db 10 ; damage
 	db DAMAGE_NORMAL ; category
 	dw EkansWrapEffectCommands ; effect commands
 	db INFLICT_PARALYSIS ; flags 1
@@ -1046,7 +1046,7 @@ EkansLv15Card:
 	db TEAM_ROCKET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
 	dw EKANS_LV15
-	db 50 ; hp
+	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
@@ -1069,7 +1069,7 @@ EkansLv15Card:
 	tx PoisonStingName ; name
 	tx MayInflictPoisonAltDescription ; description
 	dw NONE ; description (cont)
-	db 20 ; damage
+	db 10 ; damage
 	db DAMAGE_NORMAL ; category
 	dw EkansPoisonStingEffectCommands ; effect commands
 	db INFLICT_POISON ; flags 1
@@ -1098,7 +1098,7 @@ ArbokLv27Card:
 	db FOSSIL ; real set
 	db PSYCHIC_BATTLE ; in-game set
 	dw ARBOK_LV27
-	db 60 ; hp
+	db 90 ; hp
 	db STAGE1 ; stage
 	tx EkansName ; pre-evo name
 
@@ -1107,7 +1107,7 @@ ArbokLv27Card:
 	tx TerrorStrikeName ; name
 	tx TerrorStrikeDescription ; description
 	dw NONE ; description (cont)
-	db 10 ; damage
+	db 20 ; damage
 	db DAMAGE_NORMAL ; category
 	dw ArbokTerrorStrikeEffectCommands ; effect commands
 	db NONE ; flags 1
@@ -1117,11 +1117,11 @@ ArbokLv27Card:
 	db ATK_ANIM_TERROR_STRIKE ; animation
 
 	; attack 2
-	energy GRASS, 2, COLORLESS, 1 ; energies
+	energy GRASS, 1, COLORLESS, 2 ; energies
 	tx PoisonFangName ; name
 	tx InflictPoisonDescription ; description
 	dw NONE ; description (cont)
-	db 20 ; damage
+	db 30 ; damage
 	db DAMAGE_NORMAL ; category
 	dw ArbokPoisonFangEffectCommands ; effect commands
 	db INFLICT_POISON ; flags 1
@@ -1150,7 +1150,7 @@ ArbokLv30Card:
 	db EXPANSION_SHEET ; real set
 	db ISLAND_OF_FOSSIL ; in-game set
 	dw ARBOK_LV30
-	db 60 ; hp
+	db 80 ; hp
 	db STAGE1 ; stage
 	tx EkansName ; pre-evo name
 
@@ -1169,11 +1169,11 @@ ArbokLv30Card:
 	db ATK_ANIM_HIT ; animation
 
 	; attack 2
-	energy GRASS, 3 ; energies
+	energy GRASS, 2 ; energies
 	tx DeadlyPoisonName ; name
 	tx DeadlyPoisonDescription ; description
 	dw NONE ; description (cont)
-	db 30 ; damage
+	db 20 ; damage
 	db DAMAGE_PLUS ; category
 	dw ArbokDeadlyPoisonEffectCommands ; effect commands
 	db INFLICT_POISON ; flags 1
@@ -1202,12 +1202,12 @@ DarkArbokCard:
 	db TEAM_ROCKET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
 	dw DARK_ARBOK
-	db 60 ; hp
+	db 90 ; hp
 	db STAGE1 ; stage
 	tx EkansName ; pre-evo name
 
 	; attack 1
-	energy GRASS, 2 ; energies
+	energy COLORLESS, 1 ; energies
 	tx StareName ; name
 	tx StareDescription ; description
 	dw NONE ; description (cont)
@@ -1221,7 +1221,7 @@ DarkArbokCard:
 	db ATK_ANIM_STARE ; animation
 
 	; attack 2
-	energy GRASS, 3 ; energies
+	energy GRASS, 1, COLORLESS, 1 ; energies
 	tx PoisonVaporName ; name
 	tx PoisonVaporDescription ; description
 	dw NONE ; description (cont)
@@ -1257,23 +1257,23 @@ NidoranFLv12Card:
 	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
-
+	
 	; attack 1
 	energy COLORLESS, 1 ; energies
-	tx TailWhipName ; name
-	tx TailWhipDescription ; description
+	tx CallForFamilyName ; name
+	tx CallForFamilyNidoranDescription ; description
 	dw NONE ; description (cont)
 	db 0 ; damage
-	db DAMAGE_NORMAL ; category
-	dw NidoranFTailWhipEffectCommands ; effect commands
+	db RESIDUAL ; category
+	dw NidoranFCallForFamilyEffectCommands ; effect commands
 	db NONE ; flags 1
-	db NULLIFY_OR_WEAKEN_ATTACK ; flags 2
-	db NONE ; flags 3
+	db NONE ; flags 2
+	db SPECIAL_AI_HANDLING | FLAG_3_BIT_2 ; flags 3
 	db 0 ; ?
-	db ATK_ANIM_TAIL_WHIP ; animation
+	db ATK_ANIM_GLOW_EFFECT ; animation
 
 	; attack 2
-	energy GRASS, 1 ; energies
+	energy GRASS, 2 ; energies
 	tx PoisonStingName ; name
 	tx MayInflictPoisonAltDescription ; description
 	dw NONE ; description (cont)
@@ -1309,23 +1309,9 @@ NidoranFLv13Card:
 	db 60 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
-
+	
 	; attack 1
-	energy GRASS, 1 ; energies
-	tx FurySwipesName ; name
-	tx FurySwipes10DamageDescription ; description
-	dw NONE ; description (cont)
-	db 10 ; damage
-	db DAMAGE_X ; category
-	dw NidoranFFurySwipesEffectCommands ; effect commands
-	db NONE ; flags 1
-	db NONE ; flags 2
-	db NONE ; flags 3
-	db 0 ; ?
-	db ATK_ANIM_MULTIPLE_SLASH ; animation
-
-	; attack 2
-	energy GRASS, 2 ; energies
+	energy COLORLESS, 1 ; energies
 	tx CallForFamilyName ; name
 	tx CallForFamilyNidoranDescription ; description
 	dw NONE ; description (cont)
@@ -1337,6 +1323,20 @@ NidoranFLv13Card:
 	db SPECIAL_AI_HANDLING | FLAG_3_BIT_2 ; flags 3
 	db 0 ; ?
 	db ATK_ANIM_GLOW_EFFECT ; animation
+
+	; attack 2
+	energy GRASS, 1 ; energies
+	tx FurySwipesName ; name
+	tx Do10DamageTimes2FlipsDescription ; description
+	dw NONE ; description (cont)
+	db 10 ; damage
+	db DAMAGE_X ; category
+	dw Do10DamageTimes2FlipsEffectCommands ; effect commands
+	db NONE ; flags 1
+	db NONE ; flags 2
+	db NONE ; flags 3
+	db 0 ; ?
+	db ATK_ANIM_MULTIPLE_SLASH ; animation
 
 	db 1 ; retreat cost
 	db WR_PSYCHIC ; weakness
@@ -1358,11 +1358,25 @@ NidorinaLv22Card:
 	db EXPANSION_SHEET ; real set
 	db PSYCHIC_BATTLE ; in-game set
 	dw NIDORINA_LV22
-	db 60 ; hp
+	db 80 ; hp
 	db STAGE1 ; stage
 	tx NidoranFName ; pre-evo name
-
+	
 	; attack 1
+	energy COLORLESS, 1 ; energies
+	tx CallForFamilyName ; name
+	tx CallForFamilyNidoranDescription ; description
+	dw NONE ; description (cont)
+	db 0 ; damage
+	db RESIDUAL ; category
+	dw NidoranFCallForFamilyEffectCommands ; effect commands
+	db NONE ; flags 1
+	db NONE ; flags 2
+	db SPECIAL_AI_HANDLING | FLAG_3_BIT_2 ; flags 3
+	db 0 ; ?
+	db ATK_ANIM_GLOW_EFFECT ; animation
+
+	; attack 2
 	energy GRASS, 2 ; energies
 	tx StrengthInNumbersName ; name
 	tx StrengthInNumbersDescription ; description
@@ -1375,20 +1389,6 @@ NidorinaLv22Card:
 	db NONE ; flags 3
 	db 0 ; ?
 	db ATK_ANIM_HIT ; animation
-
-	; attack 2
-	energy GRASS, 2, COLORLESS, 1 ; energies
-	tx FurySwipesName ; name
-	tx FurySwipes30DamageDescription ; description
-	dw NONE ; description (cont)
-	db 30 ; damage
-	db DAMAGE_X ; category
-	dw NidorinaFurySwipesEffectCommands ; effect commands
-	db NONE ; flags 1
-	db NONE ; flags 2
-	db NONE ; flags 3
-	db 0 ; ?
-	db ATK_ANIM_MULTIPLE_SLASH ; animation
 
 	db 2 ; retreat cost
 	db WR_PSYCHIC ; weakness
@@ -1415,23 +1415,23 @@ NidorinaLv24Card:
 	tx NidoranFName ; pre-evo name
 
 	; attack 1
-	energy GRASS, 1 ; energies
-	tx SupersonicName ; name
-	tx MayInflictConfusionAltDescription ; description
+	energy COLORLESS, 1 ; energies
+	tx CallForFamilyName ; name
+	tx CallForFamilyNidoranDescription ; description
 	dw NONE ; description (cont)
 	db 0 ; damage
-	db DAMAGE_NORMAL ; category
-	dw NidorinaSupersonicEffectCommands ; effect commands
-	db INFLICT_CONFUSION ; flags 1
+	db RESIDUAL ; category
+	dw NidoranFCallForFamilyEffectCommands ; effect commands
+	db NONE ; flags 1
 	db NONE ; flags 2
-	db NONE ; flags 3
+	db SPECIAL_AI_HANDLING | FLAG_3_BIT_2 ; flags 3
 	db 0 ; ?
-	db ATK_ANIM_SUPERSONIC ; animation
+	db ATK_ANIM_GLOW_EFFECT ; animation
 
 	; attack 2
-	energy GRASS, 1, COLORLESS, 2 ; energies
+	energy GRASS, 2 ; energies
 	tx DoubleKickName ; name
-	tx Do30DamageNumberOfHeadsDescription ; description
+	tx Do30DamageTimes2FlipsDescription ; description
 	dw NONE ; description (cont)
 	db 30 ; damage
 	db DAMAGE_X ; category
@@ -1442,7 +1442,7 @@ NidorinaLv24Card:
 	db 0 ; ?
 	db ATK_ANIM_LEG_SWEEP ; animation
 
-	db 1 ; retreat cost
+	db 2 ; retreat cost
 	db WR_PSYCHIC ; weakness
 	db NONE ; resistance
 	tx PoisonStingName ; category
@@ -1465,13 +1465,27 @@ NidoqueenCard:
 	db 90 ; hp
 	db STAGE2 ; stage
 	tx NidorinaName ; pre-evo name
-
+	
 	; attack 1
-	energy GRASS, 1, COLORLESS, 1 ; energies
+	energy COLORLESS, 1 ; energies
+	tx CallForFamilyName ; name
+	tx CallForFamilyNidoranDescription ; description
+	dw NONE ; description (cont)
+	db 0 ; damage
+	db RESIDUAL ; category
+	dw NidoranFCallForFamilyEffectCommands ; effect commands
+	db NONE ; flags 1
+	db NONE ; flags 2
+	db SPECIAL_AI_HANDLING | FLAG_3_BIT_2 ; flags 3
+	db 0 ; ?
+	db ATK_ANIM_GLOW_EFFECT ; animation
+
+	; attack 2
+	energy GRASS, 2 ; energies
 	tx BoyfriendsName ; name
 	tx BoyfriendsDescription ; description
 	dw NONE ; description (cont)
-	db 20 ; damage
+	db 40 ; damage
 	db DAMAGE_PLUS ; category
 	dw NidoqueenBoyfriendsEffectCommands ; effect commands
 	db NONE ; flags 1
@@ -1479,20 +1493,6 @@ NidoqueenCard:
 	db NONE ; flags 3
 	db 0 ; ?
 	db ATK_ANIM_BOYFRIENDS ; animation
-
-	; attack 2
-	energy GRASS, 2, COLORLESS, 2 ; energies
-	tx MegaPunchName ; name
-	dw NONE ; description
-	dw NONE ; description (cont)
-	db 50 ; damage
-	db DAMAGE_NORMAL ; category
-	dw NONE ; effect commands
-	db NONE ; flags 1
-	db NONE ; flags 2
-	db NONE ; flags 3
-	db 0 ; ?
-	db ATK_ANIM_MEGA_PUNCH ; animation
 
 	db 3 ; retreat cost
 	db WR_PSYCHIC ; weakness
@@ -1514,7 +1514,7 @@ NidoranMLv20Card:
 	db BASE_SET ; real set
 	db BEGINNING_POKEMON ; in-game set
 	dw NIDORANM_LV20
-	db 40 ; hp
+	db 30 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
@@ -1566,7 +1566,7 @@ NidoranMLv22Card:
 	db EXPANSION_SHEET ; real set
 	db PSYCHIC_BATTLE ; in-game set
 	dw NIDORANM_LV22
-	db 50 ; hp
+	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
@@ -1618,7 +1618,7 @@ NidorinoLv23Card:
 	db EXPANSION_SHEET ; real set
 	db PSYCHIC_BATTLE ; in-game set
 	dw NIDORINO_LV23
-	db 60 ; hp
+	db 70 ; hp
 	db STAGE1 ; stage
 	tx NidoranMName ; pre-evo name
 
@@ -1650,7 +1650,7 @@ NidorinoLv23Card:
 	db 0 ; ?
 	db ATK_ANIM_NONE ; animation
 
-	db 1 ; retreat cost
+	db 2 ; retreat cost
 	db WR_PSYCHIC ; weakness
 	db NONE ; resistance
 	tx PoisonStingName ; category
@@ -1670,14 +1670,14 @@ NidorinoLv25Card:
 	db BASE_SET ; real set
 	db BEGINNING_POKEMON ; in-game set
 	dw NIDORINO_LV25
-	db 60 ; hp
+	db 70 ; hp
 	db STAGE1 ; stage
 	tx NidoranMName ; pre-evo name
 
 	; attack 1
-	energy GRASS, 1, COLORLESS, 2 ; energies
+	energy COLORLESS, 2 ; energies
 	tx DoubleKickName ; name
-	tx Do30DamageNumberOfHeadsDescription ; description
+	tx Do30DamageTimes2FlipsDescription ; description
 	dw NONE ; description (cont)
 	db 30 ; damage
 	db DAMAGE_X ; category
@@ -1687,22 +1687,22 @@ NidorinoLv25Card:
 	db NONE ; flags 3
 	db 0 ; ?
 	db ATK_ANIM_LEG_SWEEP ; animation
-
+	
 	; attack 2
-	energy GRASS, 2, COLORLESS, 2 ; energies
-	tx HornDrillName ; name
+	energy 0 ; energies
+	dw NONE ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
-	db 50 ; damage
+	db 0 ; damage
 	db DAMAGE_NORMAL ; category
 	dw NONE ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
 	db 0 ; ?
-	db ATK_ANIM_DRILL ; animation
+	db ATK_ANIM_NONE ; animation
 
-	db 1 ; retreat cost
+	db 2 ; retreat cost
 	db WR_PSYCHIC ; weakness
 	db NONE ; resistance
 	tx PoisonStingName ; category
@@ -1722,30 +1722,30 @@ NidokingCard:
 	db BASE_SET ; real set
 	db LEGENDARY_POWER ; in-game set
 	dw NIDOKING
-	db 90 ; hp
+	db 110 ; hp
 	db STAGE2 ; stage
 	tx NidorinoName ; pre-evo name
 
 	; attack 1
-	energy GRASS, 1, COLORLESS, 2 ; energies
+	energy COLORLESS, 2 ; energies
 	tx ThrashName ; name
-	tx ThrashDescription ; description
+	tx Do10DamageToSelfDescription ; description
 	dw NONE ; description (cont)
 	db 30 ; damage
-	db DAMAGE_PLUS ; category
-	dw NidokingThrashEffectCommands ; effect commands
+	db DAMAGE_NORMAL ; category
+	dw Do10DamageToSelfEffectCommands ; effect commands
 	db LOW_RECOIL ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
 	db 0 ; ?
-	db ATK_ANIM_MULTIPLE_SLASH ; animation
+	db ATK_ANIM_THUNDERSHOCK ; animation
 
 	; attack 2
 	energy GRASS, 3 ; energies
 	tx ToxicName ; name
 	tx ToxicDescription ; description
 	dw NONE ; description (cont)
-	db 20 ; damage
+	db 40 ; damage
 	db DAMAGE_NORMAL ; category
 	dw NidokingToxicEffectCommands ; effect commands
 	db INFLICT_POISON ; flags 1
@@ -6371,11 +6371,11 @@ PsyduckLv15Card:
 	; attack 2
 	energy WATER, 1 ; energies
 	tx FurySwipesName ; name
-	tx FurySwipes10DamageDescription ; description
+	tx Do10DamageTimes3FlipsDescription ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_X ; category
-	dw PsyduckFurySwipesEffectCommands ; effect commands
+	dw Do10DamageTimes3FlipsEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
@@ -6735,7 +6735,7 @@ PoliwhirlLv28Card:
 	; attack 2
 	energy WATER, 2, COLORLESS, 1 ; energies
 	tx DoubleSlapName ; name
-	tx Do30DamageNumberOfHeadsDescription ; description
+	tx Do30DamageTimes2FlipsDescription ; description
 	dw NONE ; description (cont)
 	db 30 ; damage
 	db DAMAGE_X ; category
@@ -7359,7 +7359,7 @@ CloysterCard:
 	; attack 2
 	energy WATER, 2 ; energies
 	tx SpikeCannonName ; name
-	tx Do30DamageNumberOfHeadsDescription ; description
+	tx Do30DamageTimes2FlipsDescription ; description
 	dw NONE ; description (cont)
 	db 30 ; damage
 	db DAMAGE_X ; category
@@ -8229,11 +8229,11 @@ MagikarpLv10Card:
 	; attack 1
 	energy WATER, 1 ; energies
 	tx TrickleName ; name
-	tx Plus10DamagePerHeadsDescription ; description
+	tx Do10DamageTimes2FlipsDescription ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_X ; category
-	dw MagikarpTrickleEffectCommands ; effect commands
+	dw Do10DamageTimes2FlipsEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
@@ -8815,7 +8815,7 @@ OmastarLv32Card:
 	; attack 2
 	energy WATER, 2 ; energies
 	tx SpikeCannonName ; name
-	tx Do30DamageNumberOfHeadsDescription ; description
+	tx Do30DamageTimes2FlipsDescription ; description
 	dw NONE ; description (cont)
 	db 30 ; damage
 	db DAMAGE_X ; category
@@ -9106,7 +9106,7 @@ PikachuLv5Card:
 	db EXPANSION_SHEET ; real set
 	db SKY_FLYING_POKEMON ; in-game set
 	dw PIKACHU_LV5
-	db 30 ; hp
+	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
@@ -9126,17 +9126,17 @@ PikachuLv5Card:
 
 	; attack 2
 	energy LIGHTNING, 2 ; energies
-	tx AgilityName ; name
-	tx AgilityDescription ; description
+	tx TackleName ; name
+	dw NONE ; description
 	dw NONE ; description (cont)
 	db 20 ; damage
 	db DAMAGE_NORMAL ; category
-	dw PikachuAgilityEffectCommands ; effect commands
+	dw NONE ; effect commands
 	db NONE ; flags 1
-	db NULLIFY_OR_WEAKEN_ATTACK ; flags 2
-	db FLAG_3_BIT_2 ; flags 3
+	db NONE ; flags 2
+	db NONE ; flags 3
 	db 0 ; ?
-	db ATK_ANIM_AGILITY_PROTECT ; animation
+	db ATK_ANIM_LIGHTNING_FLASH ; animation
 
 	db 0 ; retreat cost
 	db WR_FIGHTING ; weakness
@@ -9179,11 +9179,11 @@ PikachuLv12Card:
 	; attack 2
 	energy LIGHTNING, 1, COLORLESS, 1 ; energies
 	tx ThunderJoltName ; name
-	tx ThunderJoltDescription ; description
+	tx Do10DamageToSelfDescription ; description
 	dw NONE ; description (cont)
 	db 30 ; damage
 	db DAMAGE_NORMAL ; category
-	dw PikachuThunderJoltEffectCommands ; effect commands
+	dw Do10DamageToSelfEffectCommands ; effect commands
 	db LOW_RECOIL ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
@@ -9210,7 +9210,7 @@ PikachuLv13Card:
 	db PRO ; real set
 	db PROMOTIONAL ; in-game set
 	dw PIKACHU_LV13
-	db 50 ; hp
+	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
@@ -9229,11 +9229,11 @@ PikachuLv13Card:
 	db ATK_ANIM_GLOW_EFFECT ; animation
 
 	; attack 2
-	energy LIGHTNING, 3 ; energies
+	energy LIGHTNING, 4 ; energies
 	tx ThunderboltName ; name
 	tx ThunderboltDescription ; description
 	dw NONE ; description (cont)
-	db 50 ; damage
+	db 40 ; damage
 	db DAMAGE_NORMAL ; category
 	dw PikachuThunderboltEffectCommands ; effect commands
 	db NONE ; flags 1
@@ -9262,7 +9262,7 @@ PikachuLv14Card:
 	db JUNGLE ; real set
 	db ISLAND_OF_FOSSIL ; in-game set
 	dw PIKACHU_LV14
-	db 50 ; hp
+	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
@@ -9314,7 +9314,7 @@ PikachuLv16Card:
 	db PRO ; real set
 	db PROMOTIONAL ; in-game set
 	dw PIKACHU_LV16
-	db 60 ; hp
+	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
@@ -9366,7 +9366,7 @@ PikachuAltLv16Card:
 	db PRO ; real set
 	db PROMOTIONAL ; in-game set
 	dw PIKACHU_ALT_LV16
-	db 60 ; hp
+	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
@@ -9423,7 +9423,7 @@ FlyingPikachuLv12Card:
 	dw NONE ; pre-evo name
 
 	; attack 1
-	energy LIGHTNING, 1 ; energies
+	energy LIGHTNING, 1, COLORLESS, 1 ; energies
 	tx ThundershockName ; name
 	tx MayInflictParalysisAltDescription ; description
 	dw NONE ; description (cont)
@@ -9441,7 +9441,7 @@ FlyingPikachuLv12Card:
 	tx FlyName ; name
 	tx FlyDescription ; description
 	dw NONE ; description (cont)
-	db 30 ; damage
+	db 20 ; damage
 	db DAMAGE_NORMAL ; category
 	dw FlyingPikachuFlyEffectCommands ; effect commands
 	db NONE ; flags 1
@@ -9450,8 +9450,8 @@ FlyingPikachuLv12Card:
 	db 0 ; ?
 	db ATK_ANIM_QUICK_ATTACK ; animation
 
-	db 1 ; retreat cost
-	db NONE ; weakness
+	db 0 ; retreat cost
+	db WR_FIGHTING ; weakness
 	db WR_FIGHTING ; resistance
 	tx MouseName ; category
 	db DEX_PIKACHU ; Pokedex number
@@ -9475,7 +9475,7 @@ FlyingPikachuAltLv12Card:
 	dw NONE ; pre-evo name
 
 	; attack 1
-	energy LIGHTNING, 1 ; energies
+	energy LIGHTNING, 1, COLORLESS, 1 ; energies
 	tx ThundershockName ; name
 	tx MayInflictParalysisAltDescription ; description
 	dw NONE ; description (cont)
@@ -9493,7 +9493,7 @@ FlyingPikachuAltLv12Card:
 	tx FlyName ; name
 	tx FlyDescription ; description
 	dw NONE ; description (cont)
-	db 30 ; damage
+	db 20 ; damage
 	db DAMAGE_NORMAL ; category
 	dw FlyingPikachuAltFlyEffectCommands ; effect commands
 	db NONE ; flags 1
@@ -9502,8 +9502,8 @@ FlyingPikachuAltLv12Card:
 	db 0 ; ?
 	db ATK_ANIM_QUICK_ATTACK ; animation
 
-	db 1 ; retreat cost
-	db NONE ; weakness
+	db 0 ; retreat cost
+	db WR_FIGHTING ; weakness
 	db WR_FIGHTING ; resistance
 	tx MouseName ; category
 	db DEX_PIKACHU ; Pokedex number
@@ -9631,7 +9631,7 @@ RaichuLv32Card:
 	tx PikachuName ; pre-evo name
 
 	; attack 1
-	energy LIGHTNING, 2 ; energies
+	energy COLORLESS, 1 ; energies
 	tx ShortCircuitName ; name
 	tx ShortCircuitDescription ; description
 	dw NONE ; description (cont)
@@ -9645,11 +9645,11 @@ RaichuLv32Card:
 	db ATK_ANIM_THUNDERSHOCK ; animation
 
 	; attack 2
-	energy LIGHTNING, 2, COLORLESS, 1 ; energies
+	energy COLORLESS, 2 ; energies
 	tx SparkingKickName ; name
 	tx MayInflictParalysisAltDescription ; description
 	dw NONE ; description (cont)
-	db 30 ; damage
+	db 20 ; damage
 	db DAMAGE_NORMAL ; category
 	dw RaichuSparkingKickEffectCommands ; effect commands
 	db INFLICT_PARALYSIS ; flags 1
@@ -9658,7 +9658,7 @@ RaichuLv32Card:
 	db 0 ; ?
 	db ATK_ANIM_SPARKING_KICK ; animation
 
-	db 1 ; retreat cost
+	db 0 ; retreat cost
 	db WR_FIGHTING ; weakness
 	db NONE ; resistance
 	tx MouseName ; category
@@ -9678,18 +9678,18 @@ RaichuLv33Card:
 	db BULBASAUR_DECK ; real set
 	db BEGINNING_POKEMON ; in-game set
 	dw RAICHU_LV33
-	db 70 ; hp
+	db 80 ; hp
 	db STAGE1 ; stage
 	tx PikachuName ; pre-evo name
 
 	; attack 1
 	energy COLORLESS, 2 ; energies
-	tx QuickAttackName ; name
-	tx QuickAttackAltDescription1 ; description
+	tx TackleName ; name
+	dw NONE ; description
 	dw NONE ; description (cont)
-	db 10 ; damage
-	db DAMAGE_PLUS ; category
-	dw RaichuQuickAttackEffectCommands ; effect commands
+	db 30 ; damage
+	db DAMAGE_NORMAL ; category
+	dw NONE ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
@@ -9697,11 +9697,11 @@ RaichuLv33Card:
 	db ATK_ANIM_QUICK_ATTACK ; animation
 
 	; attack 2
-	energy LIGHTNING, 3 ; energies
+	energy LIGHTNING, 4 ; energies
 	tx ThunderboltName ; name
 	tx ThunderboltAltDescription1 ; description
 	dw NONE ; description (cont)
-	db 60 ; damage
+	db 100 ; damage
 	db DAMAGE_NORMAL ; category
 	dw RaichuThunderboltEffectCommands ; effect commands
 	db NONE ; flags 1
@@ -9735,7 +9735,7 @@ RaichuLv40Card:
 	tx PikachuName ; pre-evo name
 
 	; attack 1
-	energy LIGHTNING, 1, COLORLESS, 2 ; energies
+	energy COLORLESS, 2 ; energies
 	tx AgilityName ; name
 	tx AgilityDescription ; description
 	dw NONE ; description (cont)
@@ -9749,13 +9749,13 @@ RaichuLv40Card:
 	db ATK_ANIM_QUICK_ATTACK ; animation
 
 	; attack 2
-	energy LIGHTNING, 3, COLORLESS, 1 ; energies
+	energy LIGHTNING, 1, COLORLESS, 2 ; energies
 	tx ThunderName ; name
-	tx ThunderDescription ; description
+	tx Do20DamageToSelfDescription ; description
 	dw NONE ; description (cont)
 	db 60 ; damage
 	db DAMAGE_NORMAL ; category
-	dw RaichuThunderEffectCommands ; effect commands
+	dw MachokeSubmissionEffectCommands	; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
@@ -9782,12 +9782,12 @@ RaichuLv45Card:
 	db FOSSIL ; real set
 	db ISLAND_OF_FOSSIL ; in-game set
 	dw RAICHU_LV45
-	db 90 ; hp
+	db 80 ; hp
 	db STAGE1 ; stage
 	tx PikachuName ; pre-evo name
 
 	; attack 1
-	energy LIGHTNING, 4 ; energies
+	energy LIGHTNING, 3 ; energies
 	tx GigashockName ; name
 	tx GigashockDescription ; description
 	dw NONE ; description (cont)
@@ -9834,7 +9834,7 @@ DarkRaichuCard:
 	db GB ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
 	dw DARK_RAICHU
-	db 70 ; hp
+	db 80 ; hp
 	db STAGE1 ; stage
 	tx PikachuName ; pre-evo name
 
@@ -9843,7 +9843,7 @@ DarkRaichuCard:
 	tx SurpriseThunderName ; name
 	tx SurpriseThunderDescription ; description
 	dw NONE ; description (cont)
-	db 30 ; damage
+	db 20 ; damage
 	db DAMAGE_NORMAL ; category
 	dw DarkRaichuSurpriseThunderEffectCommands ; effect commands
 	db DAMAGE_TO_OPPONENT_BENCH ; flags 1
@@ -10843,11 +10843,11 @@ JolteonLv29Card:
 	; attack 2
 	energy LIGHTNING, 2, COLORLESS, 1 ; energies
 	tx PinMissileName ; name
-	tx PinMissileDescription ; description
+	tx Do20DamageTimes4FlipsDescription ; description
 	dw NONE ; description (cont)
 	db 20 ; damage
 	db DAMAGE_X ; category
-	dw JolteonPinMissileEffectCommands ; effect commands
+	dw Do20DamageTimes4FlipsEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
@@ -11191,6 +11191,20 @@ SandshrewLv15Card:
 	dw NONE ; pre-evo name
 
 	; attack 1
+	energy COLORLESS, 1 ; energies
+	tx SwiftName ; name
+	tx SwiftDescription ; description
+	dw NONE ; description (cont)
+	db 10 ; damage
+	db DAMAGE_NORMAL ; category
+	dw SandshrewSwiftEffectCommands ; effect commands
+	db NONE ; flags 1
+	db NONE ; flags 2
+	db FLAG_3_BIT_2 ; flags 3
+	db 0 ; ?
+	db ATK_ANIM_SWIFT ; animation
+
+	; attack 2
 	energy FIGHTING, 1 ; energies
 	tx PoisonStingName ; name
 	tx MayInflictPoisonAltDescription ; description
@@ -11203,20 +11217,6 @@ SandshrewLv15Card:
 	db NONE ; flags 3
 	db 0 ; ?
 	db ATK_ANIM_POISON_NEEDLE ; animation
-
-	; attack 2
-	energy FIGHTING, 1 ; energies
-	tx SwiftName ; name
-	tx SwiftDescription ; description
-	dw NONE ; description (cont)
-	db 20 ; damage
-	db DAMAGE_NORMAL ; category
-	dw SandshrewSwiftEffectCommands ; effect commands
-	db NONE ; flags 1
-	db NONE ; flags 2
-	db FLAG_3_BIT_2 ; flags 3
-	db 0 ; ?
-	db ATK_ANIM_SWIFT ; animation
 
 	db 1 ; retreat cost
 	db WR_GRASS ; weakness
@@ -11238,32 +11238,32 @@ SandslashLv33Card:
 	db FOSSIL ; real set
 	db LEGENDARY_POWER ; in-game set
 	dw SANDSLASH_LV33
-	db 70 ; hp
+	db 90 ; hp
 	db STAGE1 ; stage
 	tx SandshrewName ; pre-evo name
 
 	; attack 1
 	energy COLORLESS, 2 ; energies
-	tx SlashName ; name
-	dw NONE ; description
+	tx SwiftName ; name
+	tx SwiftDescription ; description
 	dw NONE ; description (cont)
 	db 20 ; damage
 	db DAMAGE_NORMAL ; category
-	dw NONE ; effect commands
+	dw SandshrewSwiftEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
-	db NONE ; flags 3
+	db FLAG_3_BIT_2 ; flags 3
 	db 0 ; ?
-	db ATK_ANIM_SLASH ; animation
+	db ATK_ANIM_SWIFT ; animation
 
 	; attack 2
 	energy FIGHTING, 2 ; energies
 	tx FurySwipesName ; name
-	tx FurySwipes20DamageDescription ; description
+	tx Do20DamageTimes4FlipsDescription ; description
 	dw NONE ; description (cont)
 	db 20 ; damage
 	db DAMAGE_X ; category
-	dw SandslashFurySwipesEffectCommands ; effect commands
+	dw Do20DamageTimes4FlipsEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
@@ -11290,7 +11290,7 @@ SandslashLv35Card:
 	db EXPANSION_SHEET ; real set
 	db SKY_FLYING_POKEMON ; in-game set
 	dw SANDSLASH_LV35
-	db 70 ; hp
+	db 90 ; hp
 	db STAGE1 ; stage
 	tx SandshrewName ; pre-evo name
 
@@ -11817,11 +11817,11 @@ PrimeapeCard:
 	; attack 1
 	energy FIGHTING, 2 ; energies
 	tx FurySwipesName ; name
-	tx FurySwipes20DamageDescription ; description
+	tx Do20DamageTimes3FlipsDescription ; description
 	dw NONE ; description (cont)
 	db 20 ; damage
 	db DAMAGE_X ; category
-	dw PrimeapeFurySwipesEffectCommands ; effect commands
+	dw Do20DamageTimes3FlipsEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3

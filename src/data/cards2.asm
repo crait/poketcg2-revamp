@@ -949,7 +949,7 @@ MarowakLv26Card:
 	; attack 1
 	energy FIGHTING, 2 ; energies
 	tx BonemerangName ; name
-	tx Do30DamageNumberOfHeadsDescription ; description
+	tx Do30DamageTimes2FlipsDescription ; description
 	dw NONE ; description (cont)
 	db 30 ; damage
 	db DAMAGE_X ; category
@@ -1105,7 +1105,7 @@ HitmonleeLv23Card:
 	; attack 1
 	energy FIGHTING, 2 ; energies
 	tx DoubleKickName ; name
-	tx Do30DamageNumberOfHeadsDescription ; description
+	tx Do30DamageTimes2FlipsDescription ; description
 	dw NONE ; description (cont)
 	db 30 ; damage
 	db DAMAGE_X ; category
@@ -1675,32 +1675,32 @@ AerodactylLv30Card:
 	tx MysteriousFossilName ; pre-evo name
 
 	; attack 1
-	energy COLORLESS, 1 ; energies
-	tx SupersonicName ; name
-	tx MayInflictConfusionDescription ; description
-	dw NONE ; description (cont)
-	db 0 ; damage
-	db DAMAGE_NORMAL ; category
-	dw AerodactylSupersonicEffectCommands ; effect commands
-	db INFLICT_CONFUSION ; flags 1
-	db NONE ; flags 2
-	db NONE ; flags 3
-	db 0 ; ?
-	db ATK_ANIM_SUPERSONIC_COPY ; animation
-
-	; attack 2
 	energy COLORLESS, 3 ; energies
 	tx TailspinAttackName ; name
-	tx TailspinAttackDescription ; description
+	tx Do10DamageToSelfDescription ; description
 	dw NONE ; description (cont)
-	db 40 ; damage
+	db 50 ; damage
 	db DAMAGE_NORMAL ; category
-	dw AerodactylTailspinAttackEffectCommands ; effect commands
+	dw Do10DamageToSelfEffectCommands ; effect commands
 	db LOW_RECOIL ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
 	db 10 ; ?
 	db ATK_ANIM_HIT_RECOIL ; animation
+
+	; attack 2
+	energy 0 ; energies
+	dw NONE ; name
+	dw NONE ; description
+	dw NONE ; description (cont)
+	db 0 ; damage
+	db DAMAGE_NORMAL ; category
+	dw NONE ; effect commands
+	db NONE ; flags 1
+	db NONE ; flags 2
+	db NONE ; flags 3
+	db 0 ; ?
+	db ATK_ANIM_NONE ; animation
 
 	db 1 ; retreat cost
 	db WR_GRASS ; weakness
@@ -3497,7 +3497,7 @@ JynxLv23Card:
 	; attack 1
 	energy PSYCHIC, 1 ; energies
 	tx DoubleSlapName ; name
-	tx Plus10DamagePerHeadsDescription ; description
+	tx Do10DamageTimes2FlipsDescription ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_X ; category
@@ -4745,7 +4745,7 @@ SpearowLv12Card:
 	; attack 1
 	energy COLORLESS, 1 ; energies
 	tx FuryAttackName ; name
-	tx Plus10DamagePerHeadsDescription ; description
+	tx Do10DamageTimes2FlipsDescription ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_X ; category
@@ -5695,11 +5695,11 @@ MeowthLv17Card:
 	; attack 2
 	energy COLORLESS, 2 ; energies
 	tx FurySwipesName ; name
-	tx FurySwipes10DamageDescription ; description
+	tx Do10DamageTimes3FlipsDescription ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_X ; category
-	dw MeowthFurySwipesEffectCommands ; effect commands
+	dw Do10DamageTimes3FlipsEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
@@ -6045,7 +6045,7 @@ DoduoLv10Card:
 	; attack 1
 	energy COLORLESS, 1 ; energies
 	tx FuryAttackName ; name
-	tx Plus10DamagePerHeadsDescription ; description
+	tx Do10DamageTimes2FlipsDescription ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_X ; category
@@ -6111,7 +6111,7 @@ DodrioLv25Card:
 	; attack 2
 	energy COLORLESS, 3 ; energies
 	tx TriAttackName ; name
-	tx FurySwipes20DamageDescription ; description
+	tx Do20DamageTimes3FlipsDescription ; description
 	dw NONE ; description (cont)
 	db 20 ; damage
 	db DAMAGE_X ; category
@@ -6461,7 +6461,7 @@ KangaskhanLv38Card:
 	; attack 1
 	energy COLORLESS, 1 ; energies
 	tx DizzyPunchName ; name
-	tx Plus10DamagePerHeadsDescription ; description
+	tx Do10DamageTimes2FlipsDescription ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_X ; category
@@ -6527,11 +6527,11 @@ KangaskhanLv40Card:
 	; attack 2
 	energy COLORLESS, 4 ; energies
 	tx CometPunchName ; name
-	tx PinMissileDescription ; description
+	tx Do20DamageTimes4FlipsDescription ; description
 	dw NONE ; description (cont)
 	db 20 ; damage
 	db DAMAGE_X ; category
-	dw KangaskhanCometPunchEffectCommands ; effect commands
+	dw Do20DamageTimes4FlipsEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
@@ -7345,7 +7345,7 @@ DragonairCard:
 	; attack 1
 	energy COLORLESS, 3 ; energies
 	tx SlamName ; name
-	tx Do30DamageNumberOfHeadsDescription ; description
+	tx Do30DamageTimes2FlipsDescription ; description
 	dw NONE ; description (cont)
 	db 30 ; damage
 	db DAMAGE_X ; category
@@ -7463,7 +7463,7 @@ DragoniteLv41Card:
 	; attack 2
 	energy COLORLESS, 3 ; energies
 	tx SlamName ; name
-	tx Do30DamageNumberOfHeadsDescription ; description
+	tx Do30DamageTimes2FlipsDescription ; description
 	dw NONE ; description (cont)
 	db 30 ; damage
 	db DAMAGE_X ; category

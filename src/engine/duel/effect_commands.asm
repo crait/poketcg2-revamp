@@ -144,10 +144,10 @@ ZubatLeechLifeEffectCommands:
 	dbw EFFECTCMDTYPE_AFTER_DAMAGE, ZubatLeechLifeEffect
 	db $00
 
-BeedrillTwineedleEffectCommands:
+Do30DamageTimes2FlipsEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Twineedle_MultiplierEffect
-	dbw EFFECTCMDTYPE_AI, Twineedle_AIEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Do30DamageTimes2Flips_MultiplierEffect
+	dbw EFFECTCMDTYPE_AI, Do30DamageTimes2Flips_AIEffect
 	db $00
 
 BeedrillPoisonStingEffectCommands:
@@ -227,10 +227,10 @@ NidoqueenBoyfriendsEffectCommands:
 	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, BoyfriendsEffect
 	db $00
 
-NidoranFFurySwipesEffectCommands:
+Do10DamageTimes3FlipsEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, NidoranFFurySwipes_MultiplierEffect
-	dbw EFFECTCMDTYPE_AI, NidoranFFurySwipes_AIEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Do10DamageTimes3Flips_MultiplierEffect
+	dbw EFFECTCMDTYPE_AI, Do10DamageTimes3Flips_AIEffect
 	db $00
 
 NidoranFCallForFamilyEffectCommands:
@@ -1204,7 +1204,7 @@ SandshrewSandAttackEffectCommands:
 	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, SandshrewSandAttackEffect
 	db $00
 
-SandslashFurySwipesEffectCommands:
+Do20DamageTimes3FlipsEffectCommands:
 	db BANK("Effect Functions 1")
 	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, SandslashFurySwipes_MultiplierEffect
 	dbw EFFECTCMDTYPE_AI, SandslashFurySwipes_AIEffect
@@ -1292,10 +1292,10 @@ JolteonQuickAttackEffectCommands:
 	dbw EFFECTCMDTYPE_AI, JolteonQuickAttack_AIEffect
 	db $00
 
-JolteonPinMissileEffectCommands:
+Do20DamageTimes4FlipsEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, PinMissile_MultiplierEffect
-	dbw EFFECTCMDTYPE_AI, PinMissile_AIEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Do20DamageTimes4Flips_MultiplierEffect
+	dbw EFFECTCMDTYPE_AI, Do20DamageTimes4Flips_AIEffect
 	db $00
 
 FlyingPikachuThundershockEffectCommands:
@@ -2872,9 +2872,9 @@ AerodactylSupersonicEffectCommands:
 	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, AerodactylSupersonicEffect
 	db $00
 
-AerodactylTailspinAttackEffectCommands:
+Do10DamageToSelfEffectCommands:
 	db BANK("Effect Functions 2")
-	dbw EFFECTCMDTYPE_AFTER_DAMAGE, TailspinAttackEffect
+	dbw EFFECTCMDTYPE_AFTER_DAMAGE, Do10DamageToSelfEffect
 	db $00
 
 ArticunoAuroraVeilEffectCommands:
@@ -2953,10 +2953,10 @@ NidorinaStrengthInNumbersEffectCommands:
 	dbw EFFECTCMDTYPE_AI, StrengthInNumbersEffect
 	db $00
 
-NidorinaFurySwipesEffectCommands:
+Do30DamageTimes3FlipsEffectCommands:
 	db BANK("Effect Functions 2")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, NidorinaFurySwipes_MultiplierEffect
-	dbw EFFECTCMDTYPE_AI, NidorinaFurySwipes_AIEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Do30DamageTimes3Flips_MultiplierEffect
+	dbw EFFECTCMDTYPE_AI, Do30DamageTimes3Flips_AIEffect
 	db $00
 
 NidorinoSwiftLungeEffectCommands:
@@ -3442,10 +3442,10 @@ DragoniteSupersonicFlightEffectCommands:
 	dbw EFFECTCMDTYPE_AI, SupersonicFlight_AIEffect
 	db $00
 
-MagikarpTrickleEffectCommands:
+Do10DamageTimes2FlipsEffectCommands:
 	db BANK("Effect Functions 2")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Trickle_MultiplierEffect
-	dbw EFFECTCMDTYPE_AI, Trickle_AIEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Do10DamageTimes2Flips_MultiplierEffect
+	dbw EFFECTCMDTYPE_AI, Do10DamageTimes2Flips_AIEffect
 	db $00
 
 MagikarpDragonRageEffectCommands:

@@ -2712,7 +2712,7 @@ SharpClaws_DamageBoostEffect:
 	farcall AddDamageIfHeads
 	ret
 
-TailspinAttackEffect:
+Do10DamageToSelfEffect:
 	farcall SetIsDamageToSelf
 	ld b, PLAY_AREA_ARENA
 	ld de, 10
@@ -3292,13 +3292,13 @@ StrengthInNumbersEffect:
 	farcall AddToDamage
 	ret
 
-NidorinaFurySwipes_AIEffect:
+Do30DamageTimes3Flips_AIEffect:
 	ld a, (30 * 3) / 2
 	lb de, 0, 90
 	farcall SetExpectedAIDamage
 	ret
 
-NidorinaFurySwipes_MultiplierEffect:
+Do30DamageTimes3Flips_MultiplierEffect:
 	ld hl, 30
 	call LoadTxRam3
 	ldtx de, DamageCheckXDamageTimesHeadsText
@@ -6195,13 +6195,13 @@ SupersonicFlight_NoDamage50PercentEffect:
 	farcall SetWasUnsuccessful
 	ret
 
-Trickle_AIEffect:
+Do10DamageTimes2Flips_AIEffect:
 	ld a, (10 * 2) / 2
 	lb de, 0, 20
 	farcall SetExpectedAIDamage
 	ret
 
-Trickle_MultiplierEffect:
+Do10DamageTimes2Flips_MultiplierEffect:
 	ld hl, 10
 	call LoadTxRam3
 	ldtx de, DamageCheckXDamageTimesHeadsText

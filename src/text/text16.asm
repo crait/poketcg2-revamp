@@ -930,7 +930,7 @@ TailspinAttackName:
 	textfw "きりもみアタック"
 	done
 
-TailspinAttackDescription:
+Do10DamageToSelfDescription:
 	textfw "[自分]にも、「弱点・抵抗力」に"
 	linefw "関係なく、10ダメージ。"
 	done

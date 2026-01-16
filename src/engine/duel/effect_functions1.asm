@@ -1755,14 +1755,14 @@ ZubatLeechLifeEffect:
 	call ApplyAndAnimateHPRecovery
 	ret
 
-Twineedle_AIEffect:
-	ld a, 60 / 2
+Do30DamageTimes2Flips_AIEffect:
+	ld a, (30 * 2) / 2
 	lb de, 0, 60
 	call SetExpectedAIDamage
 	ret
 
 ; Flip 2 coins; deal 30x number of heads
-Twineedle_MultiplierEffect:
+Do30DamageTimes2Flips_MultiplierEffect:
 	ld hl, 30
 	call LoadTxRam3
 	ldtx de, DamageCheckXDamageTimesHeadsText
@@ -2027,13 +2027,13 @@ BoyfriendsEffect:
 	call AddToDamage ; adds 2 * 10 * c
 	ret
 
-NidoranFFurySwipes_AIEffect:
+Do10DamageTimes3Flips_AIEffect:
 	ld a, 30 / 2
 	lb de, 0, 30
 	call SetExpectedAIDamage
 	ret
 
-NidoranFFurySwipes_MultiplierEffect:
+Do10DamageTimes3Flips_MultiplierEffect:
 	ld hl, 10
 	call LoadTxRam3
 	ldtx de, DamageCheckXDamageTimesHeadsText
@@ -6459,13 +6459,13 @@ JolteonQuickAttack_DamageBoostEffect:
 	call AddDamageIfHeads
 	ret
 
-PinMissile_AIEffect:
+Do20DamageTimes4Flips_AIEffect:
 	ld a, (20 * 4) / 2
 	lb de, 0, 80
 	call SetExpectedAIDamage
 	ret
 
-PinMissile_MultiplierEffect:
+Do20DamageTimes4Flips_MultiplierEffect:
 	ld hl, 20
 	call LoadTxRam3
 	ldtx de, DamageCheckXDamageTimesHeadsText

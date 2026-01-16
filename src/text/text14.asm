@@ -1017,7 +1017,7 @@ TwineedleName:
 	textfw "ダブルニードル"
 	done
 
-Do30DamageNumberOfHeadsDescription:
+Do30DamageTimes2FlipsDescription:
 	textfw "コインを2枚投げ、「おもて」の数"
 	linefw "×30のダメージ。"
 	done
@@ -1177,7 +1177,7 @@ FurySwipesName:
 	textfw "みだれひっかき"
 	done
 
-FurySwipes10DamageDescription:
+Do10DamageTimes3FlipsDescription:
 	textfw "コインを3枚投げ、「おもて」の数"
 	linefw "×10のダメージ。"
 	done
@@ -1215,7 +1215,7 @@ StrengthInNumbersDescription:
 	linefw "×10のダメージを追加する。"
 	done
 
-FurySwipes30DamageDescription:
+Do30DamageTimes3FlipsDescription:
 	textfw "コインを3枚投げ、「おもて」の数"
 	linefw "×30のダメージ。"
 	done

@@ -1521,7 +1521,7 @@ TrickleName:
 	textfw "びちびち"
 	done
 
-Plus10DamagePerHeadsDescription:
+Do10DamageTimes2FlipsDescription:
 	textfw "コインを2枚投げ、「おもて」の数"
 	linefw "×10のダメージ。"
 	done
@@ -2377,7 +2377,7 @@ PinMissileName:
 	textfw "ミサイルばり"
 	done
 
-PinMissileDescription:
+Do20DamageTimes4FlipsDescription:
 	textfw "コインを4枚投げ、「おもて」の数"
 	linefw "×20のダメージ。"
 	done
@@ -2545,7 +2545,7 @@ SandslashName:
 	textfw "サンドパン"
 	done
 
-FurySwipes20DamageDescription:
+Do20DamageTimes3FlipsDescription:
 	textfw "コインを3枚投げ、「おもて」の数"
 	linefw "×20のダメージ。"
 	done
