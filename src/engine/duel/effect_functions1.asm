@@ -4137,10 +4137,10 @@ Firegiver_AddToHandEffect:
 	ret
 
 .found
-; pick a random number between 1 and 4,
+; pick a random number between 1 and 2,
 ; up to the maximum number of Fire Energy
 ; cards that were found.
-	ld a, 4
+	ld a, 2
 	call Random
 	inc a
 	cp c
@@ -6982,7 +6982,7 @@ RandomlyDamagePlayAreaPokemon:
 
 BigThunderEffect:
 	call ExchangeRNG
-	ld de, 70 ; damage to inflict
+	ld de, 60 ; damage to inflict
 	call RandomlyDamagePlayAreaPokemon
 	ret
 

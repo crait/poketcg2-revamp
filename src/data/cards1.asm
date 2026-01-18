@@ -682,36 +682,36 @@ ButterfreeCard:
 	db JUNGLE ; real set
 	db LEGENDARY_POWER ; in-game set
 	dw BUTTERFREE
-	db 70 ; hp
+	db 100 ; hp
 	db STAGE2 ; stage
 	tx MetapodName ; pre-evo name
 
 	; attack 1
-	energy COLORLESS, 2 ; energies
+	energy COLORLESS, 1 ; energies
 	tx WhirlwindName ; name
-	tx WhirlwindDescription ; description
+	tx LureDescription ; description
 	dw NONE ; description (cont)
-	db 20 ; damage
-	db DAMAGE_NORMAL ; category
-	dw ButterfreeWhirlwindEffectCommands ; effect commands
+	db 0 ; damage
+	db RESIDUAL ; category
+	dw VictreebelLureEffectCommands ; effect commands
 	db NONE ; flags 1
 	db SWITCH_OPPONENT_POKEMON ; flags 2
-	db NONE ; flags 3
+	db FLAG_3_BIT_2 ; flags 3
 	db 0 ; ?
 	db ATK_ANIM_WHIRLWIND ; animation
 
 	; attack 2
 	energy GRASS, 4 ; energies
 	tx MegaDrainName ; name
-	tx MegaDrainDescription ; description
+	tx LeechLifeDescription ; description
 	dw NONE ; description (cont)
 	db 40 ; damage
 	db DAMAGE_NORMAL ; category
-	dw ButterfreeMegaDrainEffectCommands ; effect commands
+	dw ZubatLeechLifeEffectCommands ; effect commands
 	db NONE ; flags 1
 	db HEAL_USER ; flags 2
 	db NONE ; flags 3
-	db 2 ; ?
+	db 3 ; ?
 	db ATK_ANIM_DRAIN ; animation
 
 	db 0 ; retreat cost
@@ -858,17 +858,17 @@ KakunaLv20Card:
 
 	; attack 2
 	energy COLORLESS, 1 ; energies
-	tx RolloutName ; name
-	dw NONE ; description
+	tx HardenName ; name
+	tx ReduceDamageBy20Description ; description
 	dw NONE ; description (cont)
-	db 10 ; damage
+	db 0 ; damage
 	db DAMAGE_NORMAL ; category
-	dw NONE ; effect commands
+	dw ReduceDamageBy20EffectCommands ; effect commands
 	db NONE ; flags 1
-	db NONE ; flags 2
+	db NULLIFY_OR_WEAKEN_ATTACK ; flags 2
 	db NONE ; flags 3
-	db 0 ; ?
-	db ATK_ANIM_HIT ; animation
+	db 20 ; ?
+	db ATK_ANIM_CRY ; animation
 
 	db 2 ; retreat cost
 	db WR_FIRE ; weakness
@@ -5697,7 +5697,7 @@ MoltresLv35Card:
 	tx DiveBombName ; name
 	tx IfTailsDoNothingDescription ; description
 	dw NONE ; description (cont)
-	db 80 ; damage
+	db 60 ; damage
 	db DAMAGE_NORMAL ; category
 	dw MoltresLv35DiveBombEffectCommands ; effect commands
 	db NONE ; flags 1
@@ -5707,7 +5707,7 @@ MoltresLv35Card:
 	db ATK_ANIM_NONE ; animation
 
 	db 2 ; retreat cost
-	db NONE ; weakness
+	db WR_WATER ; weakness
 	db WR_FIGHTING ; resistance
 	tx FlameName ; category
 	db DEX_MOLTRES ; Pokedex number
@@ -5726,12 +5726,12 @@ MoltresLv37Card:
 	db EXPANSION_SHEET ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
 	dw MOLTRES_LV37
-	db 80 ; hp
+	db 70 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
 	; attack 1
-	energy FIRE, 2 ; energies
+	energy FIRE, 1 ; energies
 	tx DryUpName ; name
 	tx DryUpDescription ; description
 	dw NONE ; description (cont)
@@ -5745,11 +5745,11 @@ MoltresLv37Card:
 	db ATK_ANIM_DRY_UP ; animation
 
 	; attack 2
-	energy FIRE, 3, COLORLESS, 1 ; energies
+	energy FIRE, 1, COLORLESS, 2 ; energies
 	tx FireWingName ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
-	db 50 ; damage
+	db 40 ; damage
 	db DAMAGE_NORMAL ; category
 	dw NONE ; effect commands
 	db NONE ; flags 1
@@ -5759,7 +5759,7 @@ MoltresLv37Card:
 	db ATK_ANIM_DIVE_BOMB ; animation
 
 	db 1 ; retreat cost
-	db NONE ; weakness
+	db WR_WATER ; weakness
 	db WR_FIGHTING ; resistance
 	tx FlameName ; category
 	db DEX_MOLTRES ; Pokedex number
@@ -5778,7 +5778,7 @@ MoltresLv40Card:
 	db GB ; real set
 	db PROMOTIONAL ; in-game set
 	dw MOLTRES_LV40
-	db 100 ; hp
+	db 70 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
@@ -5801,7 +5801,7 @@ MoltresLv40Card:
 	tx DiveBombName ; name
 	tx IfTailsDoNothingDescription ; description
 	dw NONE ; description (cont)
-	db 70 ; damage
+	db 50 ; damage
 	db DAMAGE_NORMAL ; category
 	dw MoltresLv37DiveBombEffectCommands ; effect commands
 	db NONE ; flags 1
@@ -5810,8 +5810,8 @@ MoltresLv40Card:
 	db 0 ; ?
 	db ATK_ANIM_NONE ; animation
 
-	db 2 ; retreat cost
-	db NONE ; weakness
+	db 4 ; retreat cost
+	db WR_WATER ; weakness
 	db WR_FIGHTING ; resistance
 	tx FlameName ; category
 	db DEX_MOLTRES ; Pokedex number
@@ -8950,7 +8950,7 @@ ArticunoLv34Card:
 	db EXPANSION_SHEET ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
 	dw ARTICUNO_LV34
-	db 80 ; hp
+	db 70 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
@@ -8983,7 +8983,7 @@ ArticunoLv34Card:
 	db ATK_ANIM_ICE_BEAM ; animation
 
 	db 2 ; retreat cost
-	db NONE ; weakness
+	db WR_LIGHTNING ; weakness
 	db WR_FIGHTING ; resistance
 	tx FreezeName ; category
 	db DEX_ARTICUNO ; Pokedex number
@@ -9007,13 +9007,13 @@ ArticunoLv35Card:
 	dw NONE ; pre-evo name
 
 	; attack 1
-	energy WATER, 3 ; energies
+	energy WATER, 1 ; energies
 	tx FreezeDryName ; name
 	tx MayInflictParalysisDescription ; description
 	dw NONE ; description (cont)
-	db 30 ; damage
+	db 0 ; damage
 	db DAMAGE_NORMAL ; category
-	dw ArticunoFreezeDryEffectCommands ; effect commands
+	dw MayInflictParalysisEffectCommands ; effect commands
 	db INFLICT_PARALYSIS ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
@@ -9025,7 +9025,7 @@ ArticunoLv35Card:
 	tx BlizzardName ; name
 	tx BlizzardDescription ; description
 	dw NONE ; description (cont)
-	db 50 ; damage
+	db 30 ; damage
 	db DAMAGE_NORMAL ; category
 	dw ArticunoBlizzardEffectCommands ; effect commands
 	db DAMAGE_TO_OPPONENT_BENCH ; flags 1
@@ -9035,7 +9035,7 @@ ArticunoLv35Card:
 	db ATK_ANIM_BLIZZARD ; animation
 
 	db 2 ; retreat cost
-	db NONE ; weakness
+	db WR_LIGHTNING ; weakness
 	db WR_FIGHTING ; resistance
 	tx FreezeName ; category
 	db DEX_ARTICUNO ; Pokedex number
@@ -9054,7 +9054,7 @@ ArticunoLv37Card:
 	db GB ; real set
 	db PROMOTIONAL ; in-game set
 	dw ARTICUNO_LV37
-	db 100 ; hp
+	db 70 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
@@ -9073,7 +9073,7 @@ ArticunoLv37Card:
 	db ATK_ANIM_QUICKFREEZE ; animation
 
 	; attack 2
-	energy WATER, 3 ; energies
+	energy WATER, 4 ; energies
 	tx IceBreathName ; name
 	tx IceBreathDescription ; description
 	dw NONE ; description (cont)
@@ -9086,8 +9086,8 @@ ArticunoLv37Card:
 	db 3 ; ?
 	db ATK_ANIM_WHIRLWIND_ZIGZAG ; animation
 
-	db 2 ; retreat cost
-	db NONE ; weakness
+	db 4 ; retreat cost
+	db WR_LIGHTNING ; weakness
 	db WR_FIGHTING ; resistance
 	tx FreezeName ; category
 	db DEX_ARTICUNO ; Pokedex number
@@ -9111,11 +9111,11 @@ MarillCard:
 	dw NONE ; pre-evo name
 
 	; attack 1
-	energy WATER, 2 ; energies
+	energy WATER, 1 ; energies
 	tx WaterGunName ; name
 	tx Do20DamagePlus10WaterEnergyAltDescription2 ; description
 	dw NONE ; description (cont)
-	db 20 ; damage
+	db 10 ; damage
 	db DAMAGE_PLUS ; category
 	dw MarillWaterGunEffectCommands ; effect commands
 	db NONE ; flags 1
@@ -9138,7 +9138,7 @@ MarillCard:
 	db 0 ; ?
 	db ATK_ANIM_NONE ; animation
 
-	db 1 ; retreat cost
+	db 0 ; retreat cost
 	db WR_LIGHTNING ; weakness
 	db NONE ; resistance
 	tx AquamouseName ; category
@@ -10983,20 +10983,6 @@ ZapdosLv28Card:
 	dw NONE ; pre-evo name
 
 	; attack 1
-	energy LIGHTNING, 3 ; energies
-	tx RagingThunderName ; name
-	tx RagingThunderDescription ; description
-	dw NONE ; description (cont)
-	db 50 ; damage
-	db DAMAGE_NORMAL ; category
-	dw ZapdosRagingThunderEffectCommands ; effect commands
-	db NONE ; flags 1
-	db NONE ; flags 2
-	db SPECIAL_AI_HANDLING | FLAG_3_BIT_2 ; flags 3
-	db 0 ; ?
-	db ATK_ANIM_THUNDERBOLT ; animation
-
-	; attack 2
 	energy LIGHTNING, 2, COLORLESS, 2 ; energies
 	tx ThunderCrashName ; name
 	tx ThunderCrashDescription ; description
@@ -11010,8 +10996,22 @@ ZapdosLv28Card:
 	db 0 ; ?
 	db ATK_ANIM_THUNDERBOLT ; animation
 
+	; attack 2
+	energy 0 ; energies
+	dw NONE ; name
+	dw NONE ; description
+	dw NONE ; description (cont)
+	db 0 ; damage
+	db DAMAGE_NORMAL ; category
+	dw NONE ; effect commands
+	db NONE ; flags 1
+	db NONE ; flags 2
+	db NONE ; flags 3
+	db 0 ; ?
+	db ATK_ANIM_NONE ; animation
+
 	db 2 ; retreat cost
-	db NONE ; weakness
+	db WR_FIGHTING ; weakness
 	db WR_FIGHTING ; resistance
 	tx ThunderJoltName ; category
 	db DEX_ZAPDOS ; Pokedex number
@@ -11035,11 +11035,25 @@ ZapdosLv40Card:
 	dw NONE ; pre-evo name
 
 	; attack 1
+	energy LIGHTNING, 1 ; energies
+	tx ThunderWaveName ; name
+	tx MayInflictParalysisDescription ; description
+	dw NONE ; description (cont)
+	db 0 ; damage
+	db DAMAGE_NORMAL ; category
+	dw MayInflictParalysisEffectCommands ; effect commands
+	db INFLICT_PARALYSIS ; flags 1
+	db NONE ; flags 2
+	db NONE ; flags 3
+	db 0 ; ?
+	db ATK_ANIM_THUNDER_WAVE ; animation
+
+	; attack 2
 	energy LIGHTNING, 4 ; energies
 	tx ThunderstormName ; name
 	tx ThunderstormDescription ; description
 	dw NONE ; description (cont)
-	db 40 ; damage
+	db 30 ; damage
 	db DAMAGE_NORMAL ; category
 	dw ZapdosThunderstormEffectCommands ; effect commands
 	db LOW_RECOIL | DAMAGE_TO_OPPONENT_BENCH ; flags 1
@@ -11048,22 +11062,8 @@ ZapdosLv40Card:
 	db 0 ; ?
 	db ATK_ANIM_THUNDERSTORM ; animation
 
-	; attack 2
-	energy 0 ; energies
-	dw NONE ; name
-	dw NONE ; description
-	dw NONE ; description (cont)
-	db 0 ; damage
-	db DAMAGE_NORMAL ; category
-	dw NONE ; effect commands
-	db NONE ; flags 1
-	db NONE ; flags 2
-	db NONE ; flags 3
-	db 0 ; ?
-	db ATK_ANIM_NONE ; animation
-
 	db 2 ; retreat cost
-	db NONE ; weakness
+	db WR_FIGHTING ; weakness
 	db WR_FIGHTING ; resistance
 	tx ThunderJoltName ; category
 	db DEX_ZAPDOS ; Pokedex number
@@ -11082,40 +11082,40 @@ ZapdosLv64Card:
 	db BASE_SET ; real set
 	db BEGINNING_POKEMON ; in-game set
 	dw ZAPDOS_LV64
-	db 90 ; hp
+	db 70 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
 	; attack 1
-	energy LIGHTNING, 3, COLORLESS, 1 ; energies
-	tx ThunderName ; name
-	tx ThunderDescription ; description
+	energy LIGHTNING, 1 ; energies
+	tx ThunderboltName ; name
+	dw NONE ; description
 	dw NONE ; description (cont)
-	db 60 ; damage
+	db 10 ; damage
 	db DAMAGE_NORMAL ; category
-	dw ZapdosThunderEffectCommands ; effect commands
-	db LOW_RECOIL ; flags 1
+	dw NONE ; effect commands
+	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
 	db 0 ; ?
-	db ATK_ANIM_THUNDER ; animation
+	db ATK_ANIM_THUNDERBOLT ; animation
 
 	; attack 2
 	energy LIGHTNING, 4 ; energies
-	tx ThunderboltName ; name
+	tx ThunderName ; name
 	tx ThunderboltAltDescription2 ; description
 	dw NONE ; description (cont)
-	db 100 ; damage
+	db 60 ; damage
 	db DAMAGE_NORMAL ; category
 	dw ZapdosThunderboltEffectCommands ; effect commands
 	db NONE ; flags 1
 	db DISCARD_ENERGY ; flags 2
 	db NONE ; flags 3
 	db 9 ; ?
-	db ATK_ANIM_THUNDERBOLT ; animation
+	db ATK_ANIM_THUNDER ; animation
 
 	db 3 ; retreat cost
-	db NONE ; weakness
+	db WR_FIGHTING ; weakness
 	db WR_FIGHTING ; resistance
 	tx ThunderJoltName ; category
 	db DEX_ZAPDOS ; Pokedex number
@@ -11153,7 +11153,7 @@ ZapdosLv68Card:
 	db ATK_ANIM_PEAL_OF_THUNDER ; animation
 
 	; attack 2
-	energy LIGHTNING, 3 ; energies
+	energy LIGHTNING, 4 ; energies
 	tx BigThunderName ; name
 	tx BigThunderDescription ; description
 	dw NONE ; description (cont)
@@ -11166,8 +11166,8 @@ ZapdosLv68Card:
 	db 0 ; ?
 	db ATK_ANIM_BIG_THUNDER ; animation
 
-	db 2 ; retreat cost
-	db NONE ; weakness
+	db 4 ; retreat cost
+	db WR_FIGHTING ; weakness
 	db WR_FIGHTING ; resistance
 	tx ThunderJoltName ; category
 	db DEX_ZAPDOS ; Pokedex number
