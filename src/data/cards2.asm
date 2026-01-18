@@ -1209,11 +1209,11 @@ HitmonleeLv30Card:
 	; attack 1
 	energy FIGHTING, 2 ; energies
 	tx StretchKickName ; name
-	tx StretchKickDescription ; description
+	tx FlitterDescription ; description
 	dw NONE ; description (cont)
 	db 0 ; damage
 	db RESIDUAL ; category
-	dw HitmonleeStretchKickEffectCommands ; effect commands
+	dw DarkGolbatFlitterEffectCommands ; effect commands
 	db DAMAGE_TO_OPPONENT_BENCH ; flags 1
 	db FLAG_2_BIT_6 ; flags 2
 	db FLAG_3_BIT_2 ; flags 3
@@ -1225,7 +1225,7 @@ HitmonleeLv30Card:
 	tx HighJumpKick ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
-	db 50 ; damage
+	db 40 ; damage
 	db DAMAGE_NORMAL ; category
 	dw NONE ; effect commands
 	db NONE ; flags 1
@@ -1234,7 +1234,7 @@ HitmonleeLv30Card:
 	db 0 ; ?
 	db ATK_ANIM_LEG_SWEEP ; animation
 
-	db 1 ; retreat cost
+	db 2 ; retreat cost
 	db WR_PSYCHIC ; weakness
 	db NONE ; resistance
 	tx KickName ; category
