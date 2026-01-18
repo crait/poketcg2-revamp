@@ -267,7 +267,7 @@ NidorinoDoubleKickEffectCommands:
 	
 PidgeotSlicingWindEffectCommands:
 	db BANK("Effect Functions 1")
-	; dbw EFFECTCMDTYPE_INITIAL_EFFECT_1, AssertPokemonInBench
+	dbw EFFECTCMDTYPE_INITIAL_EFFECT_1, VictreebelLure_AssertPokemonInBench
 	dbw EFFECTCMDTYPE_AFTER_DAMAGE, SlicingWindEffect2
 	db $00
 
@@ -275,8 +275,8 @@ ButterfreeWhirlwindEffectCommands:
 	db BANK("Effect Functions 1")
 	dbw EFFECTCMDTYPE_AFTER_DAMAGE, ButterfreeWhirlwind_SwitchEffect
 	dbw EFFECTCMDTYPE_REQUIRE_SELECTION, ButterfreeWhirlwind_CheckBench
-	; Removed this to reclaim space to add AssertPokemonInBench to SlicingWindEffectCommands
-	dbw EFFECTCMDTYPE_AI_SWITCH_DEFENDING_PKMN, ButterfreeWhirlwind_CheckBench
+	; Removed this to reclaim space to add CheckNonTurnDuelistHasBench to SlicingWindEffectCommands
+	; dbw EFFECTCMDTYPE_AI_SWITCH_DEFENDING_PKMN, ButterfreeWhirlwind_CheckBench
 	db $00
 
 ButterfreeMegaDrainEffectCommands:
