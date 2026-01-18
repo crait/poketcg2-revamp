@@ -8771,13 +8771,14 @@ Maintenance_ReturnToDeckAndDrawEffect:
 	call RemoveCardFromHand
 	call ReturnCardToDeck
 	call CallShuffleCardsInDeck
-
+	
+	; Changed Maintenance to draw before, so no need to draw after.
+	ret
 ; draw one card
 	ld a, 1
 	farcall DisplayDrawNCardsScreen
 	call DrawCardFromDeck
 	call AddCardToHand
-	ret
 
 ; return carry if no cards in deck
 PokeBall_DeckCheck:

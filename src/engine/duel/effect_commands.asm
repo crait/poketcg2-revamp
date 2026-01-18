@@ -3870,7 +3870,7 @@ LassEffectCommands:
 
 MaintenanceEffectCommands:
 	db BANK("Effect Functions 2")
-	dbw EFFECTCMDTYPE_INITIAL_EFFECT_1, Maintenance_HandCheck
+	dbw EFFECTCMDTYPE_INITIAL_EFFECT_1, BillEffect ; Maintenance_HandCheck
 	dbw EFFECTCMDTYPE_INITIAL_EFFECT_2, Maintenance_PlayerSelection
 	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Maintenance_ReturnToDeckAndDrawEffect
 	db $00
