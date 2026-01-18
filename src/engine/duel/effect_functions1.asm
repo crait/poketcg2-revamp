@@ -930,7 +930,7 @@ CreateEnergyCardListFromDiscardPile:
 CheckNonTurnDuelistHasBench:
 	ld a, DUELVARS_NUMBER_OF_POKEMON_IN_PLAY_AREA
 	call GetNonTurnDuelistVariable
-	ldtx hl, EffectNoBenchedPokemonText
+	ldtx hl, NoBenchedPokemonText
 	cp 2
 	ret
 
