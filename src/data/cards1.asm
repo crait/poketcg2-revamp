@@ -7607,7 +7607,7 @@ HorseaLv19Card:
 	tx SmokescreenName ; name
 	tx SmokescreenDescription ; description
 	dw NONE ; description (cont)
-	db 10 ; damage
+	db 0 ; damage
 	db DAMAGE_NORMAL ; category
 	dw HorseaSmokescreenEffectCommands ; effect commands
 	db NONE ; flags 1
@@ -7618,19 +7618,19 @@ HorseaLv19Card:
 
 	; attack 2
 	energy 0 ; energies
-	dw NONE ; name
-	dw NONE ; description
+	tx BubbleName ; name
+	tx MayPreventRetreatingDescription ; description
 	dw NONE ; description (cont)
-	db 0 ; damage
+	db 10 ; damage
 	db DAMAGE_NORMAL ; category
-	dw NONE ; effect commands
+	dw VictreebelAcidEffectCommands ; effect commands
 	db NONE ; flags 1
-	db NONE ; flags 2
+	db FLAG_2_BIT_6 ; flags 2
 	db NONE ; flags 3
-	db 0 ; ?
-	db ATK_ANIM_NONE ; animation
+	db 1 ; ?
+	db ATK_ANIM_BUBBLES ; animation
 
-	db 0 ; retreat cost
+	db 1 ; retreat cost
 	db WR_LIGHTNING ; weakness
 	db NONE ; resistance
 	tx DragonName ; category
@@ -7702,26 +7702,12 @@ SeadraLv23Card:
 	db FOSSIL ; real set
 	db ISLAND_OF_FOSSIL ; in-game set
 	dw SEADRA_LV23
-	db 60 ; hp
+	db 80 ; hp
 	db STAGE1 ; stage
 	tx HorseaName ; pre-evo name
 
 	; attack 1
 	energy WATER, 1, COLORLESS, 1 ; energies
-	tx WaterGunName ; name
-	tx Do20DamagePlus10WaterEnergyDescription ; description
-	dw NONE ; description (cont)
-	db 20 ; damage
-	db DAMAGE_PLUS ; category
-	dw SeadraWaterGunEffectCommands ; effect commands
-	db NONE ; flags 1
-	db ATTACHED_ENERGY_BOOST ; flags 2
-	db NONE ; flags 3
-	db 2 ; ?
-	db ATK_ANIM_WATER_GUN ; animation
-
-	; attack 2
-	energy WATER, 1, COLORLESS, 2 ; energies
 	tx AgilityName ; name
 	tx AgilityDescription ; description
 	dw NONE ; description (cont)
@@ -7734,7 +7720,21 @@ SeadraLv23Card:
 	db 0 ; ?
 	db ATK_ANIM_QUICK_ATTACK ; animation
 
-	db 1 ; retreat cost
+	; attack 2
+	energy WATER, 1, COLORLESS, 1 ; energies
+	tx WaterGunName ; name
+	tx Do20DamagePlus10WaterEnergyAltDescription1 ; description
+	dw NONE ; description (cont)
+	db 30 ; damage
+	db DAMAGE_PLUS ; category
+	dw VaporeonWaterGunEffectCommands ; effect commands
+	db NONE ; flags 1
+	db ATTACHED_ENERGY_BOOST ; flags 2
+	db NONE ; flags 3
+	db 2 ; ?
+	db ATK_ANIM_WATER_GUN ; animation
+
+	db 0 ; retreat cost
 	db WR_LIGHTNING ; weakness
 	db NONE ; resistance
 	tx DragonName ; category
@@ -7879,15 +7879,15 @@ SeakingCard:
 	; attack 2
 	energy WATER, 1, COLORLESS, 1 ; energies
 	tx WaterfallName ; name
-	dw NONE ; description
+	tx Do20DamagePlus10WaterEnergyAltDescription1 ; description
 	dw NONE ; description (cont)
 	db 30 ; damage
-	db DAMAGE_NORMAL ; category
-	dw NONE ; effect commands
+	db DAMAGE_PLUS ; category
+	dw VaporeonWaterGunEffectCommands ; effect commands
 	db NONE ; flags 1
-	db NONE ; flags 2
+	db ATTACHED_ENERGY_BOOST ; flags 2
 	db NONE ; flags 3
-	db 0 ; ?
+	db 2 ; ?
 	db ATK_ANIM_WATER_JETS ; animation
 
 	db 1 ; retreat cost
