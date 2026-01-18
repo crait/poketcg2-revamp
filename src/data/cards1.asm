@@ -601,7 +601,7 @@ MetapodLv20Card:
 	tx MysteriousPowerName ; name
 	tx MayInflictConfusionDescription ; description
 	dw NONE ; description (cont)
-	db 20 ; damage
+	db 0 ; damage
 	db DAMAGE_NORMAL ; category
 	dw MetapodMysteriousPowerEffectCommands ; effect commands
 	db INFLICT_CONFUSION ; flags 1
@@ -7656,7 +7656,7 @@ HorseaLv20Card:
 
 	; attack 1
 	energy COLORLESS, 1 ; energies
-	tx HideName ; name
+	tx SmokescreenName ; name
 	tx HideDescription ; description
 	dw NONE ; description (cont)
 	db 0 ; damage
@@ -7666,7 +7666,7 @@ HorseaLv20Card:
 	db NULLIFY_OR_WEAKEN_ATTACK ; flags 2
 	db FLAG_3_BIT_2 ; flags 3
 	db 0 ; ?
-	db ATK_ANIM_PROTECT ; animation
+	db ATK_ANIM_DARK_GAS ; animation
 
 	; attack 2
 	energy WATER, 1 ; energies
@@ -11399,18 +11399,18 @@ DiglettLv8Card:
 	dw NONE ; pre-evo name
 
 	; attack 1
-	energy FIGHTING, 1 ; energies
+	energy COLORLESS, 1 ; energies
 	tx DigName ; name
-	dw NONE ; description
+	tx SmokescreenDescription ; description
 	dw NONE ; description (cont)
-	db 10 ; damage
+	db 0 ; damage
 	db DAMAGE_NORMAL ; category
-	dw NONE ; effect commands
+	dw HorseaSmokescreenEffectCommands ; effect commands
 	db NONE ; flags 1
-	db NONE ; flags 2
+	db NULLIFY_OR_WEAKEN_ATTACK ; flags 2
 	db NONE ; flags 3
 	db 0 ; ?
-	db ATK_ANIM_HIT ; animation
+	db ATK_ANIM_DARK_GAS ; animation
 
 	; attack 2
 	energy FIGHTING, 2 ; energies
@@ -11451,6 +11451,20 @@ DiglettLv15Card:
 	dw NONE ; pre-evo name
 
 	; attack 1
+	energy COLORLESS, 1 ; energies
+	tx DigName ; name
+	tx SmokescreenDescription ; description
+	dw NONE ; description (cont)
+	db 0 ; damage
+	db DAMAGE_NORMAL ; category
+	dw HorseaSmokescreenEffectCommands ; effect commands
+	db NONE ; flags 1
+	db NULLIFY_OR_WEAKEN_ATTACK ; flags 2
+	db NONE ; flags 3
+	db 0 ; ?
+	db ATK_ANIM_DARK_GAS ; animation
+
+	; attack 2
 	energy FIGHTING, 1 ; energies
 	tx DigUnderName ; name
 	tx DigUnderDescription ; description
@@ -11461,20 +11475,6 @@ DiglettLv15Card:
 	db DAMAGE_TO_OPPONENT_BENCH ; flags 1
 	db FLAG_2_BIT_6 ; flags 2
 	db FLAG_3_BIT_2 ; flags 3
-	db 0 ; ?
-	db ATK_ANIM_HIT ; animation
-
-	; attack 2
-	energy FIGHTING, 1, COLORLESS, 1 ; energies
-	tx ScratchName ; name
-	dw NONE ; description
-	dw NONE ; description (cont)
-	db 20 ; damage
-	db DAMAGE_NORMAL ; category
-	dw NONE ; effect commands
-	db NONE ; flags 1
-	db NONE ; flags 2
-	db NONE ; flags 3
 	db 0 ; ?
 	db ATK_ANIM_HIT ; animation
 
@@ -11498,16 +11498,30 @@ DiglettLv16Card:
 	db PRO ; real set
 	db PROMOTIONAL ; in-game set
 	dw DIGLETT_LV16
-	db 50 ; hp
+	db 30 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
 	; attack 1
-	energy COLORLESS, 1 ; energies
-	tx PeckName ; name
+	energy 0 ; energies
+	tx GoUndergroundName ; name
+	tx GoUndergroundDescription ; description
+	dw NONE ; description (cont)
+	db 0 ; damage
+	db POKEMON_POWER ; category
+	dw DugtrioGoUndergroundEffectCommands ; effect commands
+	db NONE ; flags 1
+	db NONE ; flags 2
+	db NONE ; flags 3
+	db 0 ; ?
+	db ATK_ANIM_NONE ; animation
+
+	; attack 2
+	energy FIGHTING, 1, COLORLESS, 1 ; energies
+	tx TripOverName ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
-	db 10 ; damage
+	db 20 ; damage
 	db DAMAGE_NORMAL ; category
 	dw NONE ; effect commands
 	db NONE ; flags 1
@@ -11516,21 +11530,7 @@ DiglettLv16Card:
 	db 0 ; ?
 	db ATK_ANIM_HIT ; animation
 
-	; attack 2
-	energy FIGHTING, 1, COLORLESS, 1 ; energies
-	tx TripOverName ; name
-	tx IfHeadsDo10DamageDescription ; description
-	dw NONE ; description (cont)
-	db 20 ; damage
-	db DAMAGE_PLUS ; category
-	dw DiglettTripOverEffectCommands ; effect commands
-	db NONE ; flags 1
-	db NONE ; flags 2
-	db NONE ; flags 3
-	db 0 ; ?
-	db ATK_ANIM_HIT ; animation
-
-	db 1 ; retreat cost
+	db 0 ; retreat cost
 	db WR_GRASS ; weakness
 	db WR_LIGHTNING ; resistance
 	tx MoleName ; category
@@ -11555,21 +11555,21 @@ DugtrioLv36Card:
 	tx DiglettName ; pre-evo name
 
 	; attack 1
-	energy FIGHTING, 2, COLORLESS, 1 ; energies
-	tx SlashName ; name
-	dw NONE ; description
+	energy COLORLESS, 1 ; energies
+	tx DigName ; name
+	tx SmokescreenDescription ; description
 	dw NONE ; description (cont)
-	db 40 ; damage
+	db 0 ; damage
 	db DAMAGE_NORMAL ; category
-	dw NONE ; effect commands
+	dw HorseaSmokescreenEffectCommands ; effect commands
 	db NONE ; flags 1
-	db NONE ; flags 2
+	db NULLIFY_OR_WEAKEN_ATTACK ; flags 2
 	db NONE ; flags 3
 	db 0 ; ?
-	db ATK_ANIM_SLASH ; animation
+	db ATK_ANIM_DARK_GAS ; animation
 
 	; attack 2
-	energy FIGHTING, 4 ; energies
+	energy FIGHTING, 2, COLORLESS, 2 ; energies
 	tx EarthquakeName ; name
 	tx EarthquakeDescription ; description
 	dw NONE ; description (cont)
@@ -11580,9 +11580,9 @@ DugtrioLv36Card:
 	db NONE ; flags 2
 	db SPECIAL_AI_HANDLING ; flags 3
 	db 0 ; ?
-	db ATK_ANIM_HIT ; animation
+	db ATK_ANIM_EARTHQUAKE ; animation
 
-	db 2 ; retreat cost
+	db 1 ; retreat cost
 	db WR_GRASS ; weakness
 	db WR_LIGHTNING ; resistance
 	tx MoleName ; category
@@ -11632,7 +11632,7 @@ DugtrioLv40Card:
 	db NONE ; flags 2
 	db FLAG_3_BIT_2 ; flags 3
 	db 0 ; ?
-	db ATK_ANIM_HIT ; animation
+	db ATK_ANIM_EARTHQUAKE ; animation
 
 	db 1 ; retreat cost
 	db WR_GRASS ; weakness
@@ -11654,7 +11654,7 @@ DarkDugtrioCard:
 	db TEAM_ROCKET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
 	dw DARK_DUGTRIO
-	db 50 ; hp
+	db 60 ; hp
 	db STAGE1 ; stage
 	tx DiglettName ; pre-evo name
 
@@ -11674,17 +11674,17 @@ DarkDugtrioCard:
 
 	; attack 2
 	energy FIGHTING, 2 ; energies
-	tx KnockDownName ; name
-	tx KnockDownDescription ; description
+	tx HideName ; name
+	tx TeleportBlastDescription ; description
 	dw NONE ; description (cont)
-	db 20 ; damage
-	db DAMAGE_PLUS ; category
-	dw DarkDugtrioKnockDownEffectCommands ; effect commands
+	db 40 ; damage
+	db DAMAGE_NORMAL ; category
+	dw DarkAlakazamTeleportBlastEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
-	db NONE ; flags 3
+	db SPECIAL_AI_HANDLING ; flags 3
 	db 0 ; ?
-	db ATK_ANIM_HIT ; animation
+	db ATK_ANIM_DARK_GAS ; animation
 
 	db 2 ; retreat cost
 	db WR_GRASS ; weakness
@@ -11725,20 +11725,20 @@ MankeyLv7Card:
 	db ATK_ANIM_PKMN_POWER_1 ; animation
 
 	; attack 2
-	energy COLORLESS, 1 ; energies
-	tx ScratchName ; name
-	dw NONE ; description
+	energy FIGHTING, 1 ; energies
+	tx HideName ; name
+	tx TeleportBlastDescription ; description
 	dw NONE ; description (cont)
-	db 10 ; damage
+	db 40 ; damage
 	db DAMAGE_NORMAL ; category
-	dw NONE ; effect commands
+	dw DarkAlakazamTeleportBlastEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
-	db NONE ; flags 3
+	db SPECIAL_AI_HANDLING ; flags 3
 	db 0 ; ?
-	db ATK_ANIM_SLASH ; animation
+	db ATK_ANIM_DARK_GAS ; animation
 
-	db 0 ; retreat cost
+	db 1 ; retreat cost
 	db WR_PSYCHIC ; weakness
 	db NONE ; resistance
 	tx PigMonkeyName ; category

@@ -5717,7 +5717,7 @@ SECTION "Text Offsets 2", ROMX
 	textpointer SwiftDescription                                      ; 0x1649
 	textpointer SandshrewLv15Description                              ; 0x164a
 	textpointer SandslashName                                         ; 0x164b
-	textpointer Do20DamageTimes3FlipsDescription                         ; 0x164c
+	textpointer Do20DamageTimes3FlipsDescription                      ; 0x164c
 	textpointer SandslashLv33Description                              ; 0x164d
 	textpointer SandVeilName                                          ; 0x164e
 	textpointer RollingNeedleName                                     ; 0x164f

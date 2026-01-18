@@ -2160,22 +2160,40 @@ RainbowPowderEffect:
 	farcall ParalysisEffect
 	ret
 
+; Reclaimed 28 bytes!
+; FocusedOneShotEffect:
+; 	ldtx de, FocusedOneShotCheckText
+; 	farcall TossCoin_Bank1a
+; 	jr c, .heads
+
+; 	; was tails, next turn cannot use Corkscrew Punch
+; 	ld a, SUBSTATUS1_CANNOT_USE_CORKSCREW_PUNCH
+; 	farcall ApplySubstatus1ToAttackingCardAndSetCountdown
+; 	ld a, ATK_ANIM_FOCUSED_ONE_SHOT_FAILED
+; 	ld [wLoadedAttackAnimation], a
+; 	ret
+
+; .heads
+; 	; heads, next turn Corkscrew Punch is double damage
+; 	ld a, SUBSTATUS1_NEXT_TURN_DOUBLE_DAMAGE
+; 	farcall SetAttackDoubleOrTripleDamageNextTurn
+; 	ret
+
 FocusedOneShotEffect:
-	ldtx de, FocusedOneShotCheckText
+	ds 5, 0
+
+HeadacheEffect2:
+	ldtx de, AttackSuccessCheckText
 	farcall TossCoin_Bank1a
-	jr c, .heads
-
-	; was tails, next turn cannot use Corkscrew Punch
-	ld a, SUBSTATUS1_CANNOT_USE_CORKSCREW_PUNCH
-	farcall ApplySubstatus1ToAttackingCardAndSetCountdown
-	ld a, ATK_ANIM_FOCUSED_ONE_SHOT_FAILED
-	ld [wLoadedAttackAnimation], a
+	jr nc, .unsuccessful
+	ld a, DUELVARS_ARENA_CARD_SUBSTATUS3
+	call GetNonTurnDuelistVariable
+	set SUBSTATUS3_HEADACHE_F, [hl]
 	ret
-
-.heads
-	; heads, next turn Corkscrew Punch is double damage
-	ld a, SUBSTATUS1_NEXT_TURN_DOUBLE_DAMAGE
-	farcall SetAttackDoubleOrTripleDamageNextTurn
+.unsuccessful
+	xor a
+	ld [wLoadedAttackAnimation], a
+	farcall SetWasUnsuccessful
 	ret
 
 CorkscrewPunchEffect:

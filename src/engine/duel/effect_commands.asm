@@ -502,8 +502,8 @@ MagikarpFlailEffectCommands:
 	db $00
 
 PsyduckHeadacheEffectCommands:
-	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, HeadacheEffect
+	db BANK("Effect Functions 2") ; Used to be 1
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, HeadacheEffect2
 	db $00
 
 PsyduckFurySwipesEffectCommands:

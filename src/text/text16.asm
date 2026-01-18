@@ -2003,7 +2003,7 @@ SlicingWingName:
 	done
 
 SlicingWingDescription:
-	textfw "相手の場にいるポケモン1匹に、"
+	textfw "相手の控えポケモン1匹に、  "
 	linefw "「弱点・抵抗力」に関係なく、30"
 	linefw "ダメージ。ダメージを受けるポケモンは"
 	linefw "自動的に選ばれる。"

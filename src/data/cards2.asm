@@ -2606,22 +2606,22 @@ GastlyLv13Card:
 	db EXPANSION_SHEET ; real set
 	db ISLAND_OF_FOSSIL ; in-game set
 	dw GASTLY_LV13
-	db 40 ; hp
+	db 30 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
 	; attack 1
 	energy COLORLESS, 1 ; energies
 	tx SpookifyName ; name
-	tx SpookifyDescription ; description
+	tx HeadacheDescription ; description
 	dw NONE ; description (cont)
 	db 0 ; damage
 	db RESIDUAL ; category
-	dw GastlySpookifyEffectCommands ; effect commands
+	dw PsyduckHeadacheEffectCommands ; effect commands
 	db NONE ; flags 1
 	db FLAG_2_BIT_6 ; flags 2
 	db FLAG_3_BIT_2 ; flags 3
-	db 1 ; ?
+	db 0 ; ?
 	db ATK_ANIM_SPOOKIFY ; animation
 
 	; attack 2
@@ -6529,7 +6529,7 @@ KangaskhanLv40Card:
 	tx CometPunchName ; name
 	tx Do10DamageTimes4FlipsDescription ; description
 	dw NONE ; description (cont)
-	db 20 ; damage
+	db 10 ; damage
 	db DAMAGE_X ; category
 	dw Do10DamageTimes4FlipsEffectCommands ; effect commands
 	db NONE ; flags 1
