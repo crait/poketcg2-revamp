@@ -1514,7 +1514,7 @@ KabutoLv9Card:
 	db FOSSIL ; real set
 	db ISLAND_OF_FOSSIL ; in-game set
 	dw KABUTO_LV9
-	db 30 ; hp
+	db 70 ; hp
 	db STAGE1 ; stage
 	tx MysteriousFossilName ; pre-evo name
 
@@ -1546,7 +1546,7 @@ KabutoLv9Card:
 	db 0 ; ?
 	db ATK_ANIM_SLASH ; animation
 
-	db 1 ; retreat cost
+	db 2 ; retreat cost
 	db WR_GRASS ; weakness
 	db NONE ; resistance
 	tx ShellfishName ; category
@@ -1618,7 +1618,7 @@ KabutopsCard:
 	db FOSSIL ; real set
 	db PSYCHIC_BATTLE ; in-game set
 	dw KABUTOPS
-	db 60 ; hp
+	db 100 ; hp
 	db STAGE2 ; stage
 	tx KabutoName ; pre-evo name
 
@@ -1637,11 +1637,11 @@ KabutopsCard:
 	db ATK_ANIM_TEAR ; animation
 
 	; attack 2
-	energy FIGHTING, 4 ; energies
+	energy FIGHTING, 2, COLORLESS 2 ; energies
 	tx AbsorbName ; name
 	tx MegaDrainDescription ; description
 	dw NONE ; description (cont)
-	db 40 ; damage
+	db 60 ; damage
 	db DAMAGE_NORMAL ; category
 	dw KabutopsAbsorbEffectCommands ; effect commands
 	db NONE ; flags 1
@@ -7078,7 +7078,7 @@ SnorlaxLv20Card:
 	db JUNGLE ; real set
 	db BEGINNING_POKEMON ; in-game set
 	dw SNORLAX_LV20
-	db 90 ; hp
+	db 80 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
@@ -7101,7 +7101,7 @@ SnorlaxLv20Card:
 	tx BodySlamName ; name
 	tx MayInflictParalysisDescription ; description
 	dw NONE ; description (cont)
-	db 30 ; damage
+	db 20 ; damage
 	db DAMAGE_NORMAL ; category
 	dw SnorlaxBodySlamEffectCommands ; effect commands
 	db INFLICT_PARALYSIS ; flags 1
@@ -7112,7 +7112,7 @@ SnorlaxLv20Card:
 
 	db 4 ; retreat cost
 	db WR_FIGHTING ; weakness
-	db WR_PSYCHIC ; resistance
+	db NONE ; resistance
 	tx SleepingName ; category
 	db DEX_SNORLAX ; Pokedex number
 	db FALSE ; is Dark
@@ -7182,7 +7182,7 @@ HungrySnorlaxCard:
 	db PRO ; real set
 	db PROMOTIONAL ; in-game set
 	dw HUNGRY_SNORLAX
-	db 100 ; hp
+	db 80 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
@@ -7201,11 +7201,11 @@ HungrySnorlaxCard:
 	db ATK_ANIM_GLOW_EFFECT ; animation
 
 	; attack 2
-	energy COLORLESS, 3 ; energies
+	energy COLORLESS, 4 ; energies
 	tx RolloutName ; name
 	tx RolloutDescription ; description
 	dw NONE ; description (cont)
-	db 20 ; damage
+	db 10 ; damage
 	db DAMAGE_PLUS ; category
 	dw HungrySnorlaxRolloutEffectCommands ; effect commands
 	db NONE ; flags 1
@@ -7216,7 +7216,7 @@ HungrySnorlaxCard:
 
 	db 4 ; retreat cost
 	db WR_FIGHTING ; weakness
-	db WR_PSYCHIC ; resistance
+	db NONE ; resistance
 	tx SleepingName ; category
 	db DEX_SNORLAX ; Pokedex number
 	db FALSE ; is Dark

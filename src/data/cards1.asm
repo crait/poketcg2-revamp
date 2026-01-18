@@ -8690,7 +8690,7 @@ OmanyteLv19Card:
 	db FOSSIL ; real set
 	db ISLAND_OF_FOSSIL ; in-game set
 	dw OMANYTE_LV19
-	db 40 ; hp
+	db 70 ; hp
 	db STAGE1 ; stage
 	tx MysteriousFossilName ; pre-evo name
 
@@ -8742,7 +8742,7 @@ OmanyteLv20Card:
 	db EXPANSION_SHEET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
 	dw OMANYTE_LV20
-	db 50 ; hp
+	db 70 ; hp
 	db STAGE1 ; stage
 	tx MysteriousFossilName ; pre-evo name
 
@@ -8774,7 +8774,7 @@ OmanyteLv20Card:
 	db 0 ; ?
 	db ATK_ANIM_HIT ; animation
 
-	db 1 ; retreat cost
+	db 2 ; retreat cost
 	db WR_GRASS ; weakness
 	db NONE ; resistance
 	tx SpiralName ; category
@@ -8794,7 +8794,7 @@ OmanyteLv22Card:
 	db EXPANSION_SHEET ; real set
 	db SKY_FLYING_POKEMON ; in-game set
 	dw OMANYTE_LV22
-	db 50 ; hp
+	db 60 ; hp
 	db STAGE1 ; stage
 	tx MysteriousFossilName ; pre-evo name
 
@@ -8813,11 +8813,11 @@ OmanyteLv22Card:
 	db ATK_ANIM_GLOW_EFFECT ; animation
 
 	; attack 2
-	energy WATER, 2 ; energies
+	energy WATER, 1 ; energies
 	tx SurfName ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
-	db 30 ; damage
+	db 10 ; damage
 	db DAMAGE_NORMAL ; category
 	dw NONE ; effect commands
 	db NONE ; flags 1
@@ -8826,7 +8826,7 @@ OmanyteLv22Card:
 	db 0 ; ?
 	db ATK_ANIM_WATER_JETS ; animation
 
-	db 1 ; retreat cost
+	db 2 ; retreat cost
 	db WR_GRASS ; weakness
 	db NONE ; resistance
 	tx SpiralName ; category
@@ -8898,7 +8898,7 @@ OmastarLv36Card:
 	db EXPANSION_SHEET ; real set
 	db PROMOTIONAL ; in-game set
 	dw OMASTAR_LV36
-	db 80 ; hp
+	db 120 ; hp
 	db STAGE2 ; stage
 	tx OmanyteName ; pre-evo name
 
@@ -8917,13 +8917,13 @@ OmastarLv36Card:
 	db ATK_ANIM_GLOW_EFFECT ; animation
 
 	; attack 2
-	energy WATER, 3 ; energies
+	energy WATER, 2 ; energies
 	tx CorrosiveAcidName ; name
-	tx CorrosiveAcidDescription ; description
+	tx MayInflictParalysisAltDescription ; description
 	dw NONE ; description (cont)
 	db 40 ; damage
 	db DAMAGE_NORMAL ; category
-	dw OmastarCorrosiveAcidEffectCommands ; effect commands
+	dw ArticunoIceBeamEffectCommands ; effect commands
 	db INFLICT_PARALYSIS ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3

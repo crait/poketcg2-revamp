@@ -1114,7 +1114,7 @@ NoPokemonEvolvingFromFossilText:
 
 CannotUseSinceItAlreadyHas2FoodCountersText:
 	textfw "「たべものカウンター」が"
-	linefw "2コのっているので つかえません"
+	linefw "4コのっているので つかえません"
 	done
 
 CannotEvolveText:

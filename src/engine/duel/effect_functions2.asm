@@ -5504,7 +5504,7 @@ Eat_CountersCheck:
 	ld a, DUELVARS_ARENA_CARD_FOOD_COUNTERS
 	get_turn_duelist_var
 	ldtx hl, CannotUseSinceItAlreadyHas2FoodCountersText
-	cp 2
+	cp 4
 	ccf
 	; carry set if food counters >= 2
 	ret
@@ -5618,8 +5618,8 @@ Rollout_RemoveCountersAndDamageBoostEffect:
 
 	; add num chosen * 30 to damage
 	ld a, e
-	add a
-	add e
+	nop ; add a
+	nop ; add e
 	call ATimes10
 	farcall AddToDamage
 	ret
