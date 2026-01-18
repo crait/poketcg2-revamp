@@ -2155,32 +2155,48 @@ NidorinoDoubleKick_MultiplierEffect:
 	call SetDefiniteDamage
 	ret
 
+; Reclaiming 38 bytes! (8, 6, and 24)
+; ButterfreeWhirlwind_CheckBench:
+; 	call HandleMandatorySwitchSelection
+; 	ldh a, [hTempPlayAreaLocation_ff9d]
+; 	ldh [hTemp_ffa0], a
+; 	ret
+; ButterfreeWhirlwind_SwitchEffect:
+; 	ldh a, [hTemp_ffa0]
+; 	call HandleSwitchDefendingPokemonEffect
+; 	ret
+; ButterfreeMegaDrainEffect:
+; 	ld hl, wDealtDamage
+; 	ld a, [hli]
+; 	ld h, [hl]
+; 	ld l, a
+; 	srl h
+; 	rr l
+; 	bit 0, l
+; 	jr z, .asm_68b02
+; 	ldtx de, DoneText
+; 	add hl, de
+; .asm_68b02
+; 	ld e, l
+; 	ld d, h
+; 	call ApplyAndAnimateHPRecovery
+; 	ret
 ButterfreeWhirlwind_CheckBench:
-	call HandleMandatorySwitchSelection
-	ldh a, [hTempPlayAreaLocation_ff9d]
-	ldh [hTemp_ffa0], a
-	ret
-
 ButterfreeWhirlwind_SwitchEffect:
-	ldh a, [hTemp_ffa0]
-	call HandleSwitchDefendingPokemonEffect
-	ret
-
 ButterfreeMegaDrainEffect:
-	ld hl, wDealtDamage
-	ld a, [hli]
-	ld h, [hl]
-	ld l, a
-	srl h
-	rr l
-	bit 0, l
-	jr z, .asm_68b02
-	ldtx de, DoneText
-	add hl, de
-.asm_68b02
-	ld e, l
-	ld d, h
-	call ApplyAndAnimateHPRecovery
+	ds 12, 0
+
+SlicingWindEffect2:
+	farcall CheckNonTurnDuelistHasBench
+	ret c
+	call SwapTurn
+	dec a
+	call Random
+	inc a
+	ld b, a
+	ld de, 30
+	call DealDamageToPlayAreaPokemon_RegularAnim
+	call SwapTurn
 	ret
 
 ParasSporeEffect:

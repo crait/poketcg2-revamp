@@ -709,7 +709,7 @@ HornRush_NoDamage50PercentEffect:
 	farcall SetWasUnsuccessful
 	ret
 
-FollowMe_AssertPokemonInBench:
+AssertPokemonInBench:
 	farcall CheckNonTurnDuelistHasBench
 	ret
 

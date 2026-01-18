@@ -264,10 +264,18 @@ NidorinoDoubleKickEffectCommands:
 	dbw EFFECTCMDTYPE_AI, NidorinoDoubleKick_AIEffect
 	db $00
 
+	
+PidgeotSlicingWindEffectCommands:
+	db BANK("Effect Functions 1")
+	; dbw EFFECTCMDTYPE_INITIAL_EFFECT_1, AssertPokemonInBench
+	dbw EFFECTCMDTYPE_AFTER_DAMAGE, SlicingWindEffect2
+	db $00
+
 ButterfreeWhirlwindEffectCommands:
 	db BANK("Effect Functions 1")
 	dbw EFFECTCMDTYPE_AFTER_DAMAGE, ButterfreeWhirlwind_SwitchEffect
 	dbw EFFECTCMDTYPE_REQUIRE_SELECTION, ButterfreeWhirlwind_CheckBench
+	; Removed this to reclaim space to add AssertPokemonInBench to SlicingWindEffectCommands
 	dbw EFFECTCMDTYPE_AI_SWITCH_DEFENDING_PKMN, ButterfreeWhirlwind_CheckBench
 	db $00
 
@@ -1715,11 +1723,6 @@ DittoMorphEffectCommands:
 	dbw EFFECTCMDTYPE_AFTER_DAMAGE, Morph_TransformEffect
 	db $00
 
-PidgeotSlicingWindEffectCommands:
-	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_AFTER_DAMAGE, SlicingWindEffect
-	db $00
-
 PidgeotGaleEffectCommands:
 	db BANK("Effect Functions 1")
 	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Gale_LoadAnimation
@@ -2400,7 +2403,7 @@ NidoranMHornRushEffectCommands:
 
 ClefairyFollowMeEffectCommands:
 	db BANK("Effect Functions 2")
-	dbw EFFECTCMDTYPE_INITIAL_EFFECT_1, FollowMe_AssertPokemonInBench
+	dbw EFFECTCMDTYPE_INITIAL_EFFECT_1, AssertPokemonInBench
 	dbw EFFECTCMDTYPE_AFTER_DAMAGE, FollowMe_SwitchDefendingPokemon
 	dbw EFFECTCMDTYPE_REQUIRE_SELECTION, FollowMe_SelectSwitchPokemon
 	dbw EFFECTCMDTYPE_AI_SWITCH_DEFENDING_PKMN, FollowMe_GetBenchPokemonWithLowestHP
