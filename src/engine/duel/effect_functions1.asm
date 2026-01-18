@@ -8363,12 +8363,16 @@ PickRandomBasicCardFromDeck:
 SlicingWindEffect:
 	call SwapTurn
 	call PickRandomPlayAreaCard
+	; or a
+	; jr nz, .ok
+	; inc a
+; .ok
 	ld b, a
 	ld de, 30
 	call DealDamageToPlayAreaPokemon_RegularAnim
 	call SwapTurn
 	ret
-
+	
 Gale_LoadAnimation:
 	ld a, ATK_ANIM_GALE
 	ld [wLoadedAttackAnimation], a
