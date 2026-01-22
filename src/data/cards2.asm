@@ -4225,14 +4225,14 @@ PidgeottoLv36Card:
 	; attack 1
 	energy COLORLESS, 1 ; energies
 	tx WhirlwindName ; name
-	tx WhirlwindDescription ; description
+	tx FoxFireDescription ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_NORMAL ; category
-	dw PidgeottoWhirlwindEffectCommands ; effect commands
+	dw VulpixFoxFireEffectCommands ; effect commands
 	db NONE ; flags 1
-	db SWITCH_OPPONENT_POKEMON ; flags 2
-	db NONE ; flags 3
+	db NONE ; flags 2
+	db SPECIAL_AI_HANDLING | FLAG_3_BIT_2 ; flags 3
 	db 0 ; ?
 	db ATK_ANIM_WHIRLWIND ; animation
 
@@ -6619,7 +6619,7 @@ TaurosLv35Card:
 	tx KickAwayName ; name
 	tx TeleportBlastDescription ; description
 	dw NONE ; description (cont)
-	db 10 ; damage
+	db 30 ; damage
 	db DAMAGE_NORMAL ; category
 	dw DarkAlakazamTeleportBlastEffectCommands ; effect commands
 	db NONE ; flags 1
@@ -7713,7 +7713,7 @@ LugiaCard:
 	dw NONE ; description (cont)
 	db 0 ; damage
 	db RESIDUAL ; category
-	dw ClefairyFollowMeEffectCommands ; effect commands
+	dw VictreebelLureEffectCommands ; effect commands
 	db NONE ; flags 1
 	db SWITCH_OPPONENT_POKEMON ; flags 2
 	db FLAG_3_BIT_2 ; flags 3
