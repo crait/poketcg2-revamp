@@ -2049,7 +2049,7 @@ DrowzeeNightmareEffectCommands:
 
 DarkHypnoBenchManipulationEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_INITIAL_EFFECT_1, BenchManipulation_CheckBench
+	dbw EFFECTCMDTYPE_INITIAL_EFFECT_1, CheckNonTurnDuelistHasBench
 	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, BenchManipulation_MultiplierEffect
 	dbw EFFECTCMDTYPE_AI, BenchManipulation_AIEffect
 	db $00

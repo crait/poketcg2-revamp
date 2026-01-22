@@ -9899,6 +9899,7 @@ BenchManipulation_AIEffect:
 	ld a, DUELVARS_NUMBER_OF_POKEMON_IN_PLAY_AREA
 	call GetNonTurnDuelistVariable
 	add a
+	add a ; In order to change the damage from 20x to 30x, I am adding this
 	call ATimes10
 	; sets max damage as (num bench cards) * 20
 	ld [wAIMaxDamage], a
@@ -9910,9 +9911,7 @@ BenchManipulation_AIEffect:
 	ld [wAIMinDamage], a
 	ret
 
-BenchManipulation_CheckBench:
-	call CheckNonTurnDuelistHasBench
-	ret
+ds 3, 0
 
 BenchManipulation_MultiplierEffect:
 	; don't do damage if Aurora Veil is active
@@ -9925,7 +9924,7 @@ BenchManipulation_MultiplierEffect:
 	jr nc, .no_aurora_veil
 	ret
 .no_aurora_veil
-	ld hl, 20
+	ld hl, 30
 	call LoadTxRam3
 	call SwapTurn
 	ld a, DUELVARS_NUMBER_OF_POKEMON_IN_PLAY_AREA

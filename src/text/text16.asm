@@ -1604,7 +1604,7 @@ BenchManipulationName:
 BenchManipulationDescription:
 	textfw "相手プレイヤーは、相手の控えポケモン"
 	linefw "の数ぶんコインを投げ、「うら」が"
-	linefw "出た数×20のダメージ。"
+	linefw "出た数×30のダメージ。"
 	linefw "(このワザのダメージは[相手]の「弱点"
 	linefw "・抵抗力」の影響を受けない)"
 	done

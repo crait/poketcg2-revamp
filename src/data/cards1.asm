@@ -5570,12 +5570,12 @@ FlareonLv28Card:
 	db JUNGLE ; real set
 	db LEGENDARY_POWER ; in-game set
 	dw FLAREON_LV28
-	db 70 ; hp
+	db 80 ; hp
 	db STAGE1 ; stage
 	tx EeveeName ; pre-evo name
 
 	; attack 1
-	energy COLORLESS, 2 ; energies
+	energy FIRE, 1 ; energies
 	tx QuickAttackName ; name
 	tx QuickAttackDescription ; description
 	dw NONE ; description (cont)
@@ -5593,7 +5593,7 @@ FlareonLv28Card:
 	tx FlamethrowerName ; name
 	tx DiscardOneFireEnergyDescription ; description
 	dw NONE ; description (cont)
-	db 60 ; damage
+	db 80 ; damage
 	db DAMAGE_NORMAL ; category
 	dw FlareonFlamethrowerEffectCommands ; effect commands
 	db NONE ; flags 1
