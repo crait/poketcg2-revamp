@@ -6997,7 +6997,7 @@ TentacruelCard:
 	tx PoisonStingName ; name
 	tx InflictPoisonDescription ; description
 	dw NONE ; description (cont)
-	db 10 ; damage
+	db 20 ; damage
 	db DAMAGE_NORMAL ; category
 	dw ParasectToxicSporeEffectCommands ; effect commands
 	db INFLICT_POISON ; flags 1
