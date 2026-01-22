@@ -752,9 +752,12 @@ AISelectSpecialAttackParameters:
 	or a
 	jp nz, .no_carry
 
-	; toss coin
-	ldtx de, IfHeadsAttachUpTo3WaterEnergyFromDeckText
-	farcall Serial_TossCoin
+	; Removed coin toss by removing the farcall and adding two nop to retain the same footprint
+	ldtx de, AttachUpTo3WaterEnergyFromDeckText
+	; farcall Serial_TossCoin
+	ld a, 1
+	nop
+	nop
 	ldh [hTemp_ffa0], a
 
 	; check number of Water energies attached to Kingler

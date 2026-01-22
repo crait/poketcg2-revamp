@@ -446,7 +446,7 @@ TextOffsets::
 	textpointer ChooseAParasText                                      ; 0x01b8
 	textpointer ChooseATrainerCardFromDeckText                        ; 0x01b9
 	textpointer ChooseATrainerCardText                                ; 0x01ba
-	textpointer IfHeadsAttachUpTo3WaterEnergyFromDeckText             ; 0x01bb
+	textpointer AttachUpTo3WaterEnergyFromDeckText                    ; 0x01bb
 	textpointer ChooseWaterEnergyText                                 ; 0x01bc
 	textpointer NoFossilsInDiscardPileText                            ; 0x01bd
 	textpointer ChooseALightningEnergyFromDeckText                    ; 0x01be

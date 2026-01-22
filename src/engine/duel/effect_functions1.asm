@@ -2184,7 +2184,12 @@ NidorinoDoubleKick_MultiplierEffect:
 ButterfreeWhirlwind_CheckBench:
 ButterfreeWhirlwind_SwitchEffect:
 ButterfreeMegaDrainEffect:
-	ds 12, 0
+PreventRetreatingToSelfEffect:
+	ld a, SUBSTATUS2_ACID
+	call ApplySubstatus2ToAttackingCard
+	ret
+
+ds 6, 0
 
 SlicingWindEffect2:
 	farcall CheckNonTurnDuelistHasBench
@@ -2960,58 +2965,30 @@ CalculateKinglerFlailDamage:
 	call SetDefiniteDamage
 	ret
 
-; returns carry if no cards in Deck
-; or if Play Area is full already.
+ds 77, 0
 KrabbyCallForFamily_CheckDeckAndPlayArea:
-	farcall CheckIfDeckIsEmpty
-	ret c ; return if no cards in deck
-	farcall CheckIfHasSpaceInBench
-	ret
-
 KrabbyCallForFamily_PlayerSelectEffect:
-	call CreateDeckCardList
-	ldtx hl, ChooseAKrabbyFromDeckText
-	ldtx bc, EffectTargetKrabbyText
-	ld de, DEX_KRABBY
-	ld a, CARDSEARCH_POKEDEX_NUMBER
-	farcall LookForCardsInDeck
-	jr c, .got_selection
-	ldtx hl, ChooseAKrabbyText
-	ldtx de, DuelistDeckText
-	farcall SelectCardSearchTarget
-.got_selection
-	ldh [hTemp_ffa0], a
-	ret
-
 KrabbyCallForFamily_AISelectEffect:
-	ld de, DEX_KRABBY
-	ld a, CARDSEARCH_POKEDEX_NUMBER
-	farcall SetCardSearchFuncParams
-	call CreateDeckCardList
-	ld hl, wDuelTempList
-.loop
-	ld a, [hli]
-	ldh [hTemp_ffa0], a
-	cp $ff
-	ret z
-	farcall ExecuteCardSearchFunc
-	jr nc, .loop
-	ret
-
 KrabbyCallForFamily_PutInPlayAreaEffect:
-	ldh a, [hTemp_ffa0]
-	cp $ff
-	jr z, .shuffle
-	call SearchCardInDeckAndAddToHand
-	call AddCardToHand
-	call PutHandPokemonCardInPlayArea
-	call IsPlayerTurn
-	jr c, .shuffle
-	ldh a, [hTemp_ffa0]
-	ldtx hl, PlacedOnBenchText
-	bank1call DisplayCardDetailScreen
-.shuffle
-	call ShuffleCardsInDeck
+DigALittleEffect:
+	call SwapTurn
+	ld c, 2
+	xor a
+	ld b, a
+.loop
+	call DrawCardFromDeck
+	jr c, .no_card
+	call PutCardInDiscardPile
+	inc b
+.no_card
+	dec c
+	jr nz, .loop
+	ld l, b
+	ld h, 0
+	call LoadTxRam3
+	ldtx hl, DiscardedCardsFromDeckText
+	call DrawWideTextBox_PrintText
+	call SwapTurn
 	ret
 
 MagikarpFlail_AIEffect:
@@ -6314,7 +6291,7 @@ ElectabuzzQuickAttack_DamageBoostEffect:
 	call AddToDamage
 	ret
 
-MagnemiteThunderWaveEffect:
+MagmemiteThunderWaveEffect:
 	call Paralysis50PercentEffect
 	ret
 
@@ -9308,7 +9285,7 @@ PollenStench_ConfusionEffect:
 	jr .animate
 
 .got_heads
-	ld a, ATK_ANIM_POLLEN_STENCH_CONFUSION
+	ld a, ATK_ANIM_POLLEN_STENCH_OWN_CONFUSION
 	farcall PlayAttackAnimationOverAttackingPokemon
 	call ConfusionEffect
 
@@ -10933,13 +10910,16 @@ ToxicSpore_PoisonEffect:
 	call PoisonEffect
 	ret
 
-PoliwagBubbleEffect:
-	call Paralysis50PercentEffect
+; apply a status condition of type 2 identified by register a to the target
+ApplySubstatus2ToAttackingCard:
+	push af
+	ld a, DUELVARS_ARENA_CARD_SUBSTATUS2
+	get_turn_duelist_var
+	pop af
+	ld [hli], a
 	ret
 
-PoliwagBodySlamEffect:
-	call Paralysis50PercentEffect
-	ret
+ds 1, 0
 
 LickitungLickEffect:
 	call Paralysis50PercentOrNoEffect

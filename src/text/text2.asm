@@ -669,9 +669,10 @@ ChooseATrainerCardText:
 	linefw "えらんでください"
 	done
 
-IfHeadsAttachUpTo3WaterEnergyFromDeckText:
-	textfw "「おもて」なら 山札から 3枚まで"
-	linefw "水エネルギーをひいて [自分]につける"
+AttachUpTo3WaterEnergyFromDeckText:
+	
+	textfw "山札から 「水」エネルギーを    "
+	linefw "3枚 えらんでください       "
 	done
 
 ChooseWaterEnergyText:

@@ -77,9 +77,9 @@ VictreebelLureEffectCommands:
 	dbw EFFECTCMDTYPE_AI_SELECTION, VictreebelLure_GetBenchPokemonWithLowestHP
 	db $00
 
-VictreebelAcidEffectCommands:
+PreventRetreatingToSelfEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, MayPreventRetreatingEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, PreventRetreatingToSelfEffect
 	db $00
 
 PinsirIronGripEffectCommands:
@@ -87,7 +87,7 @@ PinsirIronGripEffectCommands:
 	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, IronGripEffect
 	db $00
 
-CaterpieStringShotEffectCommands:
+MayPreventRetreatingEffectCommands:
 	db BANK("Effect Functions 1")
 	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, MayPreventRetreatingEffect
 	db $00
@@ -1268,9 +1268,9 @@ ElectabuzzQuickAttackEffectCommands:
 	dbw EFFECTCMDTYPE_AI, ElectabuzzQuickAttack_AIEffect
 	db $00
 
-MagnemiteThunderWaveEffectCommands:
+DigALittleEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, MagnemiteThunderWaveEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, DigALittleEffect
 	db $00
 
 Selfdestruct60DamageEffectCommands:
@@ -2463,7 +2463,7 @@ ParasectLeechLifeEffectCommands:
 
 PoliwagBubbleEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, PoliwagBubbleEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, MayInflictParalysisEffect
 	db $00
 
 PoliwhirlTwiddleEffectCommands:
@@ -2473,7 +2473,7 @@ PoliwhirlTwiddleEffectCommands:
 
 PoliwagBodySlamEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, PoliwagBodySlamEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, MayInflictParalysisEffect
 	db $00
 
 PoliwrathHydroPumpEffectCommands:

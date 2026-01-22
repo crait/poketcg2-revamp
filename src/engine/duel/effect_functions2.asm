@@ -4730,13 +4730,16 @@ SaltWater_AIEffect:
 	ret
 
 SaltWater_PlayerSelectEffect:
-	ldtx de, IfHeadsAttachUpTo3WaterEnergyFromDeckText
-	farcall Serial_TossCoin
-	ldh [hTemp_ffa0], a
-	ret nc ; tails
-
-	; was heads
+	ldtx hl, AttachUpTo3WaterEnergyFromDeckText
+	call DrawWideTextBox_WaitForInput
+	; farcall Serial_TossCoin
+	; ldh [hTemp_ffa0], a
+	; ret nc ; tails
+	nop
+	nop
+	
 	ld a, 1
+	ldh [hTemp_ffa0], a
 	ldh [hCurSelectionItem], a
 	call CreateDeckCardList
 .init_menu
@@ -4796,10 +4799,18 @@ SaltWater_AttachToArenaEffect:
 	jr z, .finish
 	call SearchCardInDeckAndAddToHand
 	call AddCardToHand
-	push hl
-	ld e, PLAY_AREA_ARENA
-	call PutHandCardInPlayArea
-	pop hl
+	; Don't put the energy cards into the hand, anymore
+	; push hl
+	; ld e, PLAY_AREA_ARENA
+	; call PutHandCardInPlayArea
+	; pop hl
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
 	jr .loop_attach_energy
 
 .finish

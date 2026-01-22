@@ -1253,10 +1253,10 @@ SaltWaterName:
 	done
 
 SaltWaterDescription:
-	textfw "コインを投げて「おもて」なら、自分の"
-	linefw "山札から「水」エネルギーカードを3枚"
-	linefw "選び出し、このカードにつける。"
-	linefw "その後、その山札をよく切る。"
+	textfw "自分の 山札から「水」エネルギー "
+	linefw "カードを3枚 選び出し、"
+	linefw "手札にくわえる。 その後、"
+	linefw "その山札をよく切る。"
 	done
 
 DoubleEdgedPincersName:
