@@ -9701,7 +9701,7 @@ RaichuLv32Card:
 	tx SparkingKickName ; name
 	tx MayInflictParalysisAltDescription ; description
 	dw NONE ; description (cont)
-	db 20 ; damage
+	db 30 ; damage
 	db DAMAGE_NORMAL ; category
 	dw RaichuSparkingKickEffectCommands ; effect commands
 	db INFLICT_PARALYSIS ; flags 1
