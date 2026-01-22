@@ -11729,7 +11729,7 @@ MankeyLv7Card:
 	tx HideName ; name
 	tx TeleportBlastDescription ; description
 	dw NONE ; description (cont)
-	db 40 ; damage
+	db 10 ; damage
 	db DAMAGE_NORMAL ; category
 	dw DarkAlakazamTeleportBlastEffectCommands ; effect commands
 	db NONE ; flags 1
