@@ -2398,12 +2398,12 @@ ParasLv8Card:
 	db JUNGLE ; real set
 	db PSYCHIC_BATTLE ; in-game set
 	dw PARAS_LV8
-	db 50 ; hp
+	db 30 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
 	; attack 1
-	energy COLORLESS, 2 ; energies
+	energy COLORLESS, 1 ; energies
 	tx ScratchName ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
