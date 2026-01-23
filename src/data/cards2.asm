@@ -6369,8 +6369,8 @@ ChanseyLv55Card:
 	db ATK_ANIM_NONE ; animation
 
 	; attack 2
-	energy COLORLESS, 2 ; energies
-	tx SubmissionName ; name
+	energy COLORLESS, 3 ; energies
+	tx DoubleEdgeName ; name
 	tx Do20DamageToSelfDescription ; description
 	dw NONE ; description (cont)
 	db 20 ; damage
