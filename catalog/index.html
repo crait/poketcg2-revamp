@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+		<title>Pokemon TCG - Revamp: Card &amp; Deck Catalog</title>
+	</head>
+	<body class="d-flex flex-column h-100">
+		<div class="container py-4">
+			<h2>Pokemon TCG - Revamp: Card &amp; Deck Catalog</h2>
+			<br />
+
+			<ul class="nav nav-tabs" id="myTab" role="tablist">
+				<li class="nav-item" role="presentation">
+					<button class="nav-link active" id="decks-tab" data-bs-toggle="tab" data-bs-target="#decks-tab-pane" type="button" role="tab" aria-controls="decks-tab-pane" aria-selected="true">
+						Decks
+					</button>
+				</li>
+				<li class="nav-item" role="presentation">
+					<button class="nav-link" id="packs-tab" data-bs-toggle="tab" data-bs-target="#packs-tab-pane" type="button" role="tab" aria-controls="packs-tab-pane" aria-selected="false">
+						Packs
+					</button>
+				</li>
+			</ul>
+			<div class="tab-content" id="myTabContent">
+				<div class="tab-pane fade show active" id="decks-tab-pane" role="tabpanel" aria-labelledby="decks-tab" tabindex="0">
+					<select id="deck-selector" class="form-select">
+						
+					</select>
+					
+					<div id="deck-display" class="p-4">
+						<h5 id="deck-name"></h5>
+						<div id="deck-contents">
+		
+						</div>
+					</div>
+				</div>
+				<div class="tab-pane fade" id="packs-tab-pane" role="tabpanel" aria-labelledby="packs-tab" tabindex="0">
+					<select id="pack-selector" class="form-select">
+						
+					</select>
+					
+					<div id="pack-display" class="p-4">
+						<h5 id="pack-name"></h5>
+						<span id="pack-count" class="badge bg-secondary"></span>
+						<div id="pack-contents">
+		
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+		<script>
+			fetch('data.json').then((response) => {
+				return response.json()
+			}).then((data) => {
+				console.log(data)
+				decks = data.decks
+				cards = data.cards
+
+				let create_image = (id) => {
+					let sprite = document.createElement('img')
+					sprite.src = './art/' + id + '.png'
+					sprite.width = 64
+					sprite.height = 48
+					sprite.onclick = () => {
+						navigator.clipboard.writeText(id)
+					}
+					return sprite
+				}
+
+				let update_deck_contents = (deck) => {
+					deck_contents = document.getElementById('deck-contents')
+					deck_name = document.getElementById('deck-name')
+					
+					deck_name.innerHTML = data.decks[deck].key_name
+					deck_contents.innerHTML = ''
+
+					data.decks[deck].cards.forEach((card) => {
+						deck_contents.appendChild(create_image(card))
+					})
+				}
+
+				let update_pack_contents = (pack) => {
+					pack_contents = document.getElementById('pack-contents')
+					pack_name = document.getElementById('pack-name')
+					pack_count = document.getElementById('pack-count')
+					
+					pack_name.innerHTML = pack
+					pack_contents.innerHTML = ''
+
+					var count = 0
+
+					Object.keys(data.packs[pack]).forEach((rarity) => {
+						pack_contents.appendChild(document.createElement('hr'))
+
+						data.packs[pack][rarity].forEach((card) => {
+							count++
+							pack_contents.appendChild(create_image(card))
+						})
+					})
+
+					pack_count.innerHTML = count.toString()
+				}
+				
+				deck_select = document.getElementById('deck-selector')
+				for(let key in data.decks) {
+					deck_select.options[deck_select.options.length] = new Option(key, key)
+				}
+				deck_select.onchange = function() {
+					update_deck_contents(this.value)
+				}
+				
+				pack_select = document.getElementById('pack-selector')
+				for(let key in data.packs) {
+					pack_select.options[pack_select.options.length] = new Option(key, key)
+				}
+				pack_select.onchange = function() {
+					update_pack_contents(this.value)
+				}
+			})
+		</script>
+	</body>
+</html>

@@ -370,7 +370,7 @@ DarkMachampCard:
 	db TEAM_ROCKET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
 	dw DARK_MACHAMP
-	db 120 ; hp
+	db 110 ; hp
 	db STAGE2 ; stage
 	tx MachokeName ; pre-evo name
 
@@ -678,7 +678,7 @@ GolemLv36Card:
 	db TYPE_PKMN_FIGHTING ; type
 	dw $3d1e ; gfx
 	tx GolemName ; name
-	db DIAMOND ; rarity
+	db STAR ; rarity
 	db FOSSIL ; real set
 	db ISLAND_OF_FOSSIL ; in-game set
 	dw GOLEM_LV36
@@ -1146,7 +1146,7 @@ HitmonleeLv23Card:
 	db TYPE_PKMN_FIGHTING ; type
 	dw $88d2 ; gfx
 	tx HitmonleeName ; name
-	db STAR ; rarity
+	db DIAMOND ; rarity
 	db EXPANSION_SHEET ; real set
 	db LEGENDARY_POWER ; in-game set
 	dw HITMONLEE_LV23
@@ -1406,7 +1406,7 @@ RhydonLv37Card:
 	db TYPE_PKMN_FIGHTING ; type
 	dw $993b ; gfx
 	tx RhydonName ; name
-	db STAR ; rarity
+	db DIAMOND ; rarity
 	db EXPANSION_SHEET ; real set
 	db PSYCHIC_BATTLE ; in-game set
 	dw RHYDON_LV37
@@ -1978,7 +1978,7 @@ KadabraLv39Card:
 	db TYPE_PKMN_PSYCHIC ; type
 	dw $9163 ; gfx
 	tx KadabraName ; name
-	db STAR ; rarity
+	db DIAMOND ; rarity
 	db EXPANSION_SHEET ; real set
 	db SKY_FLYING_POKEMON ; in-game set
 	dw KADABRA_LV39
@@ -2446,7 +2446,7 @@ SlowbroLv35Card:
 	db TYPE_PKMN_PSYCHIC ; type
 	dw $9518 ; gfx
 	tx SlowbroName ; name
-	db CIRCLE ; rarity
+	db DIAMOND ; rarity
 	db EXPANSION_SHEET ; real set
 	db SKY_FLYING_POKEMON ; in-game set
 	dw SLOWBRO_LV35
@@ -2654,7 +2654,7 @@ GastlyLv17Card:
 	db TYPE_PKMN_PSYCHIC ; type
 	dw $453a ; gfx
 	tx GastlyName ; name
-	db DIAMOND ; rarity
+	db CIRCLE ; rarity
 	db FOSSIL ; real set
 	db PSYCHIC_BATTLE ; in-game set
 	dw GASTLY_LV17
@@ -2810,7 +2810,7 @@ HaunterLv25Card:
 	db TYPE_PKMN_PSYCHIC ; type
 	dw $9657 ; gfx
 	tx HaunterName ; name
-	db STAR ; rarity
+	db DIAMOND ; rarity
 	db EXPANSION_SHEET ; real set
 	db SKY_FLYING_POKEMON ; in-game set
 	dw HAUNTER_LV25
@@ -2862,7 +2862,7 @@ HaunterLv26Card:
 	db TYPE_PKMN_PSYCHIC ; type
 	dw $95ee ; gfx
 	tx HaunterName ; name
-	db DIAMOND ; rarity
+	db STAR ; rarity
 	db EXPANSION_SHEET ; real set
 	db ISLAND_OF_FOSSIL ; in-game set
 	dw HAUNTER_LV26
@@ -3122,7 +3122,7 @@ DrowzeeLv10Card:
 	db TYPE_PKMN_PSYCHIC ; type
 	dw $66d2 ; gfx
 	tx DrowzeeName ; name
-	db CIRCLE ; rarity
+	db DIAMOND ; rarity
 	db TEAM_ROCKET ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
 	dw DROWZEE_LV10
@@ -3486,7 +3486,7 @@ JynxLv18Card:
 	db TYPE_PKMN_PSYCHIC ; type
 	dw $89a4 ; gfx
 	tx JynxName ; name
-	db STAR ; rarity
+	db DIAMOND ; rarity
 	db EXPANSION_SHEET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
 	dw JYNX_LV18
@@ -4422,7 +4422,7 @@ RattataLv9Card:
 	db TYPE_PKMN_COLORLESS ; type
 	dw $4d02 ; gfx
 	tx RattataName ; name
-	db CIRCLE ; rarity
+	db DIAMOND ; rarity
 	db BASE_SET ; real set
 	db BEGINNING_POKEMON ; in-game set
 	dw RATTATA_LV9
@@ -5774,7 +5774,7 @@ DarkPersianLv28Card:
 	db TYPE_PKMN_COLORLESS ; type
 	dw $6c7a ; gfx
 	tx PersianName ; name
-	db CIRCLE ; rarity
+	db DIAMOND ; rarity
 	db TEAM_ROCKET ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
 	dw DARK_PERSIAN_LV28
@@ -6346,7 +6346,7 @@ ChanseyLv55Card:
 	db TYPE_PKMN_COLORLESS ; type
 	dw $54a9 ; gfx
 	tx ChanseyName ; name
-	db STAR ; rarity
+	db DIAMOND ; rarity
 	db BASE_SET ; real set
 	db BEGINNING_POKEMON ; in-game set
 	dw CHANSEY_LV55
@@ -7334,7 +7334,7 @@ DragonairCard:
 	db TYPE_PKMN_COLORLESS ; type
 	dw $5869 ; gfx
 	tx DragonairName ; name
-	db STAR ; rarity
+	db DIAMOND ; rarity
 	db BASE_SET ; real set
 	db LEGENDARY_POWER ; in-game set
 	dw DRAGONAIR
@@ -7386,7 +7386,7 @@ DarkDragonairCard:
 	db TYPE_PKMN_COLORLESS ; type
 	dw $6e32 ; gfx
 	tx DragonairName ; name
-	db DIAMOND ; rarity
+	db STAR ; rarity
 	db TEAM_ROCKET ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
 	dw DARK_DRAGONAIR
@@ -7822,7 +7822,7 @@ DoubleColorlessEnergyCard:
 	db TYPE_ENERGY_DOUBLE_COLORLESS ; type
 	dw $366 ; gfx
 	tx DoubleColorlessEnergyName ; name
-	db DIAMOND ; rarity
+	db STAR ; rarity
 	db BASE_SET ; real set
 	db LEGENDARY_POWER ; in-game set
 	dw DOUBLE_COLORLESS_ENERGY
@@ -7834,7 +7834,7 @@ PotionEnergyCard:
 	db TYPE_ENERGY_UNUSED ; type
 	dw $3fb ; gfx
 	tx PotionEnergyName ; name
-	db CIRCLE ; rarity
+	db DIAMOND ; rarity
 	db TEAM_ROCKET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
 	dw POTION_ENERGY
@@ -7846,7 +7846,7 @@ FullHealEnergyCard:
 	db TYPE_ENERGY_UNUSED ; type
 	dw $466 ; gfx
 	tx FullHealEnergyName ; name
-	db CIRCLE ; rarity
+	db DIAMOND ; rarity
 	db TEAM_ROCKET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
 	dw FULLHEAL_ENERGY
@@ -7870,7 +7870,7 @@ RecycleEnergyCard:
 	db TYPE_ENERGY_UNUSED ; type
 	dw $c9c8 ; gfx
 	tx RecycleEnergyName ; name
-	db DIAMOND ; rarity
+	db STAR ; rarity
 	db GB ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
 	dw RECYCLE_ENERGY
@@ -7882,7 +7882,7 @@ SuperPotionCard:
 	db TYPE_TRAINER ; type
 	dw $b325 ; gfx
 	tx SuperPotionName ; name
-	db DIAMOND ; rarity
+	db STAR ; rarity
 	db BASE_SET ; real set
 	db BEGINNING_POKEMON ; in-game set
 	dw SUPER_POTION
@@ -7906,7 +7906,7 @@ EnergyRemovalCard:
 	db TYPE_TRAINER ; type
 	dw $acbd ; gfx
 	tx EnergyRemovalName ; name
-	db CIRCLE ; rarity
+	db DIAMOND ; rarity
 	db BASE_SET ; real set
 	db LEGENDARY_POWER ; in-game set
 	dw ENERGY_REMOVAL
@@ -7930,7 +7930,7 @@ EnergySearchCard:
 	db TYPE_TRAINER ; type
 	dw $ac4a ; gfx
 	tx EnergySearchName ; name
-	db CIRCLE ; rarity
+	db DIAMOND ; rarity
 	db FOSSIL ; real set
 	db BEGINNING_POKEMON ; in-game set
 	dw ENERGY_SEARCH
@@ -7942,7 +7942,7 @@ ProfessorOakCard:
 	db TYPE_TRAINER ; type
 	dw $a6f0 ; gfx
 	tx ProfessorOakName ; name
-	db DIAMOND ; rarity
+	db STAR ; rarity
 	db BASE_SET ; real set
 	db BEGINNING_POKEMON ; in-game set
 	dw PROFESSOR_OAK
@@ -7966,7 +7966,7 @@ PotionCard:
 	db TYPE_TRAINER ; type
 	dw $b296 ; gfx
 	tx PotionName ; name
-	db CIRCLE ; rarity
+	db DIAMOND ; rarity
 	db BASE_SET ; real set
 	db BEGINNING_POKEMON ; in-game set
 	dw POTION
@@ -8050,7 +8050,7 @@ ChallengeCard:
 	db TYPE_TRAINER ; type
 	dw $b6a2 ; gfx
 	tx ChallengeName ; name
-	db DIAMOND ; rarity
+	db CIRCLE ; rarity
 	db TEAM_ROCKET ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
 	dw CHALLENGE
@@ -8086,7 +8086,7 @@ MoonStoneCard:
 	db TYPE_TRAINER ; type
 	dw $bbba ; gfx
 	tx MoonStoneName ; name
-	db STAR ; rarity
+	db DIAMOND ; rarity
 	db EXPANSION_SHEET ; real set
 	db PSYCHIC_BATTLE ; in-game set
 	dw MOON_STONE
@@ -8098,7 +8098,7 @@ DefenderCard:
 	db TYPE_TRAINER ; type
 	dw $b0de ; gfx
 	tx DefenderName ; name
-	db DIAMOND ; rarity
+	db STAR ; rarity
 	db BASE_SET ; real set
 	db LEGENDARY_POWER ; in-game set
 	dw DEFENDER
@@ -8110,7 +8110,7 @@ GustOfWindCard:
 	db TYPE_TRAINER ; type
 	dw $b1b4 ; gfx
 	tx GustOfWindName ; name
-	db CIRCLE ; rarity
+	db STAR ; rarity
 	db BASE_SET ; real set
 	db LEGENDARY_POWER ; in-game set
 	dw GUST_OF_WIND
@@ -8122,7 +8122,7 @@ MysteriousFossilCard:
 	db TYPE_TRAINER ; type
 	dw $ab09 ; gfx
 	tx MysteriousFossilName ; name
-	db CIRCLE ; rarity
+	db DIAMOND ; rarity
 	db FOSSIL ; real set
 	db ISLAND_OF_FOSSIL ; in-game set
 	dw MYSTERIOUS_FOSSIL
@@ -8134,7 +8134,7 @@ FullHealCard:
 	db TYPE_TRAINER ; type
 	dw $b3d4 ; gfx
 	tx FullHealName ; name
-	db DIAMOND ; rarity
+	db CIRCLE ; rarity
 	db BASE_SET ; real set
 	db BEGINNING_POKEMON ; in-game set
 	dw FULL_HEAL
@@ -8230,7 +8230,7 @@ MrFujiCard:
 	db TYPE_TRAINER ; type
 	dw $a869 ; gfx
 	tx MrFujiName ; name
-	db DIAMOND ; rarity
+	db CIRCLE ; rarity
 	db FOSSIL ; real set
 	db SKY_FLYING_POKEMON ; in-game set
 	dw MR_FUJI
@@ -8242,7 +8242,7 @@ PlusPowerCard:
 	db TYPE_TRAINER ; type
 	dw $b069 ; gfx
 	tx PlusPowerName ; name
-	db DIAMOND ; rarity
+	db STAR ; rarity
 	db BASE_SET ; real set
 	db LEGENDARY_POWER ; in-game set
 	dw PLUSPOWER
@@ -8254,7 +8254,7 @@ SwitchCard:
 	db TYPE_TRAINER ; type
 	dw $adb1 ; gfx
 	tx SwitchName ; name
-	db CIRCLE ; rarity
+	db DIAMOND ; rarity
 	db BASE_SET ; real set
 	db BEGINNING_POKEMON ; in-game set
 	dw SWITCH
@@ -8290,7 +8290,7 @@ PokemonRecallCard:
 	db TYPE_TRAINER ; type
 	dw $bd11 ; gfx
 	tx PokemonRecallName ; name
-	db STAR ; rarity
+	db DIAMOND ; rarity
 	db EXPANSION_SHEET ; real set
 	db SKY_FLYING_POKEMON ; in-game set
 	dw POKEMON_RECALL
@@ -8302,7 +8302,7 @@ PokedexCard:
 	db TYPE_TRAINER ; type
 	dw $b000 ; gfx
 	tx PokedexName ; name
-	db DIAMOND ; rarity
+	db CIRCLE ; rarity
 	db BASE_SET ; real set
 	db BEGINNING_POKEMON ; in-game set
 	dw POKEDEX
@@ -8338,7 +8338,7 @@ PokemonFluteCard:
 	db TYPE_TRAINER ; type
 	dw $b53b ; gfx
 	tx PokemonFluteName ; name
-	db DIAMOND ; rarity
+	db CIRCLE ; rarity
 	db BASE_SET ; real set
 	db SKY_FLYING_POKEMON ; in-game set
 	dw POKEMON_FLUTE
@@ -8374,7 +8374,7 @@ BillCard:
 	db TYPE_TRAINER ; type
 	dw $a800 ; gfx
 	tx BillName ; name
-	db CIRCLE ; rarity
+	db STAR ; rarity
 	db BASE_SET ; real set
 	db BEGINNING_POKEMON ; in-game set
 	dw BILL

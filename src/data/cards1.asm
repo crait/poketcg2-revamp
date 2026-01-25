@@ -678,7 +678,7 @@ ButterfreeCard:
 	db TYPE_PKMN_GRASS ; type
 	dw $800 ; gfx
 	tx ButterfreeName ; name
-	db DIAMOND ; rarity
+	db STAR ; rarity
 	db JUNGLE ; real set
 	db LEGENDARY_POWER ; in-game set
 	dw BUTTERFREE
@@ -2238,7 +2238,7 @@ DarkGloomCard:
 	db TYPE_PKMN_GRASS ; type
 	dw $6225 ; gfx
 	tx GloomName ; name
-	db DIAMOND ; rarity
+	db STAR ; rarity
 	db TEAM_ROCKET ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
 	dw DARK_GLOOM
@@ -2706,7 +2706,7 @@ VenomothLv22Card:
 	db TYPE_PKMN_GRASS ; type
 	dw $833b ; gfx
 	tx VenomothName ; name
-	db CIRCLE ; rarity
+	db DIAMOND ; rarity
 	db EXPANSION_SHEET ; real set
 	db PSYCHIC_BATTLE ; in-game set
 	dw VENOMOTH_LV22
@@ -3798,7 +3798,7 @@ ScytherLv23Card:
 	db TYPE_PKMN_GRASS ; type
 	dw $9ba2 ; gfx
 	tx ScytherName ; name
-	db STAR ; rarity
+	db DIAMOND ; rarity
 	db EXPANSION_SHEET ; real set
 	db LEGENDARY_POWER ; in-game set
 	dw SCYTHER_LV23
@@ -4110,7 +4110,7 @@ CharmanderLv12Card:
 	db TYPE_PKMN_FIRE ; type
 	dw $71a6 ; gfx
 	tx CharmanderName ; name
-	db DIAMOND ; rarity
+	db CIRCLE ; rarity
 	db EXPANSION_SHEET ; real set
 	db PSYCHIC_BATTLE ; in-game set
 	dw CHARMANDER_LV12
@@ -4734,7 +4734,7 @@ GrowlitheLv16Card:
 	db TYPE_PKMN_FIRE ; type
 	dw $90fa ; gfx
 	tx GrowlitheName ; name
-	db CIRCLE ; rarity
+	db DIAMOND ; rarity
 	db EXPANSION_SHEET ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
 	dw GROWLITHE_LV16
@@ -5046,7 +5046,7 @@ PonytaLv10Card:
 	db TYPE_PKMN_FIRE ; type
 	dw $1aeb ; gfx
 	tx PonytaName ; name
-	db CIRCLE ; rarity
+	db DIAMOND ; rarity
 	db BASE_SET ; real set
 	db BEGINNING_POKEMON ; in-game set
 	dw PONYTA_LV10
@@ -5254,7 +5254,7 @@ DarkRapidashCard:
 	db TYPE_PKMN_FIRE ; type
 	dw $5b4e ; gfx
 	tx RapidashName ; name
-	db CIRCLE ; rarity
+	db DIAMOND ; rarity
 	db TEAM_ROCKET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
 	dw DARK_RAPIDASH
@@ -5514,7 +5514,7 @@ FlareonLv22Card:
 	db TYPE_PKMN_FIRE ; type
 	dw $1cbd ; gfx
 	tx FlareonName ; name
-	db DIAMOND ; rarity
+	db STAR ; rarity
 	db GB ; real set
 	db PSYCHIC_BATTLE ; in-game set
 	dw FLAREON_LV22
@@ -6502,7 +6502,7 @@ GolduckLv28Card:
 	db TYPE_PKMN_WATER ; type
 	dw $9089 ; gfx
 	tx GolduckName ; name
-	db STAR ; rarity
+	db DIAMOND ; rarity
 	db EXPANSION_SHEET ; real set
 	db ISLAND_OF_FOSSIL ; in-game set
 	dw GOLDUCK_LV28
@@ -8218,7 +8218,7 @@ MagikarpLv8Card:
 	db TYPE_PKMN_WATER ; type
 	dw $2941 ; gfx
 	tx MagikarpName ; name
-	db DIAMOND ; rarity
+	db CIRCLE ; rarity
 	db BASE_SET ; real set
 	db BEGINNING_POKEMON ; in-game set
 	dw MAGIKARP_LV8
@@ -8426,7 +8426,7 @@ LaprasLv24Card:
 	db TYPE_PKMN_WATER ; type
 	dw $8a2b ; gfx
 	tx LaprasName ; name
-	db STAR ; rarity
+	db DIAMOND ; rarity
 	db EXPANSION_SHEET ; real set
 	db LEGENDARY_POWER ; in-game set
 	dw LAPRAS_LV24
@@ -8478,7 +8478,7 @@ LaprasLv31Card:
 	db TYPE_PKMN_WATER ; type
 	dw $2a17 ; gfx
 	tx LaprasName ; name
-	db STAR ; rarity
+	db DIAMOND ; rarity
 	db FOSSIL ; real set
 	db SKY_FLYING_POKEMON ; in-game set
 	dw LAPRAS_LV31
@@ -8530,7 +8530,7 @@ VaporeonLv29Card:
 	db TYPE_PKMN_WATER ; type
 	dw $2a80 ; gfx
 	tx VaporeonName ; name
-	db DIAMOND ; rarity
+	db STAR ; rarity
 	db GB ; real set
 	db PSYCHIC_BATTLE ; in-game set
 	dw VAPOREON_LV29
@@ -8842,7 +8842,7 @@ OmastarLv32Card:
 	db TYPE_PKMN_WATER ; type
 	dw $2bbb ; gfx
 	tx OmastarName ; name
-	db DIAMOND ; rarity
+	db STAR ; rarity
 	db FOSSIL ; real set
 	db ISLAND_OF_FOSSIL ; in-game set
 	dw OMASTAR_LV32
@@ -10506,7 +10506,7 @@ ElectrodeLv35Card:
 	db TYPE_PKMN_LIGHTNING ; type
 	dw $3487 ; gfx
 	tx ElectrodeName ; name
-	db STAR ; rarity
+	db DIAMOND ; rarity
 	db GB ; real set
 	db ISLAND_OF_FOSSIL ; in-game set
 	dw ELECTRODE_LV35
@@ -10714,7 +10714,7 @@ ElectabuzzLv30Card:
 	db TYPE_PKMN_LIGHTNING ; type
 	dw $c20d ; gfx
 	tx ElectabuzzName ; name
-	db STAR ; rarity
+	db DIAMOND ; rarity
 	db BULBASAUR_DECK ; real set
 	db BEGINNING_POKEMON ; in-game set
 	dw ELECTABUZZ_LV30
@@ -10766,7 +10766,7 @@ ElectabuzzLv35Card:
 	db TYPE_PKMN_LIGHTNING ; type
 	dw $35c2 ; gfx
 	tx ElectabuzzName ; name
-	db STAR ; rarity
+	db DIAMOND ; rarity
 	db BASE_SET ; real set
 	db LEGENDARY_POWER ; in-game set
 	dw ELECTABUZZ_LV35
@@ -10818,7 +10818,7 @@ JolteonLv24Card:
 	db TYPE_PKMN_LIGHTNING ; type
 	dw $3633 ; gfx
 	tx JolteonName ; name
-	db DIAMOND ; rarity
+	db STAR ; rarity
 	db GB ; real set
 	db PSYCHIC_BATTLE ; in-game set
 	dw JOLTEON_LV24
@@ -11962,7 +11962,7 @@ MachopLv18Card:
 	db TYPE_PKMN_FIGHTING ; type
 	dw $83a4 ; gfx
 	tx MachopName ; name
-	db CIRCLE ; rarity
+	db DIAMOND ; rarity
 	db EXPANSION_SHEET ; real set
 	db SKY_FLYING_POKEMON ; in-game set
 	dw MACHOP_LV18
