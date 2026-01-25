@@ -572,7 +572,7 @@ AIActionTable_SkySparkDeck:
 	ai_energy ZAPDOS_LV40,    4, +0
 	ai_energy PIDGEY_LV10,    3, +0
 	ai_energy PIDGEOTTO_LV36, 3, +0
-	ai_energy SPEAROW_LV9,    3, +0
+	ai_energy SPEAROW_LV9,    1, +0
 	ai_energy FEAROW_LV24,    3, +0
 	dw NULL ; end
 
@@ -3059,8 +3059,8 @@ AIActionTable_EyeOfTheStormDeck:
 	ai_energy PIDGEY_LV10,             2, +0
 	ai_energy PIDGEOTTO_LV38,          3, +0
 	ai_energy PIDGEOT_LV40,            4, +1
-	ai_energy SPEAROW_LV13,            3, +0
-	ai_energy FEAROW_LV27,             4, +1
+	ai_energy SPEAROW_LV13,            1, +0
+	ai_energy FEAROW_LV27,             3, +1
 	ai_energy TAUROS_LV35,             2, +0
 	ai_energy FLYING_PIKACHU_LV12,     3, +0
 	ai_energy FLYING_PIKACHU_ALT_LV12, 3, +0
@@ -4089,9 +4089,9 @@ AIActionTable_ColorlessEnergyDeck:
 	ai_energy JOLTEON_LV24,   4, +0
 	ai_energy SPEAROW_LV9,    2, +0
 	ai_energy SPEAROW_LV12,   1, +0
-	ai_energy SPEAROW_LV13,   3, +0
+	ai_energy SPEAROW_LV13,   1, +0
 	ai_energy FEAROW_LV24,    3, +0
-	ai_energy FEAROW_LV27,    4, +0
+	ai_energy FEAROW_LV27,    3, +0
 	ai_energy EEVEE_LV12,     2, +0
 	ai_energy DRATINI_LV10,   2, +0
 	ai_energy DRAGONAIR,      4, +0
@@ -4346,7 +4346,7 @@ AIActionTable_RonaldsUltraDeck:
 	ai_energy PIDGEOTTO_LV38, 2, +0
 	ai_energy PIDGEOT_LV40,   3, +1
 	ai_energy SPEAROW_LV13,   3, +0
-	ai_energy FEAROW_LV27,    4, +0
+	ai_energy FEAROW_LV27,    3, +0
 	ai_energy FARFETCHD_LV20, 3, +0
 	dw NULL ; end
 
