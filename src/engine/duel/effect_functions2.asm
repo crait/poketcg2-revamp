@@ -1115,13 +1115,13 @@ FlameInferno_DiscardAndDamageBoostEffect:
 	farcall AddToDamage
 	ret
 
-KickAway_CheckBench:
+KnockAwayCheckBench:
 	farcall HandleMandatorySwitchSelection
 	ldh a, [hTempPlayAreaLocation_ff9d]
 	ldh [hTemp_ffa0], a
 	ret
 
-KickAway_SwitchEffect:
+KnockAwaySwitchEffect:
 	ldh a, [hTemp_ffa0]
 	farcall HandleSwitchDefendingPokemonEffect
 	ret
@@ -5013,13 +5013,13 @@ HorseaWaterGunEffect:
 	ret
 
 WaterBomb_PlayerSelectEffect:
-	lb bc, 2, 0
+	lb bc, 1, 0
 	farcall CalculateExtraWaterEnergiesForDamageBonus
 	call BenchMultiSelectMenuPlayerSelection
 	ret
 
 WaterBomb_AISelectEffect:
-	lb bc, 2, 0
+	lb bc, 1, 0
 	farcall CalculateExtraWaterEnergiesForDamageBonus
 	call BenchMultiSelectMenuAISelection
 	ret
@@ -6319,7 +6319,7 @@ GetMiniMetronomeCoinTossResult:
 	ret
 
 MarillWaterGunEffect:
-	lb bc, 2, 0
+	lb bc, 1, 0
 	farcall ApplyExtraWaterEnergy10DamageBonus
 	ret
 

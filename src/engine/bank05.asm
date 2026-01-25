@@ -3218,7 +3218,7 @@ AIActionTable_VeryRareCardDeck:
 	ai_energy MEOWTH_LV14,              1, +0
 	ai_energy DARK_PERSIAN_ALT_LV28,    2, +0
 	ai_energy FARFETCHD_ALT_LV20,       3, +0
-	ai_energy KANGASKHAN_LV38,          3, +0
+	ai_energy KANGASKHAN_LV38,          4, +0
 	ai_energy COOL_PORYGON,             3, +0
 	dw NULL ; end
 

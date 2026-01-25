@@ -459,10 +459,10 @@ BlastoiseRainDanceEffectCommands:
 	dbw EFFECTCMDTYPE_INITIAL_EFFECT_1, BlastoiseRainDanceEffect
 	db $00
 
-BlastoiseHydroPumpEffectCommands:
+WWW40WaterGunEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, BlastoiseHydroPumpEffect
-	dbw EFFECTCMDTYPE_AI, BlastoiseHydroPumpEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, WWW40WaterGunEffect
+	dbw EFFECTCMDTYPE_AI, WWW40WaterGunEffect
 	db $00
 
 BlastoiseAltRainDanceEffectCommands:
@@ -551,10 +551,10 @@ VaporeonQuickAttackEffectCommands:
 	dbw EFFECTCMDTYPE_AI, VaporeonQuickAttack_AIEffect
 	db $00
 
-VaporeonWaterGunEffectCommands:
+WC30WaterGunEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, VaporeonWaterGunEffect
-	dbw EFFECTCMDTYPE_AI, VaporeonWaterGunEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, WC30WaterGunEffect
+	dbw EFFECTCMDTYPE_AI, WC30WaterGunEffect
 	db $00
 
 DewgongIceBeamEffectCommands:
@@ -629,10 +629,10 @@ PoliwrathWhirlpoolEffectCommands:
 	dbw EFFECTCMDTYPE_AI_SELECTION, PoliwrathWhirlpool_AISelectEffect
 	db $00
 
-PoliwagWaterGunEffectCommands:
+W10WaterGunEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, PoliwagWaterGunEffect
-	dbw EFFECTCMDTYPE_AI, PoliwagWaterGunEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, W10WaterGunEffect
+	dbw EFFECTCMDTYPE_AI, W10WaterGunEffect
 	db $00
 
 CloysterClampEffectCommands:
@@ -1806,10 +1806,10 @@ DarkWartortleMirrorShellEffectCommands:
 	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, DarkWartortleMirrorShellEffect
 	db $00
 
-DarkBlastoiseHydrocannonEffectCommands:
+WW30WaterGunEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, HydrocannonEffect
-	dbw EFFECTCMDTYPE_AI, HydrocannonEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, WW30WaterGunEffect
+	dbw EFFECTCMDTYPE_AI, WW30WaterGunEffect
 	db $00
 
 DarkBlastoiseRocketTackleEffectCommands:
@@ -1824,10 +1824,10 @@ PsyduckDizzinessEffectCommands:
 	dbw EFFECTCMDTYPE_AFTER_DAMAGE, Dizziness_DrawCardEffect
 	db $00
 
-PsyduckWaterGunEffectCommands:
+WC20WaterGunEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, PsyduckWaterGunEffect
-	dbw EFFECTCMDTYPE_AI, PsyduckWaterGunEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, WC20WaterGunEffect
+	dbw EFFECTCMDTYPE_AI, WC20WaterGunEffect
 	db $00
 
 DarkGolduckThirdEyeEffectCommands:
@@ -2504,11 +2504,11 @@ RapidashFlameInfernoEffectCommands:
 	dbw EFFECTCMDTYPE_AI_SWITCH_DEFENDING_PKMN, FlameInferno_AISelectEffect
 	db $00
 
-RapidashKickAwayEffectCommands:
+KnockAwayEffectCommands:
 	db BANK("Effect Functions 2")
-	dbw EFFECTCMDTYPE_AFTER_DAMAGE, KickAway_SwitchEffect
-	dbw EFFECTCMDTYPE_REQUIRE_SELECTION, KickAway_CheckBench
-	dbw EFFECTCMDTYPE_AI_SWITCH_DEFENDING_PKMN, KickAway_CheckBench
+	dbw EFFECTCMDTYPE_AFTER_DAMAGE, KnockAwaySwitchEffect
+	dbw EFFECTCMDTYPE_REQUIRE_SELECTION, KnockAwayCheckBench
+	dbw EFFECTCMDTYPE_AI_SWITCH_DEFENDING_PKMN, KnockAwayCheckBench
 	db $00
 
 DoduoGrowlEffectCommands:

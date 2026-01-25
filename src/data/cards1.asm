@@ -3759,7 +3759,7 @@ TangelaLv12Card:
 	tx PoisonWhipName ; name
 	tx InflictPoisonDescription ; description
 	dw NONE ; description (cont)
-	db 20 ; damage
+	db 0 ; damage
 	db DAMAGE_NORMAL ; category
 	dw InflictPoisonEffectCommands ; effect commands
 	db INFLICT_POISON ; flags 1
@@ -3990,7 +3990,7 @@ PinsirLv24Card:
 	db 0 ; ?
 	db ATK_ANIM_GUILLOTINE ; animation
 
-	db 2 ; retreat cost
+	db 3 ; retreat cost
 	db WR_FIRE ; weakness
 	db NONE ; resistance
 	tx StagbeetleName ; category
@@ -5179,7 +5179,7 @@ RapidashLv30Card:
 	dw NONE ; description (cont)
 	db 30 ; damage
 	db DAMAGE_NORMAL ; category
-	dw RapidashKickAwayEffectCommands ; effect commands
+	dw KnockAwayEffectCommands ; effect commands
 	db NONE ; flags 1
 	db SWITCH_OPPONENT_POKEMON ; flags 2
 	db NONE ; flags 3
@@ -6219,7 +6219,7 @@ BlastoiseLv52Card:
 	dw NONE ; description (cont)
 	db 40 ; damage
 	db DAMAGE_PLUS ; category
-	dw BlastoiseHydroPumpEffectCommands ; effect commands
+	dw WWW40WaterGunEffectCommands ; effect commands
 	db NONE ; flags 1
 	db ATTACHED_ENERGY_BOOST ; flags 2
 	db NONE ; flags 3
@@ -6271,7 +6271,7 @@ BlastoiseAltLv52Card:
 	dw NONE ; description (cont)
 	db 40 ; damage
 	db DAMAGE_PLUS ; category
-	dw BlastoiseAltHydroPumpEffectCommands ; effect commands
+	dw WWW40WaterGunEffectCommands ; effect commands
 	db NONE ; flags 1
 	db ATTACHED_ENERGY_BOOST ; flags 2
 	db NONE ; flags 3
@@ -6309,7 +6309,7 @@ DarkBlastoiseCard:
 	dw NONE ; description (cont)
 	db 30 ; damage
 	db DAMAGE_PLUS ; category
-	dw DarkBlastoiseHydrocannonEffectCommands ; effect commands
+	dw WW30WaterGunEffectCommands ; effect commands
 	db NONE ; flags 1
 	db ATTACHED_ENERGY_BOOST ; flags 2
 	db NONE ; flags 3
@@ -6427,7 +6427,7 @@ PsyduckLv16Card:
 	dw NONE ; description (cont)
 	db 20 ; damage
 	db DAMAGE_PLUS ; category
-	dw PsyduckWaterGunEffectCommands ; effect commands
+	dw WC20WaterGunEffectCommands ; effect commands
 	db NONE ; flags 1
 	db ATTACHED_ENERGY_BOOST ; flags 2
 	db NONE ; flags 3
@@ -6621,7 +6621,7 @@ PoliwagLv13Card:
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_PLUS ; category
-	dw PoliwagWaterGunEffectCommands ; effect commands
+	dw W10WaterGunEffectCommands ; effect commands
 	db NONE ; flags 1
 	db ATTACHED_ENERGY_BOOST ; flags 2
 	db NONE ; flags 3
@@ -6877,11 +6877,11 @@ PoliwrathLv48Card:
 	; attack 1
 	energy WATER, 2 ; energies
 	tx WaterGunName ; name
-	tx Do20DamagePlus10WaterEnergyAltDescription1 ; description
+	tx HydrocannonDescription ; description
 	dw NONE ; description (cont)
 	db 30 ; damage
 	db DAMAGE_PLUS ; category
-	dw PoliwrathWaterGunEffectCommands ; effect commands
+	dw WW30WaterGunEffectCommands ; effect commands
 	db NONE ; flags 1
 	db ATTACHED_ENERGY_BOOST ; flags 2
 	db NONE ; flags 3
@@ -7675,7 +7675,7 @@ HorseaLv20Card:
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_PLUS ; category
-	dw HorseaWaterGunEffectCommands ; effect commands
+	dw W10WaterGunEffectCommands ; effect commands
 	db NONE ; flags 1
 	db ATTACHED_ENERGY_BOOST ; flags 2
 	db NONE ; flags 3
@@ -7727,7 +7727,7 @@ SeadraLv23Card:
 	dw NONE ; description (cont)
 	db 30 ; damage
 	db DAMAGE_PLUS ; category
-	dw VaporeonWaterGunEffectCommands ; effect commands
+	dw WC30WaterGunEffectCommands ; effect commands
 	db NONE ; flags 1
 	db ATTACHED_ENERGY_BOOST ; flags 2
 	db NONE ; flags 3
@@ -7883,7 +7883,7 @@ SeakingCard:
 	dw NONE ; description (cont)
 	db 30 ; damage
 	db DAMAGE_PLUS ; category
-	dw VaporeonWaterGunEffectCommands ; effect commands
+	dw WC30WaterGunEffectCommands ; effect commands
 	db NONE ; flags 1
 	db ATTACHED_ENERGY_BOOST ; flags 2
 	db NONE ; flags 3
@@ -8611,7 +8611,7 @@ VaporeonLv42Card:
 	dw NONE ; description (cont)
 	db 30 ; damage
 	db DAMAGE_PLUS ; category
-	dw VaporeonWaterGunEffectCommands ; effect commands
+	dw WC30WaterGunEffectCommands ; effect commands
 	db NONE ; flags 1
 	db ATTACHED_ENERGY_BOOST ; flags 2
 	db NONE ; flags 3
@@ -8715,7 +8715,7 @@ OmanyteLv19Card:
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_PLUS ; category
-	dw OmanyteWaterGunEffectCommands ; effect commands
+	dw W10WaterGunEffectCommands ; effect commands
 	db NONE ; flags 1
 	db ATTACHED_ENERGY_BOOST ; flags 2
 	db NONE ; flags 3
@@ -9117,7 +9117,7 @@ MarillCard:
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_PLUS ; category
-	dw MarillWaterGunEffectCommands ; effect commands
+	dw W10WaterGunEffectCommands ; effect commands
 	db NONE ; flags 1
 	db ATTACHED_ENERGY_BOOST ; flags 2
 	db NONE ; flags 3
@@ -11134,7 +11134,7 @@ ZapdosLv68Card:
 	db GB ; real set
 	db PROMOTIONAL ; in-game set
 	dw ZAPDOS_LV68
-	db 100 ; hp
+	db 60 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
@@ -11977,7 +11977,7 @@ MachopLv18Card:
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_NORMAL ; category
-	dw DarkMachokeKnockBackEffectCommands ; effect commands
+	dw KnockAwayEffectCommands ; effect commands
 	db NONE ; flags 1
 	db SWITCH_OPPONENT_POKEMON ; flags 2
 	db NONE ; flags 3

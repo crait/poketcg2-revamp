@@ -2939,7 +2939,7 @@ BlastoiseRainDanceEffect:
 	scf
 	ret
 
-BlastoiseHydroPumpEffect:
+WWW40WaterGunEffect:
 	lb bc, 3, 0
 	jp ApplyExtraWaterEnergy10DamageBonus
 
@@ -2948,7 +2948,7 @@ BlastoiseAltRainDanceEffect:
 	ret
 
 BlastoiseAltHydroPumpEffect:
-	jr BlastoiseHydroPumpEffect
+	jr WWW40WaterGunEffect
 
 BubblebeamEffect:
 	call Paralysis50PercentEffect
@@ -3076,8 +3076,8 @@ VaporeonQuickAttack_DamageBoostEffect:
 	call AddDamageIfHeads
 	ret
 
-VaporeonWaterGunEffect:
-	lb bc, 2, 1
+WC30WaterGunEffect:
+	lb bc, 1, 1
 	jp ApplyExtraWaterEnergy10DamageBonus
 
 DewgongIceBeamEffect:
@@ -3263,7 +3263,7 @@ PoliwrathWhirlpool_AISelectEffect:
 PoliwrathWhirlpool_DiscardEffect:
 	jp DiscardEnergyEffect
 
-PoliwagWaterGunEffect:
+W10WaterGunEffect:
 	lb bc, 1, 0
 	jp ApplyExtraWaterEnergy10DamageBonus
 
@@ -8866,7 +8866,7 @@ DarkWartortleMirrorShellEffect:
 	call ApplySubstatus1ToAttackingCard
 	ret
 
-HydrocannonEffect:
+WW30WaterGunEffect:
 	lb bc, 2, 0
 	call ApplyExtraWaterEnergy20DamageBonus
 	ret
@@ -8913,7 +8913,7 @@ Dizziness_DrawCardEffect:
 	bank1call OpenCardPage_FromHand
 	ret
 
-PsyduckWaterGunEffect:
+WC20WaterGunEffect:
 	lb bc, 1, 1
 	call ApplyExtraWaterEnergy10DamageBonus
 	ret

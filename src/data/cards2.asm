@@ -239,7 +239,7 @@ DarkMachokeCard:
 	dw NONE ; description (cont)
 	db 30 ; damage
 	db DAMAGE_NORMAL ; category
-	dw DarkMachokeKnockBackEffectCommands ; effect commands
+	dw KnockAwayEffectCommands ; effect commands
 	db NONE ; flags 1
 	db SWITCH_OPPONENT_POKEMON ; flags 2
 	db NONE ; flags 3
@@ -370,7 +370,7 @@ DarkMachampCard:
 	db TEAM_ROCKET ; real set
 	db WE_ARE_TEAM_ROCKET ; in-game set
 	dw DARK_MACHAMP
-	db 70 ; hp
+	db 120 ; hp
 	db STAGE2 ; stage
 	tx MachokeName ; pre-evo name
 
@@ -379,9 +379,9 @@ DarkMachampCard:
 	tx KnockBackName ; name
 	tx SwitchWithBenchedMonDescription ; description
 	dw NONE ; description (cont)
-	db 30 ; damage
+	db 40 ; damage
 	db DAMAGE_NORMAL ; category
-	dw DarkMachokeKnockBackEffectCommands ; effect commands
+	dw KnockAwayEffectCommands ; effect commands
 	db NONE ; flags 1
 	db SWITCH_OPPONENT_POKEMON ; flags 2
 	db NONE ; flags 3
@@ -1338,7 +1338,7 @@ HitmonchanLv33Card:
 	db 0 ; ?
 	db ATK_ANIM_MEGA_PUNCH ; animation
 
-	db 2 ; retreat cost
+	db 3 ; retreat cost
 	db WR_PSYCHIC ; weakness
 	db NONE ; resistance
 	tx PunchName ; category
@@ -3825,7 +3825,7 @@ MewtwoAltLv60Card:
 	tx PsyburnName ; name
 	dw NONE ; description
 	dw NONE ; description (cont)
-	db 40 ; damage
+	db 30 ; damage
 	db DAMAGE_NORMAL ; category
 	dw NONE ; effect commands
 	db NONE ; flags 1
@@ -3834,7 +3834,7 @@ MewtwoAltLv60Card:
 	db 0 ; ?
 	db ATK_ANIM_PSYCHIC_HIT ; animation
 
-	db 2 ; retreat cost
+	db 4 ; retreat cost
 	db WR_PSYCHIC ; weakness
 	db NONE ; resistance
 	tx GeneticName ; category
@@ -6246,7 +6246,7 @@ LickitungLv26Card:
 	db JUNGLE ; real set
 	db TEAM_ROCKETS_AMBITION ; in-game set
 	dw LICKITUNG_LV26
-	db 90 ; hp
+	db 60 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
 
