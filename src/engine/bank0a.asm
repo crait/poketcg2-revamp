@@ -578,19 +578,19 @@ AISelectSpecialAttackParameters:
 	jp z, .SaltWater
 	cp16 SEADRA_LV26
 	jp z, .WaterBomb
-	cp16 VULPIX_LV13
+	cp16 VULPIX_LV13		; PIDGEOTTO_LV36
 	jp z, .Foxfire
 	cp16 DARK_ELECTRODE
 	jp z, .EnergyBomb
-	cp16 ZAPDOS_LV28
-	jp z, .RagingThunder
-	cp16 PIKACHU_LV13
+	cp16 ZAPDOS_LV28		; Can be removed from this switch
+	jp z, .RagingThunder	; Can be removed from this switch
+	cp16 PIKACHU_LV13		; ELECTABUZZ_LV30
 	jp z, .Recharge
 	cp16 RAICHU_LV32
 	jp z, .ShortCircuit
 	cp16 SLOWPOKE_LV18
 	jp z, .Scavenge
-	cp16 GROWLITHE_LV16
+	cp16 GROWLITHE_LV16		; DROWZEE_LV12
 	jp z, .ErrandRunning
 	cp16 RAPIDASH_LV30
 	jp z, .FlameInferno
@@ -616,7 +616,7 @@ AISelectSpecialAttackParameters:
 	jp z, .RockBlast
 	cp16 DARK_MACHOKE
 	jp z, .DragOff
-	cp16 DARK_ALAKAZAM
+	cp16 DARK_ALAKAZAM		; MANKEY_LV7, DARK_DUGTRIO, TAUROS_LV35
 	jp z, .TeleportBlast
 	cp16 MEWTWO_LV30
 	jp z, .EnergyControlOrTelekinesis
@@ -628,7 +628,7 @@ AISelectSpecialAttackParameters:
 	jp z, .Lure
 	cp16 CLEFAIRY_LV15
 	jp z, .FollowMe
-	cp16 PORYGON_LV12
+	cp16 PORYGON_LV12		; PORYGON_LV20
 	jp z, .Conversion1
 	cp16 MACHOKE_LV24
 	jp z, .FocusBlast
@@ -752,9 +752,12 @@ AISelectSpecialAttackParameters:
 	or a
 	jp nz, .no_carry
 
-	; toss coin
-	ldtx de, IfHeadsAttachUpTo3WaterEnergyFromDeckText
-	farcall Serial_TossCoin
+	; Removed coin toss by removing the farcall and adding two nop to retain the same footprint
+	ldtx de, AttachUpTo3WaterEnergyFromDeckText
+	; farcall Serial_TossCoin
+	ld a, 1
+	nop
+	nop
 	ldh [hTemp_ffa0], a
 
 	; check number of Water energies attached to Kingler
