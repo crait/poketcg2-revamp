@@ -278,7 +278,7 @@ Text0b9f:
 	done
 
 Text0ba0:
-	textfw "サイドカードは 4枚よ"
+	textfw "サイドカードは 6枚よ"
 	linefw "かくごは・・・いい?"
 	done
 

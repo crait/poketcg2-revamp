@@ -947,9 +947,9 @@ PoisonStingName:
 	textfw "どくばり"
 	done
 
-MayInflictPoisonDescription:
-	textfw "コインを投げて「おもて」なら、[相手]"
-	linefw "を「どく」状態にする。"
+MayInflictPoisonAltDescription:
+	textfw "コインを投げて「おもて」なら、"
+	linefw "[相手]を「どく」状態にする。"
 	done
 
 HairyBugName:
@@ -1017,7 +1017,7 @@ TwineedleName:
 	textfw "ダブルニードル"
 	done
 
-Do30DamageNumberOfHeadsDescription:
+Do30DamageTimes2FlipsDescription:
 	textfw "コインを2枚投げ、「おもて」の数"
 	linefw "×30のダメージ。"
 	done
@@ -1058,7 +1058,7 @@ BiteName:
 	textfw "かみつく"
 	done
 
-MayInflictPoisonAltDescription:
+MayInflictPoisonDescription:
 	textfw "コインを投げて「おもて」なら、"
 	linefw "[相手]を「どく」状態にする。"
 	done
@@ -1177,7 +1177,7 @@ FurySwipesName:
 	textfw "みだれひっかき"
 	done
 
-FurySwipes10DamageDescription:
+Do10DamageTimes3FlipsDescription:
 	textfw "コインを3枚投げ、「おもて」の数"
 	linefw "×10のダメージ。"
 	done
@@ -1215,7 +1215,7 @@ StrengthInNumbersDescription:
 	linefw "×10のダメージを追加する。"
 	done
 
-FurySwipes30DamageDescription:
+Do30DamageTimes3FlipsDescription:
 	textfw "コインを3枚投げ、「おもて」の数"
 	linefw "×30のダメージ。"
 	done
@@ -1897,7 +1897,7 @@ AcidName:
 	textfw "ようかいえき"
 	done
 
-AcidDescription:
+MayPreventRetreatingDescription:
 	textfw "コインを投げて「おもて」なら、次の"
 	linefw "相手の番、このワザを受けた[相手]は"
 	linefw "「にげる」ことができない。"

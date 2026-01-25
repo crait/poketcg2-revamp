@@ -1241,9 +1241,9 @@ MaintenanceName:
 	done
 
 MaintenanceDescription:
-	textfw "手札からカードを2枚選び、山札にもど"
-	linefw "す。その後、山札をよく切り、カードを"
-	linefw "1枚引いて、手札に加える。"
+	textfw "山札からカードを2枚引いて、手札に加"
+	linefw "える。手札からカードを2枚選び、"
+	linefw "山札にもどして、よく切る。  "
 	done
 
 PokeballName:
@@ -1310,7 +1310,7 @@ TheRocketsTrapName:
 
 TheRocketsTrapDescription:
 	textfw "コインを投げて「おもて」なら、相手の"
-	linefw "手札から3枚のカードを、おもてを見な"
+	linefw "手札から2枚のカードを、おもてを見な"
 	linefw "いで選び、相手の山札にもどす。その後"
 	linefw "その山札をよく切る。"
 	done

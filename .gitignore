@@ -24,3 +24,12 @@
 
 # *disasm.py output file
 *disasm_output.asm
+
+# revamp tools
+*.bak
+rgbds/
+bgb/
+catalog/node_modules/
+
+# English patch files
+*.ips

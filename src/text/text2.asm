@@ -57,8 +57,8 @@ AttackUnsuccessfulText:
 	textfw "ワザを しっぱいした"
 	done
 
-UnableToRetreatDueToAcidText:
-	textfw "「ようかいえき」の効果で"
+UnableToRetreatDueToAttackText:
+	textfw "相手のワザの効果で   "
 	linefw "にげられない"
 	done
 
@@ -669,9 +669,10 @@ ChooseATrainerCardText:
 	linefw "えらんでください"
 	done
 
-IfHeadsAttachUpTo3WaterEnergyFromDeckText:
-	textfw "「おもて」なら 山札から 3枚まで"
-	linefw "水エネルギーをひいて [自分]につける"
+AttachUpTo3WaterEnergyFromDeckText:
+	
+	textfw "山札から 「水」エネルギーを    "
+	linefw "3枚 えらんでください       "
 	done
 
 ChooseWaterEnergyText:
@@ -1127,7 +1128,8 @@ ChooseADarkEvolutionCardText:
 	textfw "「わるいポケモン」への 進化カードを"
 	linefw "えらんでください"
 	done
-
+	
+EXPORT EffectTargetDarkPokemonText
 EffectTargetDarkPokemonText:
 	textfw "わるいポケモン"
 	done

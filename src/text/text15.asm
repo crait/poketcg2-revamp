@@ -630,7 +630,7 @@ FiregiverDescription:
 	linefw "出したとき、1度だけ使える。(対戦の"
 	linefw "初めに場に出したときには、使えない)"
 	linefw "自分の山札に「炎」エネルギーカードが"
-	linefw "あれば、最大4枚が選ばれ、手札に加わ"
+	linefw "あれば、最大2枚が選ばれ、手札に加わ"
 	linefw "る。手札に加わる「炎」エネルギーカー"
 	linefw "ドの枚数は、自動的に決まる。"
 	done
@@ -1066,7 +1066,7 @@ SeelName:
 	textfw "パウワウ"
 	done
 
-GrowlAltDescription1:
+ReduceDamageBy10Description:
 	textfw "次の相手の番、このワザを受けた"
 	linefw "[相手]がこのカードに与えるダメージは"
 	linefw "「-10」される。"
@@ -1253,10 +1253,10 @@ SaltWaterName:
 	done
 
 SaltWaterDescription:
-	textfw "コインを投げて「おもて」なら、自分の"
-	linefw "山札から「水」エネルギーカードを3枚"
-	linefw "選び出し、このカードにつける。"
-	linefw "その後、その山札をよく切る。"
+	textfw "自分の 山札から「水」エネルギー "
+	linefw "カードを3枚 選び出し、"
+	linefw "手札にくわえる。 その後、"
+	linefw "その山札をよく切る。"
 	done
 
 DoubleEdgedPincersName:
@@ -1521,7 +1521,7 @@ TrickleName:
 	textfw "びちびち"
 	done
 
-Plus10DamagePerHeadsDescription:
+Do10DamageTimes2FlipsDescription:
 	textfw "コインを2枚投げ、「おもて」の数"
 	linefw "×10のダメージ。"
 	done
@@ -2069,8 +2069,8 @@ ThunderWaveName:
 	textfw "でんじは"
 	done
 
-Selfdestruct40DamageDescription:
-	textfw "[自分]にも40ダメージ。"
+Selfdestruct60DamageDescription:
+	textfw "[自分]にも60ダメージ。"
 	linefw "おたがいの控えポケモン全員にも、"
 	linefw "「弱点・抵抗力」に関係なく、それぞれ"
 	linefw "10ダメージ。"
@@ -2175,8 +2175,8 @@ SonicboomDescription:
 	linefw "・抵抗力」の影響を受けない。"
 	done
 
-Selfdestruct100DamageDescription:
-	textfw "[自分]にも100ダメージ。"
+Selfdestruct200DamageDescription:
+	textfw "[自分]にも200ダメージ。"
 	linefw "おたがいの控えポケモン全員にも、"
 	linefw "「弱点・抵抗力」に関係なく、それぞれ"
 	linefw "20ダメージ。"
@@ -2352,7 +2352,7 @@ JolteonName:
 	textfw "サンダース"
 	done
 
-Do20DamageNumberOfHeadsDescription:
+Do20DamageTimes2FlipsDescription:
 	textfw "コインを2枚投げ、「おもて」の数"
 	linefw "×20のダメージ。"
 	done
@@ -2377,7 +2377,7 @@ PinMissileName:
 	textfw "ミサイルばり"
 	done
 
-PinMissileDescription:
+Do20DamageTimes4FlipsDescription:
 	textfw "コインを4枚投げ、「おもて」の数"
 	linefw "×20のダメージ。"
 	done
@@ -2545,7 +2545,7 @@ SandslashName:
 	textfw "サンドパン"
 	done
 
-FurySwipes20DamageDescription:
+Do20DamageTimes3FlipsDescription:
 	textfw "コインを3枚投げ、「おもて」の数"
 	linefw "×20のダメージ。"
 	done

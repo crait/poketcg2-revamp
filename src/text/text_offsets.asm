@@ -237,7 +237,7 @@ TextOffsets::
 	textpointer NoCardsInOpponentsHandText                            ; 0x00e7
 	textpointer NoEvolutionCardsInDiscardPileText                     ; 0x00e8
 	textpointer NoPokemonEvolvingFromFossilText                       ; 0x00e9
-	textpointer CannotUseSinceItAlreadyHas2FoodCountersText           ; 0x00ea
+	textpointer CannotUseSinceItAlreadyHas4FoodCountersText           ; 0x00ea
 	textpointer CannotEvolveText                                      ; 0x00eb
 	textpointer CannotUseText                                         ; 0x00ec
 	textpointer NotEnoughEnergyCardsInHandText                        ; 0x00ed
@@ -280,7 +280,7 @@ TextOffsets::
 	textpointer DamageCheckIfHeadsPlusDamageText                      ; 0x0112
 	textpointer DamageCheckXDamageTimesHeadsText                      ; 0x0113
 	textpointer DamageCheckPlusXDamageForEachHeadsText                ; 0x0114
-	textpointer AcidCheckText                                         ; 0x0115
+	textpointer MayPreventRetreatingCheckText                         ; 0x0115
 	textpointer TransparencyCheckText                                 ; 0x0116
 	textpointer ConfusionCheckDamageText                              ; 0x0117
 	textpointer ConfusionCheckRetreatText                             ; 0x0118
@@ -333,7 +333,7 @@ TextOffsets::
 	textpointer MagnetCheckText                                       ; 0x0147
 	textpointer FossilGuidanceCheckText                               ; 0x0148
 	textpointer AttackUnsuccessfulText                                ; 0x0149
-	textpointer UnableToRetreatDueToAcidText                          ; 0x014a
+	textpointer UnableToRetreatDueToAttackText                        ; 0x014a
 	textpointer UnableToRetreatDueToRockSealText                      ; 0x014b
 	textpointer UnableToRetreatDueToDrillDiveText                     ; 0x014c
 	textpointer UnableToRetreatDueToGuardText                         ; 0x014d
@@ -446,7 +446,7 @@ TextOffsets::
 	textpointer ChooseAParasText                                      ; 0x01b8
 	textpointer ChooseATrainerCardFromDeckText                        ; 0x01b9
 	textpointer ChooseATrainerCardText                                ; 0x01ba
-	textpointer IfHeadsAttachUpTo3WaterEnergyFromDeckText             ; 0x01bb
+	textpointer AttachUpTo3WaterEnergyFromDeckText                    ; 0x01bb
 	textpointer ChooseWaterEnergyText                                 ; 0x01bc
 	textpointer NoFossilsInDiscardPileText                            ; 0x01bd
 	textpointer ChooseALightningEnergyFromDeckText                    ; 0x01be
@@ -4955,7 +4955,7 @@ SECTION "Text Offsets 2", ROMX
 	textpointer KakunaLv23Description                                 ; 0x134f
 	textpointer BeedrillName                                          ; 0x1350
 	textpointer TwineedleName                                         ; 0x1351
-	textpointer Do30DamageNumberOfHeadsDescription                    ; 0x1352
+	textpointer Do30DamageTimes2FlipsDescription                    ; 0x1352
 	textpointer PoisonBeeName                                         ; 0x1353
 	textpointer BeedrillDescription                                   ; 0x1354
 	textpointer EkansName                                             ; 0x1355
@@ -4987,14 +4987,14 @@ SECTION "Text Offsets 2", ROMX
 	textpointer TailWhipDescription                                   ; 0x136f
 	textpointer NidoranFLv12Description                               ; 0x1370
 	textpointer FurySwipesName                                        ; 0x1371
-	textpointer FurySwipes10DamageDescription                         ; 0x1372
+	textpointer Do10DamageTimes3FlipsDescription                         ; 0x1372
 	textpointer CallForFamilyName                                     ; 0x1373
 	textpointer CallForFamilyNidoranDescription                       ; 0x1374
 	textpointer NidoranFLv13Description                               ; 0x1375
 	textpointer NidorinaName                                          ; 0x1376
 	textpointer StrengthInNumbersName                                 ; 0x1377
 	textpointer StrengthInNumbersDescription                          ; 0x1378
-	textpointer FurySwipes30DamageDescription                         ; 0x1379
+	textpointer Do30DamageTimes3FlipsDescription                         ; 0x1379
 	textpointer NidorinaLv22Description                               ; 0x137a
 	textpointer SupersonicName                                        ; 0x137b
 	textpointer MayInflictConfusionAltDescription                     ; 0x137c
@@ -5128,7 +5128,7 @@ SECTION "Text Offsets 2", ROMX
 	textpointer LureName                                              ; 0x13fc
 	textpointer LureDescription                                       ; 0x13fd
 	textpointer AcidName                                              ; 0x13fe
-	textpointer AcidDescription                                       ; 0x13ff
+	textpointer MayPreventRetreatingDescription                       ; 0x13ff
 	textpointer VictreebelDescription                                 ; 0x1400
 	textpointer GrimerName                                            ; 0x1401
 	textpointer PoisonGasName                                         ; 0x1402
@@ -5429,7 +5429,7 @@ SECTION "Text Offsets 2", ROMX
 	textpointer JellyfishStingName                                    ; 0x1529
 	textpointer TentacruelDescription                                 ; 0x152a
 	textpointer SeelName                                              ; 0x152b
-	textpointer GrowlAltDescription1                                  ; 0x152c
+	textpointer ReduceDamageBy10Description                           ; 0x152c
 	textpointer IceBeamName                                           ; 0x152d
 	textpointer SeaLionName                                           ; 0x152e
 	textpointer SeelLv10Description                                   ; 0x152f
@@ -5520,7 +5520,7 @@ SECTION "Text Offsets 2", ROMX
 	textpointer MagikarpLv6Description                                ; 0x1584
 	textpointer MagikarpLv8Description                                ; 0x1585
 	textpointer TrickleName                                           ; 0x1586
-	textpointer Plus10DamagePerHeadsDescription                       ; 0x1587
+	textpointer Do10DamageTimes2FlipsDescription                       ; 0x1587
 	textpointer DragonRageName                                        ; 0x1588
 	textpointer IfEitherTailsDoNothingDescription                     ; 0x1589
 	textpointer MagikarpLv10Description                               ; 0x158a
@@ -5629,7 +5629,7 @@ SECTION "Text Offsets 2", ROMX
 	textpointer MagnetCategoryName                                    ; 0x15f1
 	textpointer MagnemiteLv12Description                              ; 0x15f2
 	textpointer ThunderWaveName                                       ; 0x15f3
-	textpointer Selfdestruct40DamageDescription                       ; 0x15f4
+	textpointer Selfdestruct60DamageDescription                       ; 0x15f4
 	textpointer MagnemiteLv13Description                              ; 0x15f5
 	textpointer MagneticStormName                                     ; 0x15f6
 	textpointer MagneticStormDescription                              ; 0x15f7
@@ -5647,7 +5647,7 @@ SECTION "Text Offsets 2", ROMX
 	textpointer MagnetonLv30Description                               ; 0x1603
 	textpointer SonicboomName                                         ; 0x1604
 	textpointer SonicboomDescription                                  ; 0x1605
-	textpointer Selfdestruct100DamageDescription                      ; 0x1606
+	textpointer Selfdestruct200DamageDescription                      ; 0x1606
 	textpointer DarkMagnetonName                                      ; 0x1607
 	textpointer SonicboomAltDescription                               ; 0x1608
 	textpointer MagneticLinesName                                     ; 0x1609
@@ -5681,12 +5681,12 @@ SECTION "Text Offsets 2", ROMX
 	textpointer ThunderpunchDescription                               ; 0x1625
 	textpointer ElectabuzzLv35Description                             ; 0x1626
 	textpointer JolteonName                                           ; 0x1627
-	textpointer Do20DamageNumberOfHeadsDescription                    ; 0x1628
+	textpointer Do20DamageTimes2FlipsDescription                    ; 0x1628
 	textpointer StunNeedleName                                        ; 0x1629
 	textpointer JolteonLv24Description                                ; 0x162a
 	textpointer QuickAttackAltDescription2                            ; 0x162b
 	textpointer PinMissileName                                        ; 0x162c
-	textpointer PinMissileDescription                                 ; 0x162d
+	textpointer Do20DamageTimes4FlipsDescription                                 ; 0x162d
 	textpointer JolteonLv29Description                                ; 0x162e
 	textpointer DarkJolteonName                                       ; 0x162f
 	textpointer LightningFlashName                                    ; 0x1630
@@ -5717,7 +5717,7 @@ SECTION "Text Offsets 2", ROMX
 	textpointer SwiftDescription                                      ; 0x1649
 	textpointer SandshrewLv15Description                              ; 0x164a
 	textpointer SandslashName                                         ; 0x164b
-	textpointer FurySwipes20DamageDescription                         ; 0x164c
+	textpointer Do20DamageTimes3FlipsDescription                      ; 0x164c
 	textpointer SandslashLv33Description                              ; 0x164d
 	textpointer SandVeilName                                          ; 0x164e
 	textpointer RollingNeedleName                                     ; 0x164f
@@ -5845,7 +5845,7 @@ SECTION "Text Offsets 2", ROMX
 	textpointer OnixLv25Description                                   ; 0x16c9
 	textpointer CuboneName                                            ; 0x16ca
 	textpointer SnivelName                                            ; 0x16cb
-	textpointer SnivelDescription                                     ; 0x16cc
+	textpointer ReduceDamageBy20Description                           ; 0x16cc
 	textpointer LonelyName                                            ; 0x16cd
 	textpointer CuboneLv13Description                                 ; 0x16ce
 	textpointer BoneTossName                                          ; 0x16cf
@@ -5912,7 +5912,7 @@ SECTION "Text Offsets 2", ROMX
 	textpointer FossilName                                            ; 0x170c
 	textpointer AerodactylLv28Description                             ; 0x170d
 	textpointer TailspinAttackName                                    ; 0x170e
-	textpointer TailspinAttackDescription                             ; 0x170f
+	textpointer Do10DamageToSelfDescription                             ; 0x170f
 	textpointer AerodactylLv30Description                             ; 0x1710
 	textpointer AbraName                                              ; 0x1711
 	textpointer PsychicBeamName                                       ; 0x1712
@@ -6045,7 +6045,7 @@ SECTION "Text Offsets 2", ROMX
 	textpointer DampeningShieldName                                   ; 0x1791
 	textpointer DampeningShieldDescription                            ; 0x1792
 	textpointer JugglingName                                          ; 0x1793
-	textpointer JugglingDescription                                   ; 0x1794
+	textpointer Do10DamageTimes4FlipsDescription                      ; 0x1794
 	textpointer BarrierName                                           ; 0x1795
 	textpointer MrMimeLv20Description                                 ; 0x1796
 	textpointer InvisibleWallName                                     ; 0x1797

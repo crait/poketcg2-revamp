@@ -930,7 +930,7 @@ CreateEnergyCardListFromDiscardPile:
 CheckNonTurnDuelistHasBench:
 	ld a, DUELVARS_NUMBER_OF_POKEMON_IN_PLAY_AREA
 	call GetNonTurnDuelistVariable
-	ldtx hl, EffectNoBenchedPokemonText
+	ldtx hl, NoBenchedPokemonText
 	cp 2
 	ret
 
@@ -1663,8 +1663,8 @@ VictreebelLure_SwitchDefendingPokemon:
 	ret
 
 ; If heads, defending Pokemon can't retreat next turn
-AcidEffect:
-	ldtx de, AcidCheckText
+MayPreventRetreatingEffect:
+	ldtx de, MayPreventRetreatingCheckText
 	call TossCoin_Bank1a
 	ret nc
 	ld a, SUBSTATUS2_ACID
@@ -1755,14 +1755,14 @@ ZubatLeechLifeEffect:
 	call ApplyAndAnimateHPRecovery
 	ret
 
-Twineedle_AIEffect:
-	ld a, 60 / 2
+Do30DamageTimes2Flips_AIEffect:
+	ld a, (30 * 2) / 2
 	lb de, 0, 60
 	call SetExpectedAIDamage
 	ret
 
 ; Flip 2 coins; deal 30x number of heads
-Twineedle_MultiplierEffect:
+Do30DamageTimes2FlipsEffect:
 	ld hl, 30
 	call LoadTxRam3
 	ldtx de, DamageCheckXDamageTimesHeadsText
@@ -1826,7 +1826,7 @@ MetapodStunSporeEffect:
 	call Paralysis50PercentEffect
 	ret
 
-OddishStunSporeEffect:
+MayInflictParalysisEffect:
 	call Paralysis50PercentEffect
 	ret
 
@@ -2027,13 +2027,13 @@ BoyfriendsEffect:
 	call AddToDamage ; adds 2 * 10 * c
 	ret
 
-NidoranFFurySwipes_AIEffect:
+Do10DamageTimes3Flips_AIEffect:
 	ld a, 30 / 2
 	lb de, 0, 30
 	call SetExpectedAIDamage
 	ret
 
-NidoranFFurySwipes_MultiplierEffect:
+Do10DamageTimes3FlipsEffect:
 	ld hl, 10
 	call LoadTxRam3
 	ldtx de, DamageCheckXDamageTimesHeadsText
@@ -2155,33 +2155,55 @@ NidorinoDoubleKick_MultiplierEffect:
 	call SetDefiniteDamage
 	ret
 
+; Reclaiming 38 bytes! (8, 6, and 24)
+; ButterfreeWhirlwind_CheckBench:
+; 	call HandleMandatorySwitchSelection
+; 	ldh a, [hTempPlayAreaLocation_ff9d]
+; 	ldh [hTemp_ffa0], a
+; 	ret
+; ButterfreeWhirlwind_SwitchEffect:
+; 	ldh a, [hTemp_ffa0]
+; 	call HandleSwitchDefendingPokemonEffect
+; 	ret
+; ButterfreeMegaDrainEffect:
+; 	ld hl, wDealtDamage
+; 	ld a, [hli]
+; 	ld h, [hl]
+; 	ld l, a
+; 	srl h
+; 	rr l
+; 	bit 0, l
+; 	jr z, .asm_68b02
+; 	ldtx de, DoneText
+; 	add hl, de
+; .asm_68b02
+; 	ld e, l
+; 	ld d, h
+; 	call ApplyAndAnimateHPRecovery
+; 	ret
 ButterfreeWhirlwind_CheckBench:
-	call HandleMandatorySwitchSelection
-	ldh a, [hTempPlayAreaLocation_ff9d]
-	ldh [hTemp_ffa0], a
-	ret
-
 ButterfreeWhirlwind_SwitchEffect:
-	ldh a, [hTemp_ffa0]
-	call HandleSwitchDefendingPokemonEffect
+ButterfreeMegaDrainEffect:
+PreventRetreatingToSelfEffect:
+	ld a, SUBSTATUS2_ACID
+	call ApplySubstatus2ToAttackingCard
 	ret
 
-ButterfreeMegaDrainEffect:
-	ld hl, wDealtDamage
-	ld a, [hli]
-	ld h, [hl]
-	ld l, a
-	srl h
-	rr l
-	bit 0, l
-	jr z, .asm_68b02
-	ldtx de, DoneText
-	add hl, de
-.asm_68b02
-	ld e, l
-	ld d, h
-	call ApplyAndAnimateHPRecovery
+ds 6, 0
+
+SlicingWindEffect2:
+	farcall CheckNonTurnDuelistHasBench
+	ret c
+	call SwapTurn
+	dec a
+	call Random
+	inc a
+	ld b, a
+	ld de, 30
+	call DealDamageToPlayAreaPokemon_RegularAnim
+	call SwapTurn
 	ret
+
 
 ParasSporeEffect:
 	call SleepEffect
@@ -2191,13 +2213,13 @@ ParasectSporeEffect:
 	call SleepEffect
 	ret
 
-WeedlePoisonSting_AIEffect:
+MayInflictPoison_AIEffect:
 	ld a, 10 / 2
 	lb de, 0, 10
 	call UpdateExpectedAIDamage_AccountForPoison
 	ret
 
-WeedlePoisonSting_Poison50PercentEffect:
+MayInflictPoisonEffect:
 	call Poison50PercentEffect
 	ret
 
@@ -2685,13 +2707,13 @@ Heal_RemoveDamageEffect:
 	call ExchangeRNG
 	ret
 
-PetalDance_AIEffect:
+Do40DamageTimes3Flips_AIEffect:
 	ld a, 120 / 2
 	lb de, 0, 120
 	call SetExpectedAIDamage
 	ret
 
-PetalDance_MultiplierEffect:
+Do40DamageTimes3FlipsEffect:
 	ld hl, 40
 	call LoadTxRam3
 	ldtx de, DamageCheckXDamageTimesHeadsText
@@ -2918,7 +2940,7 @@ BlastoiseRainDanceEffect:
 	scf
 	ret
 
-BlastoiseHydroPumpEffect:
+WWW40WaterGunEffect:
 	lb bc, 3, 0
 	jp ApplyExtraWaterEnergy10DamageBonus
 
@@ -2927,7 +2949,7 @@ BlastoiseAltRainDanceEffect:
 	ret
 
 BlastoiseAltHydroPumpEffect:
-	jr BlastoiseHydroPumpEffect
+	jr WWW40WaterGunEffect
 
 BubblebeamEffect:
 	call Paralysis50PercentEffect
@@ -2944,58 +2966,30 @@ CalculateKinglerFlailDamage:
 	call SetDefiniteDamage
 	ret
 
-; returns carry if no cards in Deck
-; or if Play Area is full already.
+ds 77, 0
 KrabbyCallForFamily_CheckDeckAndPlayArea:
-	farcall CheckIfDeckIsEmpty
-	ret c ; return if no cards in deck
-	farcall CheckIfHasSpaceInBench
-	ret
-
 KrabbyCallForFamily_PlayerSelectEffect:
-	call CreateDeckCardList
-	ldtx hl, ChooseAKrabbyFromDeckText
-	ldtx bc, EffectTargetKrabbyText
-	ld de, DEX_KRABBY
-	ld a, CARDSEARCH_POKEDEX_NUMBER
-	farcall LookForCardsInDeck
-	jr c, .got_selection
-	ldtx hl, ChooseAKrabbyText
-	ldtx de, DuelistDeckText
-	farcall SelectCardSearchTarget
-.got_selection
-	ldh [hTemp_ffa0], a
-	ret
-
 KrabbyCallForFamily_AISelectEffect:
-	ld de, DEX_KRABBY
-	ld a, CARDSEARCH_POKEDEX_NUMBER
-	farcall SetCardSearchFuncParams
-	call CreateDeckCardList
-	ld hl, wDuelTempList
-.loop
-	ld a, [hli]
-	ldh [hTemp_ffa0], a
-	cp $ff
-	ret z
-	farcall ExecuteCardSearchFunc
-	jr nc, .loop
-	ret
-
 KrabbyCallForFamily_PutInPlayAreaEffect:
-	ldh a, [hTemp_ffa0]
-	cp $ff
-	jr z, .shuffle
-	call SearchCardInDeckAndAddToHand
-	call AddCardToHand
-	call PutHandPokemonCardInPlayArea
-	call IsPlayerTurn
-	jr c, .shuffle
-	ldh a, [hTemp_ffa0]
-	ldtx hl, PlacedOnBenchText
-	bank1call DisplayCardDetailScreen
-.shuffle
-	call ShuffleCardsInDeck
+DigALittleEffect:
+	call SwapTurn
+	ld c, 2
+	xor a
+	ld b, a
+.loop
+	call DrawCardFromDeck
+	jr c, .no_card
+	call PutCardInDiscardPile
+	inc b
+.no_card
+	dec c
+	jr nz, .loop
+	ld l, b
+	ld h, 0
+	call LoadTxRam3
+	ldtx hl, DiscardedCardsFromDeckText
+	call DrawWideTextBox_PrintText
+	call SwapTurn
 	ret
 
 MagikarpFlail_AIEffect:
@@ -3009,7 +3003,7 @@ CalculateMagikarpFlailDamage:
 	call SetDefiniteDamage
 	ret
 
-HeadacheEffect:
+UnusedEffect:
 	ld a, DUELVARS_ARENA_CARD_SUBSTATUS3
 	call GetNonTurnDuelistVariable
 	set SUBSTATUS3_HEADACHE_F, [hl]
@@ -3083,8 +3077,8 @@ VaporeonQuickAttack_DamageBoostEffect:
 	call AddDamageIfHeads
 	ret
 
-VaporeonWaterGunEffect:
-	lb bc, 2, 1
+WC30WaterGunEffect:
+	lb bc, 1, 1
 	jp ApplyExtraWaterEnergy10DamageBonus
 
 DewgongIceBeamEffect:
@@ -3270,7 +3264,7 @@ PoliwrathWhirlpool_AISelectEffect:
 PoliwrathWhirlpool_DiscardEffect:
 	jp DiscardEnergyEffect
 
-PoliwagWaterGunEffect:
+W10WaterGunEffect:
 	lb bc, 1, 0
 	jp ApplyExtraWaterEnergy10DamageBonus
 
@@ -4137,10 +4131,10 @@ Firegiver_AddToHandEffect:
 	ret
 
 .found
-; pick a random number between 1 and 4,
+; pick a random number between 1 and 2,
 ; up to the maximum number of Fire Energy
 ; cards that were found.
-	ld a, 4
+	ld a, 2
 	call Random
 	inc a
 	cp c
@@ -5890,7 +5884,7 @@ AbsorbEffect:
 	call ApplyAndAnimateHPRecovery
 	ret
 
-CuboneSnivelEffect:
+ReduceDamageBy20Effect:
 	ld a, SUBSTATUS2_REDUCE_BY_20
 	call ApplySubstatus2ToDefendingCard
 	ret
@@ -5926,28 +5920,29 @@ Bonemerang_MultiplierEffect:
 	ret
 
 ; returns carry if can't add Pokemon from deck
-MarowakCallForFamily_CheckDeckAndPlayArea:
+CallForFriend_CheckDeckAndPlayArea:
 	farcall CheckIfDeckIsEmpty
 	ret c ; return if no cards in deck
 	farcall CheckIfHasSpaceInBench
 	ret
 
-MarowakCallForFamily_PlayerSelectEffect:
+; modified to search for all Pokemon from just fighting
+CallForFriend_PlayerSelectEffect:
 	call CreateDeckCardList
-	ldtx hl, ChooseBasicFightingPokemonFromDeckText
-	ldtx bc, EffectTargetFightingPokemonText
-	ld a, CARDSEARCH_BASIC_FIGHTING_POKEMON
+	ldtx hl, ChooseBasicPokemonText ; Originally ChooseBasicFightingPokemonFromDeckText, so maybe 'from deck' should be considered
+	ldtx bc, EffectTargetBasicPokemonText
+	ld a, CARDSEARCH_BASIC_POKEMON
 	farcall LookForCardsInDeck
 	jr c, .got_selection
-	ldtx hl, ChooseBasicFightingPokemonText
+	ldtx hl, ChooseBasicPokemonText
 	ldtx de, DuelistDeckText
 	farcall SelectCardSearchTarget
 .got_selection
 	ldh [hTemp_ffa0], a
 	ret
 
-MarowakCallForFamily_AISelectEffect:
-	ld a, CARDSEARCH_BASIC_FIGHTING_POKEMON
+CallForFriend_AISelectEffect:
+	ld a, CARDSEARCH_BASIC_POKEMON
 	farcall SetCardSearchFuncParams
 	call CreateDeckCardList
 	ld hl, wDuelTempList
@@ -5960,7 +5955,7 @@ MarowakCallForFamily_AISelectEffect:
 	jr nc, .loop
 	ret
 
-MarowakCallForFamily_PutInPlayAreaEffect:
+CallForFriend_PutInPlayAreaEffect:
 	ldh a, [hTemp_ffa0]
 	cp $ff
 	jr z, .shuffle
@@ -6005,8 +6000,8 @@ SubmissionEffect:
 	call DealRecoilDamageToSelf
 	ret
 
-GolemSelfdestructEffect:
-	ld a, 100
+Selfdestruct200DamageEffect:
+	ld a, 200
 	call DealRecoilDamageToSelf
 	call SetIsDamageToSelf
 	ld a, 20
@@ -6301,8 +6296,8 @@ MagnemiteThunderWaveEffect:
 	call Paralysis50PercentEffect
 	ret
 
-MagnemiteSelfdestructEffect:
-	ld a, 40
+Selfdestruct60DamageEffect:
+	ld a, 60
 	call DealRecoilDamageToSelf
 
 	call SetIsDamageToSelf
@@ -6459,13 +6454,13 @@ JolteonQuickAttack_DamageBoostEffect:
 	call AddDamageIfHeads
 	ret
 
-PinMissile_AIEffect:
+Do20DamageTimes4Flips_AIEffect:
 	ld a, (20 * 4) / 2
 	lb de, 0, 80
 	call SetExpectedAIDamage
 	ret
 
-PinMissile_MultiplierEffect:
+Do20DamageTimes4FlipsEffect:
 	ld hl, 20
 	call LoadTxRam3
 	ldtx de, DamageCheckXDamageTimesHeadsText
@@ -6564,7 +6559,7 @@ Spark_BenchDamageEffect:
 	ret
 
 PikachuLv16GrowlEffect:
-	ld a, SUBSTATUS2_GROWL
+	ld a, SUBSTATUS2_REDUCE_BY_10
 	call ApplySubstatus2ToDefendingCard
 	ret
 
@@ -6573,7 +6568,7 @@ PikachuLv16ThundershockEffect:
 	ret
 
 PikachuAltLv16GrowlEffect:
-	ld a, SUBSTATUS2_GROWL
+	ld a, SUBSTATUS2_REDUCE_BY_10
 	call ApplySubstatus2ToDefendingCard
 	ret
 
@@ -6981,7 +6976,7 @@ RandomlyDamagePlayAreaPokemon:
 
 BigThunderEffect:
 	call ExchangeRNG
-	ld de, 70 ; damage to inflict
+	ld de, 60 ; damage to inflict
 	call RandomlyDamagePlayAreaPokemon
 	ret
 
@@ -8868,7 +8863,7 @@ DarkWartortleMirrorShellEffect:
 	call ApplySubstatus1ToAttackingCard
 	ret
 
-HydrocannonEffect:
+WW30WaterGunEffect:
 	lb bc, 2, 0
 	call ApplyExtraWaterEnergy20DamageBonus
 	ret
@@ -8915,7 +8910,7 @@ Dizziness_DrawCardEffect:
 	bank1call OpenCardPage_FromHand
 	ret
 
-PsyduckWaterGunEffect:
+WC20WaterGunEffect:
 	lb bc, 1, 1
 	call ApplyExtraWaterEnergy10DamageBonus
 	ret
@@ -9901,6 +9896,7 @@ BenchManipulation_AIEffect:
 	ld a, DUELVARS_NUMBER_OF_POKEMON_IN_PLAY_AREA
 	call GetNonTurnDuelistVariable
 	add a
+	add a ; In order to change the damage from 20x to 30x, I am adding this
 	call ATimes10
 	; sets max damage as (num bench cards) * 20
 	ld [wAIMaxDamage], a
@@ -9912,9 +9908,7 @@ BenchManipulation_AIEffect:
 	ld [wAIMinDamage], a
 	ret
 
-BenchManipulation_CheckBench:
-	call CheckNonTurnDuelistHasBench
-	ret
+ds 3, 0
 
 BenchManipulation_MultiplierEffect:
 	; don't do damage if Aurora Veil is active
@@ -9927,7 +9921,7 @@ BenchManipulation_MultiplierEffect:
 	jr nc, .no_aurora_veil
 	ret
 .no_aurora_veil
-	ld hl, 20
+	ld hl, 30
 	call LoadTxRam3
 	call SwapTurn
 	ld a, DUELVARS_NUMBER_OF_POKEMON_IN_PLAY_AREA
@@ -10870,7 +10864,7 @@ MysteriousPowerEffect:
 	call Confusion50PercentEffect
 	ret
 
-PoisonHorn_AIEffect:
+Poison_AIEffect:
 	ld a, 10
 	lb de, 10, 10
 	call UpdateExpectedAIDamage_AccountForPoison
@@ -10912,13 +10906,16 @@ ToxicSpore_PoisonEffect:
 	call PoisonEffect
 	ret
 
-PoliwagBubbleEffect:
-	call Paralysis50PercentEffect
+; apply a status condition of type 2 identified by register a to the target
+ApplySubstatus2ToAttackingCard:
+	push af
+	ld a, DUELVARS_ARENA_CARD_SUBSTATUS2
+	get_turn_duelist_var
+	pop af
+	ld [hli], a
 	ret
 
-PoliwagBodySlamEffect:
-	call Paralysis50PercentEffect
-	ret
+ds 1, 0
 
 LickitungLickEffect:
 	call Paralysis50PercentOrNoEffect

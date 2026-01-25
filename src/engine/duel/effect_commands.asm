@@ -77,9 +77,9 @@ VictreebelLureEffectCommands:
 	dbw EFFECTCMDTYPE_AI_SELECTION, VictreebelLure_GetBenchPokemonWithLowestHP
 	db $00
 
-VictreebelAcidEffectCommands:
+PreventRetreatingToSelfEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, AcidEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, PreventRetreatingToSelfEffect
 	db $00
 
 PinsirIronGripEffectCommands:
@@ -87,9 +87,9 @@ PinsirIronGripEffectCommands:
 	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, IronGripEffect
 	db $00
 
-CaterpieStringShotEffectCommands:
+MayPreventRetreatingEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, StringShotEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, MayPreventRetreatingEffect
 	db $00
 
 GloomPoisonPowderEffectCommands:
@@ -144,15 +144,15 @@ ZubatLeechLifeEffectCommands:
 	dbw EFFECTCMDTYPE_AFTER_DAMAGE, ZubatLeechLifeEffect
 	db $00
 
-BeedrillTwineedleEffectCommands:
+Do30DamageTimes2FlipsEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Twineedle_MultiplierEffect
-	dbw EFFECTCMDTYPE_AI, Twineedle_AIEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Do30DamageTimes2FlipsEffect
+	dbw EFFECTCMDTYPE_AI, Do30DamageTimes2Flips_AIEffect
 	db $00
 
 BeedrillPoisonStingEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, BeedrillPoisonSting_Poison50PercentEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, PoisonEffect
 	dbw EFFECTCMDTYPE_AI, BeedrillPoisonSting_AIEffect
 	db $00
 
@@ -182,9 +182,9 @@ MetapodStunSporeEffectCommands:
 	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, MetapodStunSporeEffect
 	db $00
 
-OddishStunSporeEffectCommands:
+MayInflictParalysisEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, OddishStunSporeEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, MayInflictParalysisEffect
 	db $00
 
 OddishSproutEffectCommands:
@@ -227,10 +227,10 @@ NidoqueenBoyfriendsEffectCommands:
 	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, BoyfriendsEffect
 	db $00
 
-NidoranFFurySwipesEffectCommands:
+Do10DamageTimes3FlipsEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, NidoranFFurySwipes_MultiplierEffect
-	dbw EFFECTCMDTYPE_AI, NidoranFFurySwipes_AIEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Do10DamageTimes3FlipsEffect
+	dbw EFFECTCMDTYPE_AI, Do10DamageTimes3Flips_AIEffect
 	db $00
 
 NidoranFCallForFamilyEffectCommands:
@@ -264,11 +264,19 @@ NidorinoDoubleKickEffectCommands:
 	dbw EFFECTCMDTYPE_AI, NidorinoDoubleKick_AIEffect
 	db $00
 
+	
+PidgeotSlicingWindEffectCommands:
+	db BANK("Effect Functions 1")
+	dbw EFFECTCMDTYPE_INITIAL_EFFECT_1, VictreebelLure_AssertPokemonInBench
+	dbw EFFECTCMDTYPE_AFTER_DAMAGE, SlicingWindEffect2
+	db $00
+
 ButterfreeWhirlwindEffectCommands:
 	db BANK("Effect Functions 1")
 	dbw EFFECTCMDTYPE_AFTER_DAMAGE, ButterfreeWhirlwind_SwitchEffect
 	dbw EFFECTCMDTYPE_REQUIRE_SELECTION, ButterfreeWhirlwind_CheckBench
-	dbw EFFECTCMDTYPE_AI_SWITCH_DEFENDING_PKMN, ButterfreeWhirlwind_CheckBench
+	; Removed this to reclaim space to add CheckNonTurnDuelistHasBench to SlicingWindEffectCommands
+	; dbw EFFECTCMDTYPE_AI_SWITCH_DEFENDING_PKMN, ButterfreeWhirlwind_CheckBench
 	db $00
 
 ButterfreeMegaDrainEffectCommands:
@@ -286,10 +294,10 @@ ParasectSporeEffectCommands:
 	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, ParasectSporeEffect
 	db $00
 
-WeedlePoisonStingEffectCommands:
+MayInflictPoisonEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, WeedlePoisonSting_Poison50PercentEffect
-	dbw EFFECTCMDTYPE_AI, WeedlePoisonSting_AIEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, MayInflictPoison_AIEffect
+	dbw EFFECTCMDTYPE_AI, MayInflictPoisonEffect
 	db $00
 
 IvysaurPoisonPowderEffectCommands:
@@ -389,10 +397,10 @@ VileplumeHealEffectCommands:
 	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Heal_RemoveDamageEffect
 	db $00
 
-VileplumePetalDanceEffectCommands:
+Do40DamageTimes3FlipsEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, PetalDance_MultiplierEffect
-	dbw EFFECTCMDTYPE_AI, PetalDance_AIEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Do40DamageTimes3FlipsEffect
+	dbw EFFECTCMDTYPE_AI, Do40DamageTimes3Flips_AIEffect
 	db $00
 
 TangelaStunSporeEffectCommands:
@@ -451,10 +459,10 @@ BlastoiseRainDanceEffectCommands:
 	dbw EFFECTCMDTYPE_INITIAL_EFFECT_1, BlastoiseRainDanceEffect
 	db $00
 
-BlastoiseHydroPumpEffectCommands:
+WWW40WaterGunEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, BlastoiseHydroPumpEffect
-	dbw EFFECTCMDTYPE_AI, BlastoiseHydroPumpEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, WWW40WaterGunEffect
+	dbw EFFECTCMDTYPE_AI, WWW40WaterGunEffect
 	db $00
 
 BlastoiseAltRainDanceEffectCommands:
@@ -494,8 +502,8 @@ MagikarpFlailEffectCommands:
 	db $00
 
 PsyduckHeadacheEffectCommands:
-	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, HeadacheEffect
+	db BANK("Effect Functions 2") ; Used to be 1
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, HeadacheEffect2
 	db $00
 
 PsyduckFurySwipesEffectCommands:
@@ -543,10 +551,10 @@ VaporeonQuickAttackEffectCommands:
 	dbw EFFECTCMDTYPE_AI, VaporeonQuickAttack_AIEffect
 	db $00
 
-VaporeonWaterGunEffectCommands:
+WC30WaterGunEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, VaporeonWaterGunEffect
-	dbw EFFECTCMDTYPE_AI, VaporeonWaterGunEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, WC30WaterGunEffect
+	dbw EFFECTCMDTYPE_AI, WC30WaterGunEffect
 	db $00
 
 DewgongIceBeamEffectCommands:
@@ -621,10 +629,10 @@ PoliwrathWhirlpoolEffectCommands:
 	dbw EFFECTCMDTYPE_AI_SELECTION, PoliwrathWhirlpool_AISelectEffect
 	db $00
 
-PoliwagWaterGunEffectCommands:
+W10WaterGunEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, PoliwagWaterGunEffect
-	dbw EFFECTCMDTYPE_AI, PoliwagWaterGunEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, W10WaterGunEffect
+	dbw EFFECTCMDTYPE_AI, W10WaterGunEffect
 	db $00
 
 CloysterClampEffectCommands:
@@ -1133,9 +1141,9 @@ KabutopsAbsorbEffectCommands:
 	dbw EFFECTCMDTYPE_AFTER_DAMAGE, AbsorbEffect
 	db $00
 
-CuboneSnivelEffectCommands:
+ReduceDamageBy20EffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, CuboneSnivelEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, ReduceDamageBy20Effect
 	db $00
 
 CuboneRageEffectCommands:
@@ -1150,12 +1158,12 @@ MarowakBonemerangEffectCommands:
 	dbw EFFECTCMDTYPE_AI, Bonemerang_AIEffect
 	db $00
 
-MarowakCallforFriendEffectCommands:
+CallforFriendEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_INITIAL_EFFECT_1, MarowakCallForFamily_CheckDeckAndPlayArea
-	dbw EFFECTCMDTYPE_AFTER_DAMAGE, MarowakCallForFamily_PutInPlayAreaEffect
-	dbw EFFECTCMDTYPE_REQUIRE_SELECTION, MarowakCallForFamily_PlayerSelectEffect
-	dbw EFFECTCMDTYPE_AI_SELECTION, MarowakCallForFamily_AISelectEffect
+	dbw EFFECTCMDTYPE_INITIAL_EFFECT_1, CallForFriend_CheckDeckAndPlayArea
+	dbw EFFECTCMDTYPE_AFTER_DAMAGE, CallForFriend_PutInPlayAreaEffect
+	dbw EFFECTCMDTYPE_REQUIRE_SELECTION, CallForFriend_PlayerSelectEffect
+	dbw EFFECTCMDTYPE_AI_SELECTION, CallForFriend_AISelectEffect
 	db $00
 
 MachokeKarateChopEffectCommands:
@@ -1169,9 +1177,9 @@ MachokeSubmissionEffectCommands:
 	dbw EFFECTCMDTYPE_AFTER_DAMAGE, SubmissionEffect
 	db $00
 
-GolemSelfdestructEffectCommands:
+Selfdestruct200DamageEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_AFTER_DAMAGE, GolemSelfdestructEffect
+	dbw EFFECTCMDTYPE_AFTER_DAMAGE, Selfdestruct200DamageEffect
 	db $00
 
 GravelerHardenEffectCommands:
@@ -1204,7 +1212,7 @@ SandshrewSandAttackEffectCommands:
 	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, SandshrewSandAttackEffect
 	db $00
 
-SandslashFurySwipesEffectCommands:
+Do20DamageTimes3FlipsEffectCommands:
 	db BANK("Effect Functions 1")
 	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, SandslashFurySwipes_MultiplierEffect
 	dbw EFFECTCMDTYPE_AI, SandslashFurySwipes_AIEffect
@@ -1260,14 +1268,14 @@ ElectabuzzQuickAttackEffectCommands:
 	dbw EFFECTCMDTYPE_AI, ElectabuzzQuickAttack_AIEffect
 	db $00
 
-MagnemiteThunderWaveEffectCommands:
+DigALittleEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, MagnemiteThunderWaveEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, DigALittleEffect
 	db $00
 
-MagnemiteSelfdestructEffectCommands:
+Selfdestruct60DamageEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_AFTER_DAMAGE, MagnemiteSelfdestructEffect
+	dbw EFFECTCMDTYPE_AFTER_DAMAGE, Selfdestruct60DamageEffect
 	db $00
 
 ZapdosThunderEffectCommands:
@@ -1292,10 +1300,10 @@ JolteonQuickAttackEffectCommands:
 	dbw EFFECTCMDTYPE_AI, JolteonQuickAttack_AIEffect
 	db $00
 
-JolteonPinMissileEffectCommands:
+Do20DamageTimes4FlipsEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, PinMissile_MultiplierEffect
-	dbw EFFECTCMDTYPE_AI, PinMissile_AIEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Do20DamageTimes4FlipsEffect
+	dbw EFFECTCMDTYPE_AI, Do20DamageTimes4Flips_AIEffect
 	db $00
 
 FlyingPikachuThundershockEffectCommands:
@@ -1715,11 +1723,6 @@ DittoMorphEffectCommands:
 	dbw EFFECTCMDTYPE_AFTER_DAMAGE, Morph_TransformEffect
 	db $00
 
-PidgeotSlicingWindEffectCommands:
-	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_AFTER_DAMAGE, SlicingWindEffect
-	db $00
-
 PidgeotGaleEffectCommands:
 	db BANK("Effect Functions 1")
 	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Gale_LoadAnimation
@@ -1803,10 +1806,10 @@ DarkWartortleMirrorShellEffectCommands:
 	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, DarkWartortleMirrorShellEffect
 	db $00
 
-DarkBlastoiseHydrocannonEffectCommands:
+WW30WaterGunEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, HydrocannonEffect
-	dbw EFFECTCMDTYPE_AI, HydrocannonEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, WW30WaterGunEffect
+	dbw EFFECTCMDTYPE_AI, WW30WaterGunEffect
 	db $00
 
 DarkBlastoiseRocketTackleEffectCommands:
@@ -1821,10 +1824,10 @@ PsyduckDizzinessEffectCommands:
 	dbw EFFECTCMDTYPE_AFTER_DAMAGE, Dizziness_DrawCardEffect
 	db $00
 
-PsyduckWaterGunEffectCommands:
+WC20WaterGunEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, PsyduckWaterGunEffect
-	dbw EFFECTCMDTYPE_AI, PsyduckWaterGunEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, WC20WaterGunEffect
+	dbw EFFECTCMDTYPE_AI, WC20WaterGunEffect
 	db $00
 
 DarkGolduckThirdEyeEffectCommands:
@@ -2046,7 +2049,7 @@ DrowzeeNightmareEffectCommands:
 
 DarkHypnoBenchManipulationEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_INITIAL_EFFECT_1, BenchManipulation_CheckBench
+	dbw EFFECTCMDTYPE_INITIAL_EFFECT_1, CheckNonTurnDuelistHasBench
 	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, BenchManipulation_MultiplierEffect
 	dbw EFFECTCMDTYPE_AI, BenchManipulation_AIEffect
 	db $00
@@ -2344,10 +2347,10 @@ MetapodMysteriousPowerEffectCommands:
 	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, MysteriousPowerEffect
 	db $00
 
-WeedlePoisonHornEffectCommands:
+InflictPoisonEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, PoisonHorn_PoisonEffect
-	dbw EFFECTCMDTYPE_AI, PoisonHorn_AIEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, PoisonEffect
+	dbw EFFECTCMDTYPE_AI, Poison_AIEffect
 	db $00
 
 KakunaPoisonFluidEffectCommands:
@@ -2400,7 +2403,7 @@ NidoranMHornRushEffectCommands:
 
 ClefairyFollowMeEffectCommands:
 	db BANK("Effect Functions 2")
-	dbw EFFECTCMDTYPE_INITIAL_EFFECT_1, FollowMe_AssertPokemonInBench
+	dbw EFFECTCMDTYPE_INITIAL_EFFECT_1, AssertPokemonInBench
 	dbw EFFECTCMDTYPE_AFTER_DAMAGE, FollowMe_SwitchDefendingPokemon
 	dbw EFFECTCMDTYPE_REQUIRE_SELECTION, FollowMe_SelectSwitchPokemon
 	dbw EFFECTCMDTYPE_AI_SWITCH_DEFENDING_PKMN, FollowMe_GetBenchPokemonWithLowestHP
@@ -2460,7 +2463,7 @@ ParasectLeechLifeEffectCommands:
 
 PoliwagBubbleEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, PoliwagBubbleEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, MayInflictParalysisEffect
 	db $00
 
 PoliwhirlTwiddleEffectCommands:
@@ -2470,7 +2473,7 @@ PoliwhirlTwiddleEffectCommands:
 
 PoliwagBodySlamEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, PoliwagBodySlamEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, MayInflictParalysisEffect
 	db $00
 
 PoliwrathHydroPumpEffectCommands:
@@ -2501,11 +2504,11 @@ RapidashFlameInfernoEffectCommands:
 	dbw EFFECTCMDTYPE_AI_SWITCH_DEFENDING_PKMN, FlameInferno_AISelectEffect
 	db $00
 
-RapidashKickAwayEffectCommands:
+KnockAwayEffectCommands:
 	db BANK("Effect Functions 2")
-	dbw EFFECTCMDTYPE_AFTER_DAMAGE, KickAway_SwitchEffect
-	dbw EFFECTCMDTYPE_REQUIRE_SELECTION, KickAway_CheckBench
-	dbw EFFECTCMDTYPE_AI_SWITCH_DEFENDING_PKMN, KickAway_CheckBench
+	dbw EFFECTCMDTYPE_AFTER_DAMAGE, KnockAwaySwitchEffect
+	dbw EFFECTCMDTYPE_REQUIRE_SELECTION, KnockAwayCheckBench
+	dbw EFFECTCMDTYPE_AI_SWITCH_DEFENDING_PKMN, KnockAwayCheckBench
 	db $00
 
 DoduoGrowlEffectCommands:
@@ -2535,10 +2538,10 @@ ChanseySingEffectCommands:
 	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, ChanseySingEffect
 	db $00
 
-ChanseyDoubleSlapEffectCommands:
+Do20DamageTimes2FlipsEffectCommands:
 	db BANK("Effect Functions 2")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, ChanseyDoubleSlap_MultiplierEffect
-	dbw EFFECTCMDTYPE_AI, ChanseyDoubleSlap_AIEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Do20DamageTimes2FlipsEffect
+	dbw EFFECTCMDTYPE_AI, Do20DamageTimes2Flips_AIEffect
 	db $00
 
 MrMimeDampeningShieldEffectCommands:
@@ -2546,10 +2549,10 @@ MrMimeDampeningShieldEffectCommands:
 	dbw EFFECTCMDTYPE_INITIAL_EFFECT_1, DampeningShieldEffect
 	db $00
 
-MrMimeJugglingEffectCommands:
+Do10DamageTimes4FlipsEffectCommands:
 	db BANK("Effect Functions 2")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Juggling_MultiplierEffect
-	dbw EFFECTCMDTYPE_AI, Juggling_AIEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Do10DamageTimes4FlipsEffect
+	dbw EFFECTCMDTYPE_AI, Do10DamageTimes4Flips_AIEffect
 	db $00
 
 PinsirSlicingThrowEffectCommands:
@@ -2761,9 +2764,9 @@ MagnetonMicrowaveEffectCommands:
 	dbw EFFECTCMDTYPE_AI, Microwave_AIEffect
 	db $00
 
-SeelGrowlEffectCommands:
+ReduceDamageBy10EffectCommands:
 	db BANK("Effect Functions 2")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, SeelGrowlEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, ReduceDamageBy10Effect
 	db $00
 
 SeelIceBeamEffectCommands:
@@ -2872,9 +2875,9 @@ AerodactylSupersonicEffectCommands:
 	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, AerodactylSupersonicEffect
 	db $00
 
-AerodactylTailspinAttackEffectCommands:
+Do10DamageToSelfEffectCommands:
 	db BANK("Effect Functions 2")
-	dbw EFFECTCMDTYPE_AFTER_DAMAGE, TailspinAttackEffect
+	dbw EFFECTCMDTYPE_AFTER_DAMAGE, Do10DamageToSelfEffect
 	db $00
 
 ArticunoAuroraVeilEffectCommands:
@@ -2953,10 +2956,10 @@ NidorinaStrengthInNumbersEffectCommands:
 	dbw EFFECTCMDTYPE_AI, StrengthInNumbersEffect
 	db $00
 
-NidorinaFurySwipesEffectCommands:
+Do30DamageTimes3FlipsEffectCommands:
 	db BANK("Effect Functions 2")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, NidorinaFurySwipes_MultiplierEffect
-	dbw EFFECTCMDTYPE_AI, NidorinaFurySwipes_AIEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Do30DamageTimes3FlipsEffect
+	dbw EFFECTCMDTYPE_AI, Do30DamageTimes3Flips_AIEffect
 	db $00
 
 NidorinoSwiftLungeEffectCommands:
@@ -3442,10 +3445,10 @@ DragoniteSupersonicFlightEffectCommands:
 	dbw EFFECTCMDTYPE_AI, SupersonicFlight_AIEffect
 	db $00
 
-MagikarpTrickleEffectCommands:
+Do10DamageTimes2FlipsEffectCommands:
 	db BANK("Effect Functions 2")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Trickle_MultiplierEffect
-	dbw EFFECTCMDTYPE_AI, Trickle_AIEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Do10DamageTimes2FlipsEffect
+	dbw EFFECTCMDTYPE_AI, Do10DamageTimes2Flips_AIEffect
 	db $00
 
 MagikarpDragonRageEffectCommands:
@@ -3870,7 +3873,7 @@ LassEffectCommands:
 
 MaintenanceEffectCommands:
 	db BANK("Effect Functions 2")
-	dbw EFFECTCMDTYPE_INITIAL_EFFECT_1, Maintenance_HandCheck
+	dbw EFFECTCMDTYPE_INITIAL_EFFECT_1, BillEffect ; Maintenance_HandCheck
 	dbw EFFECTCMDTYPE_INITIAL_EFFECT_2, Maintenance_PlayerSelection
 	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, Maintenance_ReturnToDeckAndDrawEffect
 	db $00

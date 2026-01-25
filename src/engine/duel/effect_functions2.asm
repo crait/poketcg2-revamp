@@ -619,7 +619,7 @@ BulbasaurFirstAid_HealEffect:
 	ret
 
 CharmanderGrowlEffect:
-	ld a, SUBSTATUS2_GROWL
+	ld a, SUBSTATUS2_REDUCE_BY_10
 	farcall ApplySubstatus2ToDefendingCard
 	ret
 
@@ -709,7 +709,7 @@ HornRush_NoDamage50PercentEffect:
 	farcall SetWasUnsuccessful
 	ret
 
-FollowMe_AssertPokemonInBench:
+AssertPokemonInBench:
 	farcall CheckNonTurnDuelistHasBench
 	ret
 
@@ -1115,19 +1115,19 @@ FlameInferno_DiscardAndDamageBoostEffect:
 	farcall AddToDamage
 	ret
 
-KickAway_CheckBench:
+KnockAwayCheckBench:
 	farcall HandleMandatorySwitchSelection
 	ldh a, [hTempPlayAreaLocation_ff9d]
 	ldh [hTemp_ffa0], a
 	ret
 
-KickAway_SwitchEffect:
+KnockAwaySwitchEffect:
 	ldh a, [hTemp_ffa0]
 	farcall HandleSwitchDefendingPokemonEffect
 	ret
 
 DoduoGrowlEffect:
-	ld a, SUBSTATUS2_GROWL
+	ld a, SUBSTATUS2_REDUCE_BY_10
 	farcall ApplySubstatus2ToDefendingCard
 	ret
 
@@ -1159,13 +1159,13 @@ LickitungStomp_DamageBoostEffect:
 	farcall AddDamageIfHeads
 	ret
 
-ChanseyDoubleSlap_AIEffect:
+Do20DamageTimes2Flips_AIEffect:
 	ld a, (20 * 2) / 2
 	lb de, 0, 40
 	farcall SetExpectedAIDamage
 	ret
 
-ChanseyDoubleSlap_MultiplierEffect:
+Do20DamageTimes2FlipsEffect:
 	ld hl, 20
 	call LoadTxRam3
 	ldtx de, DamageCheckXDamageTimesHeadsText
@@ -1180,13 +1180,13 @@ DampeningShieldEffect:
 	scf
 	ret
 
-Juggling_AIEffect:
+Do10DamageTimes4Flips_AIEffect:
 	ld a, (10 * 4) / 2
 	lb de, 0, 40
 	farcall SetExpectedAIDamage
 	ret
 
-Juggling_MultiplierEffect:
+Do10DamageTimes4FlipsEffect:
 	ld hl, 10
 	call LoadTxRam3
 	ldtx de, DamageCheckXDamageTimesHeadsText
@@ -1320,7 +1320,7 @@ TheRocketsTrap_ReturnToDeck50PercentEffect:
 
 	; place terminating byte on end of list
 	ld a, $ff
-	ld [wDuelTempList + 3], a
+	ld [wDuelTempList + 2], a
 
 	; go through shuffled hand cards and add to wDuelTempList
 	ld c, a ; -1
@@ -2160,22 +2160,40 @@ RainbowPowderEffect:
 	farcall ParalysisEffect
 	ret
 
+; Reclaimed 28 bytes!
+; FocusedOneShotEffect:
+; 	ldtx de, FocusedOneShotCheckText
+; 	farcall TossCoin_Bank1a
+; 	jr c, .heads
+
+; 	; was tails, next turn cannot use Corkscrew Punch
+; 	ld a, SUBSTATUS1_CANNOT_USE_CORKSCREW_PUNCH
+; 	farcall ApplySubstatus1ToAttackingCardAndSetCountdown
+; 	ld a, ATK_ANIM_FOCUSED_ONE_SHOT_FAILED
+; 	ld [wLoadedAttackAnimation], a
+; 	ret
+
+; .heads
+; 	; heads, next turn Corkscrew Punch is double damage
+; 	ld a, SUBSTATUS1_NEXT_TURN_DOUBLE_DAMAGE
+; 	farcall SetAttackDoubleOrTripleDamageNextTurn
+; 	ret
+
 FocusedOneShotEffect:
-	ldtx de, FocusedOneShotCheckText
+	ds 5, 0
+
+HeadacheEffect2:
+	ldtx de, AttackSuccessCheckText
 	farcall TossCoin_Bank1a
-	jr c, .heads
-
-	; was tails, next turn cannot use Corkscrew Punch
-	ld a, SUBSTATUS1_CANNOT_USE_CORKSCREW_PUNCH
-	farcall ApplySubstatus1ToAttackingCardAndSetCountdown
-	ld a, ATK_ANIM_FOCUSED_ONE_SHOT_FAILED
-	ld [wLoadedAttackAnimation], a
+	jr nc, .unsuccessful
+	ld a, DUELVARS_ARENA_CARD_SUBSTATUS3
+	call GetNonTurnDuelistVariable
+	set SUBSTATUS3_HEADACHE_F, [hl]
 	ret
-
-.heads
-	; heads, next turn Corkscrew Punch is double damage
-	ld a, SUBSTATUS1_NEXT_TURN_DOUBLE_DAMAGE
-	farcall SetAttackDoubleOrTripleDamageNextTurn
+.unsuccessful
+	xor a
+	ld [wLoadedAttackAnimation], a
+	farcall SetWasUnsuccessful
 	ret
 
 CorkscrewPunchEffect:
@@ -2455,8 +2473,8 @@ Microwave_BenchDamageAndDiscardEffect:
 	ld [hl], LAST_TURN_EFFECT_DISCARD_ENERGY
 	ret
 
-SeelGrowlEffect:
-	ld a, SUBSTATUS2_GROWL
+ReduceDamageBy10Effect:
+	ld a, SUBSTATUS2_REDUCE_BY_10
 	farcall ApplySubstatus2ToDefendingCard
 	ret
 
@@ -2712,7 +2730,7 @@ SharpClaws_DamageBoostEffect:
 	farcall AddDamageIfHeads
 	ret
 
-TailspinAttackEffect:
+Do10DamageToSelfEffect:
 	farcall SetIsDamageToSelf
 	ld b, PLAY_AREA_ARENA
 	ld de, 10
@@ -3292,13 +3310,13 @@ StrengthInNumbersEffect:
 	farcall AddToDamage
 	ret
 
-NidorinaFurySwipes_AIEffect:
+Do30DamageTimes3Flips_AIEffect:
 	ld a, (30 * 3) / 2
 	lb de, 0, 90
 	farcall SetExpectedAIDamage
 	ret
 
-NidorinaFurySwipes_MultiplierEffect:
+Do30DamageTimes3FlipsEffect:
 	ld hl, 30
 	call LoadTxRam3
 	ldtx de, DamageCheckXDamageTimesHeadsText
@@ -4712,13 +4730,16 @@ SaltWater_AIEffect:
 	ret
 
 SaltWater_PlayerSelectEffect:
-	ldtx de, IfHeadsAttachUpTo3WaterEnergyFromDeckText
-	farcall Serial_TossCoin
-	ldh [hTemp_ffa0], a
-	ret nc ; tails
-
-	; was heads
+	ldtx hl, AttachUpTo3WaterEnergyFromDeckText
+	call DrawWideTextBox_WaitForInput
+	; farcall Serial_TossCoin
+	; ldh [hTemp_ffa0], a
+	; ret nc ; tails
+	nop
+	nop
+	
 	ld a, 1
+	ldh [hTemp_ffa0], a
 	ldh [hCurSelectionItem], a
 	call CreateDeckCardList
 .init_menu
@@ -4778,10 +4799,18 @@ SaltWater_AttachToArenaEffect:
 	jr z, .finish
 	call SearchCardInDeckAndAddToHand
 	call AddCardToHand
-	push hl
-	ld e, PLAY_AREA_ARENA
-	call PutHandCardInPlayArea
-	pop hl
+	; Don't put the energy cards into the hand, anymore
+	; push hl
+	; ld e, PLAY_AREA_ARENA
+	; call PutHandCardInPlayArea
+	; pop hl
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
 	jr .loop_attach_energy
 
 .finish
@@ -4984,13 +5013,13 @@ HorseaWaterGunEffect:
 	ret
 
 WaterBomb_PlayerSelectEffect:
-	lb bc, 2, 0
+	lb bc, 1, 0
 	farcall CalculateExtraWaterEnergiesForDamageBonus
 	call BenchMultiSelectMenuPlayerSelection
 	ret
 
 WaterBomb_AISelectEffect:
-	lb bc, 2, 0
+	lb bc, 1, 0
 	farcall CalculateExtraWaterEnergiesForDamageBonus
 	call BenchMultiSelectMenuAISelection
 	ret
@@ -5503,8 +5532,8 @@ CoolPorygon3DAttack_MultiplierEffect:
 Eat_CountersCheck:
 	ld a, DUELVARS_ARENA_CARD_FOOD_COUNTERS
 	get_turn_duelist_var
-	ldtx hl, CannotUseSinceItAlreadyHas2FoodCountersText
-	cp 2
+	ldtx hl, CannotUseSinceItAlreadyHas4FoodCountersText
+	cp 4
 	ccf
 	; carry set if food counters >= 2
 	ret
@@ -5618,8 +5647,8 @@ Rollout_RemoveCountersAndDamageBoostEffect:
 
 	; add num chosen * 30 to damage
 	ld a, e
-	add a
-	add e
+	nop ; add a
+	nop ; add e
 	call ATimes10
 	farcall AddToDamage
 	ret
@@ -6195,13 +6224,13 @@ SupersonicFlight_NoDamage50PercentEffect:
 	farcall SetWasUnsuccessful
 	ret
 
-Trickle_AIEffect:
+Do10DamageTimes2Flips_AIEffect:
 	ld a, (10 * 2) / 2
 	lb de, 0, 20
 	farcall SetExpectedAIDamage
 	ret
 
-Trickle_MultiplierEffect:
+Do10DamageTimes2FlipsEffect:
 	ld hl, 10
 	call LoadTxRam3
 	ldtx de, DamageCheckXDamageTimesHeadsText
@@ -6290,7 +6319,7 @@ GetMiniMetronomeCoinTossResult:
 	ret
 
 MarillWaterGunEffect:
-	lb bc, 2, 0
+	lb bc, 1, 0
 	farcall ApplyExtraWaterEnergy10DamageBonus
 	ret
 
@@ -8771,13 +8800,15 @@ Maintenance_ReturnToDeckAndDrawEffect:
 	call RemoveCardFromHand
 	call ReturnCardToDeck
 	call CallShuffleCardsInDeck
-
+	
+	; Changed Maintenance to draw before, so no need to draw after.
+	ret
 ; draw one card
 	ld a, 1
 	farcall DisplayDrawNCardsScreen
 	call DrawCardFromDeck
 	call AddCardToHand
-	ret
+	; ret
 
 ; return carry if no cards in deck
 PokeBall_DeckCheck:

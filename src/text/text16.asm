@@ -583,7 +583,7 @@ SnivelName:
 	textfw "なきつく"
 	done
 
-SnivelDescription:
+ReduceDamageBy20Description:
 	textfw "次の相手の番、このワザを受けた[相手]"
 	linefw "がこのカードに与えるダメージは"
 	linefw "「-20」される。"
@@ -628,7 +628,7 @@ CallForFriendName:
 	done
 
 CallForFriendDescription:
-	textfw "自分の山札から「闘」タイプの"
+	textfw "自分の山札から       "
 	linefw "「たねポケモン」を1枚選び出し、"
 	linefw "自分のベンチに出す。その後、"
 	linefw "その山札をよく切る。(ベンチに空きが"
@@ -930,7 +930,7 @@ TailspinAttackName:
 	textfw "きりもみアタック"
 	done
 
-TailspinAttackDescription:
+Do10DamageToSelfDescription:
 	textfw "[自分]にも、「弱点・抵抗力」に"
 	linefw "関係なく、10ダメージ。"
 	done
@@ -1604,7 +1604,7 @@ BenchManipulationName:
 BenchManipulationDescription:
 	textfw "相手プレイヤーは、相手の控えポケモン"
 	linefw "の数ぶんコインを投げ、「うら」が"
-	linefw "出た数×20のダメージ。"
+	linefw "出た数×30のダメージ。"
 	linefw "(このワザのダメージは[相手]の「弱点"
 	linefw "・抵抗力」の影響を受けない)"
 	done
@@ -1634,7 +1634,7 @@ JugglingName:
 	textfw "ジャグリング"
 	done
 
-JugglingDescription:
+Do10DamageTimes4FlipsDescription:
 	textfw "コインを4枚投げ、「おもて」の数"
 	linefw "×10のダメージ。"
 	done
@@ -2003,7 +2003,7 @@ SlicingWingName:
 	done
 
 SlicingWingDescription:
-	textfw "相手の場にいるポケモン1匹に、"
+	textfw "相手の控えポケモン1匹に、  "
 	linefw "「弱点・抵抗力」に関係なく、30"
 	linefw "ダメージ。ダメージを受けるポケモンは"
 	linefw "自動的に選ばれる。"

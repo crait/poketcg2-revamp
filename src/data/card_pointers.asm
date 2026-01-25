@@ -171,6 +171,7 @@ CardPointers::
 	card_ptr StaryuLv17Card            ; STARYU_LV17
 	card_ptr StarmieCard               ; STARMIE
 	card_ptr DarkStarmieCard           ; DARK_STARMIE
+	card_ptr JynxLv23Card              ; JYNX_LV23
 	card_ptr MagikarpLv6Card           ; MAGIKARP_LV6
 	card_ptr MagikarpLv8Card           ; MAGIKARP_LV8
 	card_ptr MagikarpLv10Card          ; MAGIKARP_LV10
@@ -314,7 +315,6 @@ CardPointers::
 	card_ptr MrMimeLv20Card            ; MR_MIME_LV20
 	card_ptr MrMimeLv28Card            ; MR_MIME_LV28
 	card_ptr JynxLv18Card              ; JYNX_LV18
-	card_ptr JynxLv23Card              ; JYNX_LV23
 	card_ptr JynxLv27Card              ; JYNX_LV27
 	card_ptr MewtwoLv30Card            ; MEWTWO_LV30
 	card_ptr MewtwoLv53Card            ; MEWTWO_LV53

@@ -5936,7 +5936,7 @@ HandleBetweenTurnKnockOuts:
 	db TURN_PLAYER_WON,   TURN_PLAYER_TIED, TURN_PLAYER_WON,  TURN_PLAYER_WON
 	db TURN_PLAYER_TIED,  TURN_PLAYER_LOST, TURN_PLAYER_WON,  TURN_PLAYER_TIED
 
-; clears SUBSTATUS2_REDUCE_BY_20, SUBSTATUS2_POUNCE, SUBSTATUS2_GROWL,
+; clears SUBSTATUS2_REDUCE_BY_20, SUBSTATUS2_POUNCE, SUBSTATUS2_REDUCE_BY_10,
 ; SUBSTATUS2_TAIL_WAG, and SUBSTATUS2_LEER for each arena Pokemon with 0 HP
 .ClearDamageReductionSubstatus2OfKnockedOutPokemon:
 	call SwapTurn
@@ -7195,7 +7195,7 @@ HandleDamageReduction::
 	jr z, .reduce_damage_by_20
 	cp SUBSTATUS2_POUNCE
 	jr z, .reduce_damage_by_10
-	cp SUBSTATUS2_GROWL
+	cp SUBSTATUS2_REDUCE_BY_10
 	jr z, .reduce_damage_by_10
 	ret
 .reduce_damage_by_20
@@ -8096,7 +8096,7 @@ ClearDamageReductionSubstatus2:
 	jr z, .zero
 	cp SUBSTATUS2_POUNCE
 	jr z, .zero
-	cp SUBSTATUS2_GROWL
+	cp SUBSTATUS2_REDUCE_BY_10
 	jr z, .zero
 	cp SUBSTATUS2_TAIL_WAG
 	jr z, .zero
@@ -8940,10 +8940,10 @@ CheckUnableToRetreatDueToEffect:
 	get_turn_duelist_var
 	or a
 	jr z, .can_retreat
-	ldtx hl, UnableToRetreatDueToAcidText
+	ldtx hl, UnableToRetreatDueToAttackText
 	cp SUBSTATUS2_ACID
 	jr z, .set_carry
-	ldtx hl, UnableToRetreatDueToRockSealText
+	ldtx hl, UnableToRetreatDueToAttackText
 	cp SUBSTATUS2_ROCK_SEAL
 	jr z, .set_carry
 .can_retreat

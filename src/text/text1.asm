@@ -1112,9 +1112,9 @@ NoPokemonEvolvingFromFossilText:
 	linefw "ポケモンがいません"
 	done
 
-CannotUseSinceItAlreadyHas2FoodCountersText:
+CannotUseSinceItAlreadyHas4FoodCountersText:
 	textfw "「たべものカウンター」が"
-	linefw "2コのっているので つかえません"
+	linefw "4コのっているので つかえません"
 	done
 
 CannotEvolveText:
@@ -1326,9 +1326,9 @@ DamageCheckPlusXDamageForEachHeadsText:
 	linefw "「おもて」×<RAMNUM>ダメージ追加!!"
 	done
 
-AcidCheckText:
-	textfw "「ようかいえき」判定"
-	linefw "「おもて」ならつぎの番ににげられない"
+MayPreventRetreatingCheckText:
+	textfw "「おもて」ならつぎの番ににげられない"
+	linefw "          "
 	done
 
 TransparencyCheckText:
