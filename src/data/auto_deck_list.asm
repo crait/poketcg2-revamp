@@ -5,23 +5,23 @@
 ; basic
 MachineStarterDeckList:
 	dbw 14, FIRE_ENERGY
-	dbw 12, FIGHTING_ENERGY
+	dbw 14, FIGHTING_ENERGY
 	dbw  4, CHARMANDER_LV10
-	dbw  3, CHARMELEON
+	dbw  2, CHARMELEON
 	dbw  2, GROWLITHE_LV12
-	dbw  3, PONYTA_LV10
+	dbw  2, PONYTA_LV10
 	dbw  2, DIGLETT_LV8
-	dbw  4, MACHOP_LV20
-	dbw  3, MACHOKE_LV40
-	dbw  2, RATTATA_LV9
-	dbw  1, RATICATE
-	dbw  2, SPEAROW_LV9
-	dbw  1, MEOWTH_LV17
-	dbw  1, ENERGY_RETRIEVAL
+	dbw  2, MACHOP_LV20
+	dbw  3, GEODUDE_LV16
+	dbw  1, RATTATA_LV9
+	dbw  2, MAGMAR_LV24
+	dbw  2, DODUO_LV8
+	dbw  2, MEOWTH_LV17
+	dbw  2, ENERGY_RETRIEVAL
 	dbw  2, POTION
 	dbw  1, GUST_OF_WIND
 	dbw  2, SWITCH
-	dbw  1, BILL
+	dbw  1, ENERGY_SEARCH
 	db 0
 
 MachineElectricFireDeckList:

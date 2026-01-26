@@ -166,6 +166,7 @@
 	const STARYU_LV17              ; $0a5
 	const STARMIE                  ; $0a6
 	const DARK_STARMIE             ; $0a7
+	const JYNX_LV23                ; $137
 	const MAGIKARP_LV6             ; $0a8
 	const MAGIKARP_LV8             ; $0a9
 	const MAGIKARP_LV10            ; $0aa
@@ -309,7 +310,6 @@
 	const MR_MIME_LV20             ; $134
 	const MR_MIME_LV28             ; $135
 	const JYNX_LV18                ; $136
-	const JYNX_LV23                ; $137
 	const JYNX_LV27                ; $138
 	const MEWTWO_LV30              ; $139
 	const MEWTWO_LV53              ; $13a
