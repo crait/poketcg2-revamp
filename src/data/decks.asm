@@ -169,7 +169,7 @@ StarterDeck:
 	dbw  2, CHARMELEON
 	dbw  2, GROWLITHE_LV12
 	dbw  2, PONYTA_LV10
-	dbw  2, DIGLETT_LV8
+	dbw  2, DIGLETT_LV16
 	dbw  2, MACHOP_LV20
 	dbw  3, GEODUDE_LV16
 	dbw  1, RATTATA_LV9
@@ -786,7 +786,7 @@ BrickWalkDeck:
 	dbw  2, POLIWAG_LV13
 	dbw  1, POLIWAG_LV15
 	dbw  2, POLIWHIRL_LV28
-	dbw  1, POLIWRATH_LV40
+	dbw  1, POLIWRATH_LV48
 	dbw  3, JIGGLYPUFF_LV13
 	dbw  2, WIGGLYTUFF_LV36
 	dbw  1, SUPER_POTION
@@ -845,7 +845,7 @@ ElectricSelfdestructDeck:
 	dbw  2, MAGNEMITE_LV15
 	dbw  2, MAGNETON_LV28
 	dbw  4, VOLTORB_LV8
-	dbw  2, ELECTRODE_LV35
+	dbw  2, ELECTRODE_LV42
 	dbw  3, ELECTABUZZ_LV35
 	dbw  2, ZAPDOS_LV40
 	dbw  3, DODUO_LV10
@@ -1621,7 +1621,7 @@ GreatRocket1Deck:
 	dbw  2, PIKACHU_LV5
 	dbw  4, POLIWAG_LV15
 	dbw  2, POLIWHIRL_LV30
-	dbw  1, POLIWRATH_LV40
+	dbw  1, POLIWRATH_LV48
 	dbw  2, SEEL_LV10
 	dbw  1, DEWGONG_LV24
 	dbw  2, LAPRAS_LV24
@@ -2323,9 +2323,9 @@ VeryRareCardDeck:
 	db 0
 
 BadGuysDeck:
-	dbw  6, GRASS_ENERGY
-	dbw  8, FIRE_ENERGY
-	dbw  8, PSYCHIC_ENERGY
+	dbw  4, GRASS_ENERGY
+	dbw  9, FIRE_ENERGY
+	dbw  9, PSYCHIC_ENERGY
 	dbw  3, ODDISH_LV21
 	dbw  2, DARK_GLOOM
 	dbw  3, CHARMANDER_LV9

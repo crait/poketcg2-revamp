@@ -1196,13 +1196,13 @@ Do10DamageTimes4FlipsEffect:
 	farcall SetDefiniteDamage
 	ret
 
-SlicingThrow_AIEffect:
+IfHeadsDo10Plus10Damage_AIEffect:
 	ld a, (10 + 20) / 2
 	lb de, 10, 20
 	farcall SetExpectedAIDamage
 	ret
 
-SlicingThrow_DamageBoostEffect:
+IfHeadsDo10Plus10DamageEffect:
 	ld a, 10
 	farcall AddDamageIfHeads
 	ret
@@ -1843,13 +1843,13 @@ SpearowFuryAttack_MultiplierEffect:
 	farcall SetDefiniteDamage
 	ret
 
-FearowQuickAttack_AIEffect:
+IfHeadsDo10Plus20Damage_AIEffect:
 	ld a, (10 + 30) / 2
 	lb de, 10, 30
 	farcall SetExpectedAIDamage
 	ret
 
-FearowQuickAttack_DamageBoostEffect:
+IfHeadsDo10Plus20DamageEffect:
 	ld a, 20
 	farcall AddDamageIfHeads
 	ret
@@ -2719,13 +2719,13 @@ CheckIfCardIsFossilPokemon:
 	scf
 	ret
 
-SharpClaws_AIEffect:
-	ld a, 30 ; bug, should be (10 + 40) / 2
+IfHeadsDo10Plus30Damage_AIEffect:
+	ld a, (10 + 40) / 2
 	lb de, 10, 40
 	farcall SetExpectedAIDamage
 	ret
 
-SharpClaws_DamageBoostEffect:
+IfHeadsDo10Plus30DamageEffect:
 	ld a, 30
 	farcall AddDamageIfHeads
 	ret

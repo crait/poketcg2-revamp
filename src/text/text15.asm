@@ -290,7 +290,7 @@ QuickAttackName:
 	textfw "でんこうせっか"
 	done
 
-QuickAttackDescription:
+IfHeadsDo20MoreDamageDescription:
 	textfw "コインを投げて「おもて」なら、20ダ"
 	linefw "メージを追加する。"
 	done

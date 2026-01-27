@@ -871,7 +871,7 @@ SharpClawsName:
 	textfw "するどいツメ"
 	done
 
-SharpClawsDescription:
+IfHeadsDo30DamageMoreDescription:
 	textfw "コインを投げて「おもて」なら、"
 	linefw "30ダメージを追加する。"
 	done

@@ -4849,11 +4849,11 @@ ArcanineLv34Card:
 	; attack 1
 	energy COLORLESS, 2 ; energies
 	tx QuickAttackName ; name
-	tx QuickAttackDescription ; description
+	tx IfHeadsDo10Plus20DamageDescription ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_PLUS ; category
-	dw ArcanineQuickAttackEffectCommands ; effect commands
+	dw IfHeadsDo10Plus20DamageEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
@@ -5134,7 +5134,7 @@ PonytaLv15Card:
 	db 0 ; ?
 	db ATK_ANIM_NONE ; animation
 
-	db 1 ; retreat cost
+	db 0 ; retreat cost
 	db WR_WATER ; weakness
 	db NONE ; resistance
 	tx FireHorseName ; category
@@ -5577,7 +5577,7 @@ FlareonLv28Card:
 	; attack 1
 	energy FIRE, 1 ; energies
 	tx QuickAttackName ; name
-	tx QuickAttackDescription ; description
+	tx IfHeadsDo20MoreDamageDescription ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_PLUS ; category
@@ -8593,7 +8593,7 @@ VaporeonLv42Card:
 	; attack 1
 	energy WATER, 1 ; energies
 	tx QuickAttackName ; name
-	tx QuickAttackDescription ; description
+	tx IfHeadsDo20MoreDamageDescription ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_PLUS ; category
@@ -10687,11 +10687,11 @@ ElectabuzzLv20Card:
 	; attack 2
 	energy COLORLESS, 2 ; energies
 	tx QuickAttackName ; name
-	tx QuickAttackAltDescription1 ; description
+	tx IfHeadsDo10Plus20DamageDescription ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_PLUS ; category
-	dw ElectabuzzQuickAttackEffectCommands ; effect commands
+	dw IfHeadsDo10Plus20DamageEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
@@ -11677,7 +11677,7 @@ DarkDugtrioCard:
 	tx HideName ; name
 	tx TeleportBlastDescription ; description
 	dw NONE ; description (cont)
-	db 40 ; damage
+	db 30 ; damage
 	db DAMAGE_NORMAL ; category
 	dw DarkAlakazamTeleportBlastEffectCommands ; effect commands
 	db NONE ; flags 1

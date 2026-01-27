@@ -5900,7 +5900,7 @@ SECTION "Text Offsets 2", ROMX
 	textpointer FossilizeName                                         ; 0x1700
 	textpointer FossilizeDescription                                  ; 0x1701
 	textpointer SharpClawsName                                        ; 0x1702
-	textpointer SharpClawsDescription                                 ; 0x1703
+	textpointer IfHeadsDo10Plus30DamageDescription                    ; 0x1703
 	textpointer KabutoLv22Description                                 ; 0x1704
 	textpointer KabutopsName                                          ; 0x1705
 	textpointer SharpSickleName                                       ; 0x1706
@@ -5912,7 +5912,7 @@ SECTION "Text Offsets 2", ROMX
 	textpointer FossilName                                            ; 0x170c
 	textpointer AerodactylLv28Description                             ; 0x170d
 	textpointer TailspinAttackName                                    ; 0x170e
-	textpointer Do10DamageToSelfDescription                             ; 0x170f
+	textpointer Do10DamageToSelfDescription                           ; 0x170f
 	textpointer AerodactylLv30Description                             ; 0x1710
 	textpointer AbraName                                              ; 0x1711
 	textpointer PsychicBeamName                                       ; 0x1712

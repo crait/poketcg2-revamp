@@ -565,10 +565,10 @@ AIActionTable_SkySparkDeck:
 
 .list_energy
 	ai_energy PIKACHU_LV14,   3, +1
-	ai_energy RAICHU_LV45,    4, +1
+	ai_energy RAICHU_LV45,    3, +1
 	ai_energy DARK_RAICHU,    3, +1
 	ai_energy VOLTORB_LV13,   1, +0
-	ai_energy DARK_ELECTRODE, 2, +0
+	ai_energy DARK_ELECTRODE, 4, +0
 	ai_energy ZAPDOS_LV40,    4, +0
 	ai_energy PIDGEY_LV10,    3, +0
 	ai_energy PIDGEOTTO_LV36, 3, +0
@@ -656,13 +656,13 @@ AIActionTable_ElectricSelfdestructDeck:
 .list_energy
 	ai_energy MAGNEMITE_LV13,  2, +1
 	ai_energy MAGNEMITE_LV15,  2, +1
-	ai_energy MAGNETON_LV28,   3, +1
-	ai_energy VOLTORB_LV8,     2, +1
-	ai_energy ELECTRODE_LV35,  3, +0
-	ai_energy ELECTABUZZ_LV35, 3, +0
+	ai_energy MAGNETON_LV28,   2, +1
+	ai_energy VOLTORB_LV8,     4, +1
+	ai_energy ELECTRODE_LV42,  4, +0
+	ai_energy ELECTABUZZ_LV35, 4, +0
 	ai_energy ZAPDOS_LV40,     4, +0
 	ai_energy DODUO_LV10,      1, +0
-	ai_energy DODRIO_LV25,     3, +0
+	ai_energy DODRIO_LV25,     2, +0
 	dw NULL ; end
 
 .list_prize
@@ -748,15 +748,15 @@ AIActionTable_PsychicEliteDeck:
 	dw NULL ; end
 
 .list_energy
-	ai_energy ABRA_LV14,     1, -1
+	ai_energy ABRA_LV14,     2, -1
 	ai_energy KADABRA_LV39,  3, -1
 	ai_energy ALAKAZAM_LV42, 3, -1
-	ai_energy GASTLY_LV13,   2, +0
-	ai_energy HAUNTER_LV26,  2, -2
+	ai_energy GASTLY_LV13,   1, +0
+	ai_energy HAUNTER_LV26,  1, -2
 	ai_energy MR_MIME_LV20,  2, -3
-	ai_energy MR_MIME_LV28,  2, +0
+	ai_energy MR_MIME_LV28,  1, +0
 	ai_energy MEWTWO_LV60,   3, +0
-	ai_energy CHANSEY_LV55,  4, -2
+	ai_energy CHANSEY_LV55,  3, -2
 	dw NULL ; end
 
 .list_prize
@@ -832,11 +832,11 @@ AIActionTable_PuppetMasterDeck:
 	dw NULL ; end
 
 .list_energy
-	ai_energy SLOWPOKE_LV18, 2, +0
-	ai_energy SLOWBRO_LV26,  2, -1
+	ai_energy SLOWPOKE_LV18, 1, +0
+	ai_energy SLOWBRO_LV26,  3, -1
 	ai_energy DROWZEE_LV12,  2, +2
 	ai_energy HYPNO_LV30,    2, +4
-	ai_energy MR_MIME_LV28,  2, +0
+	ai_energy MR_MIME_LV28,  1, +0
 	dw NULL ; end
 
 .StoreListPointers:
@@ -920,11 +920,11 @@ AIActionTable_Even3YearsOnARockDeck:
 	dw NULL ; end
 
 .list_energy
-	ai_energy GEODUDE_LV16,  2, +0
+	ai_energy GEODUDE_LV16,  1, +0
 	ai_energy GRAVELER_LV28, 2, +0
-	ai_energy ONIX_LV25,     2, +0
+	ai_energy ONIX_LV25,     3, +0
 	ai_energy CUBONE_LV13,   2, +0
-	ai_energy MAROWAK_LV32,  3, -1
+	ai_energy MAROWAK_LV32,  1, -1
 	ai_energy RHYHORN,       3, +0
 	ai_energy RHYDON_LV48,   4, +0
 	dw NULL ; end
@@ -1008,16 +1008,16 @@ AIActionTable_RagingBillowOfFistsDeck:
 	dw NULL ; end
 
 .list_energy
-	ai_energy MACHOP_LV18,     3, +0
-	ai_energy MACHOP_LV24,     3, +0
-	ai_energy MACHOKE_LV24,    3, +0
+	ai_energy MACHOP_LV18,     2, +0
+	ai_energy MACHOP_LV24,     2, +0
+	ai_energy MACHOKE_LV24,    2, +0
 	ai_energy MACHOKE_LV40,    4, +0
 	ai_energy MACHAMP_LV54,    4, +0
 	ai_energy HITMONLEE_LV23,  3, +0
 	ai_energy HITMONCHAN_LV33, 3, +0
 	ai_energy MR_MIME_LV20,    2, -8
 	ai_energy LICKITUNG_LV20,  2, +0
-	ai_energy KANGASKHAN_LV38, 3, +0
+	ai_energy KANGASKHAN_LV38, 4, +0
 	dw NULL ; end
 
 .list_prize
@@ -1095,8 +1095,8 @@ AIActionTable_MaxEnergyDeck:
 
 .list_energy
 	ai_energy BULBASAUR_LV12, 2, +0
-	ai_energy IVYSAUR_LV26,   3, +0
-	ai_energy VENUSAUR_LV67,  4, +0
+	ai_energy IVYSAUR_LV26,   2, +0
+	ai_energy VENUSAUR_LV67,  3, +0
 	ai_energy CATERPIE,       1, +0
 	ai_energy METAPOD_LV20,   2, +0
 	ai_energy BUTTERFREE,     4, +0
@@ -1182,12 +1182,12 @@ AIActionTable_DarkScienceDeck:
 
 .list_energy
 	ai_energy EKANS_LV15,   2,  +0
-	ai_energy ARBOK_LV30,   3,  +0
-	ai_energy ZUBAT_LV12,   2,  +0
-	ai_energy GRIMER_LV10,  2,  +0
-	ai_energy KOFFING_LV13, 2,  -1
+	ai_energy ARBOK_LV30,   2,  +0
+	ai_energy ZUBAT_LV12,   1,  +0
+	ai_energy GRIMER_LV10,  1,  +0
+	ai_energy KOFFING_LV13, 1,  -1
 	ai_energy WEEZING_LV26, 3,  -1
-	ai_energy CHANSEY_LV55, 4, -28
+	ai_energy CHANSEY_LV55, 3, -28
 	dw NULL ; end
 
 .list_prize
@@ -1327,13 +1327,13 @@ AIActionTable_SplashingAboutDeck:
 	ret
 
 .list_energy
-	ai_energy SQUIRTLE_LV14,  2, +0
-	ai_energy WARTORTLE_LV24, 2, +0
+	ai_energy SQUIRTLE_LV14,  3, +0
+	ai_energy WARTORTLE_LV24, 3, +0
 	ai_energy POLIWAG_LV13,   2, +0
 	ai_energy HORSEA_LV20,    2, +0
-	ai_energy SEADRA_LV23,    3, +0
+	ai_energy SEADRA_LV23,    4, +0
 	ai_energy SEADRA_LV26,    3, +0
-	ai_energy LAPRAS_LV24,    2, +0
+	ai_energy LAPRAS_LV24,    3, +0
 	ai_energy VAPOREON_LV42,  4, +0
 	ai_energy EEVEE_LV12,     2, +0
 	dw NULL ; end
@@ -1383,13 +1383,13 @@ AIActionTable_BeachDeck:
 
 .list_energy
 	ai_energy TENTACOOL,     1, +0
-	ai_energy TENTACRUEL,    2, +0
-	ai_energy SHELLDER_LV16, 2, +0
+	ai_energy TENTACRUEL,    1, +0
+	ai_energy SHELLDER_LV16, 1, +0
 	ai_energy CLOYSTER,      2, +0
 	ai_energy KRABBY_LV17,   3, +0
-	ai_energy KINGLER_LV33,  1, +0
+	ai_energy KINGLER_LV33,  4, +0
 	ai_energy STARYU_LV17,   2, +0
-	ai_energy STARMIE,       3, +0
+	ai_energy STARMIE,       2, +0
 	dw NULL ; end
 
 .StoreListPointers:
@@ -1668,7 +1668,7 @@ AIActionTable_GreatRocket1Deck:
 	ai_energy PIKACHU_LV5,     2, +0
 	ai_energy POLIWAG_LV15,    2, +0
 	ai_energy POLIWHIRL_LV30,  3, +0
-	ai_energy POLIWRATH_LV40,  5, +0
+	ai_energy POLIWRATH_LV48,  5, +0
 	ai_energy SEEL_LV10,       3, +0
 	ai_energy DEWGONG_LV24,    5, +0
 	ai_energy LAPRAS_LV24,     3, +0
@@ -1766,18 +1766,18 @@ AIActionTable_GreatRocket2Deck:
 .list_energy
 	ai_energy EKANS_LV10,     2, +0
 	ai_energy EKANS_LV15,     2, +0
-	ai_energy DARK_ARBOK,     4, +0
-	ai_energy PARAS_LV8,      4, +0
-	ai_energy PARASECT_LV29,  4, +0
+	ai_energy DARK_ARBOK,     2, +0
+	ai_energy PARAS_LV8,      3, +0
+	ai_energy PARASECT_LV29,  3, +0
 	ai_energy PINSIR_LV15,    3, +0
-	ai_energy SANDSHREW_LV12, 1, +0
-	ai_energy SANDSLASH_LV33, 3, +0
+	ai_energy SANDSHREW_LV12, 2, +0
+	ai_energy SANDSLASH_LV33, 2, +0
 	ai_energy SANDSLASH_LV35, 3, +0
 	ai_energy DIGLETT_LV8,    2, +0
-	ai_energy DIGLETT_LV15,   2, +0
+	ai_energy DIGLETT_LV15,   1, +0
 	ai_energy DARK_DUGTRIO,   2, +0
 	ai_energy GEODUDE_LV15,   2, +0
-	ai_energy ONIX_LV25,      2, +0
+	ai_energy ONIX_LV25,      3, +0
 	dw NULL ; end
 
 .list_prize
@@ -1860,16 +1860,16 @@ AIActionTable_GreatRocket3Deck:
 	dw NULL ; end
 
 .list_energy
-	ai_energy ODDISH_LV8,       2, +0
-	ai_energy DARK_GLOOM,       2, +0
-	ai_energy DARK_VILEPLUME,   3, +0
+	ai_energy ODDISH_LV8,       1, +0
+	ai_energy DARK_GLOOM,       1, +0
+	ai_energy DARK_VILEPLUME,   1, +0
 	ai_energy EXEGGCUTE,        3, +0
 	ai_energy EXEGGUTOR,       28, +1
-	ai_energy TANGELA_LV12,     3, +0
+	ai_energy TANGELA_LV12,     2, +0
 	ai_energy PINSIR_LV24,      4, +0
 	ai_energy CHARMANDER_LV12,  2, +0
 	ai_energy CHARMELEON,       5, +0
-	ai_energy DARK_CHARMELEON,  5, +0
+	ai_energy DARK_CHARMELEON,  1, +0
 	ai_energy MAGMAR_LV18,      2, +0
 	ai_energy MOLTRES_LV37,     4, +0
 	dw NULL ; end
@@ -1972,7 +1972,7 @@ AIActionTable_GrandFireDeck:
 	ai_energy RAPIDASH_LV33,  3, +1
 	ai_energy VULPIX_LV11,    2, +2
 	ai_energy VULPIX_LV13,    2, +2
-	ai_energy NINETALES_LV35, 3, +1
+	ai_energy NINETALES_LV35, 2, +1
 	ai_energy MAGMAR_LV31,    1, +2
 	dw NULL ; end
 
@@ -2056,7 +2056,7 @@ AIActionTable_LegendaryFossilDeck:
 	ai_energy ELECTRODE_LV35,  2, +0
 	ai_energy ELECTABUZZ_LV35, 2, +0
 	ai_energy ZAPDOS_LV28,     4, -1
-	ai_energy ZAPDOS_LV68,     3, -1
+	ai_energy ZAPDOS_LV68,     4, -1
 	ai_energy AERODACTYL_LV28, 3, +0
 	dw NULL ; end
 
@@ -2148,7 +2148,7 @@ AIActionTable_WaterLegendDeck:
 	ai_energy ARTICUNO_LV34, 4, +1
 	ai_energy ARTICUNO_LV37, 0, -8
 	ai_energy JYNX_LV18,     2, +0
-	ai_energy CHANSEY_LV40,  3, -2
+	ai_energy CHANSEY_LV40,  2, -2
 	dw NULL ; end
 
 .list_prize
@@ -2238,11 +2238,11 @@ AIActionTable_GreatDragonDeck:
 	ai_energy CHARMELEON,         4, +1
 	ai_energy CHARIZARD_LV76,     6, +1
 	ai_energy CHARIZARD_ALT_LV76, 6, +1
-	ai_energy DRATINI_LV10,       2, +0
-	ai_energy DRATINI_LV12,       2, +0
-	ai_energy DRAGONAIR,          4, +1
-	ai_energy DARK_DRAGONAIR,     3, -1
-	ai_energy DRAGONITE_LV41,     3, +0
+	ai_energy DRATINI_LV10,       1, +0
+	ai_energy DRATINI_LV12,       1, +0
+	ai_energy DRAGONAIR,          3, +1
+	ai_energy DARK_DRAGONAIR,     2, -1
+	ai_energy DRAGONITE_LV41,     2, +0
 	ai_energy KANGASKHAN_LV40,    4, -8
 	ai_energy SCYTHER_LV25,       3, +0
 	dw NULL ; end
@@ -2325,11 +2325,11 @@ AIActionTable_MadPetalsDeck:
 	dw NULL ; end
 
 .list_energy
-	ai_energy ODDISH_LV21,     2, +1
-	ai_energy GLOOM,           2, +1
-	ai_energy DARK_GLOOM,      2, +1
+	ai_energy ODDISH_LV21,     1, +1
+	ai_energy GLOOM,           1, +1
+	ai_energy DARK_GLOOM,      1, +1
 	ai_energy VILEPLUME,       3, +1
-	ai_energy DARK_VILEPLUME,  3, +1
+	ai_energy DARK_VILEPLUME,  1, +1
 	ai_energy SCYTHER_LV25,    3, +0
 	ai_energy SQUIRTLE_LV16,   2, +0
 	ai_energy WARTORTLE_LV22,  3, +0
@@ -2641,9 +2641,9 @@ AIActionTable_GazeUponThePowerOfFireDeck:
 
 .list_energy
 	ai_energy CHARMANDER_LV9,  1, +0
-	ai_energy DARK_CHARMELEON, 3, +1
+	ai_energy DARK_CHARMELEON, 1, +1
 	ai_energy VULPIX_LV11,     2, +0
-	ai_energy DARK_NINETALES,  3, +1
+	ai_energy DARK_NINETALES,  2, +1
 	ai_energy PONYTA_LV8,      1, +0
 	ai_energy RAPIDASH_LV33,   3, +1
 	ai_energy MAGMAR_LV31,     2, +0
@@ -2725,8 +2725,8 @@ AIActionTable_WaterStreamDeck:
 .list_energy
 	ai_energy GOLDEEN,       1, +0
 	ai_energy SEAKING,       2, +0
-	ai_energy STARYU_LV15,   1, +0
-	ai_energy DARK_STARMIE,  2, +0
+	ai_energy STARYU_LV15,   2, +0
+	ai_energy DARK_STARMIE,  1, +0
 	ai_energy LAPRAS_LV31,   3, +0
 	ai_energy ARTICUNO_LV34, 4, +0
 	dw NULL ; end
@@ -2890,11 +2890,11 @@ AIActionTable_SpiritedAwayDeck:
 	dw NULL ; end
 
 .list_energy
-	ai_energy GASTLY_LV17,     2, +0
+	ai_energy GASTLY_LV17,     1, +0
 	ai_energy DARK_HAUNTER,    2, +0
 	ai_energy DARK_GENGAR,     3, +0
 	ai_energy SLOWPOKE_LV16,   1, +3
-	ai_energy MR_MIME_LV28,    2, +0
+	ai_energy MR_MIME_LV28,    1, +0
 	ai_energy KANGASKHAN_LV40, 4, -5
 	dw NULL ; end
 
@@ -2972,8 +2972,8 @@ AIActionTable_SnorlaxGuardDeck:
 	dw NULL ; end
 
 .list_energy
-	ai_energy LICKITUNG_LV26,  2, +0
-	ai_energy CHANSEY_LV55,    4, +0
+	ai_energy LICKITUNG_LV26,  1, +0
+	ai_energy CHANSEY_LV55,    3, +0
 	ai_energy KANGASKHAN_LV40, 4, +0
 	ai_energy SNORLAX_LV35,    4, +1
 	dw NULL ; end
@@ -3058,9 +3058,9 @@ AIActionTable_EyeOfTheStormDeck:
 .list_energy
 	ai_energy PIDGEY_LV10,             2, +0
 	ai_energy PIDGEOTTO_LV38,          3, +0
-	ai_energy PIDGEOT_LV40,            4, +1
+	ai_energy PIDGEOT_LV40,            3, +1
 	ai_energy SPEAROW_LV13,            3, +0
-	ai_energy FEAROW_LV27,             4, +1
+	ai_energy FEAROW_LV27,             3, +1
 	ai_energy TAUROS_LV35,             2, +0
 	ai_energy FLYING_PIKACHU_LV12,     3, +0
 	ai_energy FLYING_PIKACHU_ALT_LV12, 3, +0
@@ -3150,9 +3150,9 @@ AIActionTable_SuddenGrowthDeck:
 	ai_energy CLEFAIRY_LV15,   3, +1
 	ai_energy DARK_CLEFABLE,   4, +0
 	ai_energy JIGGLYPUFF_LV13, 1, +0
-	ai_energy DRATINI_LV12,    3, +1
-	ai_energy DARK_DRAGONAIR,  4, +0
-	ai_energy DARK_DRAGONITE,  5, +0
+	ai_energy DRATINI_LV12,    1, +1
+	ai_energy DARK_DRAGONAIR,  2, +0
+	ai_energy DARK_DRAGONITE,  4, +0
 	dw NULL ; end
 
 .list_prize
@@ -3218,7 +3218,7 @@ AIActionTable_VeryRareCardDeck:
 	ai_energy MEOWTH_LV14,              1, +0
 	ai_energy DARK_PERSIAN_ALT_LV28,    2, +0
 	ai_energy FARFETCHD_ALT_LV20,       3, +0
-	ai_energy KANGASKHAN_LV38,          3, +0
+	ai_energy KANGASKHAN_LV38,          4, +0
 	ai_energy COOL_PORYGON,             3, +0
 	dw NULL ; end
 
@@ -3301,13 +3301,13 @@ AIActionTable_BadGuysDeck:
 
 .list_energy
 	ai_energy ODDISH_LV21,     1, +1
-	ai_energy DARK_GLOOM,      2, -1
+	ai_energy DARK_GLOOM,      1, -1
 	ai_energy CHARMANDER_LV9,  1, +1
-	ai_energy DARK_CHARMELEON, 3, +0
+	ai_energy DARK_CHARMELEON, 1, +0
 	ai_energy PSYDUCK_LV16,    1, +1
 	ai_energy DARK_GOLDUCK,    3, +1
 	ai_energy SLOWPOKE_LV16,   1, +0
-	ai_energy DARK_SLOWBRO,    2, -1
+	ai_energy DARK_SLOWBRO,    3, -1
 	dw NULL ; end
 
 .list_prize
@@ -3388,9 +3388,9 @@ AIActionTable_PoisonMistDeck:
 
 .list_energy
 	ai_energy SCYTHER_LV25, 3, +0
-	ai_energy GRIMER_LV10,  2, +0
+	ai_energy GRIMER_LV10,  1, +0
 	ai_energy DARK_MUK,     2, +0
-	ai_energy KOFFING_LV14, 2, +0
+	ai_energy KOFFING_LV14, 1, +0
 	ai_energy WEEZING_LV26, 3, -1
 	ai_energy MR_MIME_LV20, 2, +0
 	dw NULL ; end
@@ -3548,9 +3548,9 @@ AIActionTable_PsychicBattleDeck:
 	dw NULL ; end
 
 .list_energy
-	ai_energy MR_MIME_LV28,    2, +0
-	ai_energy MEWTWO_LV53,     2, +0
-	ai_energy SANDSHREW_LV12,  1, +0
+	ai_energy MR_MIME_LV28,    1, +0
+	ai_energy MEWTWO_LV53,     3, +0
+	ai_energy SANDSHREW_LV12,  2, +0
 	ai_energy SANDSLASH_LV33,  4, +0
 	ai_energy HITMONCHAN_LV33, 3, +0
 	dw NULL ; end
@@ -3639,8 +3639,8 @@ AIActionTable_StopLifeDeck:
 	ai_energy BULBASAUR_LV12,  2,  +0
 	ai_energy DARK_IVYSAUR,    2,  +0
 	ai_energy DARK_VENUSAUR,   3,  +0
-	ai_energy DRATINI_LV10,    2,  +0
-	ai_energy DARK_DRAGONAIR,  3,  -3
+	ai_energy DRATINI_LV10,    1,  +0
+	ai_energy DARK_DRAGONAIR,  2,  -3
 	ai_energy SCYTHER_LV25,    3,  +0
 	ai_energy KANGASKHAN_LV40, 4,  -5
 	ai_energy MR_MIME_LV20,    0, -28
@@ -3726,8 +3726,8 @@ AIActionTable_ScorcherDeck:
 
 .list_energy
 	ai_energy CHARMANDER_LV9,  1,  +1
-	ai_energy DARK_CHARMELEON, 3,  +1
-	ai_energy DARK_CHARIZARD,  5,  +2
+	ai_energy DARK_CHARMELEON, 1,  +1
+	ai_energy DARK_CHARIZARD,  4,  +2
 	ai_energy CLEFAIRY_LV15,   2,  -2
 	ai_energy DARK_CLEFABLE,   3,  -2
 	ai_energy MAGMAR_LV31,     2,  +0
@@ -3905,13 +3905,13 @@ AIActionTable_SmashToMincemeatDeck:
 	dw NULL ; end
 
 .list_energy
-	ai_energy MACHOP_LV20,     2,  +1
-	ai_energy DARK_MACHOKE,    3,  +1
-	ai_energy DARK_MACHAMP,    4,  +2
+	ai_energy MACHOP_LV20,     1,  +1
+	ai_energy DARK_MACHOKE,    2,  +1
+	ai_energy DARK_MACHAMP,    3,  +2
 	ai_energy CLEFAIRY_LV15,   2,  -2
 	ai_energy DARK_CLEFABLE,   3,  -2
 	ai_energy KANGASKHAN_LV40, 4,  -5
-	ai_energy CHANSEY_LV55,    4,  -4
+	ai_energy CHANSEY_LV55,    3,  -4
 	ai_energy MR_MIME_LV20,    0, -28
 	dw NULL ; end
 
@@ -3994,13 +3994,13 @@ AIActionTable_TextureTuner7Deck:
 	dw NULL ; end
 
 .list_energy
-	ai_energy ZUBAT_LV12,    2, +0
-	ai_energy GOLBAT_LV29,   3, +0
+	ai_energy ZUBAT_LV12,    1, +0
+	ai_energy GOLBAT_LV29,   2, +0
 	ai_energy VENONAT_LV12,  2, +0
-	ai_energy VENOMOTH_LV22, 3, +0
+	ai_energy VENOMOTH_LV22, 4, +0
 	ai_energy SCYTHER_LV25,  3, +0
-	ai_energy PORYGON_LV12,  2, +0
-	ai_energy PORYGON_LV18,  2, +0
+	ai_energy PORYGON_LV12,  1, +0
+	ai_energy PORYGON_LV18,  3, +0
 	ai_energy COOL_PORYGON,  3, +0
 	dw NULL ; end
 
@@ -4085,16 +4085,16 @@ AIActionTable_ColorlessEnergyDeck:
 
 .list_energy
 	ai_energy FLAREON_LV22,   3, +0
-	ai_energy DARK_VAPOREON,  4, +0
+	ai_energy DARK_VAPOREON,  3, +0
 	ai_energy JOLTEON_LV24,   4, +0
 	ai_energy SPEAROW_LV9,    2, +0
 	ai_energy SPEAROW_LV12,   1, +0
-	ai_energy SPEAROW_LV13,   3, +0
+	ai_energy SPEAROW_LV13,   1, +0
 	ai_energy FEAROW_LV24,    3, +0
-	ai_energy FEAROW_LV27,    4, +0
+	ai_energy FEAROW_LV27,    3, +0
 	ai_energy EEVEE_LV12,     2, +0
-	ai_energy DRATINI_LV10,   2, +0
-	ai_energy DRAGONAIR,      4, +0
+	ai_energy DRATINI_LV10,   1, +0
+	ai_energy DRAGONAIR,      3, +0
 	ai_energy DRAGONITE_LV43, 3, +0
 	ai_energy DRAGONITE_LV45, 4, +0
 	dw NULL ; end
@@ -4258,14 +4258,14 @@ AIActionTable_RonaldsPsychicDeck:
 	dw NULL ; end
 
 .list_energy
-	ai_energy GASTLY_LV13,     2, +0
-	ai_energy HAUNTER_LV26,    2, +0
-	ai_energy GENGAR_LV40,     3, +0
-	ai_energy MEWTWO_LV67,     3, +0
+	ai_energy GASTLY_LV13,     1, +0
+	ai_energy HAUNTER_LV26,    1, +0
+	ai_energy GENGAR_LV40,     2, +0
+	ai_energy MEWTWO_LV67,     4, +0
 	ai_energy MEW_LV23,        2, +0
-	ai_energy KANGASKHAN_LV40, 4, +0
-	ai_energy DRATINI_LV10,    2, +0
-	ai_energy DARK_DRAGONAIR,  3, +0
+	ai_energy KANGASKHAN_LV40, 4, -1
+	ai_energy DRATINI_LV10,    1, +0
+	ai_energy DARK_DRAGONAIR,  2, +0
 	ai_energy DARK_DRAGONITE,  4, +0
 	dw NULL ; end
 
@@ -4342,8 +4342,8 @@ AIActionTable_RonaldsUltraDeck:
 	dw NULL ; end
 
 .list_energy
-	ai_energy PIDGEY_LV10,    2, +0
-	ai_energy PIDGEOTTO_LV38, 2, +0
+	ai_energy PIDGEY_LV10,    3, +0
+	ai_energy PIDGEOTTO_LV38, 3, +0
 	ai_energy PIDGEOT_LV40,   3, +1
 	ai_energy SPEAROW_LV13,   3, +0
 	ai_energy FEAROW_LV27,    4, +0
@@ -4522,14 +4522,14 @@ AIActionTable_ImmortalPokemonDeck:
 	dw NULL ; end
 
 .list_energy
-	ai_energy ABRA_LV14,     1,  +1
+	ai_energy ABRA_LV14,     2,  +1
 	ai_energy KADABRA_LV39,  3,  +1
 	ai_energy ALAKAZAM_LV42, 3,  +0
-	ai_energy MR_MIME_LV28,  2,  +1
+	ai_energy MR_MIME_LV28,  1,  +1
 	ai_energy MR_MIME_LV20,  2,  -8
 	ai_energy TENTACOOL,     0, -28
 	ai_energy SCYTHER_LV25,  3,  -8
-	ai_energy CHANSEY_LV55,  4,  +0
+	ai_energy CHANSEY_LV55,  3,  +0
 	dw NULL ; end
 
 .list_prize
@@ -4612,11 +4612,11 @@ AIActionTable_TorrentialFloodDeck:
 	dw NULL ; end
 
 .list_energy
-	ai_energy SQUIRTLE_LV14,  2, +0
-	ai_energy WARTORTLE_LV24, 2, +0
+	ai_energy SQUIRTLE_LV14,  3, +0
+	ai_energy WARTORTLE_LV24, 3, +0
 	ai_energy BLASTOISE_LV52, 5, +0
 	ai_energy ARTICUNO_LV35,  4, +0
-	ai_energy ARTICUNO_LV37,  3, +0
+	ai_energy ARTICUNO_LV37,  4, +0
 	ai_energy LAPRAS_LV31,    3, +0
 	dw NULL ; end
 
@@ -4697,8 +4697,8 @@ AIActionTable_TrainerImprisonDeck:
 	dw NULL ; end
 
 .list_energy
-	ai_energy GASTLY_LV13,    2,  +0
-	ai_energy HAUNTER_LV26,   3,  +0
+	ai_energy GASTLY_LV13,    1,  +0
+	ai_energy HAUNTER_LV26,   1,  +0
 	ai_energy HAUNTER_LV25,   3,  +0
 	ai_energy MR_MIME_LV20,   0,  -8
 	ai_energy ODDISH_LV21,    0, -28
@@ -4868,7 +4868,7 @@ AIActionTable_DamageChaosDeck:
 	ai_energy EXEGGCUTE,      3, +0
 	ai_energy EXEGGUTOR,     12, +0
 	ai_energy GASTLY_LV13,    2, +0
-	ai_energy GASTLY_LV17,    2, +0
+	ai_energy GASTLY_LV17,    1, +0
 	ai_energy DARK_HAUNTER,   3, +0
 	ai_energy DARK_GENGAR,    3, -1
 	ai_energy JYNX_LV27,      2, +0
@@ -4954,7 +4954,7 @@ AIActionTable_BigThunderDeck:
 .list_energy
 	ai_energy ZAPDOS_LV68,  4, +10
 	ai_energy DITTO,        4,  +3
-	ai_energy CHANSEY_LV55, 4,  +3
+	ai_energy CHANSEY_LV55, 3,  +3
 	dw NULL ; end
 
 .list_prize
@@ -5035,12 +5035,12 @@ AIActionTable_PowerOfDarknessDeck:
 .list_energy
 	ai_energy PSYDUCK_LV16,    2, +0
 	ai_energy DARK_GOLDUCK,    4, +0
-	ai_energy GRS_MEWTWO,      2, -8
+	ai_energy GRS_MEWTWO,      1, -8
 	ai_energy CLEFAIRY_LV15,   2, +0
 	ai_energy DARK_CLEFABLE,   3, +0
 	ai_energy KANGASKHAN_LV40, 4, -5
-	ai_energy DRATINI_LV12,    2, +0
-	ai_energy DARK_DRAGONAIR,  3, +0
+	ai_energy DRATINI_LV12,    1, +0
+	ai_energy DARK_DRAGONAIR,  2, +0
 	dw NULL ; end
 
 .list_prize

@@ -63,20 +63,6 @@ MachokeLv24Card:
 	tx MachopName ; pre-evo name
 
 	; attack 1
-	energy FIGHTING, 2 ; energies
-	tx WickedJabName ; name
-	tx MayInflictParalysisAltDescription ; description
-	dw NONE ; description (cont)
-	db 20 ; damage
-	db DAMAGE_NORMAL ; category
-	dw MachokeWickedJabEffectCommands ; effect commands
-	db INFLICT_PARALYSIS ; flags 1
-	db NONE ; flags 2
-	db NONE ; flags 3
-	db 0 ; ?
-	db ATK_ANIM_HIT_EFFECT ; animation
-
-	; attack 2
 	energy COLORLESS, 2 ; energies
 	tx FocusBlastName ; name
 	tx FocusBlastDescription ; description
@@ -89,6 +75,20 @@ MachokeLv24Card:
 	db FLAG_3_BIT_2 ; flags 3
 	db 0 ; ?
 	db ATK_ANIM_FOCUS_BLAST ; animation
+
+	; attack 2
+	energy FIGHTING, 2 ; energies
+	tx WickedJabName ; name
+	tx MayInflictParalysisAltDescription ; description
+	dw NONE ; description (cont)
+	db 20 ; damage
+	db DAMAGE_NORMAL ; category
+	dw MachokeWickedJabEffectCommands ; effect commands
+	db INFLICT_PARALYSIS ; flags 1
+	db NONE ; flags 2
+	db NONE ; flags 3
+	db 0 ; ?
+	db ATK_ANIM_HIT_EFFECT ; animation
 
 	db 2 ; retreat cost
 	db WR_PSYCHIC ; weakness
@@ -1052,20 +1052,6 @@ MarowakLv32Card:
 
 	; attack 1
 	energy FIGHTING, 1 ; energies
-	tx BoneAttackName ; name
-	tx BoneAttackDescription ; description
-	dw NONE ; description (cont)
-	db 10 ; damage
-	db DAMAGE_NORMAL ; category
-	dw MarowakBoneAttackEffectCommands ; effect commands
-	db NONE ; flags 1
-	db NULLIFY_OR_WEAKEN_ATTACK ; flags 2
-	db NONE ; flags 3
-	db 0 ; ?
-	db ATK_ANIM_BONEMERANG ; animation
-
-	; attack 2
-	energy FIGHTING, 1 ; energies
 	tx WailName ; name
 	tx WailDescription ; description
 	dw NONE ; description (cont)
@@ -1077,6 +1063,20 @@ MarowakLv32Card:
 	db SPECIAL_AI_HANDLING | FLAG_3_BIT_2 ; flags 3
 	db 0 ; ?
 	db ATK_ANIM_CRY ; animation
+
+	; attack 2
+	energy FIGHTING, 1 ; energies
+	tx BoneAttackName ; name
+	tx BoneAttackDescription ; description
+	dw NONE ; description (cont)
+	db 20 ; damage
+	db DAMAGE_NORMAL ; category
+	dw MarowakBoneAttackEffectCommands ; effect commands
+	db NONE ; flags 1
+	db NULLIFY_OR_WEAKEN_ATTACK ; flags 2
+	db NONE ; flags 3
+	db 0 ; ?
+	db ATK_ANIM_BONEMERANG ; animation
 
 	db 2 ; retreat cost
 	db WR_GRASS ; weakness
@@ -1587,11 +1587,11 @@ KabutoLv22Card:
 	; attack 2
 	energy COLORLESS, 2 ; energies
 	tx SharpClawsName ; name
-	tx SharpClawsDescription ; description
+	tx IfHeadsDo30DamageMoreDescription ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_PLUS ; category
-	dw KabutoSharpClawsEffectCommands ; effect commands
+	dw IfHeadsDo10Plus30DamageEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
@@ -4537,11 +4537,11 @@ RattataLv15Card:
 	; attack 1
 	energy COLORLESS, 1 ; energies
 	tx QuickAttackName ; name
-	tx IfHeadsDo10DamageDescription ; description
+	tx IfHeadsDo10Plus10DamageDescription ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_PLUS ; category
-	dw RattataQuickAttackEffectCommands ; effect commands
+	dw IfHeadsDo10Plus10DamageEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
@@ -5889,11 +5889,11 @@ FarfetchdLv20Card:
 	; attack 1
 	energy COLORLESS, 1 ; energies
 	tx LeekSlapName ; name
-	tx IfTailsDoNothingDescription ; description
+	tx LeekSlapDescription ; description
 	dw NONE ; description (cont)
 	db 30 ; damage
 	db DAMAGE_NORMAL ; category
-	dw NidoranMHornHazardEffectCommands ; effect commands
+	dw FarfetchdLeekSlapEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
@@ -5941,11 +5941,11 @@ FarfetchdAltLv20Card:
 	; attack 1
 	energy COLORLESS, 1 ; energies
 	tx LeekSlapName ; name
-	tx IfTailsDoNothingDescription ; description
+	tx LeekSlapDescription ; description
 	dw NONE ; description (cont)
 	db 30 ; damage
 	db DAMAGE_NORMAL ; category
-	dw NidoranMHornHazardEffectCommands ; effect commands
+	dw FarfetchdLeekSlapEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
@@ -6839,18 +6839,18 @@ EeveeLv12Card:
 	; attack 2
 	energy COLORLESS, 2 ; energies
 	tx QuickAttackName ; name
-	tx QuickAttackDescription ; description
+	tx IfHeadsDo10DamageDescription ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_PLUS ; category
-	dw EeveeQuickAttackEffectCommands ; effect commands
+	dw IfHeadsDo10Plus10DamageEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
 	db 0 ; ?
 	db ATK_ANIM_QUICK_ATTACK ; animation
 
-	db 1 ; retreat cost
+	db 2 ; retreat cost
 	db WR_FIGHTING ; weakness
 	db WR_PSYCHIC ; resistance
 	tx EvolutionName ; category

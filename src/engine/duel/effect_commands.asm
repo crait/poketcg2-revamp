@@ -2555,10 +2555,10 @@ Do10DamageTimes4FlipsEffectCommands:
 	dbw EFFECTCMDTYPE_AI, Do10DamageTimes4Flips_AIEffect
 	db $00
 
-PinsirSlicingThrowEffectCommands:
+IfHeadsDo10Plus10DamageEffectCommands:
 	db BANK("Effect Functions 2")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, SlicingThrow_DamageBoostEffect
-	dbw EFFECTCMDTYPE_AI, SlicingThrow_AIEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, IfHeadsDo10Plus10DamageEffect
+	dbw EFFECTCMDTYPE_AI, IfHeadsDo10Plus10Damage_AIEffect
 	db $00
 
 EeveeLungeEffectCommands:
@@ -2659,10 +2659,10 @@ SpearowFuryAttackEffectCommands:
 	dbw EFFECTCMDTYPE_AI, SpearowFuryAttack_AIEffect
 	db $00
 
-FearowQuickAttackEffectCommands:
+IfHeadsDo10Plus20DamageEffectCommands:
 	db BANK("Effect Functions 2")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, FearowQuickAttack_DamageBoostEffect
-	dbw EFFECTCMDTYPE_AI, FearowQuickAttack_AIEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, IfHeadsDo10Plus20DamageEffect
+	dbw EFFECTCMDTYPE_AI, IfHeadsDo10Plus20Damage_AIEffect
 	db $00
 
 FearowDrillDescentEffectCommands:
@@ -2864,10 +2864,10 @@ KabutoFossilizeEffectCommands:
 	dbw EFFECTCMDTYPE_REQUIRE_SELECTION, Fossilize_PlayerSelectEffect
 	db $00
 
-KabutoSharpClawsEffectCommands:
+IfHeadsDo10Plus30DamageEffectCommands:
 	db BANK("Effect Functions 2")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, SharpClaws_DamageBoostEffect
-	dbw EFFECTCMDTYPE_AI, SharpClaws_AIEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, IfHeadsDo10Plus30DamageEffect
+	dbw EFFECTCMDTYPE_AI, IfHeadsDo10Plus30Damage_AIEffect
 	db $00
 
 AerodactylSupersonicEffectCommands:

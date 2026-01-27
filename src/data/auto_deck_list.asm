@@ -10,7 +10,7 @@ MachineStarterDeckList:
 	dbw  2, CHARMELEON
 	dbw  2, GROWLITHE_LV12
 	dbw  2, PONYTA_LV10
-	dbw  2, DIGLETT_LV8
+	dbw  2, DIGLETT_LV16
 	dbw  2, MACHOP_LV20
 	dbw  3, GEODUDE_LV16
 	dbw  1, RATTATA_LV9
