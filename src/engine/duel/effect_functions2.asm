@@ -2201,13 +2201,13 @@ CorkscrewPunchEffect:
 	farcall CheckIfHasSubstatusThatPreventsUsingAttack
 	ret
 
-SteadyPunch_AIEffect:
+IfHeadsDo30Plus20Damage_AIEffect:
 	ld a, (30 + 50) / 2
 	lb de, 30, 50
 	farcall SetExpectedAIDamage
 	ret
 
-SteadyPunch_DamageBoostEffect:
+IfHeadsDo30Plus20DamageEffect:
 	ld a, 20
 	farcall AddDamageIfHeads
 	ret

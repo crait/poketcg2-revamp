@@ -131,11 +131,11 @@ MachokeLv28Card:
 	; attack 2
 	energy FIGHTING, 1, COLORLESS, 2 ; energies
 	tx SteadyPunchName ; name
-	tx QuickAttackAltDescription1 ; description
+	tx IfHeadsDo20MoreDamageDescription ; description
 	dw NONE ; description (cont)
 	db 30 ; damage
 	db DAMAGE_PLUS ; category
-	dw MachokeSteadyPunchEffectCommands ; effect commands
+	dw IfHeadsDo30Plus20DamageEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
@@ -1431,11 +1431,11 @@ RhydonLv37Card:
 	; attack 2
 	energy FIGHTING, 2 ; energies
 	tx OneTwoStrikeName ; name
-	tx QuickAttackAltDescription1 ; description
+	tx IfHeadsDo20MoreDamageDescription ; description
 	dw NONE ; description (cont)
 	db 30 ; damage
 	db DAMAGE_PLUS ; category
-	dw RhydonOneTwoStrikeEffectCommands ; effect commands
+	dw IfHeadsDo30Plus20DamageEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
@@ -1587,7 +1587,7 @@ KabutoLv22Card:
 	; attack 2
 	energy COLORLESS, 2 ; energies
 	tx SharpClawsName ; name
-	tx IfHeadsDo30DamageMoreDescription ; description
+	tx IfHeadsDo30MoreDamageDescription ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_PLUS ; category
@@ -4187,11 +4187,11 @@ PidgeyLv10Card:
 	; attack 2
 	energy COLORLESS, 3 ; energies
 	tx QuickAttackName ; name
-	tx QuickAttackAltDescription1 ; description
+	tx IfHeadsDo20MoreDamageDescription ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_PLUS ; category
-	dw PidgeyQuickAttackEffectCommands ; effect commands
+	dw IfHeadsDo10Plus20DamageEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
@@ -4537,7 +4537,7 @@ RattataLv15Card:
 	; attack 1
 	energy COLORLESS, 1 ; energies
 	tx QuickAttackName ; name
-	tx IfHeadsDo10Plus10DamageDescription ; description
+	tx IfHeadsDo10MoreDamageDescription ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_PLUS ; category
@@ -4849,11 +4849,11 @@ FearowLv24Card:
 	; attack 1
 	energy COLORLESS, 1 ; energies
 	tx QuickAttackName ; name
-	tx QuickAttackAltDescription1 ; description
+	tx IfHeadsDo20MoreDamageDescription ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_PLUS ; category
-	dw FearowQuickAttackEffectCommands ; effect commands
+	dw IfHeadsDo10Plus20DamageEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
@@ -6215,11 +6215,11 @@ LickitungLv20Card:
 	; attack 2
 	energy COLORLESS, 2 ; energies
 	tx StompName ; name
-	tx IfHeadsDo10DamageDescription ; description
+	tx IfHeadsDo10MoreDamageDescription ; description
 	dw NONE ; description (cont)
 	db 20 ; damage
 	db DAMAGE_PLUS ; category
-	dw LickitungStompEffectCommands ; effect commands
+	dw IfHeadsDo10Plus20DamageEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
@@ -6839,7 +6839,7 @@ EeveeLv12Card:
 	; attack 2
 	energy COLORLESS, 2 ; energies
 	tx QuickAttackName ; name
-	tx IfHeadsDo10DamageDescription ; description
+	tx IfHeadsDo10MoreDamageDescription ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_PLUS ; category
@@ -7411,11 +7411,11 @@ DarkDragonairCard:
 	; attack 2
 	energy COLORLESS, 3 ; energies
 	tx TailStrikeName ; name
-	tx QuickAttackAltDescription1 ; description
+	tx IfHeadsDo20MoreDamageDescription ; description
 	dw NONE ; description (cont)
 	db 20 ; damage
 	db DAMAGE_PLUS ; category
-	dw DarkDragonairTailStrikeEffectCommands ; effect commands
+	dw IfHeadsDo20Plus20DamageEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3

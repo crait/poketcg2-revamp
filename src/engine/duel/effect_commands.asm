@@ -2191,10 +2191,10 @@ DarkDragonairEvolutionaryLightEffectCommands:
 	dbw EFFECTCMDTYPE_REQUIRE_SELECTION, EvolutionaryLight_PlayerSelectEffect
 	db $00
 
-DarkDragonairTailStrikeEffectCommands:
+IfHeadsDo20Plus20DamageEffectCommands:
 	db BANK("Effect Functions 1")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, TailStrike_DamageBoostEffect
-	dbw EFFECTCMDTYPE_AI, TailStrike_AIEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, IfHeadsDo20Plus20DamageEffect
+	dbw EFFECTCMDTYPE_AI, IfHeadsDo20Plus20Damage_AIEffect
 	db $00
 
 DarkDragoniteSummonMinionsEffectCommands:
@@ -2720,10 +2720,10 @@ MachopCorkscrewPunchEffectCommands:
 	dbw EFFECTCMDTYPE_INITIAL_EFFECT_1, CorkscrewPunchEffect
 	db $00
 
-MachokeSteadyPunchEffectCommands:
+IfHeadsDo30Plus20DamageEffectCommands:
 	db BANK("Effect Functions 2")
-	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, SteadyPunch_DamageBoostEffect
-	dbw EFFECTCMDTYPE_AI, SteadyPunch_AIEffect
+	dbw EFFECTCMDTYPE_BEFORE_DAMAGE, IfHeadsDo30Plus20DamageEffect
+	dbw EFFECTCMDTYPE_AI, IfHeadsDo30Plus20Damage_AIEffect
 	db $00
 
 GravelerStoneBarrageEffectCommands:

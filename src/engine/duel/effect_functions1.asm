@@ -10460,13 +10460,13 @@ EvolutionaryLight_AddToHandEffect:
 	call ShuffleCardsInDeck
 	ret
 
-TailStrike_AIEffect:
+IfHeadsDo20Plus20Damage_AIEffect:
 	ld a, (20 + 40) / 2
 	lb de, 20, 40
 	call SetExpectedAIDamage
 	ret
 
-TailStrike_DamageBoostEffect:
+IfHeadsDo20Plus20DamageEffect:
 	ld a, 20
 	call AddDamageIfHeads
 	ret

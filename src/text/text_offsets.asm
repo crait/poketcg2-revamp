@@ -4955,7 +4955,7 @@ SECTION "Text Offsets 2", ROMX
 	textpointer KakunaLv23Description                                 ; 0x134f
 	textpointer BeedrillName                                          ; 0x1350
 	textpointer TwineedleName                                         ; 0x1351
-	textpointer Do30DamageTimes2FlipsDescription                    ; 0x1352
+	textpointer Do30DamageTimes2FlipsDescription                      ; 0x1352
 	textpointer PoisonBeeName                                         ; 0x1353
 	textpointer BeedrillDescription                                   ; 0x1354
 	textpointer EkansName                                             ; 0x1355
@@ -4987,14 +4987,14 @@ SECTION "Text Offsets 2", ROMX
 	textpointer TailWhipDescription                                   ; 0x136f
 	textpointer NidoranFLv12Description                               ; 0x1370
 	textpointer FurySwipesName                                        ; 0x1371
-	textpointer Do10DamageTimes3FlipsDescription                         ; 0x1372
+	textpointer Do10DamageTimes3FlipsDescription                      ; 0x1372
 	textpointer CallForFamilyName                                     ; 0x1373
 	textpointer CallForFamilyNidoranDescription                       ; 0x1374
 	textpointer NidoranFLv13Description                               ; 0x1375
 	textpointer NidorinaName                                          ; 0x1376
 	textpointer StrengthInNumbersName                                 ; 0x1377
 	textpointer StrengthInNumbersDescription                          ; 0x1378
-	textpointer Do30DamageTimes3FlipsDescription                         ; 0x1379
+	textpointer Do30DamageTimes3FlipsDescription                      ; 0x1379
 	textpointer NidorinaLv22Description                               ; 0x137a
 	textpointer SupersonicName                                        ; 0x137b
 	textpointer MayInflictConfusionAltDescription                     ; 0x137c
@@ -5201,7 +5201,7 @@ SECTION "Text Offsets 2", ROMX
 	textpointer ScytherLv25Description                                ; 0x1445
 	textpointer PinsirName                                            ; 0x1446
 	textpointer SlicingThrowName                                      ; 0x1447
-	textpointer IfHeadsDo10DamageDescription                          ; 0x1448
+	textpointer IfHeadsDo10MoreDamageDescription                      ; 0x1448
 	textpointer StagbeetleName                                        ; 0x1449
 	textpointer PinsirLv15Description                                 ; 0x144a
 	textpointer IrongripName                                          ; 0x144b
@@ -5274,7 +5274,7 @@ SECTION "Text Offsets 2", ROMX
 	textpointer GrowlitheLv18Description                              ; 0x148e
 	textpointer ArcanineName                                          ; 0x148f
 	textpointer QuickAttackName                                       ; 0x1490
-	textpointer QuickAttackDescription                                ; 0x1491
+	textpointer UnusedAttackDescription_1                             ; 0x1491
 	textpointer FlamesOfRageName                                      ; 0x1492
 	textpointer FlamesOfRageDescription                               ; 0x1493
 	textpointer LegendaryName                                         ; 0x1494
@@ -5520,7 +5520,7 @@ SECTION "Text Offsets 2", ROMX
 	textpointer MagikarpLv6Description                                ; 0x1584
 	textpointer MagikarpLv8Description                                ; 0x1585
 	textpointer TrickleName                                           ; 0x1586
-	textpointer Do10DamageTimes2FlipsDescription                       ; 0x1587
+	textpointer Do10DamageTimes2FlipsDescription                      ; 0x1587
 	textpointer DragonRageName                                        ; 0x1588
 	textpointer IfEitherTailsDoNothingDescription                     ; 0x1589
 	textpointer MagikarpLv10Description                               ; 0x158a
@@ -5611,7 +5611,7 @@ SECTION "Text Offsets 2", ROMX
 	textpointer ShortCircuitDescription                               ; 0x15df
 	textpointer SparkingKickName                                      ; 0x15e0
 	textpointer RaichuLv32Description                                 ; 0x15e1
-	textpointer QuickAttackAltDescription1                            ; 0x15e2
+	textpointer IfHeadsDo20MoreDamageDescription                      ; 0x15e2
 	textpointer ThunderboltAltDescription1                            ; 0x15e3
 	textpointer RaichuLv33Description                                 ; 0x15e4
 	textpointer ThunderName                                           ; 0x15e5
@@ -5681,12 +5681,12 @@ SECTION "Text Offsets 2", ROMX
 	textpointer ThunderpunchDescription                               ; 0x1625
 	textpointer ElectabuzzLv35Description                             ; 0x1626
 	textpointer JolteonName                                           ; 0x1627
-	textpointer Do20DamageTimes2FlipsDescription                    ; 0x1628
+	textpointer Do20DamageTimes2FlipsDescription                      ; 0x1628
 	textpointer StunNeedleName                                        ; 0x1629
 	textpointer JolteonLv24Description                                ; 0x162a
-	textpointer QuickAttackAltDescription2                            ; 0x162b
+	textpointer UnusedAttackDescription_2                             ; 0x162b
 	textpointer PinMissileName                                        ; 0x162c
-	textpointer Do20DamageTimes4FlipsDescription                                 ; 0x162d
+	textpointer Do20DamageTimes4FlipsDescription                      ; 0x162d
 	textpointer JolteonLv29Description                                ; 0x162e
 	textpointer DarkJolteonName                                       ; 0x162f
 	textpointer LightningFlashName                                    ; 0x1630
@@ -5900,7 +5900,7 @@ SECTION "Text Offsets 2", ROMX
 	textpointer FossilizeName                                         ; 0x1700
 	textpointer FossilizeDescription                                  ; 0x1701
 	textpointer SharpClawsName                                        ; 0x1702
-	textpointer IfHeadsDo10Plus30DamageDescription                    ; 0x1703
+	textpointer IfHeadsDo30MoreDamageDescription                      ; 0x1703
 	textpointer KabutoLv22Description                                 ; 0x1704
 	textpointer KabutopsName                                          ; 0x1705
 	textpointer SharpSickleName                                       ; 0x1706

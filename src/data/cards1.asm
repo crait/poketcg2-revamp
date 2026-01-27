@@ -4849,7 +4849,7 @@ ArcanineLv34Card:
 	; attack 1
 	energy COLORLESS, 2 ; energies
 	tx QuickAttackName ; name
-	tx IfHeadsDo10Plus20DamageDescription ; description
+	tx IfHeadsDo20MoreDamageDescription ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_PLUS ; category
@@ -5581,7 +5581,7 @@ FlareonLv28Card:
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_PLUS ; category
-	dw FlareonQuickAttackEffectCommands ; effect commands
+	dw IfHeadsDo10Plus20DamageEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
@@ -8597,7 +8597,7 @@ VaporeonLv42Card:
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_PLUS ; category
-	dw VaporeonQuickAttackEffectCommands ; effect commands
+	dw IfHeadsDo10Plus20DamageEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3
@@ -10687,7 +10687,7 @@ ElectabuzzLv20Card:
 	; attack 2
 	energy COLORLESS, 2 ; energies
 	tx QuickAttackName ; name
-	tx IfHeadsDo10Plus20DamageDescription ; description
+	tx IfHeadsDo20MoreDamageDescription ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_PLUS ; category
@@ -10881,11 +10881,11 @@ JolteonLv29Card:
 	; attack 1
 	energy LIGHTNING, 1 ; energies
 	tx QuickAttackName ; name
-	tx QuickAttackAltDescription2 ; description
+	tx IfHeadsDo20MoreDamageDescription ; description
 	dw NONE ; description (cont)
 	db 10 ; damage
 	db DAMAGE_PLUS ; category
-	dw JolteonQuickAttackEffectCommands ; effect commands
+	dw IfHeadsDo10Plus20DamageEffectCommands ; effect commands
 	db NONE ; flags 1
 	db NONE ; flags 2
 	db NONE ; flags 3

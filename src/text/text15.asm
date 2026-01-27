@@ -290,7 +290,7 @@ QuickAttackName:
 	textfw "でんこうせっか"
 	done
 
-IfHeadsDo20MoreDamageDescription:
+UnusedAttackDescription_1:
 	textfw "コインを投げて「おもて」なら、20ダ"
 	linefw "メージを追加する。"
 	done
@@ -1984,7 +1984,7 @@ RaichuLv32Description:
 	linefw "のだ。"
 	done
 
-QuickAttackAltDescription1:
+IfHeadsDo20MoreDamageDescription:
 	textfw "コインを投げて「おもて」なら、"
 	linefw "20ダメージを追加する。"
 	done
@@ -2367,7 +2367,7 @@ JolteonLv24Description:
 	linefw "相手を貫く。"
 	done
 
-QuickAttackAltDescription2:
+UnusedAttackDescription_2:
 	textfw "コインを投げて「おもて」なら、20ダ"
 	linefw "メージを追加する。"
 	linefw ""

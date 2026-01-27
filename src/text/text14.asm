@@ -2261,7 +2261,7 @@ SlicingThrowName:
 	textfw "はさんでなげる"
 	done
 
-IfHeadsDo10DamageDescription:
+IfHeadsDo10MoreDamageDescription:
 	textfw "コインを投げて「おもて」なら、"
 	linefw "10ダメージを追加する。"
 	done
